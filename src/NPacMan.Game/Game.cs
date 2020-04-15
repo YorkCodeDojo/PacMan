@@ -1,9 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace NPacMan.Game
 {
+    public class GameClock : IGameClock
+    {
+        private Action _action;
+        private Timer _timer;
+
+        public GameClock()
+        {
+            _timer = new System.Threading.Timer((state) => _action(), null, 0, 500);
+        }
+        public void Subscribe(Action action)
+        {
+            _action = action;
+        }
+    }
+    
     public class Game
     {
         public int Score { get; private set; }
@@ -15,7 +31,7 @@ namespace NPacMan.Game
         {
             gameClock.Subscribe(Tick);
             _board = board;
-            PacMan = new PacMan(10, 10, Direction.Down);
+            PacMan = new PacMan(0, 0, Direction.Down);
             _collectedCoins = new List<(int x, int y)>();
         }
 
@@ -23,6 +39,8 @@ namespace NPacMan.Game
         public PacMan PacMan { get; private set; }
         public IReadOnlyCollection<(int x, int y)> Coins
             => _board.Coins.Except(_collectedCoins).ToList().AsReadOnly();
+        public IReadOnlyCollection<(int x, int y)> Walls
+            => _board.Walls;
 
         public void ChangeDirection(Direction direction)
         {
@@ -51,19 +69,22 @@ namespace NPacMan.Game
         IReadOnlyCollection<(int x, int y)> Walls { get; }
         IReadOnlyCollection<(int x, int y)> Coins { get; }
     }
-    public class Board : IGameBoard
+    public class GameBoard : IGameBoard
     {
-        public Board()
+        public GameBoard()
         {
             Walls = new[]
             {
+                (1,1),
                 (1,2),
-                (1,2),
+                (1,3),
+                (1,4),
+                (0,4),
             };
 
             Coins = new[]
             {
-                (1,1)
+                (2,1)
             };
         }
 
