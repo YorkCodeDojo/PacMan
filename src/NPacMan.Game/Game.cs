@@ -6,17 +6,23 @@ namespace NPacMan.Game
 {
     public class Game
     {
+        public int Score { get; private set; }
+
         private IGameBoard _board;
+        private List<(int x, int y)> _collectedCoins;
 
         public Game(IGameClock gameClock, IGameBoard board)
         {
             gameClock.Subscribe(Tick);
             _board = board;
             PacMan = new PacMan(10, 10, Direction.Down);
+            _collectedCoins = new List<(int x, int y)>();
         }
 
 
         public PacMan PacMan { get; private set; }
+        public IReadOnlyCollection<(int x, int y)> Coins
+            => _board.Coins.Except(_collectedCoins).ToList().AsReadOnly();
 
         public void ChangeDirection(Direction direction)
         {
@@ -26,9 +32,16 @@ namespace NPacMan.Game
         private void Tick()
         {
             var newPacMan = PacMan.Move();
+
             if (!_board.Walls.Contains((newPacMan.X, newPacMan.Y)))
             {
                 PacMan = newPacMan;
+
+                if (_board.Coins.Contains((newPacMan.X, newPacMan.Y)))
+                {
+                    _collectedCoins.Add((newPacMan.X, newPacMan.Y));
+                    Score += 10;
+                }
             }
         }
     }
@@ -36,6 +49,7 @@ namespace NPacMan.Game
     public interface IGameBoard
     {
         IReadOnlyCollection<(int x, int y)> Walls { get; }
+        IReadOnlyCollection<(int x, int y)> Coins { get; }
     }
     public class Board : IGameBoard
     {
@@ -46,9 +60,15 @@ namespace NPacMan.Game
                 (1,2),
                 (1,2),
             };
+
+            Coins = new[]
+            {
+                (1,1)
+            };
         }
 
         public IReadOnlyCollection<(int x, int y)> Walls { get; }
+        public IReadOnlyCollection<(int x, int y)> Coins { get; }
     }
 
     public class PacMan
@@ -87,6 +107,12 @@ namespace NPacMan.Game
                 default:
                     throw new NotImplementedException();
             }
+        }
+
+        public void Deconstruct(out int x, out int y)
+        {
+            x = X;
+            y = Y;
         }
     }
 }
