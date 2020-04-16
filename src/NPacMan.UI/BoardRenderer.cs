@@ -24,7 +24,7 @@ namespace NPacMan.UI
 
         public void RenderCoins(Graphics g, int totalClientWidth, int totalClientHeight, NPacMan.Game.Game game)
         {
-            int NumberOfCellsWide = 27;
+            int NumberOfCellsWide = 28;
             var cellSize = totalClientWidth / NumberOfCellsWide;
 
             var coins = game.Coins;
