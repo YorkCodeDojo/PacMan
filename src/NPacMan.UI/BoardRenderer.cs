@@ -8,7 +8,7 @@ namespace NPacMan.UI
 
         public void RenderWalls(Graphics g, int totalClientWidth, int totalClientHeight, NPacMan.Game.Game game)
         {
-            int NumberOfCellsWide = 10;
+            int NumberOfCellsWide = 27;
             var cellSize = totalClientWidth / NumberOfCellsWide;
 
             var walls = game.Walls;
@@ -24,7 +24,7 @@ namespace NPacMan.UI
 
         public void RenderCoins(Graphics g, int totalClientWidth, int totalClientHeight, NPacMan.Game.Game game)
         {
-            int NumberOfCellsWide = 10;
+            int NumberOfCellsWide = 27;
             var cellSize = totalClientWidth / NumberOfCellsWide;
 
             var coins = game.Coins;
@@ -40,7 +40,7 @@ namespace NPacMan.UI
 
         public void RenderPacMan(Graphics g, int totalClientWidth, int totalClientHeight, NPacMan.Game.Game game)
         {
-            int NumberOfCellsWide = 10;
+            int NumberOfCellsWide = 27;
             var cellSize = totalClientWidth / NumberOfCellsWide;
 
             var x = game.PacMan.X * cellSize;
