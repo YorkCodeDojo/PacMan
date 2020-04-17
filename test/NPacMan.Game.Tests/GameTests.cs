@@ -24,6 +24,8 @@ namespace NPacMan.Game.Tests
 
         IReadOnlyDictionary<(int x, int y), (int x, int y)> IGameBoard.Portals
             => this.Portals;
+
+        public int Width { get; set; }
     }
 
     public class TestGameClock : IGameClock
@@ -227,6 +229,17 @@ namespace NPacMan.Game.Tests
             });
 
             _game.Score.Should().Be(score);
+        }
+
+
+        [Fact]
+        public void TheGameCanReadTheWidthFromTheBoard()
+        {
+            var gameBoardWidth = 100;
+            _gameBoard.Width = gameBoardWidth;
+
+            _game.Width.Should().Be(gameBoardWidth);
+
         }
     }
 }

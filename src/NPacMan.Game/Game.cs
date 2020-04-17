@@ -42,6 +42,9 @@ namespace NPacMan.Game
         public IReadOnlyCollection<(int x, int y)> Walls
             => _board.Walls;
 
+        public int Width
+            => _board.Width;
+
         public void ChangeDirection(Direction direction)
         {
             PacMan = new PacMan(PacMan.X, PacMan.Y, direction);
@@ -74,12 +77,15 @@ namespace NPacMan.Game
         IReadOnlyCollection<(int x, int y)> Walls { get; }
         IReadOnlyCollection<(int x, int y)> Coins { get; }
         IReadOnlyDictionary<(int x, int y), (int x, int y)> Portals { get; }
+        int Width { get; }
     }
 
     public class GameBoard : IGameBoard
     {
         public GameBoard()
         {
+            Width = 28;
+
             Portals = new Dictionary<(int x, int y), (int x, int y)>()
             {
                 [(-1, 14)] = (27, 14),
@@ -161,6 +167,7 @@ namespace NPacMan.Game
         public IReadOnlyCollection<(int x, int y)> Walls { get; }
         public IReadOnlyCollection<(int x, int y)> Coins { get; }
         public IReadOnlyDictionary<(int x, int y), (int x, int y)> Portals { get; }
+        public int Width { get; }
     }
 
     public class PacMan
