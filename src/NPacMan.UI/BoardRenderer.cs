@@ -1,10 +1,15 @@
 using System;
 using System.Drawing;
+using NPacMan.Game;
+
 namespace NPacMan.UI
 {
     public class BoardRenderer
     {
         private readonly Font _scoreFont = new Font("Segoe UI", 20F, FontStyle.Regular, GraphicsUnit.Point, ((byte)(0)));
+
+        private int mouthSize = 60;
+        private int mouthDirection = 1;
 
         public void RenderWalls(Graphics g, int totalClientWidth, int totalClientHeight, NPacMan.Game.Game game)
         {
@@ -34,7 +39,7 @@ namespace NPacMan.UI
                 var x = coin.x * cellSize;
                 var y = coin.y * cellSize;
 
-                g.FillEllipse(Brushes.Gold, x + (cellSize/2), y + (cellSize / 2), cellSize / 2, cellSize / 2);
+                g.FillEllipse(Brushes.Gold, x + (cellSize / 2), y + (cellSize / 2), cellSize / 2, cellSize / 2);
             }
         }
 
@@ -46,7 +51,34 @@ namespace NPacMan.UI
             var x = game.PacMan.X * cellSize;
             var y = game.PacMan.Y * cellSize;
 
-            g.FillEllipse(Brushes.Yellow, x, y, cellSize, cellSize);
+            var offset = 0;
+
+            switch  (game.PacMan.Direction)
+            {
+                case Direction.Up:
+                   offset = -90;
+                    break;
+                case Direction.Left:
+                    offset = -180;
+                    break;
+                case Direction.Down:
+                    offset = 90;
+                    break;
+            }
+
+            var halfSize = (mouthSize /2 );
+            g.FillPie(Brushes.Yellow, x, y, cellSize, cellSize, offset + halfSize, 360 - mouthSize);
+
+            mouthSize = (mouthSize + mouthDirection);
+            if (mouthSize >= 60)
+            {
+                mouthDirection = -5;
+            }
+            else if (mouthSize <= 0)
+            {
+                mouthDirection = +5;
+            }
+
         }
 
         public void RenderScore(Graphics g, int totalClientWidth, int totalClientHeight, NPacMan.Game.Game game)
