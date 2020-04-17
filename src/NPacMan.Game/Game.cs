@@ -51,6 +51,11 @@ namespace NPacMan.Game
         {
             var newPacMan = PacMan.Move();
 
+            if (_board.Portals.TryGetValue((newPacMan.X, newPacMan.Y), out var portal))
+            {
+                newPacMan = new PacMan(portal.x, portal.y, newPacMan.Direction);
+            }
+
             if (!_board.Walls.Contains((newPacMan.X, newPacMan.Y)))
             {
                 PacMan = newPacMan;
@@ -68,13 +73,23 @@ namespace NPacMan.Game
     {
         IReadOnlyCollection<(int x, int y)> Walls { get; }
         IReadOnlyCollection<(int x, int y)> Coins { get; }
+        IReadOnlyDictionary<(int x, int y), (int x, int y)> Portals { get; }
     }
+
     public class GameBoard : IGameBoard
     {
         public GameBoard()
         {
-              Walls = new[]
+            Portals = new Dictionary<(int x, int y), (int x, int y)>()
             {
+                [(-1, 14)] = (27, 14),
+                [(-1, 15)] = (27, 15),
+                [(28, 14)] = (0, 14),
+                [(28, 15)] = (0, 15),
+            };
+
+            Walls = new[]
+          {
                 (0,0),(1,0),(2,0),(3,0),(4,0),(5,0),(6,0),(7,0),(8,0),(9,0),(10,0),(11,0),(12,0),(13,0),(14,0),(15,0),(16,0),(17,0),(18,0),(19,0),(20,0),(21,0),(22,0),(23,0),(24,0),(25,0),(26,0),(27,0),
                 (0,1),(13,1),(14,1),(27,1),
                 (0,2),(2,2),(3,2),(4,2),(5,2),(7,2),(8,2),(9,2),(10,2),(11,2),(13,2),(14,2),(16,2),(17,2),(18,2),(19,2),(20,2),(22,2),(23,2),(24,2),(25,2),(27,2),
@@ -145,6 +160,7 @@ namespace NPacMan.Game
 
         public IReadOnlyCollection<(int x, int y)> Walls { get; }
         public IReadOnlyCollection<(int x, int y)> Coins { get; }
+        public IReadOnlyDictionary<(int x, int y), (int x, int y)> Portals { get; }
     }
 
     public class PacMan

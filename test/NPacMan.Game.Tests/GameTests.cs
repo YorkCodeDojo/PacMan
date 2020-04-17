@@ -18,6 +18,12 @@ namespace NPacMan.Game.Tests
 
         IReadOnlyCollection<(int x, int y)> IGameBoard.Coins
             => this.Coins;
+
+        public Dictionary<(int x, int y), (int x, int y)> Portals { get; set; }
+            = new Dictionary<(int x, int y), (int x, int y)>();
+
+        IReadOnlyDictionary<(int x, int y), (int x, int y)> IGameBoard.Portals
+            => this.Portals;
     }
 
     public class TestGameClock : IGameClock
@@ -198,6 +204,29 @@ namespace NPacMan.Game.Tests
                 (1, 2),
                 (2, 2)
             );
+        }
+
+        [Fact]
+        public void TeleportWhenYouWalkIntoAPortal()
+        {
+            var x = _game.PacMan.X;
+            var y = _game.PacMan.Y;
+            var score = _game.Score;
+
+            _gameBoard.Portals.Add((x - 1, y), (15, 15));
+
+            _game.ChangeDirection(Direction.Left);
+
+            _gameClock.Tick();
+
+            _game.PacMan.Should().BeEquivalentTo(new
+            {
+                X = 15,
+                Y = 15,
+                Direction = Direction.Left
+            });
+
+            _game.Score.Should().Be(score);
         }
     }
 }
