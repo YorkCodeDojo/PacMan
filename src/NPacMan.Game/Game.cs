@@ -9,7 +9,7 @@ namespace NPacMan.Game
         public int Score { get; private set; }
 
         private readonly IGameBoard _board;
-        private readonly List<(int x, int y)> _collectedCoins;
+        private List<(int x, int y)> _collectedCoins;
 
         public Game(IGameClock gameClock, IGameBoard board)
         {
@@ -91,7 +91,9 @@ P      .    X    X    .      P
 
                 if (_board.Coins.Contains((newPacMan.X, newPacMan.Y)))
                 {
-                    _collectedCoins.Add((newPacMan.X, newPacMan.Y));
+                    var newCollectedCoins = new List<(int,int)>(_collectedCoins);
+                    newCollectedCoins.Add((newPacMan.X, newPacMan.Y));
+                    _collectedCoins = newCollectedCoins;
                     Score += 10;
                 }
             }
