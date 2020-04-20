@@ -15,7 +15,7 @@ namespace NPacMan.UI
     {
         private readonly Timer _renderLoop = new Timer();
         private readonly BoardRenderer _boardRenderer = new BoardRenderer();
-        private readonly NPacMan.Game.Game _game = new NPacMan.Game.Game(new GameClock(), new GameBoard());
+        private readonly Game.Game _game = Game.Game.Create();
 
         public Form1()
         {

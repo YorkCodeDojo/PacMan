@@ -26,8 +26,10 @@ namespace NPacMan.UI
                 var y = wall.y * cellSize;
 
                 // Is there a space above us?
-                var wallAbove = walls.Contains((wall.x, wall.y - 1));
-                var wallBelow = walls.Contains((wall.x, wall.y + 1));
+                var wallAbove1 = walls.Contains((wall.x, wall.y - 1));
+                var wallAbove2 = walls.Contains((wall.x, wall.y - 2));
+                var wallBelow1 = walls.Contains((wall.x, wall.y + 1));
+                var wallBelow2 = walls.Contains((wall.x, wall.y + 2));
                 var wallLeft = walls.Contains((wall.x - 1, wall.y));
                 var wallRight = walls.Contains((wall.x + 1, wall.y));
                 var wallAboveRight = walls.Contains((wall.x + 1, wall.y + 1));
@@ -37,69 +39,40 @@ namespace NPacMan.UI
 
                 var offset = (cellSize - wallWidth) / 2;
 
-                g.DrawRectangle(Pens.White, x, y, cellSize, cellSize);
+                //g.DrawRectangle(Pens.White, x, y, cellSize, cellSize);
 
 
-                if (wallAbove && wallBelow)
+                if ((wallAbove2 && wallAbove1 && wallBelow1) || (wallAbove1 && wallBelow1 && wallBelow2))
                 {
-                    // Vertical wall
-                    if (!wallLeft)
-                    {
-                        // Must be coins,  so pad away from the coins
-                        g.FillRectangle(Brushes.Blue, x + offset, y, wallWidth, cellSize);
-                    }
-                    else if (!wallRight)
-                    {
-                        g.FillRectangle(Brushes.Blue, x + offset, y, wallWidth, cellSize);
-                    }
+                    // Must be coins,  so pad away from the coins
+                    g.FillRectangle(Brushes.Blue, x + offset, y, wallWidth, cellSize);
+                    continue;
                 }
                 if (wallLeft && wallRight)
                 {
-                    if (!wallAbove)
-                    {
-                        // Must be coins,  so pad away from the coins
-                        g.FillRectangle(Brushes.Blue, x, y + offset, cellSize, wallWidth);
-                    }
-                    else if (!wallBelow)
-                    {
-                        g.FillRectangle(Brushes.Blue, x, y + offset, cellSize, wallWidth);
-                    }
+                    g.FillRectangle(Brushes.Blue, x, y + offset, cellSize, wallWidth);
+                    continue;
                 }
-                if (wallRight && wallBelow && !wallLeft && !wallAbove)
+
+                if (wallRight && wallBelow1)
                 {
                     g.DrawArc(wallPen, x + (cellSize / 2), y + (cellSize / 2), cellSize, cellSize, 180, 90);
+                    continue;
                 }
-                if (wallRight && wallAbove && !wallBelow && !wallLeft)
+                if (wallRight && wallAbove1)
                 {
                     g.DrawArc(wallPen, x + (cellSize / 2), y - (cellSize / 2), cellSize, cellSize, 90, 90);
+                    continue;
                 }
-                if (wallLeft && wallBelow && !wallAbove && !wallRight)
+                if (wallLeft && wallBelow1)
                 {
                     g.DrawArc(wallPen, x - (cellSize / 2), y + (cellSize / 2), cellSize, cellSize, 270, 90);
+                    continue;
                 }
-                if (wallAbove && wallLeft && !wallBelow && !wallRight)
+                if (wallAbove1 && wallLeft)
                 {
                     g.DrawArc(wallPen, x - (cellSize / 2), y - (cellSize / 2), cellSize, cellSize, 0, 90);
-                }
-                if (wallAbove && wallBelow && wallRight && wallLeft)
-                {
-                    if (!wallAboveRight)
-                    {
-                        g.DrawArc(wallPen, x + (cellSize / 2), y + (cellSize / 2), cellSize, cellSize, 180, 90);
-                    }
-                    if (!wallBelowRight)
-                    {
-                        g.DrawArc(wallPen, x + (cellSize / 2), y - (cellSize / 2), cellSize, cellSize, 90, 90);
-                    }
-                    if (!wallAboveLeft)
-                    {
-                        g.DrawArc(wallPen, x - (cellSize / 2), y + (cellSize / 2), cellSize, cellSize, 270, 90);
-                    }
-
-                    if (!wallBelowLeft)
-                    {
-                        g.DrawArc(wallPen, x - (cellSize / 2), y - (cellSize / 2), cellSize, cellSize, 0, 90);
-                    }
+                    continue;
                 }
 
             }

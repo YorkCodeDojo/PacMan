@@ -26,6 +26,8 @@ namespace NPacMan.Game.Tests
             => this.Portals;
 
         public int Width { get; set; }
+
+        public int Height { get; set; }
     }
 
     public class TestGameClock : IGameClock
@@ -223,7 +225,7 @@ namespace NPacMan.Game.Tests
 
             _game.PacMan.Should().BeEquivalentTo(new
             {
-                X = 15,
+                X = 14,
                 Y = 15,
                 Direction = Direction.Left
             });
