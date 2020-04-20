@@ -1,26 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Threading;
 
 namespace NPacMan.Game
 {
-    public class GameClock : IGameClock
-    {
-        private Action _action;
-        private Timer _timer;
-
-        public GameClock()
-        {
-            _timer = new System.Threading.Timer((state) => _action?.Invoke(), null, 0, 200);
-        }
-        public void Subscribe(Action action)
-        {
-            _action = action;
-        }
-    }
-
     public class Game
     {
         public int Score { get; private set; }
@@ -109,128 +92,6 @@ P      .    X    X    .      P
                     Score += 10;
                 }
             }
-        }
-    }
-    
-    public class BoardLoader
-    {
-        public static IGameBoard Load(string board)
-        {
-            var rows = board.Split(new []{Environment.NewLine}, StringSplitOptions.None);
-            var height = rows.Length;
-            var width = 0;
-
-            var coins = new List<(int, int)>();
-            var walls = new List<(int, int)>();
-            var portalParts = new List<(int, int)>();
-
-            for (int rowNumber = 0; rowNumber < height; rowNumber++)
-            {
-                var row = rows[rowNumber];
-                for (int columnNumber = 0; columnNumber < row.Length; columnNumber++)
-                {
-                    switch (row[columnNumber])
-                    {
-                        case 'X':
-                            walls.Add((columnNumber-1, rowNumber));
-                            break;
-                        case '.':
-                            coins.Add((columnNumber-1,rowNumber));
-                            break;
-                        case 'P':
-                            portalParts.Add((columnNumber-1, rowNumber));
-                            break;
-                        default:
-                            break;
-                    }
-
-                    width = Math.Max(width, row.Length);
-                }
-            }
-
-            if (portalParts.Count() != 0 && portalParts.Count() != 2)
-                throw new Exception("Unexpected number of portals");
-
-            var portals = new Dictionary<(int, int), (int, int)>();
-            if (portalParts.Any())
-            {
-                portals.Add(portalParts[0], portalParts[1]);
-                portals.Add(portalParts[1], portalParts[0]);
-            }
-
-            return new GameBoard(width-2, height, walls, coins, portals);
-        }
-    }
-
-    public interface IGameBoard
-    {
-        IReadOnlyCollection<(int x, int y)> Walls { get; }
-        IReadOnlyCollection<(int x, int y)> Coins { get; }
-        IReadOnlyDictionary<(int x, int y), (int x, int y)> Portals { get; }
-        int Width { get; }
-        int Height { get; }
-    }
-
-    public class GameBoard : IGameBoard
-    {
-        public GameBoard(int width, int height, IReadOnlyCollection<(int,int)> walls, IReadOnlyCollection<(int,int)> coins, IReadOnlyDictionary<(int,int), (int, int)> portals)
-        {
-            Width = width;
-            Height = height;
-            Portals = portals;
-            Walls = walls;
-            Coins = coins;
-        }
-
-        public IReadOnlyCollection<(int x, int y)> Walls { get; }
-        public IReadOnlyCollection<(int x, int y)> Coins { get; }
-        public IReadOnlyDictionary<(int x, int y), (int x, int y)> Portals { get; }
-        public int Width { get; }
-        public int Height { get; }
-    }
-
-    public class PacMan
-    {
-        internal PacMan(int x, int y, Direction direction)
-        {
-            X = x;
-            Y = y;
-            Direction = direction;
-        }
-
-        public int X { get; }
-        public int Y { get; }
-        public Direction Direction { get; }
-
-        public PacMan WithNewX(int newX) => new PacMan(newX, Y, Direction);
-        public PacMan WithNewY(int newY) => new PacMan(X, newY, Direction);
-        public PacMan WithNewDirection(Direction newDirection) => new PacMan(X, Y, newDirection);
-
-        internal PacMan Move()
-        {
-            switch (Direction)
-            {
-                case Direction.Up:
-                    return new PacMan(X, Y - 1, Direction);
-
-                case Direction.Down:
-                    return new PacMan(X, Y + 1, Direction);
-
-                case Direction.Left:
-                    return new PacMan(X - 1, Y, Direction);
-
-                case Direction.Right:
-                    return new PacMan(X + 1, Y, Direction);
-
-                default:
-                    throw new NotImplementedException();
-            }
-        }
-
-        public void Deconstruct(out int x, out int y)
-        {
-            x = X;
-            y = Y;
         }
     }
 }

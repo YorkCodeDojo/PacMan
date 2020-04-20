@@ -1,49 +1,8 @@
-using System;
-using System.Collections.Generic;
 using FluentAssertions;
 using Xunit;
 
 namespace NPacMan.Game.Tests
 {
-    public class TestGameBoard : IGameBoard
-    {
-        public List<(int x, int y)> Walls { get; set; }
-            = new List<(int x, int y)>();
-
-        IReadOnlyCollection<(int x, int y)> IGameBoard.Walls
-            => this.Walls;
-
-        public List<(int x, int y)> Coins { get; set; }
-            = new List<(int x, int y)>();
-
-        IReadOnlyCollection<(int x, int y)> IGameBoard.Coins
-            => this.Coins;
-
-        public Dictionary<(int x, int y), (int x, int y)> Portals { get; set; }
-            = new Dictionary<(int x, int y), (int x, int y)>();
-
-        IReadOnlyDictionary<(int x, int y), (int x, int y)> IGameBoard.Portals
-            => this.Portals;
-
-        public int Width { get; set; }
-
-        public int Height { get; set; }
-    }
-
-    public class TestGameClock : IGameClock
-    {
-        private List<Action> _actions = new List<Action>();
-
-        public void Subscribe(Action action)
-        {
-            _actions.Add(action);
-        }
-
-        public void Tick()
-        {
-            _actions.ForEach(x => x());
-        }
-    }
     public class GameTests
     {
         private readonly TestGameBoard _gameBoard;
