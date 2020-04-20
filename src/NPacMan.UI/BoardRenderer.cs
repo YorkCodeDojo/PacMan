@@ -1,10 +1,78 @@
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using NPacMan.Game;
 
 namespace NPacMan.UI
 {
+
+    public enum WallType
+    {
+        VerticalLine,
+        HorizontalLine,
+        TopRightArc,
+        BottomRightArc,
+        TopLeftArc,
+        BottomLeftArc
+    }
+    public class WallAnalyzer
+    {
+        public static WallType GetWallType(IReadOnlyCollection<(int x, int y)> walls, (int x, int y) wall, int width, int height)
+        {
+            var wallLeft = walls.Contains((wall.x - 1, wall.y));
+            var wallRight = walls.Contains((wall.x + 1, wall.y));
+            var wallAbove = walls.Contains((wall.x, wall.y - 1));
+            var wallBelow = walls.Contains((wall.x, wall.y + 1));
+            var wallAboveRight = walls.Contains((wall.x + 1, wall.y - 1));
+            var wallAboveLeft = walls.Contains((wall.x - 1, wall.y - 1));
+            var wallBelowLeft = walls.Contains((wall.x - 1, wall.y + 1));
+            var wallBelowRight = walls.Contains((wall.x + 1, wall.y + 1));
+            var topEdge = wall.y == 0;
+            var leftEdge = wall.y == 0;
+            var rightEdge = wall.x + 1 == width;
+
+            if (topEdge && wallLeft && wallRight && wallBelow && !wallBelowLeft)
+                return WallType.TopRightArc;
+
+            if (rightEdge && topEdge && wallLeft && wallBelow)
+                return WallType.TopRightArc;
+
+            if (leftEdge && topEdge && wallRight && wallBelow)
+                return WallType.TopLeftArc;
+
+            if (wallRight && wallBelow && !wallAboveLeft && !wallAbove && !wallLeft)
+                return WallType.TopLeftArc;
+
+            if (wallLeft && wallBelow && !wallAboveRight && !wallAbove && !wallRight)
+                return WallType.TopRightArc;
+
+            if (wallRight && wallAbove && !wallAboveRight)
+                return WallType.BottomLeftArc;
+
+            if (wallRight && wallBelow && !wallBelowRight)
+                return WallType.TopLeftArc;
+
+            if (wallLeft && wallBelow && !wallBelowLeft)
+                return WallType.TopRightArc;
+
+            if (wallRight && wallAbove && !wallBelowLeft && !wallBelow && !wallLeft)
+                return WallType.BottomLeftArc;
+
+            if (wallLeft && wallAbove && !wallAboveLeft)
+                return WallType.BottomRightArc;
+
+            if (wallLeft && wallAbove && !wallBelowRight && !wallBelow && !wallRight)
+                return WallType.BottomRightArc;
+
+             if (wallAbove && wallBelow)
+                 return WallType.VerticalLine;
+            
+             return WallType.HorizontalLine;
+
+        }
+    }
+
     public class BoardRenderer
     {
         private readonly Font _scoreFont = new Font("Segoe UI", 20F, FontStyle.Regular, GraphicsUnit.Point, ((byte)(0)));
@@ -24,59 +92,39 @@ namespace NPacMan.UI
             {
                 var x = wall.x * cellSize;
                 var y = wall.y * cellSize;
-
-                // Is there a space above us?
-                var wallAbove1 = walls.Contains((wall.x, wall.y - 1));
-                var wallAbove2 = walls.Contains((wall.x, wall.y - 2));
-                var wallBelow1 = walls.Contains((wall.x, wall.y + 1));
-                var wallBelow2 = walls.Contains((wall.x, wall.y + 2));
-                var wallLeft = walls.Contains((wall.x - 1, wall.y));
-                var wallRight = walls.Contains((wall.x + 1, wall.y));
-                var wallAboveRight = walls.Contains((wall.x + 1, wall.y + 1));
-                var wallBelowRight = walls.Contains((wall.x + 1, wall.y - 1));
-                var wallAboveLeft = walls.Contains((wall.x - 1, wall.y + 1));
-                var wallBelowLeft = walls.Contains((wall.x - 1, wall.y - 1));
-
                 var offset = (cellSize - wallWidth) / 2;
 
-                //g.DrawRectangle(Pens.White, x, y, cellSize, cellSize);
+               // g.DrawRectangle(Pens.White, x, y, cellSize, cellSize);
 
+                var wallType = WallAnalyzer.GetWallType(walls, wall, game.Width, game.Height);
 
-                if ((wallAbove2 && wallAbove1 && wallBelow1) || (wallAbove1 && wallBelow1 && wallBelow2))
+                switch (wallType)
                 {
-                    // Must be coins,  so pad away from the coins
-                    g.FillRectangle(Brushes.Blue, x + offset, y, wallWidth, cellSize);
-                    continue;
+                    case WallType.VerticalLine:
+                        g.FillRectangle(Brushes.Blue, x + offset, y, wallWidth, cellSize);
+                        break;
+                    case WallType.HorizontalLine:
+                        g.FillRectangle(Brushes.Blue, x, y + offset, cellSize, wallWidth);
+                        break;
+                    case WallType.TopRightArc:
+                        g.DrawArc(wallPen, x - (cellSize / 2), y + (cellSize / 2), cellSize, cellSize, 270, 90);
+                        break;
+                    case WallType.BottomRightArc:
+                        g.DrawArc(wallPen, x - (cellSize / 2), y - (cellSize / 2), cellSize, cellSize, 0, 90);
+                        break;
+                    case WallType.TopLeftArc:
+                        g.DrawArc(wallPen, x + (cellSize / 2), y + (cellSize / 2), cellSize, cellSize, 180, 90);
+                        break;
+                    case WallType.BottomLeftArc:
+                        g.DrawArc(wallPen, x + (cellSize / 2), y - (cellSize / 2), cellSize, cellSize, 90, 90);
+                        break;
+                    default:
+                        g.FillRectangle(Brushes.Red, x, y, cellSize, cellSize);
+                        break;
                 }
-                if (wallLeft && wallRight)
-                {
-                    g.FillRectangle(Brushes.Blue, x, y + offset, cellSize, wallWidth);
-                    continue;
-                }
-
-                if (wallRight && wallBelow1)
-                {
-                    g.DrawArc(wallPen, x + (cellSize / 2), y + (cellSize / 2), cellSize, cellSize, 180, 90);
-                    continue;
-                }
-                if (wallRight && wallAbove1)
-                {
-                    g.DrawArc(wallPen, x + (cellSize / 2), y - (cellSize / 2), cellSize, cellSize, 90, 90);
-                    continue;
-                }
-                if (wallLeft && wallBelow1)
-                {
-                    g.DrawArc(wallPen, x - (cellSize / 2), y + (cellSize / 2), cellSize, cellSize, 270, 90);
-                    continue;
-                }
-                if (wallAbove1 && wallLeft)
-                {
-                    g.DrawArc(wallPen, x - (cellSize / 2), y - (cellSize / 2), cellSize, cellSize, 0, 90);
-                    continue;
-                }
-
             }
         }
+
 
         public void RenderCoins(Graphics g, int totalClientWidth, int totalClientHeight, NPacMan.Game.Game game)
         {

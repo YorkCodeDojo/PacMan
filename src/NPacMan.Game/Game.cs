@@ -67,6 +67,9 @@ P      .    X    X    .      P
         public int Width
             => _board.Width;
 
+        public int Height
+            => _board.Height;
+
         public void ChangeDirection(Direction direction)
         {
             PacMan = new PacMan(PacMan.X, PacMan.Y, direction);

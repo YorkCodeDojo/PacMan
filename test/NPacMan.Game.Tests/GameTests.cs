@@ -202,5 +202,15 @@ namespace NPacMan.Game.Tests
             _game.Width.Should().Be(gameBoardWidth);
 
         }
+
+        [Fact]
+        public void TheGameCanReadTheHeightFromTheBoard()
+        {
+            var gameBoardHeight = 100;
+            _gameBoard.Height = gameBoardHeight;
+
+            _game.Height.Should().Be(gameBoardHeight);
+
+        }
     }
 }
