@@ -82,8 +82,7 @@ namespace NPacMan.UI
 
         public void RenderWalls(Graphics g, int totalClientWidth, int totalClientHeight, NPacMan.Game.Game game)
         {
-            int NumberOfCellsWide = game.Width;
-            var cellSize = totalClientWidth / NumberOfCellsWide;
+            var cellSize = CellSizeFromClientSize(game, totalClientWidth, totalClientHeight);
             var wallWidth = cellSize / 5;
             var wallPen = new Pen(Brushes.Blue, wallWidth);
             var walls = game.Walls;
@@ -125,11 +124,15 @@ namespace NPacMan.UI
             }
         }
 
+        private int CellSizeFromClientSize(Game.Game game, int totalClientWidth, int totalClientHeight)
+        {
+            return Math.Min(totalClientWidth / game.Width, totalClientHeight / game.Height);
+        }
 
         public void RenderCoins(Graphics g, int totalClientWidth, int totalClientHeight, NPacMan.Game.Game game)
         {
             int NumberOfCellsWide = game.Width;
-            var cellSize = totalClientWidth / NumberOfCellsWide;
+            var cellSize = CellSizeFromClientSize(game, totalClientWidth, totalClientHeight);
 
             var coins = game.Coins;
 
@@ -145,7 +148,7 @@ namespace NPacMan.UI
         public void RenderPacMan(Graphics g, int totalClientWidth, int totalClientHeight, NPacMan.Game.Game game)
         {
             int NumberOfCellsWide = game.Width;
-            var cellSize = totalClientWidth / NumberOfCellsWide;
+            var cellSize = CellSizeFromClientSize(game, totalClientWidth, totalClientHeight);
 
             var x = game.PacMan.X * cellSize;
             var y = game.PacMan.Y * cellSize;
