@@ -4,6 +4,12 @@
     <ProjectReference Include="..\NPacMan.Game\NPacMan.Game.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="gfx.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
