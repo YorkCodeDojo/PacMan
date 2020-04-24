@@ -209,7 +209,7 @@ namespace NPacMan.UI
             var y = ghost.Y * cellSize;
 
             var sprite = _sprites.Ghost(GhostColour.Red, Direction.Up, animated);
-            _sprites.RenderSprite(g, x, y, cellSize, sprite);
+            _sprites.RenderSprite(g, x, y, sprite);
         }
 
         public void RenderScore(Graphics g, NPacMan.Game.Game game)
