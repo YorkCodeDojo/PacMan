@@ -18,5 +18,7 @@ namespace NPacMan.Game
         public IReadOnlyDictionary<(int x, int y), (int x, int y)> Portals { get; }
         public int Width { get; }
         public int Height { get; }
+        public IReadOnlyCollection<Ghost> Ghosts { get; }
+            = new List<Ghost>();
     }
 }

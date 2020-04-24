@@ -70,6 +70,8 @@ P      .    X    X    .      P
         public int Height
             => _board.Height;
 
+        public int Lives { get; private set; }
+
         public void ChangeDirection(Direction direction)
         {
             PacMan = new PacMan(PacMan.X, PacMan.Y, direction);
@@ -89,7 +91,11 @@ P      .    X    X    .      P
             {
                 PacMan = newPacMan;
 
-                if (_board.Coins.Contains((newPacMan.X, newPacMan.Y)))
+                if (_board.Ghosts.Any(ghost => ghost.X == newPacMan.X && ghost.Y == newPacMan.Y))
+                {
+                    Lives--;
+                }
+                else if (_board.Coins.Contains((newPacMan.X, newPacMan.Y)))
                 {
                     var newCollectedCoins = new List<(int,int)>(_collectedCoins);
                     newCollectedCoins.Add((newPacMan.X, newPacMan.Y));
