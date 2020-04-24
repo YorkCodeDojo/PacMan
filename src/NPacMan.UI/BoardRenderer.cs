@@ -213,6 +213,7 @@ namespace NPacMan.UI
         public void RenderScore(Graphics g, int totalClientWidth, int totalClientHeight, NPacMan.Game.Game game)
         {
             g.DrawString($"Score : {game.Score}", _scoreFont, Brushes.White, totalClientWidth - 200, 100);
+            g.DrawString($"Lives : {game.Lives}", _scoreFont, Brushes.White, totalClientWidth - 200, 200);
         }
     }
 }
