@@ -80,12 +80,21 @@ namespace NPacMan.UI
         private int mouthSize = 60;
         private int mouthDirection = 1;
 
+        private Sprites Sprites;
+
+        public BoardRenderer()
+        {
+            Sprites = new Sprites();
+        }
+
         public void RenderWalls(Graphics g, int totalClientWidth, int totalClientHeight, NPacMan.Game.Game game)
         {
             var cellSize = CellSizeFromClientSize(game, totalClientWidth, totalClientHeight);
             var wallWidth = cellSize / 5;
             var wallPen = new Pen(Brushes.Blue, wallWidth);
             var walls = game.Walls;
+
+            Sprites.RenderSprite(g, 500, 500, cellSize, Sprites.PacMan(Direction.Up, 0, false));
 
             foreach (var wall in walls)
             {
