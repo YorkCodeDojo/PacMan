@@ -83,10 +83,12 @@ namespace NPacMan.UI
         private bool animated = false;
 
         private Sprites _sprites;
+        private ScoreBoard _scoreBoard;
 
         public BoardRenderer()
         {
             _sprites = new Sprites();
+            _scoreBoard = new ScoreBoard(_sprites);
         }
 
         public void RenderWalls(Graphics g, NPacMan.Game.Game game)
@@ -212,8 +214,11 @@ namespace NPacMan.UI
 
         public void RenderScore(Graphics g, NPacMan.Game.Game game)
         {
-            g.DrawString($"Score : {game.Score}", _scoreFont, Brushes.White, 0, 0);
-            g.DrawString($"Lives : {game.Lives}", _scoreFont, Brushes.White, 0,Sprites.PixelGrid);
+            _scoreBoard.RenderStatic(g);
+            _scoreBoard.RenderScores(g, game.Score, 0, 1000);
+            _scoreBoard.RenderLivesBonus(g, 3, game.Height - 1);
+//            g.DrawString($"Score : {game.Score}", _scoreFont, Brushes.White, 0, 0);
+            //          g.DrawString($"Lives : {game.Lives}", _scoreFont, Brushes.White, 0,Sprites.PixelGrid);
         }
     }
 }
