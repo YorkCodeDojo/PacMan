@@ -4,7 +4,7 @@ namespace NPacMan.Game
 {
     public interface IGhostStrategy
     {
-        (int x, int y) Move(Ghost ghost, PacMan pacman);
+        (int x, int y) Move(Ghost ghost, Game game);
     }
 
     public interface IGameBoard
@@ -33,9 +33,9 @@ namespace NPacMan.Game
             Strategy = strategy;
         }
 
-        public Ghost Move(PacMan pacMan)
+        public Ghost Move(Game game)
         {
-            var (x, y) = Strategy.Move(this, pacMan);
+            var (x, y) = Strategy.Move(this, game);
             return new Ghost(Name, x, y, Strategy);
         }
     }

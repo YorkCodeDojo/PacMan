@@ -89,7 +89,7 @@ P      .    X    X    .      P
             var newPositionOfGhosts = new Dictionary<string, Ghost>();
             foreach (var ghost in Ghosts.Values)
             {
-                newPositionOfGhosts[ghost.Name] = ghost.Move(PacMan);
+                newPositionOfGhosts[ghost.Name] = ghost.Move(this);
             }
             _ghosts = newPositionOfGhosts;
 

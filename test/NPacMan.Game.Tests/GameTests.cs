@@ -296,11 +296,11 @@ namespace NPacMan.Game.Tests
 
     public class StandingStillGhostStrategy : IGhostStrategy
     {
-        public (int x, int y) Move(Ghost ghost, PacMan pacman) => (ghost.X, ghost.Y);
+        public (int x, int y) Move(Ghost ghost, Game game) => (ghost.X, ghost.Y);
     }
 
     public class GhostGoesRightStrategy : IGhostStrategy
     {
-        public (int x, int y) Move(Ghost ghost, PacMan pacman) => (ghost.X+1, ghost.Y);
+        public (int x, int y) Move(Ghost ghost, Game game) => (ghost.X+1, ghost.Y);
     }
 }
