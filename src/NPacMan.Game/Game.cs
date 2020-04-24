@@ -36,7 +36,7 @@ namespace NPacMan.Game
  XXXXXX.XXXXX XX XXXXX.XXXXXX
       X.XXXXX XX XXXXX.X     
       X.XX          XX.X     
-      X.XX          XX.X     
+      X.XX   R      XX.X     
  XXXXXX.XX  XXXXXX  XX.XXXXXX
 P      .    X    X    .      P
  XXXXXX.XX  XXXXXX  XX.XXXXXX

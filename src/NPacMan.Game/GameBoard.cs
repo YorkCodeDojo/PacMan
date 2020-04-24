@@ -4,12 +4,13 @@ namespace NPacMan.Game
 {
     public class GameBoard : IGameBoard
     {
-        public GameBoard(int width, int height, IReadOnlyCollection<(int,int)> walls, IReadOnlyCollection<(int,int)> coins, IReadOnlyDictionary<(int,int), (int, int)> portals, PacMan pacMan)
+        public GameBoard(int width, int height, IReadOnlyCollection<(int,int)> walls, IReadOnlyCollection<(int,int)> coins, IReadOnlyDictionary<(int,int), (int, int)> portals, PacMan pacMan, IReadOnlyCollection<Ghost> ghosts)
         {
             Width = width;
             Height = height;
             Portals = portals;
             PacMan = pacMan;
+            Ghosts = ghosts;
             Walls = walls;
             Coins = coins;
         }
@@ -21,6 +22,5 @@ namespace NPacMan.Game
         public int Width { get; }
         public int Height { get; }
         public IReadOnlyCollection<Ghost> Ghosts { get; }
-            = new List<Ghost>();
     }
 }

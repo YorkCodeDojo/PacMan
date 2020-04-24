@@ -62,6 +62,22 @@ P   P";
             });
         }
 
+        [Fact]
+        public void ShouldHaveRedGhostAtCorrectLocation()
+        {
+            var board = @" XXX 
+ XXR 
+ XXX ";
+
+            var loadedBoard = BoardLoader.Load(board);
+
+            loadedBoard.Ghosts.Should().ContainEquivalentOf(new
+            {
+                X = 2,
+                Y = 1
+            });
+        }
+
     }
 
 }

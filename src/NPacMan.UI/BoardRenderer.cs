@@ -80,11 +80,13 @@ namespace NPacMan.UI
         private int mouthSize = 60;
         private int mouthDirection = 1;
 
-        private Sprites Sprites;
+        private bool animated = false;
+
+        private Sprites _sprites;
 
         public BoardRenderer()
         {
-            Sprites = new Sprites();
+            _sprites = new Sprites();
         }
 
         public void RenderWalls(Graphics g, int totalClientWidth, int totalClientHeight, NPacMan.Game.Game game)
@@ -138,7 +140,6 @@ namespace NPacMan.UI
 
         public void RenderCoins(Graphics g, int totalClientWidth, int totalClientHeight, NPacMan.Game.Game game)
         {
-            int NumberOfCellsWide = game.Width;
             var cellSize = CellSizeFromClientSize(game, totalClientWidth, totalClientHeight);
 
             var coins = game.Coins;
@@ -154,7 +155,6 @@ namespace NPacMan.UI
 
         public void RenderPacMan(Graphics g, int totalClientWidth, int totalClientHeight, NPacMan.Game.Game game)
         {
-            int NumberOfCellsWide = game.Width;
             var cellSize = CellSizeFromClientSize(game, totalClientWidth, totalClientHeight);
 
             var x = game.PacMan.X * cellSize;
@@ -188,6 +188,26 @@ namespace NPacMan.UI
                 mouthDirection = +5;
             }
 
+        }
+
+        public void RenderGhosts(Graphics g, int totalClientWidth, int totalClientHeight, NPacMan.Game.Game game)
+        {
+            var cellSize = CellSizeFromClientSize(game, totalClientWidth, totalClientHeight);
+
+            animated = !animated;
+
+            foreach (var ghost in game.Ghosts.Values)
+            {
+                RenderGhost(g, cellSize, ghost);
+            }
+        }
+        private void RenderGhost(Graphics g, int cellSize, Ghost ghost)
+        {
+            var x = ghost.X * cellSize;
+            var y = ghost.Y * cellSize;
+
+            var sprite = _sprites.Ghost(GhostColour.Red, Direction.Up, animated);
+            _sprites.RenderSprite(g, x, y, cellSize, sprite);
         }
 
         public void RenderScore(Graphics g, int totalClientWidth, int totalClientHeight, NPacMan.Game.Game game)

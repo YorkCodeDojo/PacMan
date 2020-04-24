@@ -58,6 +58,7 @@ namespace NPacMan.UI
                 _boardRenderer.RenderCoins(g, this.ClientSize.Width, this.ClientSize.Height, _game);
                 _boardRenderer.RenderPacMan(g, this.ClientSize.Width, this.ClientSize.Height, _game);
                 _boardRenderer.RenderScore(g, this.ClientSize.Width, this.ClientSize.Height, _game);
+                _boardRenderer.RenderGhosts(g, this.ClientSize.Width, this.ClientSize.Height, _game);
 
                 myBuffer.Render();
             }
