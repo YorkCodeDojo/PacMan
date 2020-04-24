@@ -89,9 +89,9 @@ namespace NPacMan.UI
             _sprites = new Sprites();
         }
 
-        public void RenderWalls(Graphics g, int totalClientWidth, int totalClientHeight, NPacMan.Game.Game game)
+        public void RenderWalls(Graphics g, NPacMan.Game.Game game)
         {
-            var cellSize = CellSizeFromClientSize(game, totalClientWidth, totalClientHeight);
+            var cellSize = Sprites.PixelGrid;
             var wallWidth = cellSize / 5;
             var wallPen = new Pen(Brushes.Blue, wallWidth);
             var walls = game.Walls;
@@ -138,9 +138,9 @@ namespace NPacMan.UI
             return Math.Min(totalClientWidth / game.Width, totalClientHeight / game.Height);
         }
 
-        public void RenderCoins(Graphics g, int totalClientWidth, int totalClientHeight, NPacMan.Game.Game game)
+        public void RenderCoins(Graphics g, NPacMan.Game.Game game)
         {
-            var cellSize = CellSizeFromClientSize(game, totalClientWidth, totalClientHeight);
+            var cellSize = Sprites.PixelGrid;
 
             var coins = game.Coins;
 
@@ -153,9 +153,9 @@ namespace NPacMan.UI
             }
         }
 
-        public void RenderPacMan(Graphics g, int totalClientWidth, int totalClientHeight, NPacMan.Game.Game game)
+        public void RenderPacMan(Graphics g, NPacMan.Game.Game game)
         {
-            var cellSize = CellSizeFromClientSize(game, totalClientWidth, totalClientHeight);
+            var cellSize = Sprites.PixelGrid;
 
             var x = game.PacMan.X * cellSize;
             var y = game.PacMan.Y * cellSize;
@@ -190,9 +190,9 @@ namespace NPacMan.UI
 
         }
 
-        public void RenderGhosts(Graphics g, int totalClientWidth, int totalClientHeight, NPacMan.Game.Game game)
+        public void RenderGhosts(Graphics g, NPacMan.Game.Game game)
         {
-            var cellSize = CellSizeFromClientSize(game, totalClientWidth, totalClientHeight);
+            var cellSize = Sprites.PixelGrid;
 
             animated = !animated;
 
@@ -210,10 +210,10 @@ namespace NPacMan.UI
             _sprites.RenderSprite(g, x, y, cellSize, sprite);
         }
 
-        public void RenderScore(Graphics g, int totalClientWidth, int totalClientHeight, NPacMan.Game.Game game)
+        public void RenderScore(Graphics g, NPacMan.Game.Game game)
         {
-            g.DrawString($"Score : {game.Score}", _scoreFont, Brushes.White, totalClientWidth - 200, 100);
-            g.DrawString($"Lives : {game.Lives}", _scoreFont, Brushes.White, totalClientWidth - 200, 200);
+            g.DrawString($"Score : {game.Score}", _scoreFont, Brushes.White, 0, 0);
+            g.DrawString($"Lives : {game.Lives}", _scoreFont, Brushes.White, 0,Sprites.PixelGrid);
         }
     }
 }

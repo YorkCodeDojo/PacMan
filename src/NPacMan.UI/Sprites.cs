@@ -31,7 +31,7 @@ namespace NPacMan.UI
                 GraphicsUnit.Pixel);
         }
 
-        private const int PixelGrid = 8;
+        public const int PixelGrid = 8;
 
         public SpriteSource[] Bonus;
 
