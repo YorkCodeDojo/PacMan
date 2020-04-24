@@ -10,6 +10,8 @@ namespace NPacMan.Game
 
         private readonly IGameBoard _board;
         private List<(int x, int y)> _collectedCoins;
+        private Dictionary<string, Ghost> _ghosts;
+
 
         public Game(IGameClock gameClock, IGameBoard board)
         {
@@ -17,6 +19,7 @@ namespace NPacMan.Game
             _board = board;
             PacMan = new PacMan(1, 3, Direction.Down);
             _collectedCoins = new List<(int x, int y)>();
+            _ghosts = board.Ghosts.ToDictionary(x => x.Name, x => x);
         }
 
         public static Game Create()
@@ -72,6 +75,8 @@ P      .    X    X    .      P
 
         public int Lives { get; private set; }
 
+        public IReadOnlyDictionary<string, Ghost> Ghosts => _ghosts;
+
         public void ChangeDirection(Direction direction)
         {
             PacMan = new PacMan(PacMan.X, PacMan.Y, direction);
@@ -80,6 +85,13 @@ P      .    X    X    .      P
         private void Tick()
         {
             var newPacMan = PacMan.Move();
+
+            var newPositionOfGhosts = new Dictionary<string, Ghost>();
+            foreach (var ghost in Ghosts.Values)
+            {
+                newPositionOfGhosts[ghost.Name] = ghost.Move();
+            }
+            _ghosts = newPositionOfGhosts;
 
             if (_board.Portals.TryGetValue((newPacMan.X, newPacMan.Y), out var portal))
             {

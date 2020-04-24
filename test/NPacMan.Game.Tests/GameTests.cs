@@ -222,7 +222,7 @@ namespace NPacMan.Game.Tests
             var x = _game.PacMan.X + 1;
             var y = _game.PacMan.Y;
 
-            _gameBoard.Ghosts.Add(new Ghost(x, y));
+            _gameBoard.Ghosts.Add(new Ghost("Ghost1", x, y, new StandingStillGhostStrategy()));
 
             _game.ChangeDirection(Direction.Left);
             _gameClock.Tick();
@@ -237,7 +237,7 @@ namespace NPacMan.Game.Tests
             var x = _game.PacMan.X + 1;
             var y = _game.PacMan.Y;
 
-            _gameBoard.Ghosts.Add(new Ghost(x, y));
+            _gameBoard.Ghosts.Add(new Ghost("Ghost1", x, y, new StandingStillGhostStrategy()));
 
             _game.ChangeDirection(Direction.Right);
             _gameClock.Tick();
@@ -253,7 +253,7 @@ namespace NPacMan.Game.Tests
             var x = _game.PacMan.X + 1;
             var y = _game.PacMan.Y;
 
-            _gameBoard.Ghosts.Add(new Ghost(x, y));
+            _gameBoard.Ghosts.Add(new Ghost("Ghost1", x, y, new StandingStillGhostStrategy()));
             _gameBoard.Coins.Add((x, y));
 
             _game.ChangeDirection(Direction.Right);
@@ -263,5 +263,31 @@ namespace NPacMan.Game.Tests
             _game.Coins.Should().Contain((x, y));
             _game.Score.Should().Be(score);
         }
+
+        [Fact]
+        public void GhostMovesInDirectionOfStrategy()
+        {
+            var strategy = new GhostGoesRightStrategy();
+            _gameBoard.Ghosts.Add(new Ghost("Ghost1", 0, 0, strategy));
+
+            var game = new Game(_gameClock, _gameBoard);
+
+            _gameClock.Tick();
+            game.Ghosts["Ghost1"].Should().BeEquivalentTo(new
+            {
+                X = 1,
+                Y = 0,
+            });
+        }
+    }
+
+    public class StandingStillGhostStrategy : IGhostStrategy
+    {
+        public (int x, int y) Move(Ghost ghost) => (ghost.X, ghost.Y);
+    }
+
+    public class GhostGoesRightStrategy : IGhostStrategy
+    {
+        public (int x, int y) Move(Ghost ghost) => (ghost.X+1, ghost.Y);
     }
 }
