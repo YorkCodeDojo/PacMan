@@ -80,10 +80,18 @@ namespace NPacMan.UI
         private int mouthSize = 60;
         private int mouthDirection = 1;
 
+        private bool animated = false;
+
+        private Sprites _sprites;
+
+        public BoardRenderer()
+        {
+            _sprites = new Sprites();
+        }
+
         public void RenderWalls(Graphics g, int totalClientWidth, int totalClientHeight, NPacMan.Game.Game game)
         {
-            int NumberOfCellsWide = game.Width;
-            var cellSize = totalClientWidth / NumberOfCellsWide;
+            var cellSize = CellSizeFromClientSize(game, totalClientWidth, totalClientHeight);
             var wallWidth = cellSize / 5;
             var wallPen = new Pen(Brushes.Blue, wallWidth);
             var walls = game.Walls;
@@ -125,11 +133,14 @@ namespace NPacMan.UI
             }
         }
 
+        private int CellSizeFromClientSize(Game.Game game, int totalClientWidth, int totalClientHeight)
+        {
+            return Math.Min(totalClientWidth / game.Width, totalClientHeight / game.Height);
+        }
 
         public void RenderCoins(Graphics g, int totalClientWidth, int totalClientHeight, NPacMan.Game.Game game)
         {
-            int NumberOfCellsWide = game.Width;
-            var cellSize = totalClientWidth / NumberOfCellsWide;
+            var cellSize = CellSizeFromClientSize(game, totalClientWidth, totalClientHeight);
 
             var coins = game.Coins;
 
@@ -144,8 +155,7 @@ namespace NPacMan.UI
 
         public void RenderPacMan(Graphics g, int totalClientWidth, int totalClientHeight, NPacMan.Game.Game game)
         {
-            int NumberOfCellsWide = game.Width;
-            var cellSize = totalClientWidth / NumberOfCellsWide;
+            var cellSize = CellSizeFromClientSize(game, totalClientWidth, totalClientHeight);
 
             var x = game.PacMan.X * cellSize;
             var y = game.PacMan.Y * cellSize;
@@ -180,9 +190,30 @@ namespace NPacMan.UI
 
         }
 
+        public void RenderGhosts(Graphics g, int totalClientWidth, int totalClientHeight, NPacMan.Game.Game game)
+        {
+            var cellSize = CellSizeFromClientSize(game, totalClientWidth, totalClientHeight);
+
+            animated = !animated;
+
+            foreach (var ghost in game.Ghosts.Values)
+            {
+                RenderGhost(g, cellSize, ghost);
+            }
+        }
+        private void RenderGhost(Graphics g, int cellSize, Ghost ghost)
+        {
+            var x = ghost.X * cellSize;
+            var y = ghost.Y * cellSize;
+
+            var sprite = _sprites.Ghost(GhostColour.Red, Direction.Up, animated);
+            _sprites.RenderSprite(g, x, y, cellSize, sprite);
+        }
+
         public void RenderScore(Graphics g, int totalClientWidth, int totalClientHeight, NPacMan.Game.Game game)
         {
             g.DrawString($"Score : {game.Score}", _scoreFont, Brushes.White, totalClientWidth - 200, 100);
+            g.DrawString($"Lives : {game.Lives}", _scoreFont, Brushes.White, totalClientWidth - 200, 200);
         }
     }
 }

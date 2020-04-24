@@ -41,6 +41,43 @@ P   P";
             action.Should().Throw<Exception>();
         }
 
+        [Theory]
+        [InlineData("▲", Direction.Up)]
+        [InlineData("▼", Direction.Down)]
+        [InlineData("►", Direction.Right)]
+        [InlineData("◄", Direction.Left)]
+        public void ShouldHavePacManAtLocationAndDirection(string expectedDirectionSymbol, Direction expectedDirection)
+        {
+            var board = @" XXX 
+ XX? 
+ XXX ".Replace("?", expectedDirectionSymbol);
+
+            var loadedBoard = BoardLoader.Load(board);
+
+            loadedBoard.PacMan.Should().BeEquivalentTo(new
+            {
+                X = 2,
+                Y = 1,
+                Direction = expectedDirection
+            });
+        }
+
+        [Fact]
+        public void ShouldHaveRedGhostAtCorrectLocation()
+        {
+            var board = @" XXX 
+ XXR 
+ XXX ";
+
+            var loadedBoard = BoardLoader.Load(board);
+
+            loadedBoard.Ghosts.Should().ContainEquivalentOf(new
+            {
+                X = 2,
+                Y = 1
+            });
+        }
+
     }
 
 }

@@ -10,13 +10,16 @@ namespace NPacMan.Game
 
         private readonly IGameBoard _board;
         private List<(int x, int y)> _collectedCoins;
+        private Dictionary<string, Ghost> _ghosts;
+
 
         public Game(IGameClock gameClock, IGameBoard board)
         {
             gameClock.Subscribe(Tick);
             _board = board;
-            PacMan = new PacMan(1, 3, Direction.Down);
+            PacMan = board.PacMan;
             _collectedCoins = new List<(int x, int y)>();
+            _ghosts = board.Ghosts.ToDictionary(x => x.Name, x => x);
         }
 
         public static Game Create()
@@ -33,7 +36,7 @@ namespace NPacMan.Game
  XXXXXX.XXXXX XX XXXXX.XXXXXX
       X.XXXXX XX XXXXX.X     
       X.XX          XX.X     
-      X.XX          XX.X     
+      X.XX   R      XX.X     
  XXXXXX.XX  XXXXXX  XX.XXXXXX
 P      .    X    X    .      P
  XXXXXX.XX  XXXXXX  XX.XXXXXX
@@ -44,7 +47,7 @@ P      .    X    X    .      P
  X............XX............X
  X.XXXX.XXXXX.XX.XXXXX.XXXX.X
  X.XXXX.XXXXX.XX.XXXXX.XXXX.X
- X...XX................XX...X
+ X...XX.......►........XX...X
  XXX.XX.XX.XXXXXXXX.XX.XX.XXX
  XXX.XX.XX.XXXXXXXX.XX.XX.XXX
  X......XX....XX....XX......X
@@ -70,6 +73,10 @@ P      .    X    X    .      P
         public int Height
             => _board.Height;
 
+        public int Lives { get; private set; }
+
+        public IReadOnlyDictionary<string, Ghost> Ghosts => _ghosts;
+
         public void ChangeDirection(Direction direction)
         {
             PacMan = new PacMan(PacMan.X, PacMan.Y, direction);
@@ -78,6 +85,13 @@ P      .    X    X    .      P
         private void Tick()
         {
             var newPacMan = PacMan.Move();
+
+            var newPositionOfGhosts = new Dictionary<string, Ghost>();
+            foreach (var ghost in Ghosts.Values)
+            {
+                newPositionOfGhosts[ghost.Name] = ghost.Move(this);
+            }
+            _ghosts = newPositionOfGhosts;
 
             if (_board.Portals.TryGetValue((newPacMan.X, newPacMan.Y), out var portal))
             {
@@ -89,7 +103,11 @@ P      .    X    X    .      P
             {
                 PacMan = newPacMan;
 
-                if (_board.Coins.Contains((newPacMan.X, newPacMan.Y)))
+                if (_board.Ghosts.Any(ghost => ghost.X == newPacMan.X && ghost.Y == newPacMan.Y))
+                {
+                    Lives--;
+                }
+                else if (_board.Coins.Contains((newPacMan.X, newPacMan.Y)))
                 {
                     var newCollectedCoins = new List<(int,int)>(_collectedCoins);
                     newCollectedCoins.Add((newPacMan.X, newPacMan.Y));

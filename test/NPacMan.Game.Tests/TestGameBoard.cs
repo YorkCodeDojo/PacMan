@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace NPacMan.Game.Tests
 {
@@ -25,5 +26,14 @@ namespace NPacMan.Game.Tests
         public int Width { get; set; }
 
         public int Height { get; set; }
+
+        public List<Ghost> Ghosts { get; }
+            = new List<Ghost>();
+
+        IReadOnlyCollection<Ghost> IGameBoard.Ghosts
+            => this.Ghosts;
+
+        public PacMan PacMan { get; set; } = new PacMan(10, 10, Direction.Right);
+
     }
 }

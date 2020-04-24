@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using FluentAssertions;
+using FluentAssertions.Execution;
 using Xunit;
 
 namespace NPacMan.Game.Tests
@@ -21,6 +23,19 @@ namespace NPacMan.Game.Tests
             _gameBoard = new TestGameBoard();
             _gameClock = new TestGameClock();
             _game = new Game(_gameClock, _gameBoard);
+        }
+
+        [Fact]
+        public void PacManStartsInInitialPosition()
+        {
+            _gameBoard.PacMan = new PacMan(5, 6, Direction.Right);
+            var game = new Game(_gameClock, _gameBoard);
+
+            game.PacMan.Should().BeEquivalentTo(new {
+                X = 5,
+                Y = 6,
+                Direction = Direction.Right
+            });
         }
 
         [Theory]
@@ -212,5 +227,80 @@ namespace NPacMan.Game.Tests
             _game.Height.Should().Be(gameBoardHeight);
 
         }
+
+        [Fact]
+        public void PacManDoesNotLoseALifeWhenNotCollidingWithAGhost()
+        {
+            var currentLives = _game.Lives;
+            var x = _game.PacMan.X + 1;
+            var y = _game.PacMan.Y;
+
+            _gameBoard.Ghosts.Add(new Ghost("Ghost1", x, y, new StandingStillGhostStrategy()));
+
+            _game.ChangeDirection(Direction.Left);
+            _gameClock.Tick();
+
+            _game.Lives.Should().Be(currentLives);
+        }
+
+        [Fact]
+        public void PacManLosesALifeWhenCollidesWithGhost()
+        {
+            var currentLives = _game.Lives;
+            var x = _game.PacMan.X + 1;
+            var y = _game.PacMan.Y;
+
+            _gameBoard.Ghosts.Add(new Ghost("Ghost1", x, y, new StandingStillGhostStrategy()));
+
+            _game.ChangeDirection(Direction.Right);
+            _gameClock.Tick();
+
+            _game.Lives.Should().Be(currentLives - 1);
+        }
+
+
+        [Fact]
+        public void PacManDoesNotCollectCoinAndScoreStaysTheSameWhenCollidesWithGhost()
+        {
+            var score = _game.Score;
+            var x = _game.PacMan.X + 1;
+            var y = _game.PacMan.Y;
+
+            _gameBoard.Ghosts.Add(new Ghost("Ghost1", x, y, new StandingStillGhostStrategy()));
+            _gameBoard.Coins.Add((x, y));
+
+            _game.ChangeDirection(Direction.Right);
+            _gameClock.Tick();
+
+            using var _ = new AssertionScope();
+            _game.Coins.Should().Contain((x, y));
+            _game.Score.Should().Be(score);
+        }
+
+        [Fact]
+        public void GhostMovesInDirectionOfStrategy()
+        {
+            var strategy = new GhostGoesRightStrategy();
+            _gameBoard.Ghosts.Add(new Ghost("Ghost1", 0, 0, strategy));
+
+            var game = new Game(_gameClock, _gameBoard);
+
+            _gameClock.Tick();
+            game.Ghosts["Ghost1"].Should().BeEquivalentTo(new
+            {
+                X = 1,
+                Y = 0,
+            });
+        }
+    }
+
+    public class StandingStillGhostStrategy : IGhostStrategy
+    {
+        public (int x, int y) Move(Ghost ghost, Game game) => (ghost.X, ghost.Y);
+    }
+
+    public class GhostGoesRightStrategy : IGhostStrategy
+    {
+        public (int x, int y) Move(Ghost ghost, Game game) => (ghost.X+1, ghost.Y);
     }
 }
