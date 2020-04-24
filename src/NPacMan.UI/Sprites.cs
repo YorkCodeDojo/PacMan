@@ -26,9 +26,9 @@ namespace NPacMan.UI
         /// <param name="y">Screen Y (pixel)</param>
         /// <param name="size">Size of sprite on screen (pixel)</param>
         /// <param name="source">Sprite to show</param>
-        public void RenderSprite(Graphics g, int x, int y, int size, SpriteSource source)
+        public void RenderSprite(Graphics g, int x, int y, SpriteSource source)
         {
-            size = PixelGrid * source.Size;
+            var size = PixelGrid * source.Size;
             x = x + PixelGrid / 2 - size / 2;
             y = y + PixelGrid / 2 - size / 2;
             g.DrawImage(Gfx, new Rectangle(x, y, size, size), PixelGrid * source.XPos, PixelGrid * source.YPos,
