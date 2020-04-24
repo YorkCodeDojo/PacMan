@@ -32,5 +32,8 @@ namespace NPacMan.Game.Tests
 
         IReadOnlyCollection<Ghost> IGameBoard.Ghosts
             => this.Ghosts;
+
+        public PacMan PacMan { get; set; } = new PacMan(10, 10, Direction.Right);
+
     }
 }

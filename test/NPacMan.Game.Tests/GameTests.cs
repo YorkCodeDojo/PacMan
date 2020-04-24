@@ -25,6 +25,19 @@ namespace NPacMan.Game.Tests
             _game = new Game(_gameClock, _gameBoard);
         }
 
+        [Fact]
+        public void PacManStartsInInitialPosition()
+        {
+            _gameBoard.PacMan = new PacMan(5, 6, Direction.Right);
+            var game = new Game(_gameClock, _gameBoard);
+
+            game.PacMan.Should().BeEquivalentTo(new {
+                X = 5,
+                Y = 6,
+                Direction = Direction.Right
+            });
+        }
+
         [Theory]
         [InlineData(Direction.Up, 0, -1)]
         [InlineData(Direction.Down, 0, +1)]
@@ -283,11 +296,11 @@ namespace NPacMan.Game.Tests
 
     public class StandingStillGhostStrategy : IGhostStrategy
     {
-        public (int x, int y) Move(Ghost ghost) => (ghost.X, ghost.Y);
+        public (int x, int y) Move(Ghost ghost, PacMan pacman) => (ghost.X, ghost.Y);
     }
 
     public class GhostGoesRightStrategy : IGhostStrategy
     {
-        public (int x, int y) Move(Ghost ghost) => (ghost.X+1, ghost.Y);
+        public (int x, int y) Move(Ghost ghost, PacMan pacman) => (ghost.X+1, ghost.Y);
     }
 }

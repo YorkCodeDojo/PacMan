@@ -17,7 +17,7 @@ namespace NPacMan.Game
         {
             gameClock.Subscribe(Tick);
             _board = board;
-            PacMan = new PacMan(1, 3, Direction.Down);
+            PacMan = board.PacMan;
             _collectedCoins = new List<(int x, int y)>();
             _ghosts = board.Ghosts.ToDictionary(x => x.Name, x => x);
         }
@@ -47,7 +47,7 @@ P      .    X    X    .      P
  X............XX............X
  X.XXXX.XXXXX.XX.XXXXX.XXXX.X
  X.XXXX.XXXXX.XX.XXXXX.XXXX.X
- X...XX................XX...X
+ X...XX.......►........XX...X
  XXX.XX.XX.XXXXXXXX.XX.XX.XXX
  XXX.XX.XX.XXXXXXXX.XX.XX.XXX
  X......XX....XX....XX......X
@@ -89,7 +89,7 @@ P      .    X    X    .      P
             var newPositionOfGhosts = new Dictionary<string, Ghost>();
             foreach (var ghost in Ghosts.Values)
             {
-                newPositionOfGhosts[ghost.Name] = ghost.Move();
+                newPositionOfGhosts[ghost.Name] = ghost.Move(PacMan);
             }
             _ghosts = newPositionOfGhosts;
 

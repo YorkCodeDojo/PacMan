@@ -15,7 +15,7 @@ namespace NPacMan.Game
             var coins = new List<(int, int)>();
             var walls = new List<(int, int)>();
             var portalParts = new List<(int, int)>();
-
+            PacMan pacMan = null;
             for (int rowNumber = 0; rowNumber < height; rowNumber++)
             {
                 var row = rows[rowNumber];
@@ -23,6 +23,18 @@ namespace NPacMan.Game
                 {
                     switch (row[columnNumber])
                     {
+                        case '▲':
+                            pacMan = new PacMan(columnNumber-1, rowNumber, Direction.Up);
+                            break;
+                        case '▼':
+                            pacMan = new PacMan(columnNumber - 1, rowNumber, Direction.Down);
+                            break;
+                        case '►':
+                            pacMan = new PacMan(columnNumber - 1, rowNumber, Direction.Right);
+                            break;
+                        case '◄':
+                            pacMan = new PacMan(columnNumber - 1, rowNumber, Direction.Left);
+                            break;
                         case 'X':
                             walls.Add((columnNumber-1, rowNumber));
                             break;
@@ -50,7 +62,7 @@ namespace NPacMan.Game
                 portals.Add(portalParts[1], portalParts[0]);
             }
 
-            return new GameBoard(width-2, height, walls, coins, portals);
+            return new GameBoard(width-2, height, walls, coins, portals, pacMan);
         }
     }
 }

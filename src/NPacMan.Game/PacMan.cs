@@ -4,7 +4,7 @@ namespace NPacMan.Game
 {
     public class PacMan
     {
-        internal PacMan(int x, int y, Direction direction)
+        public PacMan(int x, int y, Direction direction)
         {
             X = x;
             Y = y;

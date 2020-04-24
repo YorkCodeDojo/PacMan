@@ -4,11 +4,12 @@ namespace NPacMan.Game
 {
     public interface IGhostStrategy
     {
-        (int x, int y) Move(Ghost ghost);
+        (int x, int y) Move(Ghost ghost, PacMan pacman);
     }
 
     public interface IGameBoard
     {
+        PacMan PacMan { get; }
         IReadOnlyCollection<(int x, int y)> Walls { get; }
         IReadOnlyCollection<(int x, int y)> Coins { get; }
         IReadOnlyDictionary<(int x, int y), (int x, int y)> Portals { get; }
@@ -32,9 +33,9 @@ namespace NPacMan.Game
             Strategy = strategy;
         }
 
-        public Ghost Move()
+        public Ghost Move(PacMan pacMan)
         {
-            var (x, y) = Strategy.Move(this);
+            var (x, y) = Strategy.Move(this, pacMan);
             return new Ghost(Name, x, y, Strategy);
         }
     }
