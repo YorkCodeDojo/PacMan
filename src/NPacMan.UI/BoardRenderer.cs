@@ -94,8 +94,6 @@ namespace NPacMan.UI
             var wallPen = new Pen(Brushes.Blue, wallWidth);
             var walls = game.Walls;
 
-            Sprites.RenderSprite(g, 500, 500, cellSize, Sprites.PacMan(Direction.Up, 0, false));
-
             foreach (var wall in walls)
             {
                 var x = wall.x * cellSize;
