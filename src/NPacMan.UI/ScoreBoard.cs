@@ -33,22 +33,25 @@ namespace NPacMan.Game
         public void RenderLivesBonus(Graphics g, int lives, int boardHeight)
         {
             var lifeSprite = _sprites.PacMan(Direction.Left, 1, false);
+            // The large sprite in the score board span two grid squares
+            // rather than being central to one. Adding 0.5 grid square to compensate
+            var ypos = boardHeight * Sprites.PixelGrid + Sprites.PixelGrid / 2;
             for (int i = 0; i < lives; i++)
             {
-                _sprites.RenderSprite(g, 2 * Sprites.PixelGrid, boardHeight * Sprites.PixelGrid, Sprites.PixelGrid * 2, lifeSprite);
+                _sprites.RenderSprite(g, 2 * Sprites.PixelGrid + Sprites.PixelGrid / 2, ypos,  lifeSprite);
             }
         }
 
         private void RenderCharacter(Graphics g, char c, int x, int y)
         {
             var sprite = _sprites.Character(c);
-            _sprites.RenderSprite(g, x * Sprites.PixelGrid, y * Sprites.PixelGrid, Sprites.PixelGrid, sprite);
+            _sprites.RenderSprite(g, x * Sprites.PixelGrid, y * Sprites.PixelGrid, sprite);
         }
 
         private void RenderDigit(Graphics g, int d, int x, int y)
         {
             var sprite = _sprites.Digit(d);
-            _sprites.RenderSprite(g, x * Sprites.PixelGrid, y * Sprites.PixelGrid, Sprites.PixelGrid, sprite);
+            _sprites.RenderSprite(g, x * Sprites.PixelGrid, y * Sprites.PixelGrid, sprite);
         }
 
         private void RenderString(Graphics g, string text, int x, int y)
