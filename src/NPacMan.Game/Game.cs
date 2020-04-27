@@ -8,18 +8,19 @@ namespace NPacMan.Game
     {
         public int Score { get; private set; }
 
-        private readonly IGameBoard _board;
+        private readonly IGameSettings _settings;
         private List<(int x, int y)> _collectedCoins;
         private Dictionary<string, Ghost> _ghosts;
 
 
-        public Game(IGameClock gameClock, IGameBoard board)
+        public Game(IGameClock gameClock, IGameSettings settings)
         {
             gameClock.Subscribe(Tick);
-            _board = board;
-            PacMan = board.PacMan;
+            _settings = settings;
+            PacMan = settings.PacMan;
             _collectedCoins = new List<(int x, int y)>();
-            _ghosts = board.Ghosts.ToDictionary(x => x.Name, x => x);
+            _ghosts = settings.Ghosts.ToDictionary(x => x.Name, x => x);
+            Lives = settings.Lives;
         }
 
         public static Game Create()
@@ -57,21 +58,21 @@ P      .    X    X    .      P
  XXXXXXXXXXXXXXXXXXXXXXXXXXXX
 ";
 
-            return new Game(new GameClock(), BoardLoader.Load(board));
+            return new Game(new GameClock(), GameSettingsLoader.Load(board));
         }
 
 
         public PacMan PacMan { get; private set; }
         public IReadOnlyCollection<(int x, int y)> Coins
-            => _board.Coins.Except(_collectedCoins).ToList().AsReadOnly();
+            => _settings.Coins.Except(_collectedCoins).ToList().AsReadOnly();
         public IReadOnlyCollection<(int x, int y)> Walls
-            => _board.Walls;
+            => _settings.Walls;
 
         public int Width
-            => _board.Width;
+            => _settings.Width;
 
         public int Height
-            => _board.Height;
+            => _settings.Height;
 
         public int Lives { get; private set; }
 
@@ -93,21 +94,21 @@ P      .    X    X    .      P
             }
             _ghosts = newPositionOfGhosts;
 
-            if (_board.Portals.TryGetValue((newPacMan.X, newPacMan.Y), out var portal))
+            if (_settings.Portals.TryGetValue((newPacMan.X, newPacMan.Y), out var portal))
             {
                 newPacMan = new PacMan(portal.x, portal.y, newPacMan.Direction);
                 newPacMan = newPacMan.Move();
             }
 
-            if (!_board.Walls.Contains((newPacMan.X, newPacMan.Y)))
+            if (!_settings.Walls.Contains((newPacMan.X, newPacMan.Y)))
             {
                 PacMan = newPacMan;
 
-                if (_board.Ghosts.Any(ghost => ghost.X == newPacMan.X && ghost.Y == newPacMan.Y))
+                if (_settings.Ghosts.Any(ghost => ghost.X == newPacMan.X && ghost.Y == newPacMan.Y))
                 {
                     Lives--;
                 }
-                else if (_board.Coins.Contains((newPacMan.X, newPacMan.Y)))
+                else if (_settings.Coins.Contains((newPacMan.X, newPacMan.Y)))
                 {
                     var newCollectedCoins = new List<(int,int)>(_collectedCoins);
                     newCollectedCoins.Add((newPacMan.X, newPacMan.Y));

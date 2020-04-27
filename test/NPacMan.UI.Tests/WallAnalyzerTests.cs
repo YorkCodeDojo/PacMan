@@ -10,7 +10,7 @@ namespace NPacMan.UI.Tests
         [Fact]
         public void ShouldReturnTopHorizontalLine()
         {
-            var board = BoardLoader.Load(
+            var board = GameSettingsLoader.Load(
                 @" XXX 
  ... ");
             var type = WallAnalyzer.GetWallType(board.Walls, (1, 0), board.Width, board.Height);
@@ -21,7 +21,7 @@ namespace NPacMan.UI.Tests
         [Fact]
         public void ShouldReturnBottomHorizontalLine()
         {
-            var board = BoardLoader.Load(
+            var board = GameSettingsLoader.Load(
                 @" ... 
  XXX ");
             var type = WallAnalyzer.GetWallType(board.Walls, (1, 1), board.Width, board.Height);
@@ -33,7 +33,7 @@ namespace NPacMan.UI.Tests
         [Fact]
         public void ShouldReturnLeftVerticalLine()
         {
-            var board = BoardLoader.Load(
+            var board = GameSettingsLoader.Load(
                 @" X.. 
  X.. 
  X.. ");
@@ -45,7 +45,7 @@ namespace NPacMan.UI.Tests
         [Fact]
         public void ShouldReturnRightVerticalLine()
         {
-            var board = BoardLoader.Load(
+            var board = GameSettingsLoader.Load(
                 @" ..X 
  ..X 
  ..X ");
@@ -57,7 +57,7 @@ namespace NPacMan.UI.Tests
         [Fact]
         public void ShouldAnalyzeTopLeftCornerAsTopLeftArc()
         {
-            var board = BoardLoader.Load(
+            var board = GameSettingsLoader.Load(
                 @" XX 
  X.");
             var type = WallAnalyzer.GetWallType(board.Walls, (0, 0), board.Width, board.Height);
@@ -69,7 +69,7 @@ namespace NPacMan.UI.Tests
         [Fact]
         public void ShouldAnalyzeTopMiddleCornerAsTopRightArc()
         {
-            var board = BoardLoader.Load(
+            var board = GameSettingsLoader.Load(
                 @" XXX 
  .XX ");
             var type = WallAnalyzer.GetWallType(board.Walls, (1, 0), board.Width, board.Height);
@@ -81,7 +81,7 @@ namespace NPacMan.UI.Tests
         [Fact]
         public void ShouldAnalyzeTopRightCornerAsTopRightArc()
         {
-            var board = BoardLoader.Load(
+            var board = GameSettingsLoader.Load(
                 @" XX 
  .X ");
             var type = WallAnalyzer.GetWallType(board.Walls, (1, 0), board.Width, board.Height);
@@ -93,7 +93,7 @@ namespace NPacMan.UI.Tests
         [Fact]
         public void ShouldAnalyzeTopLeftEdgeAsTopLeftArc()
         {
-            var board = BoardLoader.Load(
+            var board = GameSettingsLoader.Load(
                 @" ... 
  .XX 
  .X ");
@@ -106,7 +106,7 @@ namespace NPacMan.UI.Tests
         [Fact]
         public void ShouldAnalyzeBottomLeftEdgeAsBottomLeftArc()
         {
-            var board = BoardLoader.Load(
+            var board = GameSettingsLoader.Load(
                 @" .X  
  .XX 
  ...");
@@ -119,7 +119,7 @@ namespace NPacMan.UI.Tests
         [Fact]
         public void ShouldAnalyzeTopRightEdgeAsTopRightArc()
         {
-            var board = BoardLoader.Load(
+            var board = GameSettingsLoader.Load(
                 @" ...
  XX.
   X. ");
@@ -132,7 +132,7 @@ namespace NPacMan.UI.Tests
         [Fact]
         public void ShouldAnalyzeBottomRightEdgeAsBottomRightArc()
         {
-            var board = BoardLoader.Load(
+            var board = GameSettingsLoader.Load(
                 @"  X.
  XX.
  ... ");
@@ -146,7 +146,7 @@ namespace NPacMan.UI.Tests
         [Fact]
         public void ShouldAnalyzeVerticalLineAsVerticalLine()
         {
-            var board = BoardLoader.Load(
+            var board = GameSettingsLoader.Load(
                 @" XXX
  .XX
  .XX");
@@ -159,7 +159,7 @@ namespace NPacMan.UI.Tests
         [Fact]
         public void ShouldAnalyzeVerticalLine2AsVerticalLine()
         {
-            var board = BoardLoader.Load(
+            var board = GameSettingsLoader.Load(
                 @" .XX
  .XX
  .XX");
@@ -172,7 +172,7 @@ namespace NPacMan.UI.Tests
         [Fact]
         public void ShouldAnalyzeVerticalLine3AsVerticalLine()
         {
-            var board = BoardLoader.Load(
+            var board = GameSettingsLoader.Load(
                 @" XXX
  XX.
  XX.");
@@ -185,7 +185,7 @@ namespace NPacMan.UI.Tests
         [Fact]
         public void ShouldAnalyzeVerticalLine4AsVerticalLine()
         {
-            var board = BoardLoader.Load(
+            var board = GameSettingsLoader.Load(
                 @" XX.
  XX.
  XX.");
@@ -199,7 +199,7 @@ namespace NPacMan.UI.Tests
         [Fact]
         public void ShouldAnalyzeHorizontalLine1AsHorizontalLine()
         {
-            var board = BoardLoader.Load(
+            var board = GameSettingsLoader.Load(
                 @" ...
  XXX
  XXX");
@@ -212,7 +212,7 @@ namespace NPacMan.UI.Tests
         [Fact]
         public void ShouldAnalyzeHorizontalLine2AsHorizontalLine()
         {
-            var board = BoardLoader.Load(
+            var board = GameSettingsLoader.Load(
                 @" XXX 
  XXX 
  ... ");
@@ -226,7 +226,7 @@ namespace NPacMan.UI.Tests
         [Fact]
         public void ShouldAnalyzeBottomLeftCorner1AsBottomLeftArc()
         {
-            var board = BoardLoader.Load(
+            var board = GameSettingsLoader.Load(
                 @" XX. 
  XXX 
  XXX ");
@@ -240,7 +240,7 @@ namespace NPacMan.UI.Tests
         [Fact]
         public void ShouldAnalyzeTopLeftCorner1AsTopLeftArc()
         {
-            var board = BoardLoader.Load(
+            var board = GameSettingsLoader.Load(
                 @" XXX 
  XXX 
  XX. ");
@@ -253,7 +253,7 @@ namespace NPacMan.UI.Tests
         [Fact]
         public void ShouldAnalyzeTopRightCorner1AsTopRightArc()
         {
-            var board = BoardLoader.Load(
+            var board = GameSettingsLoader.Load(
                 @" XXX 
  XXX 
  .XX ");
@@ -267,7 +267,7 @@ namespace NPacMan.UI.Tests
         [Fact]
         public void ShouldAnalyzeBottomRightCorner1AsBottomRightArc()
         {
-            var board = BoardLoader.Load(
+            var board = GameSettingsLoader.Load(
                 @" .XX 
  XXX 
  XXX ");
@@ -280,7 +280,7 @@ namespace NPacMan.UI.Tests
         [Fact]
         public void ShouldAnalyzeLeftHorizontalLineEdgeAsHorizontalLine()
         {
-            var board = BoardLoader.Load(
+            var board = GameSettingsLoader.Load(
                 @"    
   XX 
      ");
@@ -293,7 +293,7 @@ namespace NPacMan.UI.Tests
         [Fact]
         public void ShouldAnalyzeRightHorizontalLineEdgeAsHorizontalLine()
         {
-            var board = BoardLoader.Load(
+            var board = GameSettingsLoader.Load(
                 @"    
    XX
      ");

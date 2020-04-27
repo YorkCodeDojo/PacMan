@@ -14,7 +14,7 @@ namespace NPacMan.Game.Tests
  X.X 
  XX. 
 P   P";
-            var gameBoard = BoardLoader.Load(board);
+            var gameBoard = GameSettingsLoader.Load(board);
 
             gameBoard.Should().BeEquivalentTo(new
             {
@@ -36,7 +36,7 @@ P   P";
         [InlineData("PPPP")]
         public void ShouldThrowIfIncorrectNumberOfPortals(string board)
         {
-            Action action = () => BoardLoader.Load(board);
+            Action action = () => GameSettingsLoader.Load(board);
 
             action.Should().Throw<Exception>();
         }
@@ -52,7 +52,7 @@ P   P";
  XX? 
  XXX ".Replace("?", expectedDirectionSymbol);
 
-            var loadedBoard = BoardLoader.Load(board);
+            var loadedBoard = GameSettingsLoader.Load(board);
 
             loadedBoard.PacMan.Should().BeEquivalentTo(new
             {
@@ -69,7 +69,7 @@ P   P";
  XXR 
  XXX ";
 
-            var loadedBoard = BoardLoader.Load(board);
+            var loadedBoard = GameSettingsLoader.Load(board);
 
             loadedBoard.Ghosts.Should().ContainEquivalentOf(new
             {

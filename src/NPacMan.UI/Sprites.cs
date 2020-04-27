@@ -18,20 +18,25 @@ namespace NPacMan.UI
         
         /// <summary>
         /// Render a sprite to the graphics context
+        /// Position is top corner of 8 pixel grid
+        /// Larger sprites (eg. PacMac, Ghosts) are offset so they are in the centre of the square
         /// </summary>
         /// <param name="g"></param>
         /// <param name="x">Screen X (pixel)</param>
         /// <param name="y">Screen Y (pixel)</param>
         /// <param name="size">Size of sprite on screen (pixel)</param>
         /// <param name="source">Sprite to show</param>
-        public void RenderSprite(Graphics g, int x, int y, int size, SpriteSource source)
+        public void RenderSprite(Graphics g, int x, int y, SpriteSource source)
         {
+            var size = PixelGrid * source.Size;
+            x = x + PixelGrid / 2 - size / 2;
+            y = y + PixelGrid / 2 - size / 2;
             g.DrawImage(Gfx, new Rectangle(x, y, size, size), PixelGrid * source.XPos, PixelGrid * source.YPos,
-                PixelGrid * source.Size, PixelGrid * source.Size,
+                size, size,
                 GraphicsUnit.Pixel);
         }
 
-        private const int PixelGrid = 8;
+        public const int PixelGrid = 8;
 
         public SpriteSource[] Bonus;
 
@@ -254,20 +259,6 @@ namespace NPacMan.UI
                 default:
                     throw new Exception("Bad board piece");
             }
-        }
-    }
-
-    public class SpriteSource
-    {
-        public int XPos;
-        public int YPos;
-        public int Size;
-
-        public SpriteSource(int x, int y, int size)
-        {
-            XPos = x;
-            YPos = y;
-            Size = size;
         }
     }
 }

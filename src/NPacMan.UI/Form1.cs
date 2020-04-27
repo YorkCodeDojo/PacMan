@@ -51,16 +51,29 @@ namespace NPacMan.UI
             try
             {
                 var currentContext = BufferedGraphicsManager.Current;
-                using var myBuffer = currentContext.Allocate(this.CreateGraphics(), this.DisplayRectangle);
-                var g = myBuffer.Graphics;
+                using var screenBuffer = currentContext.Allocate(this.CreateGraphics(), this.DisplayRectangle);
 
-                _boardRenderer.RenderWalls(g, this.ClientSize.Width, this.ClientSize.Height, _game);
-                _boardRenderer.RenderCoins(g, this.ClientSize.Width, this.ClientSize.Height, _game);
-                _boardRenderer.RenderPacMan(g, this.ClientSize.Width, this.ClientSize.Height, _game);
-                _boardRenderer.RenderScore(g, this.ClientSize.Width, this.ClientSize.Height, _game);
-                _boardRenderer.RenderGhosts(g, this.ClientSize.Width, this.ClientSize.Height, _game);
+                using var gameBuffer = new Bitmap(_game.Width * Sprites.PixelGrid, (_game.Height + 5) * Sprites.PixelGrid);
+                {
+                    var g = Graphics.FromImage(gameBuffer);
 
-                myBuffer.Render();
+                    _boardRenderer.RenderWalls(g, _game);
+                    _boardRenderer.RenderCoins(g, _game);
+                    _boardRenderer.RenderPacMan(g, _game);
+                    _boardRenderer.RenderScore(g, _game);
+                    _boardRenderer.RenderGhosts(g, _game);
+                }
+                {
+                    var g = screenBuffer.Graphics;
+                    var scale = Math.Min((float)ClientSize.Width / gameBuffer.Width, (float)ClientSize.Height / gameBuffer.Height);
+                    g.DrawImage(gameBuffer, new RectangleF(0f, 0f, gameBuffer.Width * scale, gameBuffer.Height * scale), 
+                        new RectangleF(0,0,gameBuffer.Width, gameBuffer.Height), 
+                        GraphicsUnit.Pixel);
+                }
+
+                var gScreen = screenBuffer.Graphics;
+
+                screenBuffer.Render();
             }
             catch (System.ObjectDisposedException)
             {

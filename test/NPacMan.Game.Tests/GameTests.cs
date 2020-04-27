@@ -7,7 +7,7 @@ namespace NPacMan.Game.Tests
 {
     public class GameTests
     {
-        private readonly TestGameBoard _gameBoard;
+        private readonly TestGameSettings _gameSettings;
         private readonly TestGameClock _gameClock;
         private readonly Game _game;
 
@@ -20,22 +20,28 @@ namespace NPacMan.Game.Tests
 
         public GameTests()
         {
-            _gameBoard = new TestGameBoard();
+            _gameSettings = new TestGameSettings();
             _gameClock = new TestGameClock();
-            _game = new Game(_gameClock, _gameBoard);
+            _game = new Game(_gameClock, _gameSettings);
         }
 
         [Fact]
         public void PacManStartsInInitialPosition()
         {
-            _gameBoard.PacMan = new PacMan(5, 6, Direction.Right);
-            var game = new Game(_gameClock, _gameBoard);
+            _gameSettings.PacMan = new PacMan(5, 6, Direction.Right);
+            var game = new Game(_gameClock, _gameSettings);
 
             game.PacMan.Should().BeEquivalentTo(new {
                 X = 5,
                 Y = 6,
                 Direction = Direction.Right
             });
+        }
+
+        [Fact]
+        public void GameStartsWithThreeLives()
+        {
+            _game.Lives.Should().Be(3);
         }
 
         [Theory]
@@ -73,7 +79,7 @@ namespace NPacMan.Game.Tests
 
             _game.ChangeDirection(directionToFace);
 
-            _gameBoard.Walls.Add((x + createWallXOffset, y + createWallYOffset));
+            _gameSettings.Walls.Add((x + createWallXOffset, y + createWallYOffset));
 
             _gameClock.Tick();
 
@@ -109,7 +115,7 @@ namespace NPacMan.Game.Tests
 
             _game.ChangeDirection(Direction.Down);
 
-            _gameBoard.Coins.Add((x, y + 1));
+            _gameSettings.Coins.Add((x, y + 1));
             _gameClock.Tick();
 
             _game.Score.Should().Be(10);
@@ -123,8 +129,8 @@ namespace NPacMan.Game.Tests
 
             _game.ChangeDirection(Direction.Down);
 
-            _gameBoard.Coins.Add((x, y + 1));
-            _gameBoard.Coins.Add((x, y + 2));
+            _gameSettings.Coins.Add((x, y + 1));
+            _gameSettings.Coins.Add((x, y + 2));
 
             _gameClock.Tick();
             _gameClock.Tick();
@@ -140,7 +146,7 @@ namespace NPacMan.Game.Tests
 
             _game.ChangeDirection(Direction.Down);
 
-            _gameBoard.Coins.Add((x, y + 1));
+            _gameSettings.Coins.Add((x, y + 1));
 
             _gameClock.Tick();
 
@@ -155,8 +161,8 @@ namespace NPacMan.Game.Tests
 
             _game.ChangeDirection(Direction.Down);
 
-            _gameBoard.Coins.Add((x, y + 1));
-            _gameBoard.Coins.Add((x, y + 2));
+            _gameSettings.Coins.Add((x, y + 1));
+            _gameSettings.Coins.Add((x, y + 2));
 
             _gameClock.Tick();
 
@@ -167,7 +173,7 @@ namespace NPacMan.Game.Tests
         [Fact]
         public void GameContainsAllCoins()
         {
-            var gameBoard = new TestGameBoard();
+            var gameBoard = new TestGameSettings();
             gameBoard.Coins.Add((1, 1));
             gameBoard.Coins.Add((1, 2));
             gameBoard.Coins.Add((2, 2));
@@ -191,7 +197,7 @@ namespace NPacMan.Game.Tests
             var y = _game.PacMan.Y;
             var score = _game.Score;
 
-            _gameBoard.Portals.Add((x - 1, y), (15, 15));
+            _gameSettings.Portals.Add((x - 1, y), (15, 15));
 
             _game.ChangeDirection(Direction.Left);
 
@@ -212,7 +218,7 @@ namespace NPacMan.Game.Tests
         public void TheGameCanReadTheWidthFromTheBoard()
         {
             var gameBoardWidth = 100;
-            _gameBoard.Width = gameBoardWidth;
+            _gameSettings.Width = gameBoardWidth;
 
             _game.Width.Should().Be(gameBoardWidth);
 
@@ -222,7 +228,7 @@ namespace NPacMan.Game.Tests
         public void TheGameCanReadTheHeightFromTheBoard()
         {
             var gameBoardHeight = 100;
-            _gameBoard.Height = gameBoardHeight;
+            _gameSettings.Height = gameBoardHeight;
 
             _game.Height.Should().Be(gameBoardHeight);
 
@@ -235,7 +241,7 @@ namespace NPacMan.Game.Tests
             var x = _game.PacMan.X + 1;
             var y = _game.PacMan.Y;
 
-            _gameBoard.Ghosts.Add(new Ghost("Ghost1", x, y, new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", x, y, new StandingStillGhostStrategy()));
 
             _game.ChangeDirection(Direction.Left);
             _gameClock.Tick();
@@ -250,7 +256,7 @@ namespace NPacMan.Game.Tests
             var x = _game.PacMan.X + 1;
             var y = _game.PacMan.Y;
 
-            _gameBoard.Ghosts.Add(new Ghost("Ghost1", x, y, new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", x, y, new StandingStillGhostStrategy()));
 
             _game.ChangeDirection(Direction.Right);
             _gameClock.Tick();
@@ -266,8 +272,8 @@ namespace NPacMan.Game.Tests
             var x = _game.PacMan.X + 1;
             var y = _game.PacMan.Y;
 
-            _gameBoard.Ghosts.Add(new Ghost("Ghost1", x, y, new StandingStillGhostStrategy()));
-            _gameBoard.Coins.Add((x, y));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", x, y, new StandingStillGhostStrategy()));
+            _gameSettings.Coins.Add((x, y));
 
             _game.ChangeDirection(Direction.Right);
             _gameClock.Tick();
@@ -281,9 +287,9 @@ namespace NPacMan.Game.Tests
         public void GhostMovesInDirectionOfStrategy()
         {
             var strategy = new GhostGoesRightStrategy();
-            _gameBoard.Ghosts.Add(new Ghost("Ghost1", 0, 0, strategy));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", 0, 0, strategy));
 
-            var game = new Game(_gameClock, _gameBoard);
+            var game = new Game(_gameClock, _gameSettings);
 
             _gameClock.Tick();
             game.Ghosts["Ghost1"].Should().BeEquivalentTo(new
@@ -292,15 +298,5 @@ namespace NPacMan.Game.Tests
                 Y = 0,
             });
         }
-    }
-
-    public class StandingStillGhostStrategy : IGhostStrategy
-    {
-        public (int x, int y) Move(Ghost ghost, Game game) => (ghost.X, ghost.Y);
-    }
-
-    public class GhostGoesRightStrategy : IGhostStrategy
-    {
-        public (int x, int y) Move(Ghost ghost, Game game) => (ghost.X+1, ghost.Y);
     }
 }
