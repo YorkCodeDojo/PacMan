@@ -53,7 +53,7 @@ namespace NPacMan.UI
                 var currentContext = BufferedGraphicsManager.Current;
                 using var screenBuffer = currentContext.Allocate(this.CreateGraphics(), this.DisplayRectangle);
 
-                var gameBuffer = new Bitmap(_game.Width * Sprites.PixelGrid, (_game.Height + 5) * Sprites.PixelGrid);
+                using var gameBuffer = new Bitmap(_game.Width * Sprites.PixelGrid, (_game.Height + 5) * Sprites.PixelGrid);
                 {
                     var g = Graphics.FromImage(gameBuffer);
 
