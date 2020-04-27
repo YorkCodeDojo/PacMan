@@ -38,7 +38,7 @@ namespace NPacMan.Game
             var ypos = boardHeight * Sprites.PixelGrid + Sprites.PixelGrid / 2;
             for (int i = 0; i < lives; i++)
             {
-                _sprites.RenderSprite(g, 2 * Sprites.PixelGrid + Sprites.PixelGrid / 2, ypos,  lifeSprite);
+                _sprites.RenderSprite(g, (i * Sprites.PixelGrid * 2) + 2 * Sprites.PixelGrid + Sprites.PixelGrid / 2, ypos,  lifeSprite);
             }
         }
 
