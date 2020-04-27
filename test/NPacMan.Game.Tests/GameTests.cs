@@ -38,6 +38,12 @@ namespace NPacMan.Game.Tests
             });
         }
 
+        [Fact]
+        public void GameStartsWithThreeLives()
+        {
+            _game.Lives.Should().Be(3);
+        }
+
         [Theory]
         [InlineData(Direction.Up, 0, -1)]
         [InlineData(Direction.Down, 0, +1)]

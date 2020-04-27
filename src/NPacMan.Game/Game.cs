@@ -20,6 +20,7 @@ namespace NPacMan.Game
             PacMan = board.PacMan;
             _collectedCoins = new List<(int x, int y)>();
             _ghosts = board.Ghosts.ToDictionary(x => x.Name, x => x);
+            Lives = board.Lives;
         }
 
         public static Game Create()

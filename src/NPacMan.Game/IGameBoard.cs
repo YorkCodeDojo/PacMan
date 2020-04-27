@@ -15,6 +15,7 @@ namespace NPacMan.Game
         IReadOnlyDictionary<(int x, int y), (int x, int y)> Portals { get; }
         int Width { get; }
         int Height { get; }
+        int Lives { get; }
         IReadOnlyCollection<Ghost> Ghosts { get; }
     }
 

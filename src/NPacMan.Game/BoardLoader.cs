@@ -66,7 +66,7 @@ namespace NPacMan.Game
                 portals.Add(portalParts[1], portalParts[0]);
             }
 
-            return new GameBoard(width-2, height, walls, coins, portals, pacMan, ghosts);
+            return new GameBoard(width-2, height, walls, coins, portals, pacMan, ghosts, 3);
         }
     }
 }

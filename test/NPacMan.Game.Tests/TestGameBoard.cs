@@ -27,6 +27,8 @@ namespace NPacMan.Game.Tests
 
         public int Height { get; set; }
 
+        public int Lives { get; set; } = 3;
+
         public List<Ghost> Ghosts { get; }
             = new List<Ghost>();
 
