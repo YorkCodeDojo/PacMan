@@ -3,24 +3,24 @@ using System.Runtime.CompilerServices;
 
 namespace NPacMan.Game.Tests
 {
-    public class TestGameBoard : IGameBoard
+    public class TestGameSettings : IGameSettings
     {
         public List<(int x, int y)> Walls { get; set; }
             = new List<(int x, int y)>();
 
-        IReadOnlyCollection<(int x, int y)> IGameBoard.Walls
+        IReadOnlyCollection<(int x, int y)> IGameSettings.Walls
             => this.Walls;
 
         public List<(int x, int y)> Coins { get; set; }
             = new List<(int x, int y)>();
 
-        IReadOnlyCollection<(int x, int y)> IGameBoard.Coins
+        IReadOnlyCollection<(int x, int y)> IGameSettings.Coins
             => this.Coins;
 
         public Dictionary<(int x, int y), (int x, int y)> Portals { get; set; }
             = new Dictionary<(int x, int y), (int x, int y)>();
 
-        IReadOnlyDictionary<(int x, int y), (int x, int y)> IGameBoard.Portals
+        IReadOnlyDictionary<(int x, int y), (int x, int y)> IGameSettings.Portals
             => this.Portals;
 
         public int Width { get; set; }
@@ -32,7 +32,7 @@ namespace NPacMan.Game.Tests
         public List<Ghost> Ghosts { get; }
             = new List<Ghost>();
 
-        IReadOnlyCollection<Ghost> IGameBoard.Ghosts
+        IReadOnlyCollection<Ghost> IGameSettings.Ghosts
             => this.Ghosts;
 
         public PacMan PacMan { get; set; } = new PacMan(10, 10, Direction.Right);

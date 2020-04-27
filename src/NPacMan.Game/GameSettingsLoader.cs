@@ -4,9 +4,9 @@ using System.Linq;
 
 namespace NPacMan.Game
 {
-    public class BoardLoader
+    public class GameSettingsLoader
     {
-        public static IGameBoard Load(string board)
+        public static IGameSettings Load(string board)
         {
             var rows = board.Split(new []{Environment.NewLine}, StringSplitOptions.None);
             var height = rows.Length;
@@ -66,7 +66,7 @@ namespace NPacMan.Game
                 portals.Add(portalParts[1], portalParts[0]);
             }
 
-            return new GameBoard(width-2, height, walls, coins, portals, pacMan, ghosts, 3);
+            return new GameSettings(width-2, height, walls, coins, portals, pacMan, ghosts, 3);
         }
     }
 }

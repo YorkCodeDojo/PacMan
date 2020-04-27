@@ -2,9 +2,9 @@
 
 namespace NPacMan.Game
 {
-    public class GameBoard : IGameBoard
+    public class GameSettings : IGameSettings
     {
-        public GameBoard(int width, int height, IReadOnlyCollection<(int,int)> walls, IReadOnlyCollection<(int,int)> coins, IReadOnlyDictionary<(int,int), (int, int)> portals, PacMan pacMan, IReadOnlyCollection<Ghost> ghosts, int lives)
+        public GameSettings(int width, int height, IReadOnlyCollection<(int,int)> walls, IReadOnlyCollection<(int,int)> coins, IReadOnlyDictionary<(int,int), (int, int)> portals, PacMan pacMan, IReadOnlyCollection<Ghost> ghosts, int lives)
         {
             Width = width;
             Height = height;

@@ -14,7 +14,7 @@ namespace NPacMan.Game.Tests
         public void ShouldMoveTowardsPacMan(int pacManX, int pacManY, int expectedGhostPositionX, int expectedGhostPositionY)
         {
             var name = "Bob";
-            var board = new TestGameBoard()
+            var board = new TestGameSettings()
             {
                 Ghosts = { new Ghost(name, 5, 5, new DirectChaseToPacManStrategy()) },
                 PacMan = new PacMan(pacManX, pacManY, Direction.Left)
@@ -35,7 +35,7 @@ namespace NPacMan.Game.Tests
         public void ShouldNotWalkInToWall()
         {
             var name = "Bob";
-            var board = new TestGameBoard()
+            var board = new TestGameSettings()
             {
                 Ghosts = { new Ghost(name, 5, 5, new DirectChaseToPacManStrategy()) },
                 PacMan = new PacMan(3, 5, Direction.Left),
@@ -65,7 +65,7 @@ namespace NPacMan.Game.Tests
         public void ShouldNotWalkInToWall2()
         {
             var name = "Bob";
-            var board = new TestGameBoard()
+            var board = new TestGameSettings()
             {
                 Ghosts = { new Ghost(name, 5, 5, new DirectChaseToPacManStrategy()) },
                 PacMan = new PacMan(5, 3, Direction.Left),
