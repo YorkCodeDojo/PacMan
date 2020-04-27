@@ -28,16 +28,16 @@ namespace NPacMan.Game
                             ghosts.Add(new Ghost("Red", columnNumber - 1, rowNumber, new DirectChaseToPacManStrategy()));
                             break;
                         case '▲':
-                            pacMan = new PacMan(columnNumber-1, rowNumber, Direction.Up);
+                            pacMan = new PacMan(columnNumber-1, rowNumber, Direction.Up, PacManStatus.Alive, 3);
                             break;
                         case '▼':
-                            pacMan = new PacMan(columnNumber - 1, rowNumber, Direction.Down);
+                            pacMan = new PacMan(columnNumber - 1, rowNumber, Direction.Down, PacManStatus.Alive, 3);
                             break;
                         case '►':
-                            pacMan = new PacMan(columnNumber - 1, rowNumber, Direction.Right);
+                            pacMan = new PacMan(columnNumber - 1, rowNumber, Direction.Right, PacManStatus.Alive, 3);
                             break;
                         case '◄':
-                            pacMan = new PacMan(columnNumber - 1, rowNumber, Direction.Left);
+                            pacMan = new PacMan(columnNumber - 1, rowNumber, Direction.Left, PacManStatus.Alive, 3);
                             break;
                         case 'X':
                             walls.Add((columnNumber-1, rowNumber));
@@ -66,7 +66,7 @@ namespace NPacMan.Game
                 portals.Add(portalParts[1], portalParts[0]);
             }
 
-            return new GameSettings(width-2, height, walls, coins, portals, pacMan, ghosts, 3);
+            return new GameSettings(width-2, height, walls, coins, portals, pacMan, ghosts);
         }
     }
 }

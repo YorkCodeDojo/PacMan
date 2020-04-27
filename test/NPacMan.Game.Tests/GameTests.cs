@@ -28,7 +28,7 @@ namespace NPacMan.Game.Tests
         [Fact]
         public void PacManStartsInInitialPosition()
         {
-            _gameSettings.PacMan = new PacMan(5, 6, Direction.Right);
+            _gameSettings.PacMan = new PacMan(5, 6, Direction.Right, PacManStatus.Alive, 3);
             var game = new Game(_gameClock, _gameSettings);
 
             game.PacMan.Should().BeEquivalentTo(new
@@ -265,7 +265,9 @@ namespace NPacMan.Game.Tests
             _gameClock.Tick();
 
             game.Lives.Should().Be(currentLives - 1);
+            game.PacMan.Status.Should().Be(PacManStatus.Dying);
         }
+
 
         [Fact]
         public void PacManLosesALifeWhenCollidesWithGhostWalkingTowardsPacMan()
@@ -342,4 +344,5 @@ namespace NPacMan.Game.Tests
             });
         }
     }
+
 }

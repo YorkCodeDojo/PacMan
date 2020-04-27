@@ -1,9 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Xml.XPath;
 
 namespace NPacMan.Game
 {
+
+    public enum PacManStatus
+    {
+        Alive,
+        Dying,
+        Respawning,
+        Dead
+    }
     public class Game
     {
         public int Score { get; private set; }
@@ -20,7 +29,6 @@ namespace NPacMan.Game
             PacMan = settings.PacMan;
             _collectedCoins = new List<(int x, int y)>();
             _ghosts = settings.Ghosts.ToDictionary(x => x.Name, x => x);
-            Lives = settings.Lives;
         }
 
         public static Game Create()
@@ -61,7 +69,6 @@ P      .    X    X    .      P
             return new Game(new GameClock(), GameSettingsLoader.Load(board));
         }
 
-
         public PacMan PacMan { get; private set; }
         public IReadOnlyCollection<(int x, int y)> Coins
             => _settings.Coins.Except(_collectedCoins).ToList().AsReadOnly();
@@ -74,23 +81,23 @@ P      .    X    X    .      P
         public int Height
             => _settings.Height;
 
-        public int Lives { get; private set; }
+        public int Lives
+            => PacMan.Lives;
 
         public IReadOnlyDictionary<string, Ghost> Ghosts => _ghosts;
 
         public void ChangeDirection(Direction direction)
         {
-            PacMan = new PacMan(PacMan.X, PacMan.Y, direction);
+            PacMan = PacMan.WithNewDirection(direction);
         }
 
         private void Tick()
         {
             var newPacMan = PacMan.Move();
 
-
             if (_settings.Portals.TryGetValue((newPacMan.X, newPacMan.Y), out var portal))
             {
-                newPacMan = new PacMan(portal.x, portal.y, newPacMan.Direction);
+                newPacMan = PacMan.WithNewX(portal.x).WithNewY(portal.y);
                 newPacMan = newPacMan.Move();
             }
 
@@ -98,7 +105,7 @@ P      .    X    X    .      P
 
             if (HasDied())
             {
-                Lives--;
+                PacMan = PacMan.Kill();
                 return;
             }
 
@@ -109,7 +116,7 @@ P      .    X    X    .      P
 
             if (HasDied())
             {
-                Lives--;
+                PacMan = PacMan.Kill();
                 return;
             }
 
