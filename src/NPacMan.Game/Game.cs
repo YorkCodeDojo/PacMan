@@ -87,12 +87,6 @@ P      .    X    X    .      P
         {
             var newPacMan = PacMan.Move();
 
-            var newPositionOfGhosts = new Dictionary<string, Ghost>();
-            foreach (var ghost in Ghosts.Values)
-            {
-                newPositionOfGhosts[ghost.Name] = ghost.Move(this);
-            }
-            _ghosts = newPositionOfGhosts;
 
             if (_settings.Portals.TryGetValue((newPacMan.X, newPacMan.Y), out var portal))
             {
@@ -100,22 +94,51 @@ P      .    X    X    .      P
                 newPacMan = newPacMan.Move();
             }
 
+            MoveAllGhosts();
+
+            if (HasDied())
+            {
+                Lives--;
+                return;
+            }
+
             if (!_settings.Walls.Contains((newPacMan.X, newPacMan.Y)))
             {
                 PacMan = newPacMan;
-
-                if (_settings.Ghosts.Any(ghost => ghost.X == newPacMan.X && ghost.Y == newPacMan.Y))
-                {
-                    Lives--;
-                }
-                else if (_settings.Coins.Contains((newPacMan.X, newPacMan.Y)))
-                {
-                    var newCollectedCoins = new List<(int,int)>(_collectedCoins);
-                    newCollectedCoins.Add((newPacMan.X, newPacMan.Y));
-                    _collectedCoins = newCollectedCoins;
-                    Score += 10;
-                }
             }
+
+            if (HasDied())
+            {
+                Lives--;
+                return;
+            }
+
+            if (_settings.Coins.Contains((newPacMan.X, newPacMan.Y)))
+            {
+                var newCollectedCoins = new List<(int, int)>(_collectedCoins)
+                    {
+                        (newPacMan.X, newPacMan.Y)
+                    };
+                _collectedCoins = newCollectedCoins;
+                Score += 10;
+            }
+
+        }
+
+        private bool HasDied()
+        {
+            return Ghosts.Values.Any(ghost => ghost.X == PacMan.X && ghost.Y == PacMan.Y);
+        }
+
+        private void MoveAllGhosts()
+        {
+            var newPositionOfGhosts = new Dictionary<string, Ghost>();
+            foreach (var ghost in Ghosts.Values)
+            {
+                newPositionOfGhosts[ghost.Name] = ghost.Move(this);
+            }
+
+            _ghosts = newPositionOfGhosts;
         }
     }
 }
