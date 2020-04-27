@@ -28,10 +28,11 @@ namespace NPacMan.Game.Tests
         [Fact]
         public void PacManStartsInInitialPosition()
         {
-            _gameSettings.PacMan = new PacMan(5, 6, Direction.Right);
+            _gameSettings.PacMan = new PacMan(5, 6, Direction.Right, PacManStatus.Alive, 3);
             var game = new Game(_gameClock, _gameSettings);
 
-            game.PacMan.Should().BeEquivalentTo(new {
+            game.PacMan.Should().BeEquivalentTo(new
+            {
                 X = 5,
                 Y = 6,
                 Direction = Direction.Right
@@ -137,7 +138,7 @@ namespace NPacMan.Game.Tests
 
             _game.Score.Should().Be(20);
         }
-        
+
         [Fact]
         public void CoinShouldBeCollected()
         {
@@ -243,10 +244,11 @@ namespace NPacMan.Game.Tests
 
             _gameSettings.Ghosts.Add(new Ghost("Ghost1", x, y, new StandingStillGhostStrategy()));
 
-            _game.ChangeDirection(Direction.Left);
+            var game = new Game(_gameClock, _gameSettings);
+            game.ChangeDirection(Direction.Left);
             _gameClock.Tick();
 
-            _game.Lives.Should().Be(currentLives);
+            game.Lives.Should().Be(currentLives);
         }
 
         [Fact]
@@ -258,10 +260,51 @@ namespace NPacMan.Game.Tests
 
             _gameSettings.Ghosts.Add(new Ghost("Ghost1", x, y, new StandingStillGhostStrategy()));
 
-            _game.ChangeDirection(Direction.Right);
+            var game = new Game(_gameClock, _gameSettings);
+            game.ChangeDirection(Direction.Right);
             _gameClock.Tick();
 
-            _game.Lives.Should().Be(currentLives - 1);
+            game.Lives.Should().Be(currentLives - 1);
+            game.PacMan.Status.Should().Be(PacManStatus.Dying);
+        }
+
+
+        [Fact]
+        public void PacManLosesALifeWhenCollidesWithGhostWalkingTowardsPacMan()
+        {
+            var currentLives = _game.Lives;
+
+            // G . . . P
+            // . G . P .
+            // . . PG . .
+
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", _gameSettings.PacMan.X - 4, _gameSettings.PacMan.Y, new GhostGoesRightStrategy()));
+
+            var game = new Game(_gameClock, _gameSettings);
+
+            game.ChangeDirection(Direction.Left);
+            _gameClock.Tick();
+            _gameClock.Tick();
+
+            game.Lives.Should().Be(currentLives - 1);
+        }
+
+        [Fact]
+        public void PacManLosesALifeWhenCollidesWithGhostWhenPacManIsFacingAWall()
+        {
+            var currentLives = _game.Lives;
+
+            var x = _game.PacMan.X;
+            var y = _game.PacMan.Y;
+
+            _gameSettings.Walls.Add((x, y - 1));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", x - 1, y, new GhostGoesRightStrategy()));
+
+            var game = new Game(_gameClock, _gameSettings);
+            game.ChangeDirection(Direction.Up);
+            _gameClock.Tick();
+
+            game.Lives.Should().Be(currentLives - 1);
         }
 
 
@@ -275,12 +318,14 @@ namespace NPacMan.Game.Tests
             _gameSettings.Ghosts.Add(new Ghost("Ghost1", x, y, new StandingStillGhostStrategy()));
             _gameSettings.Coins.Add((x, y));
 
-            _game.ChangeDirection(Direction.Right);
+            var game = new Game(_gameClock, _gameSettings);
+            game.ChangeDirection(Direction.Right);
             _gameClock.Tick();
 
             using var _ = new AssertionScope();
-            _game.Coins.Should().Contain((x, y));
-            _game.Score.Should().Be(score);
+            game.Coins.Should().Contain((x, y));
+            game.Score.Should().Be(score);
+
         }
 
         [Fact]
@@ -299,4 +344,5 @@ namespace NPacMan.Game.Tests
             });
         }
     }
+
 }

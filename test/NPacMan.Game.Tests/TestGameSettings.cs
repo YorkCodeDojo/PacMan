@@ -27,15 +27,13 @@ namespace NPacMan.Game.Tests
 
         public int Height { get; set; }
 
-        public int Lives { get; set; } = 3;
-
         public List<Ghost> Ghosts { get; }
             = new List<Ghost>();
 
         IReadOnlyCollection<Ghost> IGameSettings.Ghosts
             => this.Ghosts;
 
-        public PacMan PacMan { get; set; } = new PacMan(10, 10, Direction.Right);
+        public PacMan PacMan { get; set; } = new PacMan(10, 10, Direction.Right, PacManStatus.Alive, 3);
 
     }
 }

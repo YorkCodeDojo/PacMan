@@ -1,9 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Xml.XPath;
 
 namespace NPacMan.Game
 {
+
+    public enum PacManStatus
+    {
+        Alive,
+        Dying,
+        Respawning,
+        Dead
+    }
     public class Game
     {
         public int Score { get; private set; }
@@ -20,7 +29,6 @@ namespace NPacMan.Game
             PacMan = settings.PacMan;
             _collectedCoins = new List<(int x, int y)>();
             _ghosts = settings.Ghosts.ToDictionary(x => x.Name, x => x);
-            Lives = settings.Lives;
         }
 
         public static Game Create()
@@ -61,7 +69,6 @@ P      .    X    X    .      P
             return new Game(new GameClock(), GameSettingsLoader.Load(board));
         }
 
-
         public PacMan PacMan { get; private set; }
         public IReadOnlyCollection<(int x, int y)> Coins
             => _settings.Coins.Except(_collectedCoins).ToList().AsReadOnly();
@@ -74,48 +81,71 @@ P      .    X    X    .      P
         public int Height
             => _settings.Height;
 
-        public int Lives { get; private set; }
+        public int Lives
+            => PacMan.Lives;
 
         public IReadOnlyDictionary<string, Ghost> Ghosts => _ghosts;
 
         public void ChangeDirection(Direction direction)
         {
-            PacMan = new PacMan(PacMan.X, PacMan.Y, direction);
+            PacMan = PacMan.WithNewDirection(direction);
         }
 
         private void Tick()
         {
             var newPacMan = PacMan.Move();
 
-            var newPositionOfGhosts = new Dictionary<string, Ghost>();
-            foreach (var ghost in Ghosts.Values)
-            {
-                newPositionOfGhosts[ghost.Name] = ghost.Move(this);
-            }
-            _ghosts = newPositionOfGhosts;
-
             if (_settings.Portals.TryGetValue((newPacMan.X, newPacMan.Y), out var portal))
             {
-                newPacMan = new PacMan(portal.x, portal.y, newPacMan.Direction);
+                newPacMan = PacMan.WithNewX(portal.x).WithNewY(portal.y);
                 newPacMan = newPacMan.Move();
+            }
+
+            MoveAllGhosts();
+
+            if (HasDied())
+            {
+                PacMan = PacMan.Kill();
+                return;
             }
 
             if (!_settings.Walls.Contains((newPacMan.X, newPacMan.Y)))
             {
                 PacMan = newPacMan;
-
-                if (_settings.Ghosts.Any(ghost => ghost.X == newPacMan.X && ghost.Y == newPacMan.Y))
-                {
-                    Lives--;
-                }
-                else if (_settings.Coins.Contains((newPacMan.X, newPacMan.Y)))
-                {
-                    var newCollectedCoins = new List<(int,int)>(_collectedCoins);
-                    newCollectedCoins.Add((newPacMan.X, newPacMan.Y));
-                    _collectedCoins = newCollectedCoins;
-                    Score += 10;
-                }
             }
+
+            if (HasDied())
+            {
+                PacMan = PacMan.Kill();
+                return;
+            }
+
+            if (_settings.Coins.Contains((newPacMan.X, newPacMan.Y)))
+            {
+                var newCollectedCoins = new List<(int, int)>(_collectedCoins)
+                    {
+                        (newPacMan.X, newPacMan.Y)
+                    };
+                _collectedCoins = newCollectedCoins;
+                Score += 10;
+            }
+
+        }
+
+        private bool HasDied()
+        {
+            return Ghosts.Values.Any(ghost => ghost.X == PacMan.X && ghost.Y == PacMan.Y);
+        }
+
+        private void MoveAllGhosts()
+        {
+            var newPositionOfGhosts = new Dictionary<string, Ghost>();
+            foreach (var ghost in Ghosts.Values)
+            {
+                newPositionOfGhosts[ghost.Name] = ghost.Move(this);
+            }
+
+            _ghosts = newPositionOfGhosts;
         }
     }
 }
