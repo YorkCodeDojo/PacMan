@@ -56,12 +56,19 @@ namespace NPacMan.UI
                 using var gameBuffer = new Bitmap(_game.Width * Sprites.PixelGrid, (_game.Height + 5) * Sprites.PixelGrid);
                 {
                     var g = Graphics.FromImage(gameBuffer);
+                    
+                    _boardRenderer.RenderScore(g, _game);
 
+                    g.TranslateTransform(0, 3 * Sprites.PixelGrid);
                     _boardRenderer.RenderWalls(g, _game);
                     _boardRenderer.RenderCoins(g, _game);
                     _boardRenderer.RenderPacMan(g, _game);
-                    _boardRenderer.RenderScore(g, _game);
                     _boardRenderer.RenderGhosts(g, _game);
+                    g.ResetTransform();
+
+                    g.TranslateTransform(0, (2 + _game.Height) * Sprites.PixelGrid);
+                    _boardRenderer.RenderLives(g, _game);
+                    g.ResetTransform();
                 }
                 {
                     var g = screenBuffer.Graphics;
