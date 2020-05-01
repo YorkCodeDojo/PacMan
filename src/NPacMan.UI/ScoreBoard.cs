@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Text;
-using System.Windows.Forms;
-using NPacMan.UI;
+using NPacMan.Game;
 
-namespace NPacMan.Game
+namespace NPacMan.UI
 {
     public class ScoreBoard
     {
-        private Sprites _sprites;
+        private readonly Sprites _sprites;
 
         public ScoreBoard(Sprites sprites)
         {
