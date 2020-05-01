@@ -45,9 +45,9 @@ namespace NPacMan.Game
  XXXXXX.XXXXX XX XXXXX.XXXXXX
       X.XXXXX XX XXXXX.X     
       X.XX          XX.X     
-      X.XX   R      XX.X     
+      X.XX   B      XX.X     
  XXXXXX.XX  XXXXXX  XX.XXXXXX
-P      .    X    X    .      P
+T      .    X IPCX    .      T
  XXXXXX.XX  XXXXXX  XX.XXXXXX
       X.XX          XX.X     
       X.XX          XX.X     

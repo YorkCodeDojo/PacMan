@@ -24,8 +24,17 @@ namespace NPacMan.Game
                 {
                     switch (row[columnNumber])
                     {
-                        case 'R':
-                            ghosts.Add(new Ghost("Red", columnNumber - 1, rowNumber, new DirectChaseToPacManStrategy()));
+                        case 'B':
+                            ghosts.Add(new Ghost("Blinky", columnNumber - 1, rowNumber, new DirectChaseToPacManStrategy()));
+                            break;
+                        case 'P':
+                            ghosts.Add(new Ghost("Pinky", columnNumber - 1, rowNumber, new StandingStillGhostStrategy()));
+                            break;
+                        case 'I':
+                            ghosts.Add(new Ghost("Inky", columnNumber - 1, rowNumber, new StandingStillGhostStrategy()));
+                            break;
+                        case 'C':
+                            ghosts.Add(new Ghost("Clyde", columnNumber - 1, rowNumber, new StandingStillGhostStrategy()));
                             break;
                         case '▲':
                             pacMan = new PacMan(columnNumber-1, rowNumber, Direction.Up, PacManStatus.Alive, 3);
@@ -45,7 +54,7 @@ namespace NPacMan.Game
                         case '.':
                             coins.Add((columnNumber-1,rowNumber));
                             break;
-                        case 'P':
+                        case 'T':
                             portalParts.Add((columnNumber-1, rowNumber));
                             break;
                         default:

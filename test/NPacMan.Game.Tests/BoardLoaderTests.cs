@@ -13,7 +13,7 @@ namespace NPacMan.Game.Tests
             var board = @" XXX 
  X.X 
  XX. 
-P ▲ P";
+T ▲ T";
             var gameBoard = GameSettingsLoader.Load(board);
 
             gameBoard.Should().BeEquivalentTo(new
@@ -31,9 +31,9 @@ P ▲ P";
         }
 
         [Theory]
-        [InlineData("P")]
-        [InlineData("PPP")]
-        [InlineData("PPPP")]
+        [InlineData("T")]
+        [InlineData("TTT")]
+        [InlineData("TTTT")]
         public void ShouldThrowIfIncorrectNumberOfPortals(string board)
         {
             Action action = () => GameSettingsLoader.Load(board);
@@ -63,21 +63,40 @@ P ▲ P";
         }
 
         [Fact]
-        public void ShouldHaveRedGhostAtCorrectLocation()
+        public void ShouldHaveGhostsAtCorrectLocations()
         {
             var board = @" XXX 
- XXR 
- ▲XX ";
+ BIP 
+ ▲XC ";
 
             var loadedBoard = GameSettingsLoader.Load(board);
 
-            loadedBoard.Ghosts.Should().ContainEquivalentOf(new
+            loadedBoard.Ghosts.Should().BeEquivalentTo(
+            new
+            {
+                X = 0,
+                Y = 1,
+                Name = "Blinky",
+            },
+            new
+            {
+                X = 1,
+                Y = 1,
+                Name = "Inky",
+            },
+            new
             {
                 X = 2,
-                Y = 1
+                Y = 1,
+                Name = "Pinky",
+            },
+            new
+            {
+                X = 2,
+                Y = 2,
+                Name = "Clyde",
             });
         }
 
     }
-
 }
