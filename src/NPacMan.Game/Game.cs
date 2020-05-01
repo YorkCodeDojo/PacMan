@@ -92,6 +92,11 @@ T      .    X IPCX    .      T
 
         private void Tick()
         {
+            if (PacMan.Status != PacManStatus.Alive)
+            {
+                return;
+            }
+
             var newPacMan = PacMan.Move();
 
             if (_settings.Portals.TryGetValue((newPacMan.X, newPacMan.Y), out var portal))
