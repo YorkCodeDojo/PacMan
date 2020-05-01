@@ -16,7 +16,7 @@ namespace NPacMan.Game
             var walls = new List<(int, int)>();
             var portalParts = new List<(int, int)>();
             var ghosts = new List<Ghost>();
-            PacMan pacMan = null;
+            PacMan? pacMan = null;
             for (int rowNumber = 0; rowNumber < height; rowNumber++)
             {
                 var row = rows[rowNumber];
@@ -65,6 +65,9 @@ namespace NPacMan.Game
                 portals.Add(portalParts[0], portalParts[1]);
                 portals.Add(portalParts[1], portalParts[0]);
             }
+
+            if (pacMan is null)
+                throw new Exception("Pacman seems to be missing from the board.");
 
             return new GameSettings(width-2, height, walls, coins, portals, pacMan, ghosts);
         }

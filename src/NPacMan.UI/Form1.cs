@@ -46,7 +46,7 @@ namespace NPacMan.UI
             }
         }
 
-        private void _renderLoop_Tick(object sender, EventArgs e)
+        private void _renderLoop_Tick(object? sender, EventArgs e)
         {
             try
             {
