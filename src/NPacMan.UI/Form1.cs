@@ -66,7 +66,7 @@ namespace NPacMan.UI
                     _boardRenderer.RenderGhosts(g, _game);
                     g.ResetTransform();
 
-                    g.TranslateTransform(0, (2 + _game.Height) * Sprites.PixelGrid);
+                    g.TranslateTransform(0, (3 + _game.Height) * Sprites.PixelGrid);
                     _boardRenderer.RenderLives(g, _game);
                     g.ResetTransform();
                 }

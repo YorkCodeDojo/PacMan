@@ -63,8 +63,7 @@ P      .    X    X    .      P
  X.XXXXXXXXXX.XX.XXXXXXXXXX.X
  X.XXXXXXXXXX.XX.XXXXXXXXXX.X
  X..........................X
- XXXXXXXXXXXXXXXXXXXXXXXXXXXX
-";
+ XXXXXXXXXXXXXXXXXXXXXXXXXXXX";
 
             return new Game(new GameClock(), GameSettingsLoader.Load(board));
         }
