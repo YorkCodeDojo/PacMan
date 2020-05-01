@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using System;
+using System.ComponentModel.Design;
 using System.Net.Http.Headers;
 using System.Xml.XPath;
 
@@ -102,6 +103,11 @@ T      .    X IPCX    .      T
                 newPacMan = newPacMan.Transition(now);
             }
 
+            if (PacMan.Status == PacManStatus.Dying && newPacMan.Status == PacManStatus.Respawning)
+            {
+                SendAllGhostsHome();
+            }
+
             if (PacMan.Status != PacManStatus.Dying)
             {
                 MoveAllGhosts();
@@ -157,5 +163,17 @@ T      .    X IPCX    .      T
 
             _ghosts = newPositionOfGhosts;
         }
+
+        private void SendAllGhostsHome()
+        {
+            var newPositionOfGhosts = new Dictionary<string, Ghost>();
+            foreach (var ghost in Ghosts.Values)
+            {
+                newPositionOfGhosts[ghost.Name] = ghost.GoHome();
+            }
+
+            _ghosts = newPositionOfGhosts;
+        }
+
     }
 }

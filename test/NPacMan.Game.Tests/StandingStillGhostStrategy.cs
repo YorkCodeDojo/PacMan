@@ -4,4 +4,6 @@ namespace NPacMan.Game.Tests
     {
         public (int x, int y) Move(Ghost ghost, Game game) => (ghost.X, ghost.Y);
     }
+
+ 
 }
