@@ -95,12 +95,6 @@ T      .    X IPCX    .      T
         private void Tick(DateTime now)
         {
             var newPacMan = PacMan.Transition(now);
-            if (newPacMan.Status != PacManStatus.Alive)
-            {
-                PacMan = newPacMan;
-                return;
-            }
-
 
             if (_settings.Portals.TryGetValue((newPacMan.X, newPacMan.Y), out var portal))
             {
@@ -108,7 +102,16 @@ T      .    X IPCX    .      T
                 newPacMan = newPacMan.Transition(now);
             }
 
-            MoveAllGhosts();
+            if (PacMan.Status != PacManStatus.Dying)
+            {
+                MoveAllGhosts();
+            }
+
+            if (newPacMan.Status != PacManStatus.Alive)
+            {
+                PacMan = newPacMan;
+                return;
+            }
 
             if (HasDied())
             {

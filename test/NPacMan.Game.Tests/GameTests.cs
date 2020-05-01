@@ -429,6 +429,24 @@ namespace NPacMan.Game.Tests
             game.PacMan.Status.Should().Be(PacManStatus.Respawning);
         }
 
+
+        [Fact]
+        public void GhostShouldBeAbleToMoveWhenPacManIsReSpawning()
+        {
+            _gameSettings.PacMan = new PacMan(1, 1, Direction.Left, PacManStatus.Respawning, 1);
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", 1, 2, new GhostGoesRightStrategy()));
+
+            var game = new Game(_gameClock, _gameSettings);
+            _gameClock.Tick();
+            
+            game.Ghosts.Values.First()
+                .Should().BeEquivalentTo(new
+                {
+                    X = 2,
+                    Y = 2
+                });
+        }
+
     }
 
 }
