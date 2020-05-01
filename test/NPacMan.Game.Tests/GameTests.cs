@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
@@ -405,6 +406,29 @@ namespace NPacMan.Game.Tests
             using var _ = new AssertionScope();
             game.Lives.Should().Be(expectedLife);
         }
+
+        [Fact]
+        public void PacManShouldRespawnAfter4Seconds()
+        {
+            _gameSettings.PacMan = new PacMan(1, 1, Direction.Down, PacManStatus.Alive, 1);
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", 1, 2, new NPacMan.Game.StandingStillGhostStrategy()));
+
+            var game = new Game(_gameClock, _gameSettings);
+            var now = DateTime.UtcNow;
+            _gameClock.Tick(now);
+
+            _gameClock.Tick(now.AddSeconds(1));
+            _gameClock.Tick(now.AddSeconds(2));
+            _gameClock.Tick(now.AddSeconds(3));
+
+            if (game.PacMan.Status != PacManStatus.Dying)
+                throw new Exception($"Invalid PacMan State {game.PacMan.Status:G}");
+
+            _gameClock.Tick(now.AddSeconds(4));
+
+            game.PacMan.Status.Should().Be(PacManStatus.Respawning);
+        }
+
     }
 
 }

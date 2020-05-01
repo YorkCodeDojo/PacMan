@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System;
+using System.Net.Http.Headers;
 using System.Xml.XPath;
 
 namespace NPacMan.Game
@@ -90,26 +92,27 @@ T      .    X IPCX    .      T
             PacMan = PacMan.WithNewDirection(direction);
         }
 
-        private void Tick()
+        private void Tick(DateTime now)
         {
-            if (PacMan.Status != PacManStatus.Alive)
+            var newPacMan = PacMan.Transition(now);
+            if (newPacMan.Status != PacManStatus.Alive)
             {
+                PacMan = newPacMan;
                 return;
             }
 
-            var newPacMan = PacMan.Move();
 
             if (_settings.Portals.TryGetValue((newPacMan.X, newPacMan.Y), out var portal))
             {
                 newPacMan = PacMan.WithNewX(portal.x).WithNewY(portal.y);
-                newPacMan = newPacMan.Move();
+                newPacMan = newPacMan.Transition(now);
             }
 
             MoveAllGhosts();
 
             if (HasDied())
             {
-                PacMan = PacMan.Kill();
+                PacMan = PacMan.Kill(now.AddSeconds(4));
                 return;
             }
 
@@ -120,7 +123,7 @@ T      .    X IPCX    .      T
 
             if (HasDied())
             {
-                PacMan = PacMan.Kill();
+                PacMan = PacMan.Kill(now.AddSeconds(4));
                 return;
             }
 

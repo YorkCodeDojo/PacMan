@@ -4,16 +4,21 @@ namespace NPacMan.Game.Tests
 {
     public class TestGameClock : IGameClock
     {
-        private Action? _action;
+        private Action<DateTime>? _action;
 
-        public void Subscribe(Action action)
+        public void Subscribe(Action<DateTime> action)
         {
             _action = action;
         }
 
         public void Tick()
         {
-            _action?.Invoke();
+            Tick(DateTime.UtcNow);
+        }
+
+        public void Tick(DateTime now)
+        {
+            _action?.Invoke(now);
         }
     }
 }

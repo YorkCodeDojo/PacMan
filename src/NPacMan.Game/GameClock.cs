@@ -3,18 +3,24 @@ using System.Threading;
 
 namespace NPacMan.Game
 {
-    public class GameClock : IGameClock
+    public class GameClock : IGameClock, IDisposable
     {
-        private Action? _action;
-        private Timer _timer;
+        private Action<DateTime>? _action;
+        private readonly Timer _timer;
 
         public GameClock()
         {
-            _timer = new System.Threading.Timer((state) => _action?.Invoke(), null, 0, 200);
+            _timer = new Timer((state) => _action?.Invoke(DateTime.Now), null, 0, 200);
         }
-        public void Subscribe(Action action)
+
+        public void Subscribe(Action<DateTime> action)
         {
             _action = action;
+        }
+
+        public void Dispose()
+        {
+            _timer.Dispose();
         }
     }
 }
