@@ -5,7 +5,7 @@ namespace NPacMan.Game
 {
     public class GameClock : IGameClock
     {
-        private Action _action;
+        private Action? _action;
         private Timer _timer;
 
         public GameClock()

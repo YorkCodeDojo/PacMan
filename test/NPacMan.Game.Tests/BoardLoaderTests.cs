@@ -13,7 +13,7 @@ namespace NPacMan.Game.Tests
             var board = @" XXX 
  X.X 
  XX. 
-P   P";
+P ▲ P";
             var gameBoard = GameSettingsLoader.Load(board);
 
             gameBoard.Should().BeEquivalentTo(new
@@ -67,7 +67,7 @@ P   P";
         {
             var board = @" XXX 
  XXR 
- XXX ";
+ ▲XX ";
 
             var loadedBoard = GameSettingsLoader.Load(board);
 

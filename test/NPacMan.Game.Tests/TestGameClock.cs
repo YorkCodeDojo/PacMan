@@ -4,7 +4,7 @@ namespace NPacMan.Game.Tests
 {
     public class TestGameClock : IGameClock
     {
-        private Action _action;
+        private Action? _action;
 
         public void Subscribe(Action action)
         {
