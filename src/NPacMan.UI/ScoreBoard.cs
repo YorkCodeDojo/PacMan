@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Text;
-using System.Windows.Forms;
-using NPacMan.UI;
+using NPacMan.Game;
 
-namespace NPacMan.Game
+namespace NPacMan.UI
 {
     public class ScoreBoard
     {
-        private Sprites _sprites;
+        private readonly Sprites _sprites;
 
         public ScoreBoard(Sprites sprites)
         {
@@ -30,12 +27,12 @@ namespace NPacMan.Game
             RenderString(g, high.ToString().PadLeft(6), 11, 1);
         }
 
-        public void RenderLivesBonus(Graphics g, int lives, int boardHeight)
+        public void RenderLivesBonus(Graphics g, int lives)
         {
             var lifeSprite = _sprites.PacMan(Direction.Left, 1, false);
             // The large sprite in the score board span two grid squares
             // rather than being central to one. Adding 0.5 grid square to compensate
-            var ypos = boardHeight * Sprites.PixelGrid + Sprites.PixelGrid / 2;
+            var ypos = Sprites.PixelGrid / 2;
             for (int i = 0; i < lives; i++)
             {
                 _sprites.RenderSprite(g, (i * Sprites.PixelGrid * 2) + 2 * Sprites.PixelGrid + Sprites.PixelGrid / 2, ypos,  lifeSprite);

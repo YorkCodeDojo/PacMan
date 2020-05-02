@@ -16,7 +16,7 @@ namespace NPacMan.Game.Tests
             var name = "Bob";
             var board = new TestGameSettings()
             {
-                Ghosts = { new Ghost(name, 5, 5, new DirectChaseToPacManStrategy()) },
+                Ghosts = { new Ghost(name, 5, 5, new DirectChaseToPacManStrategy(), new StandingStillGhostStrategy()) },
                 PacMan = new PacMan(pacManX, pacManY, Direction.Left, PacManStatus.Alive, 3)
             };
 
@@ -37,7 +37,7 @@ namespace NPacMan.Game.Tests
             var name = "Bob";
             var board = new TestGameSettings()
             {
-                Ghosts = { new Ghost(name, 5, 5, new DirectChaseToPacManStrategy()) },
+                Ghosts = { new Ghost(name, 5, 5, new DirectChaseToPacManStrategy(), new StandingStillGhostStrategy()) },
                 PacMan = new PacMan(3, 5, Direction.Left, PacManStatus.Alive, 3),
                 Walls = {(4,5)}
             };
@@ -67,7 +67,7 @@ namespace NPacMan.Game.Tests
             var name = "Bob";
             var board = new TestGameSettings()
             {
-                Ghosts = { new Ghost(name, 5, 5, new DirectChaseToPacManStrategy()) },
+                Ghosts = { new Ghost(name, 5, 5, new DirectChaseToPacManStrategy(), new StandingStillGhostStrategy()) },
                 PacMan = new PacMan(5, 3, Direction.Left, PacManStatus.Alive, 3),
                 Walls = { (5, 4) }
             };

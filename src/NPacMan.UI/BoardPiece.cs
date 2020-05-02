@@ -1,4 +1,4 @@
-﻿namespace NPacMan.Game
+﻿namespace NPacMan.UI
 {
     public enum BoardPiece
     {

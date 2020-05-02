@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using FluentAssertions;
 using NPacMan.Game;
 using Xunit;
@@ -12,7 +12,7 @@ namespace NPacMan.UI.Tests
         {
             var board = GameSettingsLoader.Load(
                 @" XXX 
- ... ");
+ .▲. ");
             var type = WallAnalyzer.GetWallType(board.Walls, (1, 0), board.Width, board.Height);
 
             type.Should().Be(WallType.HorizontalLine);
@@ -22,7 +22,7 @@ namespace NPacMan.UI.Tests
         public void ShouldReturnBottomHorizontalLine()
         {
             var board = GameSettingsLoader.Load(
-                @" ... 
+                @" .▲. 
  XXX ");
             var type = WallAnalyzer.GetWallType(board.Walls, (1, 1), board.Width, board.Height);
 
@@ -34,9 +34,9 @@ namespace NPacMan.UI.Tests
         public void ShouldReturnLeftVerticalLine()
         {
             var board = GameSettingsLoader.Load(
-                @" X.. 
+                @" X▲. 
  X.. 
- X.. ");
+ X▲. ");
             var type = WallAnalyzer.GetWallType(board.Walls, (0, 1), board.Width, board.Height);
 
             type.Should().Be(WallType.VerticalLine);
@@ -48,7 +48,7 @@ namespace NPacMan.UI.Tests
             var board = GameSettingsLoader.Load(
                 @" ..X 
  ..X 
- ..X ");
+ .▲X ");
             var type = WallAnalyzer.GetWallType(board.Walls, (2, 1), board.Width, board.Height);
 
             type.Should().Be(WallType.VerticalLine);
@@ -59,7 +59,7 @@ namespace NPacMan.UI.Tests
         {
             var board = GameSettingsLoader.Load(
                 @" XX 
- X.");
+ X▲");
             var type = WallAnalyzer.GetWallType(board.Walls, (0, 0), board.Width, board.Height);
 
 
@@ -71,7 +71,7 @@ namespace NPacMan.UI.Tests
         {
             var board = GameSettingsLoader.Load(
                 @" XXX 
- .XX ");
+ ▲XX ");
             var type = WallAnalyzer.GetWallType(board.Walls, (1, 0), board.Width, board.Height);
 
 
@@ -83,7 +83,7 @@ namespace NPacMan.UI.Tests
         {
             var board = GameSettingsLoader.Load(
                 @" XX 
- .X ");
+ ▲X ");
             var type = WallAnalyzer.GetWallType(board.Walls, (1, 0), board.Width, board.Height);
 
 
@@ -96,7 +96,7 @@ namespace NPacMan.UI.Tests
             var board = GameSettingsLoader.Load(
                 @" ... 
  .XX 
- .X ");
+ ▲X ");
             var type = WallAnalyzer.GetWallType(board.Walls, (1, 1), board.Width, board.Height);
 
 
@@ -109,7 +109,7 @@ namespace NPacMan.UI.Tests
             var board = GameSettingsLoader.Load(
                 @" .X  
  .XX 
- ...");
+ .▲.");
             var type = WallAnalyzer.GetWallType(board.Walls, (1, 1), board.Width, board.Height);
 
 
@@ -122,7 +122,7 @@ namespace NPacMan.UI.Tests
             var board = GameSettingsLoader.Load(
                 @" ...
  XX.
-  X. ");
+  X▲ ");
             var type = WallAnalyzer.GetWallType(board.Walls, (1, 1), board.Width, board.Height);
 
 
@@ -135,7 +135,7 @@ namespace NPacMan.UI.Tests
             var board = GameSettingsLoader.Load(
                 @"  X.
  XX.
- ... ");
+ .▲. ");
             var type = WallAnalyzer.GetWallType(board.Walls, (1, 1), board.Width, board.Height);
 
 
@@ -149,7 +149,7 @@ namespace NPacMan.UI.Tests
             var board = GameSettingsLoader.Load(
                 @" XXX
  .XX
- .XX");
+ ▲XX");
             var type = WallAnalyzer.GetWallType(board.Walls, (1, 1), board.Width, board.Height);
 
 
@@ -162,7 +162,7 @@ namespace NPacMan.UI.Tests
             var board = GameSettingsLoader.Load(
                 @" .XX
  .XX
- .XX");
+ ▲XX");
             var type = WallAnalyzer.GetWallType(board.Walls, (1, 1), board.Width, board.Height);
 
 
@@ -175,7 +175,7 @@ namespace NPacMan.UI.Tests
             var board = GameSettingsLoader.Load(
                 @" XXX
  XX.
- XX.");
+ XX▲");
             var type = WallAnalyzer.GetWallType(board.Walls, (1, 1), board.Width, board.Height);
 
 
@@ -188,7 +188,7 @@ namespace NPacMan.UI.Tests
             var board = GameSettingsLoader.Load(
                 @" XX.
  XX.
- XX.");
+ XX▲");
             var type = WallAnalyzer.GetWallType(board.Walls, (1, 1), board.Width, board.Height);
 
 
@@ -200,7 +200,7 @@ namespace NPacMan.UI.Tests
         public void ShouldAnalyzeHorizontalLine1AsHorizontalLine()
         {
             var board = GameSettingsLoader.Load(
-                @" ...
+                @" .▲.
  XXX
  XXX");
             var type = WallAnalyzer.GetWallType(board.Walls, (1, 1), board.Width, board.Height);
@@ -215,7 +215,7 @@ namespace NPacMan.UI.Tests
             var board = GameSettingsLoader.Load(
                 @" XXX 
  XXX 
- ... ");
+ .▲. ");
             var type = WallAnalyzer.GetWallType(board.Walls, (1, 1), board.Width, board.Height);
 
 
@@ -227,7 +227,7 @@ namespace NPacMan.UI.Tests
         public void ShouldAnalyzeBottomLeftCorner1AsBottomLeftArc()
         {
             var board = GameSettingsLoader.Load(
-                @" XX. 
+                @" XX▲ 
  XXX 
  XXX ");
             var type = WallAnalyzer.GetWallType(board.Walls, (1, 1), board.Width, board.Height);
@@ -243,7 +243,7 @@ namespace NPacMan.UI.Tests
             var board = GameSettingsLoader.Load(
                 @" XXX 
  XXX 
- XX. ");
+ XX▲ ");
             var type = WallAnalyzer.GetWallType(board.Walls, (1, 1), board.Width, board.Height);
 
 
@@ -256,7 +256,7 @@ namespace NPacMan.UI.Tests
             var board = GameSettingsLoader.Load(
                 @" XXX 
  XXX 
- .XX ");
+ ▲XX ");
             var type = WallAnalyzer.GetWallType(board.Walls, (1, 1), board.Width, board.Height);
 
 
@@ -268,7 +268,7 @@ namespace NPacMan.UI.Tests
         public void ShouldAnalyzeBottomRightCorner1AsBottomRightArc()
         {
             var board = GameSettingsLoader.Load(
-                @" .XX 
+                @" ▲XX 
  XXX 
  XXX ");
             var type = WallAnalyzer.GetWallType(board.Walls, (1, 1), board.Width, board.Height);
@@ -283,7 +283,7 @@ namespace NPacMan.UI.Tests
             var board = GameSettingsLoader.Load(
                 @"    
   XX 
-     ");
+  ▲  ");
             var type = WallAnalyzer.GetWallType(board.Walls, (1, 1), board.Width, board.Height);
 
 
@@ -296,7 +296,7 @@ namespace NPacMan.UI.Tests
             var board = GameSettingsLoader.Load(
                 @"    
    XX
-     ");
+   ▲ ");
             var type = WallAnalyzer.GetWallType(board.Walls, (1, 1), board.Width, board.Height);
 
 

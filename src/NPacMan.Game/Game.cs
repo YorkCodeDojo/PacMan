@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System;
+using System.ComponentModel.Design;
+using System.Net.Http.Headers;
 using System.Xml.XPath;
 
 namespace NPacMan.Game
@@ -45,9 +48,9 @@ namespace NPacMan.Game
  XXXXXX.XXXXX XX XXXXX.XXXXXX
       X.XXXXX XX XXXXX.X     
       X.XX          XX.X     
-      X.XX   R      XX.X     
+      X.XX   B      XX.X     
  XXXXXX.XX  XXXXXX  XX.XXXXXX
-P      .    X    X    .      P
+T      .    X IPCX    .      T
  XXXXXX.XX  XXXXXX  XX.XXXXXX
       X.XX          XX.X     
       X.XX          XX.X     
@@ -63,8 +66,7 @@ P      .    X    X    .      P
  X.XXXXXXXXXX.XX.XXXXXXXXXX.X
  X.XXXXXXXXXX.XX.XXXXXXXXXX.X
  X..........................X
- XXXXXXXXXXXXXXXXXXXXXXXXXXXX
-";
+ XXXXXXXXXXXXXXXXXXXXXXXXXXXX";
 
             return new Game(new GameClock(), GameSettingsLoader.Load(board));
         }
@@ -91,21 +93,35 @@ P      .    X    X    .      P
             PacMan = PacMan.WithNewDirection(direction);
         }
 
-        private void Tick()
+        private void Tick(DateTime now)
         {
-            var newPacMan = PacMan.Move();
+            var newPacMan = PacMan.Transition(now);
 
             if (_settings.Portals.TryGetValue((newPacMan.X, newPacMan.Y), out var portal))
             {
                 newPacMan = PacMan.WithNewX(portal.x).WithNewY(portal.y);
-                newPacMan = newPacMan.Move();
+                newPacMan = newPacMan.Transition(now);
             }
 
-            MoveAllGhosts();
+            if (PacMan.Status == PacManStatus.Dying && newPacMan.Status == PacManStatus.Respawning)
+            {
+                SendAllGhostsHome();
+            }
+
+            if (PacMan.Status != PacManStatus.Dying)
+            {
+                MoveAllGhosts();
+            }
+
+            if (newPacMan.Status != PacManStatus.Alive)
+            {
+                PacMan = newPacMan;
+                return;
+            }
 
             if (HasDied())
             {
-                PacMan = PacMan.Kill();
+                PacMan = PacMan.Kill(now.AddSeconds(4));
                 return;
             }
 
@@ -116,7 +132,7 @@ P      .    X    X    .      P
 
             if (HasDied())
             {
-                PacMan = PacMan.Kill();
+                PacMan = PacMan.Kill(now.AddSeconds(4));
                 return;
             }
 
@@ -147,5 +163,17 @@ P      .    X    X    .      P
 
             _ghosts = newPositionOfGhosts;
         }
+
+        private void SendAllGhostsHome()
+        {
+            var newPositionOfGhosts = new Dictionary<string, Ghost>();
+            foreach (var ghost in Ghosts.Values)
+            {
+                newPositionOfGhosts[ghost.Name] = ghost.GoHome();
+            }
+
+            _ghosts = newPositionOfGhosts;
+        }
+
     }
 }

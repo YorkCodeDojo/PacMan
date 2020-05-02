@@ -139,7 +139,16 @@ namespace NPacMan.UI
             var x = ghost.X * cellSize;
             var y = ghost.Y * cellSize;
 
-            var sprite = _sprites.Ghost(GhostColour.Red, Direction.Up, animated);
+            var ghostColour = ghost.Name switch
+            {
+                "Blinky" => GhostColour.Red,
+                "Inky" => GhostColour.Cyan,
+                "Pinky" => GhostColour.Pink,
+                "Clyde" => GhostColour.Orange,
+                _ => GhostColour.Red,
+            };
+
+            var sprite = _sprites.Ghost(ghostColour, Direction.Up, animated);
             _sprites.RenderSprite(g, x, y, sprite);
         }
 
@@ -147,9 +156,11 @@ namespace NPacMan.UI
         {
             _scoreBoard.RenderStatic(g);
             _scoreBoard.RenderScores(g, game.Score, 0, 1000);
-            _scoreBoard.RenderLivesBonus(g, game.Lives, game.Height - 1);
-//            g.DrawString($"Score : {game.Score}", _scoreFont, Brushes.White, 0, 0);
-            //          g.DrawString($"Lives : {game.Lives}", _scoreFont, Brushes.White, 0,Sprites.PixelGrid);
+        }
+
+        public void RenderLives(Graphics g, NPacMan.Game.Game game)
+        {
+            _scoreBoard.RenderLivesBonus(g, game.Lives);
         }
     }
 }

@@ -1,0 +1,13 @@
+name: Continuous Integration Workflow
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: Build and Test
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@master
+
+      - run: dotnet restore
+      - run: dotnet build --no-restore --configuration Release
+      - run: dotnet test --no-build --configuration Release
