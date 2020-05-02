@@ -37,7 +37,7 @@ namespace NPacMan.Game
         public static Game Create()
         {
             var board = @" XXXXXXXXXXXXXXXXXXXXXXXXXXXX
- X............XX............X
+ Xb...........XX...........iX
  X.XXXX.XXXXX.XX.XXXXX.XXXX.X
  X.X  X.X   X.XX.X   X.X  X.X
  X.XXXX.XXXXX.XX.XXXXX.XXXX.X
@@ -65,7 +65,7 @@ T      .    X IPCX    .      T
  X......XX....XX....XX......X
  X.XXXXXXXXXX.XX.XXXXXXXXXX.X
  X.XXXXXXXXXX.XX.XXXXXXXXXX.X
- X..........................X
+ Xp........................cX
  XXXXXXXXXXXXXXXXXXXXXXXXXXXX";
 
             return new Game(new GameClock(), GameSettingsLoader.Load(board));

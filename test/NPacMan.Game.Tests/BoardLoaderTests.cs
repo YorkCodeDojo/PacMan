@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using FluentAssertions;
+using FluentAssertions.Execution;
 using Xunit;
 
 namespace NPacMan.Game.Tests
@@ -67,7 +69,8 @@ T ▲ T";
         {
             var board = @" XXX 
  BIP 
- ▲XC ";
+ ▲XC
+ bipc";
 
             var loadedBoard = GameSettingsLoader.Load(board);
 
@@ -96,6 +99,34 @@ T ▲ T";
                 Y = 2,
                 Name = "Clyde",
             });
+        }
+
+        [Fact]
+        public void ShouldHaveGhostsAtCorrectHomeLocations()
+        {
+            var board = @" XXX 
+ BIP 
+ ▲XC 
+ bipc";
+
+            var loadedBoard = GameSettingsLoader.Load(board);
+
+            using var _ = new AssertionScope();
+            var blinky = loadedBoard.Ghosts.Single(ghost => ghost.Name == "Blinky");
+            ((MoveHomeGhostStrategy)blinky.HomeStrategy).X.Should().Be(0);
+            ((MoveHomeGhostStrategy)blinky.HomeStrategy).Y.Should().Be(3);
+
+            var inky = loadedBoard.Ghosts.Single(ghost => ghost.Name == "Inky");
+            ((MoveHomeGhostStrategy)inky.HomeStrategy).X.Should().Be(1);
+            ((MoveHomeGhostStrategy)inky.HomeStrategy).Y.Should().Be(3);
+
+            var pinky = loadedBoard.Ghosts.Single(ghost => ghost.Name == "Pinky");
+            ((MoveHomeGhostStrategy)pinky.HomeStrategy).X.Should().Be(2);
+            ((MoveHomeGhostStrategy)pinky.HomeStrategy).Y.Should().Be(3);
+
+            var clyde = loadedBoard.Ghosts.Single(ghost => ghost.Name == "Clyde");
+            ((MoveHomeGhostStrategy)clyde.HomeStrategy).X.Should().Be(3);
+            ((MoveHomeGhostStrategy)clyde.HomeStrategy).Y.Should().Be(3);
         }
 
     }
