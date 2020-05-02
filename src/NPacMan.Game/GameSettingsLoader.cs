@@ -25,16 +25,16 @@ namespace NPacMan.Game
                     switch (row[columnNumber])
                     {
                         case 'B':
-                            ghosts.Add(new Ghost("Blinky", columnNumber - 1, rowNumber, new DirectChaseToPacManStrategy(), new MoveHomeGhostStrategy(1,1)));
+                            ghosts.Add(new Ghost(GhostNames.Blinky, columnNumber - 1, rowNumber, new DirectChaseToPacManStrategy(), new MoveHomeGhostStrategy(1,1)));
                             break;
                         case 'P':
-                            ghosts.Add(new Ghost("Pinky", columnNumber - 1, rowNumber, new StandingStillGhostStrategy(), new MoveHomeGhostStrategy(1, 1)));
+                            ghosts.Add(new Ghost(GhostNames.Pinky, columnNumber - 1, rowNumber, new StandingStillGhostStrategy(), new MoveHomeGhostStrategy(1, 1)));
                             break;
                         case 'I':
-                            ghosts.Add(new Ghost("Inky", columnNumber - 1, rowNumber, new StandingStillGhostStrategy(), new MoveHomeGhostStrategy(1, 1)));
+                            ghosts.Add(new Ghost(GhostNames.Inky, columnNumber - 1, rowNumber, new StandingStillGhostStrategy(), new MoveHomeGhostStrategy(1, 1)));
                             break;
                         case 'C':
-                            ghosts.Add(new Ghost("Clyde", columnNumber - 1, rowNumber, new StandingStillGhostStrategy(), new MoveHomeGhostStrategy(1, 1)));
+                            ghosts.Add(new Ghost(GhostNames.Clyde, columnNumber - 1, rowNumber, new StandingStillGhostStrategy(), new MoveHomeGhostStrategy(1, 1)));
                             break;
                         case '▲':
                             pacMan = new PacMan(columnNumber-1, rowNumber, Direction.Up, PacManStatus.Alive, 3);
