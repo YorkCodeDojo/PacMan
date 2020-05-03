@@ -110,23 +110,31 @@ T ▲ T";
  bipc";
 
             var loadedBoard = GameSettingsLoader.Load(board);
-
-            using var _ = new AssertionScope();
-            var blinky = loadedBoard.Ghosts.Single(ghost => ghost.Name == "Blinky");
-            ((MoveHomeGhostStrategy)blinky.HomeStrategy).X.Should().Be(0);
-            ((MoveHomeGhostStrategy)blinky.HomeStrategy).Y.Should().Be(3);
-
-            var inky = loadedBoard.Ghosts.Single(ghost => ghost.Name == "Inky");
-            ((MoveHomeGhostStrategy)inky.HomeStrategy).X.Should().Be(1);
-            ((MoveHomeGhostStrategy)inky.HomeStrategy).Y.Should().Be(3);
-
-            var pinky = loadedBoard.Ghosts.Single(ghost => ghost.Name == "Pinky");
-            ((MoveHomeGhostStrategy)pinky.HomeStrategy).X.Should().Be(2);
-            ((MoveHomeGhostStrategy)pinky.HomeStrategy).Y.Should().Be(3);
-
-            var clyde = loadedBoard.Ghosts.Single(ghost => ghost.Name == "Clyde");
-            ((MoveHomeGhostStrategy)clyde.HomeStrategy).X.Should().Be(3);
-            ((MoveHomeGhostStrategy)clyde.HomeStrategy).Y.Should().Be(3);
+            loadedBoard.Ghosts.Should().BeEquivalentTo(
+            new
+            {
+                HomeLocationX = 0,
+                HomeLocationY = 3,
+                Name = "Blinky",
+            },
+            new
+            {
+                HomeLocationX = 1,
+                HomeLocationY = 3,
+                Name = "Inky",
+            },
+            new
+            {
+                HomeLocationX = 2,
+                HomeLocationY = 3,
+                Name = "Pinky",
+            },
+            new
+            {
+                HomeLocationX = 3,
+                HomeLocationY = 3,
+                Name = "Clyde",
+            });
         }
 
         [Fact]

@@ -7,11 +7,14 @@
         public int Y { get; }
         public IGhostStrategy Strategy { get; }
         public IGhostStrategy CurrentStrategy { get; }
-        public IGhostStrategy HomeStrategy { get; }
+        private IGhostStrategy _homeStrategy { get; }
+
+        public int HomeLocationX => ((MoveHomeGhostStrategy)_homeStrategy).X;
+        public int HomeLocationY => ((MoveHomeGhostStrategy)_homeStrategy).Y;
 
         public Ghost(string name, int x, int y, IGhostStrategy strategy, IGhostStrategy homeStrategy, IGhostStrategy? currentStrategy = null)
         {
-            HomeStrategy = homeStrategy;
+            _homeStrategy = homeStrategy;
             Name = name;
             X = x;
             Y = y;
@@ -22,12 +25,12 @@
         public Ghost Move(Game game)
         {
             var (x, y) = CurrentStrategy.Move(this, game);
-            return new Ghost(Name, x, y, Strategy, HomeStrategy, CurrentStrategy);
+            return new Ghost(Name, x, y, Strategy, _homeStrategy, CurrentStrategy);
         }
 
         public Ghost GoHome()
         {
-            return new Ghost(Name, X, Y, Strategy, HomeStrategy, HomeStrategy);
+            return new Ghost(Name, X, Y, Strategy, _homeStrategy, _homeStrategy);
         }
     }
 }
