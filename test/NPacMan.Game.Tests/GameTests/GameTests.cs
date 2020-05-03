@@ -3,12 +3,12 @@ using Xunit;
 
 namespace NPacMan.Game.Tests.GameTests
 {
-    public class GameTestsxx
+    public class GameTests
     {
         private readonly TestGameSettings _gameSettings;
         private readonly Game _game;
 
-        public GameTestsxx()
+        public GameTests()
         {
             _gameSettings = new TestGameSettings();
             var gameClock = new TestGameClock();
