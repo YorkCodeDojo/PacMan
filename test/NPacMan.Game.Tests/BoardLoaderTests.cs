@@ -102,7 +102,7 @@ T ▲ T";
         }
 
         [Fact]
-        public void ShouldHaveGhostsAtCorrectHomeLocations()
+        public void ShouldHaveGhostsWithCorrectHomeLocations()
         {
             var board = @" XXX 
  BIP 
@@ -127,6 +127,18 @@ T ▲ T";
             var clyde = loadedBoard.Ghosts.Single(ghost => ghost.Name == "Clyde");
             ((MoveHomeGhostStrategy)clyde.HomeStrategy).X.Should().Be(3);
             ((MoveHomeGhostStrategy)clyde.HomeStrategy).Y.Should().Be(3);
+        }
+
+        [Fact]
+        public void AGhostsHomeLocationIsAlsoACoin()
+        {
+            var board = @" XXX 
+ BIP 
+ ▲XC 
+ bipc";
+            var loadedBoard = GameSettingsLoader.Load(board);
+
+            loadedBoard.Coins.Should().BeEquivalentTo( (0,3), (1, 3), (2, 3), (3, 3) );
         }
 
     }

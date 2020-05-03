@@ -57,13 +57,15 @@ namespace NPacMan.Game
                         case 'X':
                             walls.Add((columnNumber - 1, rowNumber));
                             break;
-                        case '.':
-                            coins.Add((columnNumber - 1, rowNumber));
-                            break;
                         case 'T':
                             portalParts.Add((columnNumber - 1, rowNumber));
                             break;
                         default:
+                            if (row[columnNumber] == '.' || char.IsLower(row[columnNumber]))
+                            {
+                                // Coins are either explicitly marked with a '.',  or a lowercase letter for a ghost's home location.
+                                coins.Add((columnNumber - 1, rowNumber));
+                            }
                             break;
                     }
 
