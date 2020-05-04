@@ -50,7 +50,7 @@ namespace NPacMan.Game
       X.XX   B      XX.X     
       X.XX XXX--XXX XX.X     
  XXXXXX.XX X      X XX.XXXXXX
-T      .   X  IPC X   .      T
+T      .   XI P C X   .      T
  XXXXXX.XX X      X XX.XXXXXX
       X.XX XXXXXXXX XX.X     
       X.XX          XX.X     
