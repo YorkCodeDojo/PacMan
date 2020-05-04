@@ -13,7 +13,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NPacMan.Game.Tests", "test\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NPacMan.UI", "src\NPacMan.UI\NPacMan.UI.csproj", "{530A5DB8-FAE2-44B0-84BD-B38FB9E4D38D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NPacMan.UI.Tests", "test\NPacMan.UI.Tests\NPacMan.UI.Tests.csproj", "{2D6C8AEB-6731-4028-A4E7-6F22FE743FBD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NPacMan.UI.Tests", "test\NPacMan.UI.Tests\NPacMan.UI.Tests.csproj", "{2D6C8AEB-6731-4028-A4E7-6F22FE743FBD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{70F9337E-FBEE-4EBB-AA71-ABB86B748C47}"
+	ProjectSection(SolutionItems) = preProject
+		GhostMovement.md = GhostMovement.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
