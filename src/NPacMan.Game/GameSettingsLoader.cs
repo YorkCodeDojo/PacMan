@@ -33,8 +33,7 @@ namespace NPacMan.Game
                                                  new CellLocation(columnNumber - 1,rowNumber),
                                                  Direction.Left,
                                                  new CellLocation(homeB.X, homeB.Y),
-                                                 new DirectChaseToPacManStrategy(),
-                                                 new MoveHomeGhostStrategy()));
+                                                 new DirectToStrategy(new DirectToPacManLocation())));
                             break;
                         case 'P':
                             var homeP = homeLocations['p'];
@@ -42,8 +41,7 @@ namespace NPacMan.Game
                                                  new CellLocation(columnNumber - 1, rowNumber),
                                                  Direction.Left,
                                                  new CellLocation(homeP.X, homeP.Y),
-                                                 new StandingStillGhostStrategy(),
-                                                 new MoveHomeGhostStrategy()));
+                                                 new StandingStillGhostStrategy()));
                             break;
                         case 'I':
                             var homeI = homeLocations['i'];
@@ -51,8 +49,7 @@ namespace NPacMan.Game
                                                  new CellLocation(columnNumber - 1, rowNumber),
                                                   Direction.Left,
                                                  new CellLocation(homeI.X, homeI.Y),
-                                                 new StandingStillGhostStrategy(),
-                                                 new MoveHomeGhostStrategy()));
+                                                 new StandingStillGhostStrategy()));
                             break;
                         case 'C':
                             var homeC = homeLocations['c'];
@@ -60,8 +57,7 @@ namespace NPacMan.Game
                                                  new CellLocation(columnNumber - 1, rowNumber),
                                                 Direction.Left,
                                                  new CellLocation(homeC.X, homeC.Y),
-                                                 new StandingStillGhostStrategy(),
-                                                 new MoveHomeGhostStrategy()));
+                                                 new StandingStillGhostStrategy()));
                             break;
                         case '▲':
                             pacMan = new PacMan(columnNumber - 1, rowNumber, Direction.Up, PacManStatus.Alive, 3);
