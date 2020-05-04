@@ -16,6 +16,7 @@ namespace NPacMan.Game
 
             var coins = new List<(int, int)>();
             var walls = new List<(int, int)>();
+            var doors = new List<CellLocation>();
             var portalParts = new List<(int, int)>();
             var ghosts = new List<Ghost>();
             PacMan? pacMan = null;
@@ -77,6 +78,9 @@ namespace NPacMan.Game
                         case 'X':
                             walls.Add((columnNumber - 1, rowNumber));
                             break;
+                        case '-':
+                            doors.Add(new CellLocation(columnNumber - 1, rowNumber));
+                            break;                            
                         case 'T':
                             portalParts.Add((columnNumber - 1, rowNumber));
                             break;
@@ -108,7 +112,7 @@ namespace NPacMan.Game
             if (pacMan is null)
                 throw new Exception("Pacman seems to be missing from the board.");
 
-            return new GameSettings(width - 2, height, walls, coins, portals, pacMan, ghosts);
+            return new GameSettings(width - 2, height, walls, coins, portals, pacMan, ghosts, doors);
         }
 
         private static Dictionary<char,(int X, int Y)> FindHomeLocations(int width, int height, string[] rows)

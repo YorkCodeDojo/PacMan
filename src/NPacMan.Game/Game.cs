@@ -47,12 +47,12 @@ namespace NPacMan.Game
  X......XX....XX....XX......X
  XXXXXX.XXXXX XX XXXXX.XXXXXX
       X.XXXXX XX XXXXX.X     
-      X.XX          XX.X     
       X.XX   B      XX.X     
- XXXXXX.XX  XXXXXX  XX.XXXXXX
-T      .    X IPCX    .      T
- XXXXXX.XX  XXXXXX  XX.XXXXXX
-      X.XX          XX.X     
+      X.XX XXX--XXX XX.X     
+ XXXXXX.XX X      X XX.XXXXXX
+T      .   X  IPC X   .      T
+ XXXXXX.XX X      X XX.XXXXXX
+      X.XX XXXXXXXX XX.X     
       X.XX          XX.X     
       X.XX XXXXXXXX XX.X
  XXXXXX.XX XXXXXXXX XX.XXXXXX
@@ -76,6 +76,9 @@ T      .    X IPCX    .      T
             => _settings.Coins.Except(_collectedCoins).ToList().AsReadOnly();
         public IReadOnlyCollection<(int x, int y)> Walls
             => _settings.Walls;
+
+        public IReadOnlyCollection<CellLocation> Doors
+            => _settings.Doors;
 
         public int Width
             => _settings.Width;

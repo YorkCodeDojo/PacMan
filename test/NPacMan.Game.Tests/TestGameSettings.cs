@@ -16,6 +16,12 @@ namespace NPacMan.Game.Tests
         IReadOnlyCollection<(int x, int y)> IGameSettings.Coins
             => this.Coins;
 
+        public List<CellLocation> Doors { get; set; }
+            = new List<CellLocation>();
+
+        IReadOnlyCollection<CellLocation> IGameSettings.Doors
+            => this.Doors;
+
         public Dictionary<(int x, int y), (int x, int y)> Portals { get; set; }
             = new Dictionary<(int x, int y), (int x, int y)>();
 

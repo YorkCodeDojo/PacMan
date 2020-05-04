@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using NPacMan.Game;
 
 namespace NPacMan.UI.Map
 {
@@ -36,7 +37,7 @@ namespace NPacMan.UI.Map
             _map = new MapCellDetail[_width, _height];
 
             // Todo: This needs to come from the game object
-            var doors = new List<(int x, int y)> {(14, 13)};
+            var doors = game.Doors;
 
             GetWallsFromGame(game, doors);
 
@@ -52,7 +53,7 @@ namespace NPacMan.UI.Map
         /// Create a matrix of map pieces from Game object
         /// </summary>
         /// <param name="game"></param>
-        private void GetWallsFromGame(Game.Game game, IReadOnlyCollection<(int x, int y)> doors)
+        private void GetWallsFromGame(Game.Game game, IReadOnlyCollection<CellLocation> doors)
         {
             // Populate the map matrix from the given list of walls
             
@@ -65,8 +66,8 @@ namespace NPacMan.UI.Map
 
             foreach (var item in doors)
             {
-                var x = item.x + 1;
-                var y = item.y + 1;
+                var x = item.X + 1;
+                var y = item.Y + 1;
                 _map[x, y] = new MapCellDetail(_map, x, y, BasicMapPiece.Door);
             }
 
@@ -83,11 +84,11 @@ namespace NPacMan.UI.Map
         /// <summary>
         /// Convert the basic walls into singles/doubles etc.
         /// </summary>
-        private void MakeBasicMap(int playX, int playY, IReadOnlyCollection<(int x, int y)> doors)
+        private void MakeBasicMap(int playX, int playY, IReadOnlyCollection<CellLocation> doors)
         {
             foreach (var door in doors)
             {
-                TraceGhostHouseWalls(_map[door.x + 1, door.y + 1]);
+                TraceGhostHouseWalls(_map[door.X + 1, door.Y + 1]);
             }
 
             BlockTunnels();

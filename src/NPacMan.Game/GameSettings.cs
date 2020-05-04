@@ -4,7 +4,15 @@ namespace NPacMan.Game
 {
     public class GameSettings : IGameSettings
     {
-        public GameSettings(int width, int height, IReadOnlyCollection<(int,int)> walls, IReadOnlyCollection<(int,int)> coins, IReadOnlyDictionary<(int,int), (int, int)> portals, PacMan pacMan, IReadOnlyCollection<Ghost> ghosts)
+        public GameSettings(
+            int width,
+            int height,
+            IReadOnlyCollection<(int, int)> walls,
+            IReadOnlyCollection<(int, int)> coins,
+            IReadOnlyDictionary<(int, int), (int, int)> portals,
+            PacMan pacMan,
+            IReadOnlyCollection<Ghost> ghosts,
+            IReadOnlyCollection<CellLocation> doors)
         {
             Width = width;
             Height = height;
@@ -13,6 +21,7 @@ namespace NPacMan.Game
             Ghosts = ghosts;
             Walls = walls;
             Coins = coins;
+            Doors = doors;
         }
 
         public PacMan PacMan { get; }
@@ -22,5 +31,6 @@ namespace NPacMan.Game
         public int Width { get; }
         public int Height { get; }
         public IReadOnlyCollection<Ghost> Ghosts { get; }
-}
+        public IReadOnlyCollection<CellLocation> Doors { get; }
+    }
 }
