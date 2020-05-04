@@ -2,7 +2,7 @@
 
 namespace NPacMan.Game
 {
-    public static class DirectionExtentions
+    public static class DirectionExtensions
     {
         public static Direction Opposite(this Direction direction)
             => direction switch {
