@@ -8,14 +8,6 @@ using System.Xml.XPath;
 
 namespace NPacMan.Game
 {
-
-    public enum PacManStatus
-    {
-        Alive,
-        Dying,
-        Respawning,
-        Dead
-    }
     public class Game
     {
         public int Score { get; private set; }
@@ -47,10 +39,10 @@ namespace NPacMan.Game
  X......XX....XX....XX......X
  XXXXXX.XXXXX XX XXXXX.XXXXXX
       X.XXXXX XX XXXXX.X     
-      X.XX   B      XX.X     
+      X.XX   B  ICP XX.X     
       X.XX XXX--XXX XX.X     
  XXXXXX.XX X      X XX.XXXXXX
-T      .   XI P C X   .      T
+T      .   X      X   .      T
  XXXXXX.XX X      X XX.XXXXXX
       X.XX XXXXXXXX XX.X     
       X.XX          XX.X     

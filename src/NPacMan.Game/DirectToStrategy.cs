@@ -1,47 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace NPacMan.Game
 {
-    public static class DirectionExtentions
-    {
-        public static Direction Opposite(this Direction direction)
-            => direction switch {
-                Direction.Up => Direction.Down,
-                Direction.Down => Direction.Up,
-                Direction.Right => Direction.Left,
-                Direction.Left => Direction.Right,
-                _ => throw new NotImplementedException()
-            };
-    }
-
-    public interface IDirectToLocation
-    {
-        CellLocation GetLocation(Game game);
-    }
-    public class DirectToPacManLocation : IDirectToLocation
-    {
-        public CellLocation GetLocation(Game game)
-        {
-            return new CellLocation(game.PacMan.X, game.PacMan.Y);
-        }
-    }
-
-    public class DirectToGhostHomeLocation : IDirectToLocation
-    {
-        private readonly CellLocation _home;
-        public DirectToGhostHomeLocation(Ghost ghost)
-        {
-            _home = ghost.HomeLocation;
-        }
-
-        public CellLocation GetLocation(Game game)
-        {
-            return _home;
-        }
-    }
-
     public class DirectToStrategy : IGhostStrategy
     {
         private readonly IDirectToLocation _directToLocation;
