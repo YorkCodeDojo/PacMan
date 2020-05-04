@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using FluentAssertions;
+using FluentAssertions.Execution;
 using Xunit;
 
 namespace NPacMan.Game.Tests
@@ -67,7 +69,8 @@ T ▲ T";
         {
             var board = @" XXX 
  BIP 
- ▲XC ";
+ ▲XC
+ bipc";
 
             var loadedBoard = GameSettingsLoader.Load(board);
 
@@ -96,6 +99,54 @@ T ▲ T";
                 Y = 2,
                 Name = "Clyde",
             });
+        }
+
+        [Fact]
+        public void ShouldHaveGhostsWithCorrectHomeLocations()
+        {
+            var board = @" XXX 
+ BIP 
+ ▲XC 
+ bipc";
+
+            var loadedBoard = GameSettingsLoader.Load(board);
+            loadedBoard.Ghosts.Should().BeEquivalentTo(
+            new
+            {
+                HomeLocationX = 0,
+                HomeLocationY = 3,
+                Name = "Blinky",
+            },
+            new
+            {
+                HomeLocationX = 1,
+                HomeLocationY = 3,
+                Name = "Inky",
+            },
+            new
+            {
+                HomeLocationX = 2,
+                HomeLocationY = 3,
+                Name = "Pinky",
+            },
+            new
+            {
+                HomeLocationX = 3,
+                HomeLocationY = 3,
+                Name = "Clyde",
+            });
+        }
+
+        [Fact]
+        public void AGhostsHomeLocationIsAlsoACoin()
+        {
+            var board = @" XXX 
+ BIP 
+ ▲XC 
+ bipc";
+            var loadedBoard = GameSettingsLoader.Load(board);
+
+            loadedBoard.Coins.Should().BeEquivalentTo( (0,3), (1, 3), (2, 3), (3, 3) );
         }
 
     }
