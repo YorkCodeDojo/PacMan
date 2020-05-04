@@ -40,12 +40,29 @@ namespace NPacMan.UI.Map
 
             GetWallsFromGame(game, doors);
 
-            // We need one valid play cell
-            // As there are always ghosts, we can use the position of the first ghost
-            var validPlayCell = game.Ghosts.Values.First();
-            MakeBasicMap(validPlayCell.Location.X, validPlayCell.Location.Y, doors);
+            var validPlayCell = FindValidPlayCell();
+            MakeBasicMap(validPlayCell.X, validPlayCell.Y, doors);
 
             MakeDetailedMap();
+        }
+
+        /// <summary>
+        /// Find the play area by looking for the inside edge of a corner
+        /// </summary>
+        /// <returns></returns>
+        private CellLocation FindValidPlayCell()
+        {
+            for (int y = 1; y < _height - 1; y++)
+            {
+                for (int x = 1; x < _width - 1; x++)
+                {
+                    var cell = _map[x, y];
+                    if (cell.IsSpace && cell.CellAbove.IsWall && cell.CellLeft.IsWall)
+                        return new CellLocation(x, y);
+                }
+            }
+
+            throw new Exception("Can't find play area");
         }
 
         /// <summary>
@@ -94,7 +111,7 @@ namespace NPacMan.UI.Map
             
         //    ChangeSingleWallTouching(BasicMapPiece.InnerSpace, BasicMapPiece.GhostWall);
 
-            Flood(_map[playX + 1, playY + 1], BasicMapPiece.PlayArea);
+            Flood(_map[playX, playY], BasicMapPiece.PlayArea);
             Flood(_map[0, 0], BasicMapPiece.OuterSpace);
             Flood(_map[0, _height - 1], BasicMapPiece.OuterSpace);
             for (int y = 0; y < _height; y++)
