@@ -141,10 +141,10 @@ namespace NPacMan.UI
 
             var ghostColour = ghost.Name switch
             {
-                "Blinky" => GhostColour.Red,
-                "Inky" => GhostColour.Cyan,
-                "Pinky" => GhostColour.Pink,
-                "Clyde" => GhostColour.Orange,
+                GhostNames.Blinky => GhostColour.Red,
+                GhostNames.Inky => GhostColour.Cyan,
+                GhostNames.Pinky => GhostColour.Pink,
+                GhostNames.Clyde => GhostColour.Orange,
                 _ => GhostColour.Red,
             };
 
