@@ -55,7 +55,7 @@ namespace NPacMan.UI
 
                 using var gameBuffer = new Bitmap(_game.Width * Sprites.PixelGrid, (_game.Height + 5) * Sprites.PixelGrid);
                 {
-                    var g = Graphics.FromImage(gameBuffer);
+                    using var g = Graphics.FromImage(gameBuffer);
                     
                     _boardRenderer.RenderScore(g, _game);
 
@@ -70,15 +70,15 @@ namespace NPacMan.UI
                     _boardRenderer.RenderLives(g, _game);
                     g.ResetTransform();
                 }
+
+                using var gScreen = screenBuffer.Graphics;
+
                 {
-                    var g = screenBuffer.Graphics;
                     var scale = Math.Min((float)ClientSize.Width / gameBuffer.Width, (float)ClientSize.Height / gameBuffer.Height);
-                    g.DrawImage(gameBuffer, new RectangleF(0f, 0f, gameBuffer.Width * scale, gameBuffer.Height * scale), 
+                    gScreen.DrawImage(gameBuffer, new RectangleF(0f, 0f, gameBuffer.Width * scale, gameBuffer.Height * scale), 
                         new RectangleF(0,0,gameBuffer.Width, gameBuffer.Height), 
                         GraphicsUnit.Pixel);
                 }
-
-                var gScreen = screenBuffer.Graphics;
 
                 screenBuffer.Render();
             }
