@@ -7,6 +7,8 @@
         JoinRightHandTop, JoinLeftHandTop, JoinRightHandBottom, JoinLeftHandBottom, DoubleTop, DoubleBottom, Top,
         Bottom, TopRight, TopLeft, Right, Left, BottomRight, BottomLeft, 
         GhostTopRight, GhostTopLeft, GhostBottomRight, GhostBottomLeft, GhostEndLeft, GhostEndRight,
-        JoinTopRight, JoinTopLeft, GhostDoor
+        JoinTopRight, JoinTopLeft, GhostDoor,
+        InnerTopRight, InnerTopLeft, InnerBottomRight, InnerBottomLeft,
+        InsideWalls
     }
 }
