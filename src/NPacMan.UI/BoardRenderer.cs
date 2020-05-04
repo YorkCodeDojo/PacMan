@@ -1,6 +1,7 @@
 using System;
 using System.Drawing;
 using NPacMan.Game;
+using NPacMan.UI.Map;
 
 namespace NPacMan.UI
 {
@@ -15,57 +16,31 @@ namespace NPacMan.UI
 
         private Sprites _sprites;
         private ScoreBoard _scoreBoard;
+        private MapLayout _mapLayout;
 
         public BoardRenderer()
         {
             _sprites = new Sprites();
             _scoreBoard = new ScoreBoard(_sprites);
+            _mapLayout = new MapLayout();
         }
 
         public void RenderWalls(Graphics g, NPacMan.Game.Game game)
         {
+            _mapLayout.UpdateFromGame(game);
             var cellSize = Sprites.PixelGrid;
-            var wallWidth = cellSize / 5;
-            var wallPen = new Pen(Brushes.Blue, wallWidth);
-            var walls = game.Walls;
 
-            foreach (var wall in walls)
+            for (int y = 0; y < _mapLayout.DisplayHeight; y++)
             {
-                var x = wall.x * cellSize;
-                var y = wall.y * cellSize;
-                var offset = (cellSize - wallWidth) / 2;
-
-               // g.DrawRectangle(Pens.White, x, y, cellSize, cellSize);
-
-                var wallType = WallAnalyzer.GetWallType(walls, wall, game.Width, game.Height);
-
-                switch (wallType)
+                for (int x = 0; x < _mapLayout.DisplayWidth; x++)
                 {
-                    case WallType.VerticalLine:
-                        g.FillRectangle(Brushes.Blue, x + offset, y, wallWidth, cellSize);
-                        break;
-                    case WallType.HorizontalLine:
-                        g.FillRectangle(Brushes.Blue, x, y + offset, cellSize, wallWidth);
-                        break;
-                    case WallType.TopRightArc:
-                        g.DrawArc(wallPen, x - (cellSize / 2), y + (cellSize / 2), cellSize, cellSize, 270, 90);
-                        break;
-                    case WallType.BottomRightArc:
-                        g.DrawArc(wallPen, x - (cellSize / 2), y - (cellSize / 2), cellSize, cellSize, 0, 90);
-                        break;
-                    case WallType.TopLeftArc:
-                        g.DrawArc(wallPen, x + (cellSize / 2), y + (cellSize / 2), cellSize, cellSize, 180, 90);
-                        break;
-                    case WallType.BottomLeftArc:
-                        g.DrawArc(wallPen, x + (cellSize / 2), y - (cellSize / 2), cellSize, cellSize, 90, 90);
-                        break;
-                    default:
-                        g.FillRectangle(Brushes.Red, x, y, cellSize, cellSize);
-                        break;
+                    var posX = x * cellSize;
+                    var posY = y * cellSize;
+                    _sprites.RenderSprite(g, posX, posY, _sprites.Map(_mapLayout.BoardPieceToDisplay(x,y)));
                 }
             }
         }
-
+        
         private int CellSizeFromClientSize(Game.Game game, int totalClientWidth, int totalClientHeight)
         {
             return Math.Min(totalClientWidth / game.Width, totalClientHeight / game.Height);

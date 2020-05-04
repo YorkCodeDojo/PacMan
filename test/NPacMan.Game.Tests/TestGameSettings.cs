@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 namespace NPacMan.Game.Tests
 {

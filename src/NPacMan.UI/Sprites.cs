@@ -191,7 +191,7 @@ namespace NPacMan.UI
             switch (piece)
             {
                 case BoardPiece.Blank:
-                    return new SpriteSource(6, 0, 1);
+                    return new SpriteSource(0, 6, 1);
                 case BoardPiece.Pill:
                     return new SpriteSource(16, 0, 1);
                 case BoardPiece.PowerAnim1:
@@ -201,23 +201,23 @@ namespace NPacMan.UI
                 case BoardPiece.DoubleTopRight:
                     return new SpriteSource(16, 6, 1);
                 case BoardPiece.DoubleTopLeft:
-                    return new SpriteSource(17,6,1);
+                    return new SpriteSource(17, 6, 1);
                 case BoardPiece.DoubleRight:
-                    return new SpriteSource(18,6,1);
+                    return new SpriteSource(18, 6, 1);
                 case BoardPiece.DoubleLeft:
-                    return new SpriteSource(19,6,1);
+                    return new SpriteSource(19, 6, 1);
                 case BoardPiece.DoubleBottomRight:
-                    return new SpriteSource(20,6,1);
+                    return new SpriteSource(20, 6, 1);
                 case BoardPiece.DoubleBottomLeft:
-                    return new SpriteSource(21,6,1);
+                    return new SpriteSource(21, 6, 1);
                 case BoardPiece.JoinRightHandTop:
                     return new SpriteSource(22, 6, 1);
                 case BoardPiece.JoinLeftHandTop:
-                    return new SpriteSource(23,6,1);
+                    return new SpriteSource(23, 6, 1);
                 case BoardPiece.JoinRightHandBottom:
-                    return new SpriteSource(24,6,1);
+                    return new SpriteSource(24, 6, 1);
                 case BoardPiece.JoinLeftHandBottom:
-                    return new SpriteSource(25,6,1);
+                    return new SpriteSource(25, 6, 1);
                 case BoardPiece.DoubleTop:
                     return new SpriteSource(26, 6, 1);
                 case BoardPiece.DoubleBottom:
@@ -249,13 +249,23 @@ namespace NPacMan.UI
                 case BoardPiece.GhostEndRight:
                     return new SpriteSource(16, 7, 1);
                 case BoardPiece.GhostEndLeft:
-                    return new SpriteSource(17,7,1);
+                    return new SpriteSource(17, 7, 1);
                 case BoardPiece.JoinTopRight:
-                    return new SpriteSource(26,7,1);
+                    return new SpriteSource(26, 7, 1);
                 case BoardPiece.JoinTopLeft:
                     return new SpriteSource(27, 7, 1);
                 case BoardPiece.GhostDoor:
                     return new SpriteSource(15, 6, 1);
+                case BoardPiece.InnerTopRight:
+                    return new SpriteSource(19, 7, 1);
+                case BoardPiece.InnerTopLeft:
+                    return new SpriteSource(18, 7, 1);
+                case BoardPiece.InnerBottomRight:
+                    return new SpriteSource(21, 7, 1);
+                case BoardPiece.InnerBottomLeft:
+                    return new SpriteSource(20, 7, 1);
+                case BoardPiece.InsideWalls:
+                    return new SpriteSource(1, 6, 1);
                 default:
                     throw new Exception("Bad board piece");
             }
