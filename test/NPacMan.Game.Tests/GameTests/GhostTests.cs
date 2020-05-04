@@ -21,7 +21,7 @@ namespace NPacMan.Game.Tests.GameTests
         public void GhostMovesInDirectionOfStrategy()
         {
             var strategy = new GhostGoesRightStrategy();
-            _gameSettings.Ghosts.Add(new Ghost("Ghost1", 0, 0, strategy, new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", 0, 0, CellLocation.TopLeft, strategy, new StandingStillGhostStrategy()));
 
             var game = new Game(_gameClock, _gameSettings);
 
@@ -40,7 +40,7 @@ namespace NPacMan.Game.Tests.GameTests
             var x = 1;
             var y = 1;
 
-            _gameSettings.Ghosts.Add(new Ghost("Ghost1", x, y, new DirectChaseToPacManStrategy(), new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", x, y, CellLocation.TopLeft, new DirectChaseToPacManStrategy(), new StandingStillGhostStrategy()));
             _gameSettings.PacMan = new PacMan(3, 3, Direction.Down, PacManStatus.Dying, 1);
 
             var game = new Game(_gameClock, _gameSettings);
@@ -61,7 +61,7 @@ namespace NPacMan.Game.Tests.GameTests
         public void GhostShouldBeAbleToMoveWhenPacManIsReSpawning()
         {
             _gameSettings.PacMan = new PacMan(1, 1, Direction.Left, PacManStatus.Respawning, 1);
-            _gameSettings.Ghosts.Add(new Ghost("Ghost1", 1, 2, new GhostGoesRightStrategy(), new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", 1, 2, CellLocation.TopLeft, new GhostGoesRightStrategy(), new StandingStillGhostStrategy()));
 
             var game = new Game(_gameClock, _gameSettings);
             _gameClock.Tick();
@@ -78,7 +78,7 @@ namespace NPacMan.Game.Tests.GameTests
         public void GhostShouldGoHome()
         {
             _gameSettings.PacMan = new PacMan(1, 1, Direction.Down, PacManStatus.Alive, 2);
-            _gameSettings.Ghosts.Add(new Ghost("Ghost1", 1, 2, new NPacMan.Game.StandingStillGhostStrategy(), new MoveHomeGhostStrategy(4, 4)));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", 1, 2, new CellLocation(4, 4), new NPacMan.Game.StandingStillGhostStrategy(), new MoveHomeGhostStrategy()));
 
             var game = new Game(_gameClock, _gameSettings);
             var now = DateTime.UtcNow;

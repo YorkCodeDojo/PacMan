@@ -123,7 +123,7 @@ namespace NPacMan.Game.Tests.GameTests
             var x = _gameSettings.PacMan.X + 1;
             var y = _gameSettings.PacMan.Y;
 
-            _gameSettings.Ghosts.Add(new Ghost("Ghost1", x, y, new StandingStillGhostStrategy(), new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", x, y, CellLocation.TopLeft, new StandingStillGhostStrategy(), new StandingStillGhostStrategy()));
             _gameSettings.Coins.Add((x, y));
 
             var game = new Game(_gameClock, _gameSettings);

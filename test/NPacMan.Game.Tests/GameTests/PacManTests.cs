@@ -131,7 +131,7 @@ namespace NPacMan.Game.Tests.GameTests
         public void PacManShouldRespawnAfter4Seconds()
         {
             _gameSettings.PacMan = new PacMan(1, 1, Direction.Down, PacManStatus.Alive, 1);
-            _gameSettings.Ghosts.Add(new Ghost("Ghost1", 1, 2, new NPacMan.Game.StandingStillGhostStrategy(), new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", 1, 2, CellLocation.TopLeft, new NPacMan.Game.StandingStillGhostStrategy(), new StandingStillGhostStrategy()));
 
             var game = new Game(_gameClock, _gameSettings);
             var now = DateTime.UtcNow;
