@@ -2,10 +2,11 @@
 using FluentAssertions.Execution;
 using Xunit;
 
-namespace NPacMan.Game.Tests
+namespace NPacMan.Game.Tests.GameTests
 {
     public class DirectChaseToPacManStrategyTests
     {
+
         [Theory]
         [InlineData(0,5,4,5)]
         [InlineData(10,5,6,5)]
