@@ -7,11 +7,8 @@
         public CellLocation HomeLocation { get; }
 
         public Direction Direction { get; }
-        public IGhostStrategy Strategy { get; }
-        public IGhostStrategy CurrentStrategy { get; }
-
-        public int HomeLocationX => HomeLocation.X;
-        public int HomeLocationY => HomeLocation.Y;
+        private IGhostStrategy Strategy { get; }
+        private IGhostStrategy CurrentStrategy { get; }
 
         public Ghost(string name, CellLocation location, Direction direction, CellLocation homeLocation, IGhostStrategy strategy) 
         : this(name, location, direction, homeLocation, strategy, strategy)

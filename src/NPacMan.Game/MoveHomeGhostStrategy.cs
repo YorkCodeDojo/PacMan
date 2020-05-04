@@ -1,4 +1,0 @@
-namespace NPacMan.Game
-{
-
-}

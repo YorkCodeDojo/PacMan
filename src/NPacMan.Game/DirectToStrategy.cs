@@ -22,7 +22,9 @@ namespace NPacMan.Game
             var target = _directToLocation.GetLocation(game);
 
             return availableMoves
-                .OrderBy(possibleDirection => (ghost.Location + possibleDirection) - target).ThenBy(p => (int) p).First();
+                .OrderBy(possibleDirection => (ghost.Location + possibleDirection) - target)
+                .ThenBy(p => (int) p)
+                .First();
 
         }
 
