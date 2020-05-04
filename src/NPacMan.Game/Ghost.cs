@@ -3,8 +3,8 @@
     public class Ghost
     {
         public string Name { get; }
-        public int X { get; }
-        public int Y { get; }
+        public CellLocation Location { get; }
+        public Direction Direction { get; }
         public IGhostStrategy Strategy { get; }
         public IGhostStrategy CurrentStrategy { get; }
 
@@ -15,12 +15,12 @@
         public int HomeLocationX => _homeLocation.X;
         public int HomeLocationY => _homeLocation.Y;
 
-        public Ghost(string name, int x, int y, CellLocation homeLocation, IGhostStrategy strategy, IGhostStrategy homeStrategy, IGhostStrategy? currentStrategy = null)
+        public Ghost(string name, CellLocation location, Direction direction, CellLocation homeLocation, IGhostStrategy strategy, IGhostStrategy homeStrategy, IGhostStrategy? currentStrategy = null)
         {
             _homeStrategy = homeStrategy;
             Name = name;
-            X = x;
-            Y = y;
+            Location = location;
+            Direction = direction;
             Strategy = strategy;
             CurrentStrategy = currentStrategy ?? strategy;
             _homeLocation = homeLocation;
@@ -28,13 +28,23 @@
 
         public Ghost Move(Game game)
         {
-            var (x, y) = CurrentStrategy.Move(this, game);
-            return new Ghost(Name, x, y, _homeLocation, Strategy, _homeStrategy, CurrentStrategy);
+            var newDirection = CurrentStrategy.GetNextDirection(this, game);
+            
+            var newLocation = newDirection switch 
+            {
+                Direction.Up => Location.Above,
+                Direction.Down => Location.Below,
+                Direction.Left => Location.Left,
+                Direction.Right => Location.Right,
+                _ => Location
+            };
+
+            return new Ghost(Name, newLocation, newDirection ?? Direction, _homeLocation, Strategy, _homeStrategy, CurrentStrategy);
         }
 
         public Ghost GoHome()
         {
-            return new Ghost(Name, X, Y, _homeLocation, Strategy, _homeStrategy, _homeStrategy);
+            return new Ghost(Name,Location, Direction, _homeLocation, Strategy, _homeStrategy, currentStrategy: _homeStrategy);
         }
     }
 }

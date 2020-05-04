@@ -111,8 +111,8 @@ namespace NPacMan.UI
         }
         private void RenderGhost(Graphics g, int cellSize, Ghost ghost)
         {
-            var x = ghost.X * cellSize;
-            var y = ghost.Y * cellSize;
+            var x = ghost.Location.X * cellSize;
+            var y = ghost.Location.Y * cellSize;
 
             var ghostColour = ghost.Name switch
             {

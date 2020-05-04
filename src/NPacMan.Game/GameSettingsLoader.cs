@@ -30,8 +30,8 @@ namespace NPacMan.Game
                         case 'B':
                             var homeB = homeLocations['b'];
                             ghosts.Add(new Ghost(GhostNames.Blinky,
-                                                 columnNumber - 1,
-                                                 rowNumber,
+                                                 new CellLocation(columnNumber - 1,rowNumber),
+                                                 Direction.Left,
                                                  new CellLocation(homeB.X, homeB.Y),
                                                  new DirectChaseToPacManStrategy(),
                                                  new MoveHomeGhostStrategy()));
@@ -39,8 +39,8 @@ namespace NPacMan.Game
                         case 'P':
                             var homeP = homeLocations['p'];
                             ghosts.Add(new Ghost(GhostNames.Pinky,
-                                                 columnNumber - 1,
-                                                 rowNumber,
+                                                 new CellLocation(columnNumber - 1, rowNumber),
+                                                 Direction.Left,
                                                  new CellLocation(homeP.X, homeP.Y),
                                                  new StandingStillGhostStrategy(),
                                                  new MoveHomeGhostStrategy()));
@@ -48,8 +48,8 @@ namespace NPacMan.Game
                         case 'I':
                             var homeI = homeLocations['i'];
                             ghosts.Add(new Ghost(GhostNames.Inky,
-                                                 columnNumber - 1,
-                                                 rowNumber,
+                                                 new CellLocation(columnNumber - 1, rowNumber),
+                                                  Direction.Left,
                                                  new CellLocation(homeI.X, homeI.Y),
                                                  new StandingStillGhostStrategy(),
                                                  new MoveHomeGhostStrategy()));
@@ -57,8 +57,8 @@ namespace NPacMan.Game
                         case 'C':
                             var homeC = homeLocations['c'];
                             ghosts.Add(new Ghost(GhostNames.Clyde,
-                                                 columnNumber - 1,
-                                                 rowNumber,
+                                                 new CellLocation(columnNumber - 1, rowNumber),
+                                                Direction.Left,
                                                  new CellLocation(homeC.X, homeC.Y),
                                                  new StandingStillGhostStrategy(),
                                                  new MoveHomeGhostStrategy()));

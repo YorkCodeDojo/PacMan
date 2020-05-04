@@ -1,4 +1,6 @@
-﻿namespace NPacMan.Game
+﻿using System;
+
+namespace NPacMan.Game
 {
     public readonly struct CellLocation
     {
@@ -12,6 +14,32 @@
         }
 
         public static CellLocation TopLeft => new CellLocation(0, 0);
+
+        public CellLocation Above => new CellLocation(X, Y - 1);
+
+        public CellLocation Below => new CellLocation(X, Y + 1);
+
+        public CellLocation Left => new CellLocation(X - 1, Y);
+
+        public CellLocation Right => new CellLocation(X + 1, Y);
+
+        public static implicit operator (int X, int Y)(CellLocation cellLocation)
+                    => (cellLocation.X, cellLocation.Y);
+
+        public static implicit operator CellLocation((int x, int y) location)
+                    => new CellLocation(location.x, location.y);
+
+        public static CellLocation operator +(CellLocation location, Direction direction)
+            => direction switch 
+                {
+                    Direction.Up => location.Above,
+                    Direction.Down => location.Below,
+                    Direction.Left => location.Left,
+                    Direction.Right => location.Right,
+                    _ => location
+                };
+
+        public static int operator -(CellLocation from, CellLocation to) => Math.Abs(to.X - from.X) + Math.Abs(to.Y - from.Y);
 
     }
 }

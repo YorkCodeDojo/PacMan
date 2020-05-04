@@ -153,7 +153,7 @@ T      .   XI P C X   .      T
 
         private bool HasDied()
         {
-            return Ghosts.Values.Any(ghost => ghost.X == PacMan.X && ghost.Y == PacMan.Y);
+            return Ghosts.Values.Any(ghost => ghost.Location.X == PacMan.X && ghost.Location.Y == PacMan.Y);
         }
 
         private void MoveAllGhosts()

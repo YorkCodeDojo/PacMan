@@ -79,26 +79,38 @@ T ▲ T
             loadedBoard.Ghosts.Should().BeEquivalentTo(
             new
             {
-                X = 0,
-                Y = 1,
+                Location = new
+                {
+                    X = 0,
+                    Y = 1
+                },
                 Name = "Blinky",
             },
             new
             {
-                X = 1,
-                Y = 1,
+                Location = new 
+                {
+                    X = 1,
+                    Y = 1
+                },
                 Name = "Inky",
             },
             new
             {
-                X = 2,
-                Y = 1,
+                Location = new
+                {
+                    X = 2,
+                    Y = 1
+                },
                 Name = "Pinky",
             },
             new
             {
-                X = 2,
-                Y = 2,
+                Location = new
+                {
+                    X = 2,
+                    Y = 2
+                },
                 Name = "Clyde",
             });
         }

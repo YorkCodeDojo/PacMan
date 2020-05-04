@@ -21,15 +21,17 @@ namespace NPacMan.Game.Tests.GameTests
         public void GhostMovesInDirectionOfStrategy()
         {
             var strategy = new GhostGoesRightStrategy();
-            _gameSettings.Ghosts.Add(new Ghost("Ghost1", 0, 0, CellLocation.TopLeft, strategy, new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(0, 0), Direction.Left, CellLocation.TopLeft, strategy, new StandingStillGhostStrategy()));
 
             var game = new Game(_gameClock, _gameSettings);
 
             _gameClock.Tick();
             game.Ghosts["Ghost1"].Should().BeEquivalentTo(new
             {
-                X = 1,
-                Y = 0,
+                Location = new {
+                    X = 1,
+                    Y = 0
+                }
             });
         }
 
@@ -40,7 +42,7 @@ namespace NPacMan.Game.Tests.GameTests
             var x = 1;
             var y = 1;
 
-            _gameSettings.Ghosts.Add(new Ghost("Ghost1", x, y, CellLocation.TopLeft, new DirectChaseToPacManStrategy(), new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(x, y), Direction.Left, CellLocation.TopLeft, new DirectChaseToPacManStrategy(), new StandingStillGhostStrategy()));
             _gameSettings.PacMan = new PacMan(3, 3, Direction.Down, PacManStatus.Dying, 1);
 
             var game = new Game(_gameClock, _gameSettings);
@@ -50,8 +52,10 @@ namespace NPacMan.Game.Tests.GameTests
             game.Ghosts.Values.First()
                 .Should().BeEquivalentTo(new
                 {
-                    X = x,
-                    Y = y
+                    Location = new {
+                        X = x,
+                        Y = y
+                    }
                 });
         }
 
@@ -61,7 +65,7 @@ namespace NPacMan.Game.Tests.GameTests
         public void GhostShouldBeAbleToMoveWhenPacManIsReSpawning()
         {
             _gameSettings.PacMan = new PacMan(1, 1, Direction.Left, PacManStatus.Respawning, 1);
-            _gameSettings.Ghosts.Add(new Ghost("Ghost1", 1, 2, CellLocation.TopLeft, new GhostGoesRightStrategy(), new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(1, 2), Direction.Left, CellLocation.TopLeft, new GhostGoesRightStrategy(), new StandingStillGhostStrategy()));
 
             var game = new Game(_gameClock, _gameSettings);
             _gameClock.Tick();
@@ -69,8 +73,10 @@ namespace NPacMan.Game.Tests.GameTests
             game.Ghosts.Values.First()
                 .Should().BeEquivalentTo(new
                 {
-                    X = 2,
-                    Y = 2
+                    Location = new {
+                        X = 2,
+                        Y = 2
+                    }
                 });
         }
 
@@ -78,7 +84,7 @@ namespace NPacMan.Game.Tests.GameTests
         public void GhostShouldGoHome()
         {
             _gameSettings.PacMan = new PacMan(1, 1, Direction.Down, PacManStatus.Alive, 2);
-            _gameSettings.Ghosts.Add(new Ghost("Ghost1", 1, 2, new CellLocation(4, 4), new NPacMan.Game.StandingStillGhostStrategy(), new MoveHomeGhostStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(1, 2), Direction.Left, new CellLocation(4, 4), new NPacMan.Game.StandingStillGhostStrategy(), new MoveHomeGhostStrategy()));
 
             var game = new Game(_gameClock, _gameSettings);
             var now = DateTime.UtcNow;
@@ -97,8 +103,10 @@ namespace NPacMan.Game.Tests.GameTests
             game.Ghosts.Values.First()
                 .Should().BeEquivalentTo(new
                 {
-                    X = 4,
-                    Y = 4
+                    Location = new {
+                        X = 4,
+                        Y = 4
+                    }
                 });
         }
     }

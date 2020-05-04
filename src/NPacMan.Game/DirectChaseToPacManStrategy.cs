@@ -4,62 +4,59 @@ using System.Linq;
 
 namespace NPacMan.Game
 {
+    public static class DirectionExtentions
+    {
+        public static Direction Opposite(this Direction direction)
+            => direction switch {
+                Direction.Up => Direction.Down,
+                Direction.Down => Direction.Up,
+                Direction.Right => Direction.Left,
+                Direction.Left => Direction.Right,
+                _ => throw new NotImplementedException()
+            };
+    } 
     public class DirectChaseToPacManStrategy : IGhostStrategy
     {
-        public (int x, int y) Move(Ghost ghost, Game game)
+        public Direction? GetNextDirection(Ghost ghost, Game game)
         {
-            var pacman = game.PacMan;
-            var walls = game.Walls;
+            var availableMoves = GetAvailableMovesForLocation(ghost.Location, game.Walls);
+                
+            availableMoves.Remove(ghost.Direction.Opposite());
 
-            var possibleGoodMoves = new List<(int x, int y)>();
+            if (availableMoves.Count() == 1)
+                return availableMoves.First();
+            
+            var pacMan = new CellLocation(game.PacMan.X, game.PacMan.Y);
 
-            if (pacman.X < ghost.X)
-            {
-                if (TryMove(walls, ghost.X - 1, ghost.Y, out var newLocation))
-                    possibleGoodMoves.Add(newLocation);
-            }
-
-            if (pacman.X > ghost.X)
-            {
-                if (TryMove(walls, ghost.X + 1, ghost.Y, out var newLocation))
-                    possibleGoodMoves.Add(newLocation);
-            }
-
-            if (pacman.Y > ghost.Y)
-            {
-                if (TryMove(walls, ghost.X, ghost.Y + 1, out var newLocation))
-                    possibleGoodMoves.Add(newLocation);
-            }
-
-            if (pacman.Y < ghost.Y)
-            {
-                if (TryMove(walls, ghost.X, ghost.Y - 1, out var newLocation))
-                    possibleGoodMoves.Add(newLocation);
-            }
-
-            if (!possibleGoodMoves.Any())
-            {
-                if (TryMove(walls, ghost.X - 1, ghost.Y, out var newLocation1))
-                    possibleGoodMoves.Add(newLocation1);
-
-                if (TryMove(walls, ghost.X + 1, ghost.Y, out var newLocation2))
-                    possibleGoodMoves.Add(newLocation2);
-
-                if (TryMove(walls, ghost.X, ghost.Y + 1, out var newLocation3))
-                    possibleGoodMoves.Add(newLocation3);
-
-                if (TryMove(walls, ghost.X, ghost.Y - 1, out var newLocation4))
-                    possibleGoodMoves.Add(newLocation4);
-            }
-
-            return possibleGoodMoves.First();
+            // return availableMoves
+            //     .OrderBy(possibleDirection => CalculateDistance(ghost.Location + possibleDirection, pacMan)).First();
+            
+                        return availableMoves
+                .OrderBy(possibleDirection => (ghost.Location + possibleDirection) - pacMan).First();
 
         }
 
-        public bool TryMove(IReadOnlyCollection<(int x, int y)> walls, int newX, int newY, out (int x, int y) newLocation)
+    //    public int CalculateDistance(CellLocation from, CellLocation to) => Math.Abs(to.X - from.X) + Math.Abs(to.Y - from.Y);
+        
+
+        public List<Direction> GetAvailableMovesForLocation(CellLocation location, IReadOnlyCollection<(int x, int y)> walls)
         {
-            newLocation = (newX, newY);
-            return !walls.Contains((newX, newY));
+            var result = new List<Direction>(4);
+
+            if (!walls.Contains(location.Left))
+                result.Add(Direction.Left);
+
+            if (!walls.Contains(location.Right))
+                result.Add(Direction.Right);
+
+            if (!walls.Contains(location.Above))
+                result.Add(Direction.Up);
+
+            if (!walls.Contains(location.Below))
+                result.Add(Direction.Down);
+
+            return result;                                             
         }
+
     }
 }

@@ -36,7 +36,6 @@ namespace NPacMan.UI.Map
             _width = game.Width + 2;
             _map = new MapCellDetail[_width, _height];
 
-            // Todo: This needs to come from the game object
             var doors = game.Doors;
 
             GetWallsFromGame(game, doors);
@@ -44,7 +43,7 @@ namespace NPacMan.UI.Map
             // We need one valid play cell
             // As there are always ghosts, we can use the position of the first ghost
             var validPlayCell = game.Ghosts.Values.First();
-            MakeBasicMap(validPlayCell.X, validPlayCell.Y, doors);
+            MakeBasicMap(validPlayCell.Location.X, validPlayCell.Location.Y, doors);
 
             MakeDetailedMap();
         }
