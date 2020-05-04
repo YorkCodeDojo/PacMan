@@ -244,7 +244,7 @@ namespace NPacMan.Game.Tests
             var x = _game.PacMan.X + 1;
             var y = _game.PacMan.Y;
 
-            _gameSettings.Ghosts.Add(new Ghost("Ghost1", x, y, new StandingStillGhostStrategy(), new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", x, y, CellLocation.TopLeft, new StandingStillGhostStrategy(), new StandingStillGhostStrategy()));
 
             var game = new Game(_gameClock, _gameSettings);
             game.ChangeDirection(Direction.Left);
@@ -260,7 +260,7 @@ namespace NPacMan.Game.Tests
             var x = _game.PacMan.X + 1;
             var y = _game.PacMan.Y;
 
-            _gameSettings.Ghosts.Add(new Ghost("Ghost1", x, y, new StandingStillGhostStrategy(), new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", x, y, CellLocation.TopLeft, new StandingStillGhostStrategy(), new StandingStillGhostStrategy()));
 
             var game = new Game(_gameClock, _gameSettings);
             game.ChangeDirection(Direction.Right);
@@ -280,7 +280,7 @@ namespace NPacMan.Game.Tests
             // . G . P .
             // . . PG . .
 
-            _gameSettings.Ghosts.Add(new Ghost("Ghost1", _gameSettings.PacMan.X - 4, _gameSettings.PacMan.Y, new GhostGoesRightStrategy(), new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", _gameSettings.PacMan.X - 4, _gameSettings.PacMan.Y, CellLocation.TopLeft, new GhostGoesRightStrategy(), new StandingStillGhostStrategy()));
 
             var game = new Game(_gameClock, _gameSettings);
 
@@ -300,7 +300,7 @@ namespace NPacMan.Game.Tests
             var y = _game.PacMan.Y;
 
             _gameSettings.Walls.Add((x, y - 1));
-            _gameSettings.Ghosts.Add(new Ghost("Ghost1", x - 1, y, new GhostGoesRightStrategy(), new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", x - 1, y, CellLocation.TopLeft, new GhostGoesRightStrategy(), new StandingStillGhostStrategy()));
 
             var game = new Game(_gameClock, _gameSettings);
             game.ChangeDirection(Direction.Up);
@@ -317,7 +317,7 @@ namespace NPacMan.Game.Tests
             var x = _game.PacMan.X + 1;
             var y = _game.PacMan.Y;
 
-            _gameSettings.Ghosts.Add(new Ghost("Ghost1", x, y, new StandingStillGhostStrategy(), new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", x, y, CellLocation.TopLeft, new StandingStillGhostStrategy(), new StandingStillGhostStrategy()));
             _gameSettings.Coins.Add((x, y));
 
             var game = new Game(_gameClock, _gameSettings);
@@ -334,7 +334,7 @@ namespace NPacMan.Game.Tests
         public void GhostMovesInDirectionOfStrategy()
         {
             var strategy = new GhostGoesRightStrategy();
-            _gameSettings.Ghosts.Add(new Ghost("Ghost1", 0, 0, strategy, new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", 0, 0, CellLocation.TopLeft, strategy, new StandingStillGhostStrategy()));
 
             var game = new Game(_gameClock, _gameSettings);
 
@@ -353,7 +353,7 @@ namespace NPacMan.Game.Tests
             var x = 1;
             var y = 1;
 
-            _gameSettings.Ghosts.Add(new Ghost("Ghost1", x, y, new DirectChaseToPacManStrategy(), new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", x, y, CellLocation.TopLeft, new DirectChaseToPacManStrategy(), new StandingStillGhostStrategy()));
             _gameSettings.PacMan = new PacMan(3,3,Direction.Down, PacManStatus.Dying, 1);
 
             var game = new Game(_gameClock, _gameSettings);
@@ -397,7 +397,7 @@ namespace NPacMan.Game.Tests
             var x = 1;
             var y = 1;
         
-            _gameSettings.Ghosts.Add(new Ghost("Ghost1", x, y, new NPacMan.Game.StandingStillGhostStrategy(), new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", x, y, CellLocation.TopLeft, new NPacMan.Game.StandingStillGhostStrategy(), new StandingStillGhostStrategy()));
             _gameSettings.PacMan = new PacMan(1, 1, Direction.Down, PacManStatus.Dying, expectedLife);
         
             var game = new Game(_gameClock, _gameSettings);
@@ -411,7 +411,7 @@ namespace NPacMan.Game.Tests
         public void PacManShouldRespawnAfter4Seconds()
         {
             _gameSettings.PacMan = new PacMan(1, 1, Direction.Down, PacManStatus.Alive, 1);
-            _gameSettings.Ghosts.Add(new Ghost("Ghost1", 1, 2, new NPacMan.Game.StandingStillGhostStrategy(), new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", 1, 2, CellLocation.TopLeft, new NPacMan.Game.StandingStillGhostStrategy(), new StandingStillGhostStrategy()));
 
             var game = new Game(_gameClock, _gameSettings);
             var now = DateTime.UtcNow;
@@ -434,7 +434,7 @@ namespace NPacMan.Game.Tests
         public void GhostShouldBeAbleToMoveWhenPacManIsReSpawning()
         {
             _gameSettings.PacMan = new PacMan(1, 1, Direction.Left, PacManStatus.Respawning, 1);
-            _gameSettings.Ghosts.Add(new Ghost("Ghost1", 1, 2, new GhostGoesRightStrategy(), new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", 1, 2, CellLocation.TopLeft, new GhostGoesRightStrategy(), new StandingStillGhostStrategy()));
 
             var game = new Game(_gameClock, _gameSettings);
             _gameClock.Tick();
@@ -451,7 +451,7 @@ namespace NPacMan.Game.Tests
         public void GhostShouldGoHome()
         {
             _gameSettings.PacMan = new PacMan(1, 1, Direction.Down, PacManStatus.Alive, 2);
-            _gameSettings.Ghosts.Add(new Ghost("Ghost1", 1, 2, new NPacMan.Game.StandingStillGhostStrategy(), new MoveHomeGhostStrategy(4, 4)));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", 1, 2, new CellLocation(4, 4), new NPacMan.Game.StandingStillGhostStrategy(), new MoveHomeGhostStrategy()));
 
             var game = new Game(_gameClock, _gameSettings);
             var now = DateTime.UtcNow;

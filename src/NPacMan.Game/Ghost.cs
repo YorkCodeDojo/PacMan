@@ -7,12 +7,15 @@
         public int Y { get; }
         public IGhostStrategy Strategy { get; }
         public IGhostStrategy CurrentStrategy { get; }
+
+        private readonly CellLocation _homeLocation;
+
         private IGhostStrategy _homeStrategy { get; }
 
-        public int HomeLocationX => ((MoveHomeGhostStrategy)_homeStrategy).X;
-        public int HomeLocationY => ((MoveHomeGhostStrategy)_homeStrategy).Y;
+        public int HomeLocationX => _homeLocation.X;
+        public int HomeLocationY => _homeLocation.Y;
 
-        public Ghost(string name, int x, int y, IGhostStrategy strategy, IGhostStrategy homeStrategy, IGhostStrategy? currentStrategy = null)
+        public Ghost(string name, int x, int y, CellLocation homeLocation, IGhostStrategy strategy, IGhostStrategy homeStrategy, IGhostStrategy? currentStrategy = null)
         {
             _homeStrategy = homeStrategy;
             Name = name;
@@ -20,17 +23,18 @@
             Y = y;
             Strategy = strategy;
             CurrentStrategy = currentStrategy ?? strategy;
+            _homeLocation = homeLocation;
         }
 
         public Ghost Move(Game game)
         {
             var (x, y) = CurrentStrategy.Move(this, game);
-            return new Ghost(Name, x, y, Strategy, _homeStrategy, CurrentStrategy);
+            return new Ghost(Name, x, y, _homeLocation, Strategy, _homeStrategy, CurrentStrategy);
         }
 
         public Ghost GoHome()
         {
-            return new Ghost(Name, X, Y, Strategy, _homeStrategy, _homeStrategy);
+            return new Ghost(Name, X, Y, _homeLocation, Strategy, _homeStrategy, _homeStrategy);
         }
     }
 }

@@ -28,19 +28,39 @@ namespace NPacMan.Game
                     {
                         case 'B':
                             var homeB = homeLocations['b'];
-                            ghosts.Add(new Ghost(GhostNames.Blinky, columnNumber - 1, rowNumber, new DirectChaseToPacManStrategy(), new MoveHomeGhostStrategy(homeB.X, homeB.Y)));
+                            ghosts.Add(new Ghost(GhostNames.Blinky,
+                                                 columnNumber - 1,
+                                                 rowNumber,
+                                                 new CellLocation(homeB.X, homeB.Y),
+                                                 new DirectChaseToPacManStrategy(),
+                                                 new MoveHomeGhostStrategy()));
                             break;
                         case 'P':
                             var homeP = homeLocations['p'];
-                            ghosts.Add(new Ghost(GhostNames.Pinky, columnNumber - 1, rowNumber, new StandingStillGhostStrategy(), new MoveHomeGhostStrategy(homeP.X, homeP.Y)));
+                            ghosts.Add(new Ghost(GhostNames.Pinky,
+                                                 columnNumber - 1,
+                                                 rowNumber,
+                                                 new CellLocation(homeP.X, homeP.Y),
+                                                 new StandingStillGhostStrategy(),
+                                                 new MoveHomeGhostStrategy()));
                             break;
                         case 'I':
                             var homeI = homeLocations['i'];
-                            ghosts.Add(new Ghost(GhostNames.Inky, columnNumber - 1, rowNumber, new StandingStillGhostStrategy(), new MoveHomeGhostStrategy(homeI.X, homeI.Y)));
+                            ghosts.Add(new Ghost(GhostNames.Inky,
+                                                 columnNumber - 1,
+                                                 rowNumber,
+                                                 new CellLocation(homeI.X, homeI.Y),
+                                                 new StandingStillGhostStrategy(),
+                                                 new MoveHomeGhostStrategy()));
                             break;
                         case 'C':
                             var homeC = homeLocations['c'];
-                            ghosts.Add(new Ghost(GhostNames.Clyde, columnNumber - 1, rowNumber, new StandingStillGhostStrategy(), new MoveHomeGhostStrategy(homeC.X, homeC.Y)));
+                            ghosts.Add(new Ghost(GhostNames.Clyde,
+                                                 columnNumber - 1,
+                                                 rowNumber,
+                                                 new CellLocation(homeC.X, homeC.Y),
+                                                 new StandingStillGhostStrategy(),
+                                                 new MoveHomeGhostStrategy()));
                             break;
                         case '▲':
                             pacMan = new PacMan(columnNumber - 1, rowNumber, Direction.Up, PacManStatus.Alive, 3);
