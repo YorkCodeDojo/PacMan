@@ -6,6 +6,11 @@ namespace NPacMan.Game
 {
     public class GameSettingsLoader
     {
+        public static IGameSettings LoadFromFile(string filename)
+        {
+            var fileContents = System.IO.File.ReadAllText(filename);
+            return Load(fileContents);
+        }
         public static IGameSettings Load(string board)
         {
             var rows = board.Split(new[] { Environment.NewLine }, StringSplitOptions.None);

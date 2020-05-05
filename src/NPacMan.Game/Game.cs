@@ -1,10 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using System;
-using System.ComponentModel.Design;
-using System.Net.Http.Headers;
-using System.Xml.XPath;
 
 namespace NPacMan.Game
 {
@@ -28,39 +24,10 @@ namespace NPacMan.Game
 
         public static Game Create()
         {
-            var board = @" XXXXXXXXXXXXXXXXXXXXXXXXXXXX
- Xp...........XX...........bX
- X.XXXX.XXXXX.XX.XXXXX.XXXX.X
- X.X  X.X   X.XX.X   X.X  X.X
- X.XXXX.XXXXX.XX.XXXXX.XXXX.X
- X..........................X
- X.XXXX.XX.XXXXXXXX.XX.XXXX.X
- X.XXXX.XX.XXXXXXXX.XX.XXXX.X
- X......XX....XX....XX......X
- XXXXXX.XXXXX XX XXXXX.XXXXXX
-      X.XXXXX XX XXXXX.X     
-      X.XX   B  ICP XX.X     
-      X.XX XXX--XXX XX.X     
- XXXXXX.XX X      X XX.XXXXXX
-T      .   X      X   .      T
- XXXXXX.XX X      X XX.XXXXXX
-      X.XX XXXXXXXX XX.X     
-      X.XX          XX.X     
-      X.XX XXXXXXXX XX.X
- XXXXXX.XX XXXXXXXX XX.XXXXXX
- X............XX............X
- X.XXXX.XXXXX.XX.XXXXX.XXXX.X
- X.XXXX.XXXXX.XX.XXXXX.XXXX.X
- X...XX.......►........XX...X
- XXX.XX.XX.XXXXXXXX.XX.XX.XXX
- XXX.XX.XX.XXXXXXXX.XX.XX.XXX
- X......XX....XX....XX......X
- X.XXXXXXXXXX.XX.XXXXXXXXXX.X
- X.XXXXXXXXXX.XX.XXXXXXXXXX.X
- Xc........................iX
- XXXXXXXXXXXXXXXXXXXXXXXXXXXX";
+            var filename = "board.txt";
+            var gameSettings = GameSettingsLoader.LoadFromFile(filename);
 
-            return new Game(new GameClock(), GameSettingsLoader.Load(board));
+            return new Game(new GameClock(), gameSettings);
         }
 
         public PacMan PacMan { get; private set; }
