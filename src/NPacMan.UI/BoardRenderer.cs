@@ -9,9 +9,6 @@ namespace NPacMan.UI
     {
         private readonly Font _scoreFont = new Font("Segoe UI", 20F, FontStyle.Regular, GraphicsUnit.Point, ((byte)(0)));
 
-        private int mouthSize = 60;
-        private int mouthDirection = 1;
-
         private bool animated = false;
 
         private Sprites _sprites;
@@ -36,11 +33,11 @@ namespace NPacMan.UI
                 {
                     var posX = x * cellSize;
                     var posY = y * cellSize;
-                    _sprites.RenderSprite(g, posX, posY, _sprites.Map(_mapLayout.BoardPieceToDisplay(x,y)));
+                    _sprites.RenderSprite(g, posX, posY, _sprites.Map(_mapLayout.BoardPieceToDisplay(x, y)));
                 }
             }
         }
-        
+
         private int CellSizeFromClientSize(Game.Game game, int totalClientWidth, int totalClientHeight)
         {
             return Math.Min(totalClientWidth / game.Width, totalClientHeight / game.Height);
@@ -61,6 +58,8 @@ namespace NPacMan.UI
             }
         }
 
+        private int _pacManAnimation = 0;
+        private int _pacManAnimationDelay = 0;
         public void RenderPacMan(Graphics g, NPacMan.Game.Game game)
         {
             var cellSize = Sprites.PixelGrid;
@@ -68,35 +67,23 @@ namespace NPacMan.UI
             var x = game.PacMan.X * cellSize;
             var y = game.PacMan.Y * cellSize;
 
-            var offset = 0;
-
-            switch (game.PacMan.Direction)
+            _pacManAnimationDelay++;
+            if (_pacManAnimationDelay == 3)
             {
-                case Direction.Up:
-                    offset = -90;
-                    break;
-                case Direction.Left:
-                    offset = -180;
-                    break;
-                case Direction.Down:
-                    offset = 90;
-                    break;
+                if (game.PacMan.Status == PacManStatus.Alive)
+                {
+                    _pacManAnimation = (_pacManAnimation + 1) % 4;
+                }
+                else
+                {
+                    _pacManAnimation = (_pacManAnimation + 1) % 4;
+                }
+                _pacManAnimationDelay = 0;
             }
 
-            var halfSize = (mouthSize / 2);
-            g.FillPie(Brushes.Yellow, x, y, cellSize, cellSize, offset + halfSize, 360 - mouthSize);
-
-            mouthSize = (mouthSize + mouthDirection);
-            if (mouthSize >= 60)
-            {
-                mouthDirection = -5;
-            }
-            else if (mouthSize <= 0)
-            {
-                mouthDirection = +5;
-            }
-
+            _sprites.RenderSprite(g, x, y, _sprites.PacMan(game.PacMan.Direction, _pacManAnimation, game.PacMan.Status == PacManStatus.Dying));
         }
+
 
         public void RenderGhosts(Graphics g, NPacMan.Game.Game game)
         {
