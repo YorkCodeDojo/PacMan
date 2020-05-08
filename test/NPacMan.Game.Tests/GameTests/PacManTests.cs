@@ -148,5 +148,24 @@ namespace NPacMan.Game.Tests.GameTests
 
             game.PacMan.Status.Should().Be(PacManStatus.Respawning);
         }
+
+        [Fact]
+        public void PacManShouldBeAliveAfter4SecondsWhenInRespawning()
+        {
+            _gameSettings.PacMan = new PacMan(1, 1, Direction.Down, PacManStatus.Alive, 2);
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(1, 2), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
+
+            var game = new Game(_gameClock, _gameSettings);
+            var now = DateTime.UtcNow;
+            _gameClock.Tick(now);
+            _gameClock.Tick(now.AddSeconds(4));
+
+            if (game.PacMan.Status != PacManStatus.Respawning)
+                throw new Exception($"Invalid PacMan State {game.PacMan.Status:G}");
+
+            _gameClock.Tick(now.AddSeconds(8));
+
+            game.PacMan.Status.Should().Be(PacManStatus.Alive);
+        }
     }
 }

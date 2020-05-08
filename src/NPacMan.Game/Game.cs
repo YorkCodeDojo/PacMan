@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Collections.Immutable;
 
 namespace NPacMan.Game
 {
@@ -48,7 +49,8 @@ namespace NPacMan.Game
         public int Lives
             => PacMan.Lives;
 
-        public IReadOnlyDictionary<string, Ghost> Ghosts => _ghosts;
+        public IReadOnlyDictionary<string, Ghost> Ghosts
+            => PacMan.Status == PacManStatus.Respawning ? (IReadOnlyDictionary<string, Ghost>)ImmutableDictionary<string, Ghost>.Empty : _ghosts;
 
         public void ChangeDirection(Direction direction)
         {

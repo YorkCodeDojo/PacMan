@@ -31,15 +31,26 @@ namespace NPacMan.Game
 
         internal PacMan Transition(DateTime now)
         {
-            if (Status == PacManStatus.Respawning || Status == PacManStatus.Dead)
+            if (Status == PacManStatus.Dead)
             {
                 return this;
             }
+            
             if (Status == PacManStatus.Dying)
             {
                 if (now >= _timeToChangeState)
                 {
-                    return WithNewStatus(PacManStatus.Respawning);
+                    return Respawn(now.AddSeconds(4));
+                }
+
+                return this;
+            }
+
+            if (Status == PacManStatus.Respawning)
+            {
+                if (now >= _timeToChangeState)
+                {
+                    return WithNewStatus(PacManStatus.Alive);
                 }
 
                 return this;
@@ -73,6 +84,11 @@ namespace NPacMan.Game
         public PacMan Kill(DateTime timeToDie)
         {
             return new PacMan(X, Y, Direction, PacManStatus.Dying, Lives - 1, timeToDie);
+        }
+
+        public PacMan Respawn(DateTime timeToBecomeAlive)
+        {
+            return new PacMan(X, Y, Direction, PacManStatus.Respawning, Lives, timeToBecomeAlive);
         }
     }
 }
