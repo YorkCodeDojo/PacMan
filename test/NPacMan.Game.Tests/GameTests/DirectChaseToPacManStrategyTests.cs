@@ -191,6 +191,33 @@ namespace NPacMan.Game.Tests.GameTests
             });
         }
 
+        [Fact]
+        public void ShouldBeAbleInterceptPacMan()
+        {
+// ghost = 1,2
+// pacman (+2) will be at= 6,1
+// difference 5,-1
+// target vector = (difference * 2) = 10, -2
+// ghost + vector = 11, 0
+
+            var board = new TestGameSettings()
+            {
+                PacMan = new PacMan(4, 1, Direction.Right, PacManStatus.Alive, 3),
+                Ghosts = { new Ghost("ghost-1", new CellLocation(1, 2), Direction.Up, CellLocation.TopLeft, new DirectToStrategy(new DirectToPacManLocation())) },                
+                Walls = { }
+            };
+            var gameClock = new TestGameClock();
+            var game = new Game(gameClock, board);
+
+            var inkyTargetCell = new InterceptPacManLocation("ghost-1");
+            var targetLocation = inkyTargetCell.GetLocation(game);
+
+            targetLocation.Should().BeEquivalentTo(new
+            {
+                X = 11,
+                Y = 0
+            });
+        }
 
     }
 }
