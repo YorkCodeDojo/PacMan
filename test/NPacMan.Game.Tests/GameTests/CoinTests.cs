@@ -19,8 +19,6 @@ namespace NPacMan.Game.Tests.GameTests
         public void ScoreDoesNotChangeWhenNoCoinIsCollected()
         {
             var game = new Game(_gameClock, _gameSettings);
-            var x = game.PacMan.X;
-            var y = game.PacMan.Y;
             var score = game.Score;
 
             game.ChangeDirection(Direction.Down);
@@ -34,8 +32,7 @@ namespace NPacMan.Game.Tests.GameTests
         public void IncrementsScoreBy10WhenCoinCollected()
         {
             var game = new Game(_gameClock, _gameSettings);
-            var x = game.PacMan.X;
-            var y = game.PacMan.Y;
+            var (x, y) = game.PacMan.Location;
 
             game.ChangeDirection(Direction.Down);
 
@@ -49,8 +46,7 @@ namespace NPacMan.Game.Tests.GameTests
         public void IncrementsScoreBy20WhenTwoCoinsAreCollected()
         {
             var game = new Game(_gameClock, _gameSettings);
-            var x = game.PacMan.X;
-            var y = game.PacMan.Y;
+            var (x, y) = game.PacMan.Location;
 
             game.ChangeDirection(Direction.Down);
 
@@ -67,8 +63,7 @@ namespace NPacMan.Game.Tests.GameTests
         public void CoinShouldBeCollected()
         {
             var game = new Game(_gameClock, _gameSettings);
-            var x = game.PacMan.X;
-            var y = game.PacMan.Y;
+            var (x, y) = game.PacMan.Location;
 
             game.ChangeDirection(Direction.Down);
 
@@ -83,8 +78,7 @@ namespace NPacMan.Game.Tests.GameTests
         public void JustTheCollectedCoinShouldBeCollected()
         {
             var game = new Game(_gameClock, _gameSettings);
-            var x = game.PacMan.X;
-            var y = game.PacMan.Y;
+            var (x, y) = game.PacMan.Location;
 
             game.ChangeDirection(Direction.Down);
 
@@ -111,17 +105,17 @@ namespace NPacMan.Game.Tests.GameTests
             gameClock.Tick();
 
             game.Coins.Should().BeEquivalentTo(
-                (1, 1),
-                (1, 2),
-                (2, 2)
+                new CellLocation(1, 1),
+                new CellLocation(1, 2),
+                new CellLocation(2, 2)
             );
         }
 
         [Fact]
         public void PacManDoesNotCollectCoinAndScoreStaysTheSameWhenCollidesWithGhost()
         {
-            var x = _gameSettings.PacMan.X + 1;
-            var y = _gameSettings.PacMan.Y;
+            var x = _gameSettings.PacMan.Location.X + 1;
+            var y = _gameSettings.PacMan.Location.Y;
 
             _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(x, y), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
             _gameSettings.Coins.Add((x, y));

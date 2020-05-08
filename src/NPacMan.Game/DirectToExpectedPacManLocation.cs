@@ -4,7 +4,7 @@ namespace NPacMan.Game
     {
         public CellLocation GetLocation(Game game)
         {
-            return new CellLocation(game.PacMan.X, game.PacMan.Y)
+            return game.PacMan.Location
                 + game.PacMan.Direction
                 + game.PacMan.Direction
                 + game.PacMan.Direction

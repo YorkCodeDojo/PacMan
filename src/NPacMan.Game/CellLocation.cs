@@ -12,8 +12,16 @@ namespace NPacMan.Game
             X = x;
             Y = y;
         }
+        public void Deconstruct(out int x, out int y)
+        {
+            x = X;
+            y = Y;
+        }
 
         public static CellLocation TopLeft => new CellLocation(0, 0);
+
+        public CellLocation WithNewX(int newX) => new CellLocation(newX, Y);
+        public CellLocation WithNewY(int newY) => new CellLocation(X, newY);
 
         public CellLocation Above => new CellLocation(X, Y - 1);
 

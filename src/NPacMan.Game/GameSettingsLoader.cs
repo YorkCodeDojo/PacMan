@@ -22,10 +22,10 @@ namespace NPacMan.Game
 
             var homeLocations = FindHomeLocations(instructions);
 
-            var coins = new List<(int, int)>();
-            var walls = new List<(int, int)>();
+            var coins = new List<CellLocation>();
+            var walls = new List<CellLocation>();
             var doors = new List<CellLocation>();
-            var portalParts = new List<(int, int)>();
+            var portalParts = new List<CellLocation>();
             var ghosts = new List<Ghost>();
             PacMan? pacMan = null;
             for (int rowNumber = 0; rowNumber < height; rowNumber++)
@@ -33,12 +33,13 @@ namespace NPacMan.Game
                 var row = rows[rowNumber];
                 for (int columnNumber = 0; columnNumber < row.Length; columnNumber++)
                 {
+                    var location = new CellLocation(columnNumber - 1, rowNumber);
                     switch (row[columnNumber])
                     {
                         case 'B':
                             var homeB = homeLocations[GhostNames.Blinky];
                             ghosts.Add(new Ghost(GhostNames.Blinky,
-                                                 new CellLocation(columnNumber - 1, rowNumber),
+                                                 location,
                                                  Direction.Left,
                                                  new CellLocation(homeB.X, homeB.Y),
                                                  new DirectToStrategy(new DirectToPacManLocation())));
@@ -46,7 +47,7 @@ namespace NPacMan.Game
                         case 'P':
                             var homeP = homeLocations[GhostNames.Pinky];
                             ghosts.Add(new Ghost(GhostNames.Pinky,
-                                                 new CellLocation(columnNumber - 1, rowNumber),
+                                                 location,
                                                  Direction.Left,
                                                  new CellLocation(homeP.X, homeP.Y),
                                                  new DirectToStrategy(new DirectToExpectedPacManLocation())));
@@ -54,7 +55,7 @@ namespace NPacMan.Game
                         case 'I':
                             var homeI = homeLocations[GhostNames.Inky];
                             ghosts.Add(new Ghost(GhostNames.Inky,
-                                                 new CellLocation(columnNumber - 1, rowNumber),
+                                                 location,
                                                   Direction.Left,
                                                  new CellLocation(homeI.X, homeI.Y),
                                                  new DirectToStrategy(new InterceptPacManLocation(GhostNames.Blinky))));
@@ -62,28 +63,28 @@ namespace NPacMan.Game
                         case 'C':
                             var homeC = homeLocations[GhostNames.Clyde];
                             ghosts.Add(new Ghost(GhostNames.Clyde,
-                                                 new CellLocation(columnNumber - 1, rowNumber),
+                                                 location,
                                                 Direction.Left,
                                                  new CellLocation(homeC.X, homeC.Y),
                                                  new DirectToStrategy(new StaysCloseToPacManLocation(GhostNames.Clyde))));
                             break;
                         case '▲':
-                            pacMan = new PacMan(columnNumber - 1, rowNumber, Direction.Up, PacManStatus.Alive, 3);
+                            pacMan = new PacMan(location, Direction.Up, PacManStatus.Alive, 3);
                             break;
                         case '▼':
-                            pacMan = new PacMan(columnNumber - 1, rowNumber, Direction.Down, PacManStatus.Alive, 3);
+                            pacMan = new PacMan(location, Direction.Down, PacManStatus.Alive, 3);
                             break;
                         case '►':
-                            pacMan = new PacMan(columnNumber - 1, rowNumber, Direction.Right, PacManStatus.Alive, 3);
+                            pacMan = new PacMan(location, Direction.Right, PacManStatus.Alive, 3);
                             break;
                         case '◄':
-                            pacMan = new PacMan(columnNumber - 1, rowNumber, Direction.Left, PacManStatus.Alive, 3);
+                            pacMan = new PacMan(location, Direction.Left, PacManStatus.Alive, 3);
                             break;
                         case 'X':
                             walls.Add((columnNumber - 1, rowNumber));
                             break;
                         case '-':
-                            doors.Add(new CellLocation(columnNumber - 1, rowNumber));
+                            doors.Add(location);
                             break;
                         case 'T':
                             portalParts.Add((columnNumber - 1, rowNumber));
@@ -102,7 +103,7 @@ namespace NPacMan.Game
             if (portalParts.Count() != 0 && portalParts.Count() != 2)
                 throw new Exception("Unexpected number of portals");
 
-            var portals = new Dictionary<(int, int), (int, int)>();
+            var portals = new Dictionary<CellLocation, CellLocation>();
             if (portalParts.Any())
             {
                 portals.Add(portalParts[0], portalParts[1]);
