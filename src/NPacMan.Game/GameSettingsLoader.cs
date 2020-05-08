@@ -65,7 +65,7 @@ namespace NPacMan.Game
                                                  new CellLocation(columnNumber - 1, rowNumber),
                                                 Direction.Left,
                                                  new CellLocation(homeC.X, homeC.Y),
-                                                 new StandingStillGhostStrategy()));
+                                                 new DirectToStrategy(new StaysCloseToPacManLocation(GhostNames.Clyde))));
                             break;
                         case '▲':
                             pacMan = new PacMan(columnNumber - 1, rowNumber, Direction.Up, PacManStatus.Alive, 3);
