@@ -67,7 +67,7 @@ namespace NPacMan.Game
 
             if (PacMan.Status == PacManStatus.Dying && newPacMan.Status == PacManStatus.Respawning)
             {
-                SendAllGhostsHome();
+                ScatterAllGhosts();
             }
 
             if (PacMan.Status != PacManStatus.Dying)
@@ -126,12 +126,12 @@ namespace NPacMan.Game
             _ghosts = newPositionOfGhosts;
         }
 
-        private void SendAllGhostsHome()
+        private void ScatterAllGhosts()
         {
             var newPositionOfGhosts = new Dictionary<string, Ghost>();
             foreach (var ghost in Ghosts.Values)
             {
-                newPositionOfGhosts[ghost.Name] = ghost.GoHome();
+                newPositionOfGhosts[ghost.Name] = ghost.Scatter();
             }
 
             _ghosts = newPositionOfGhosts;

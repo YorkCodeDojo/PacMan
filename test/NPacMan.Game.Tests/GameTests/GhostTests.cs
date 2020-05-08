@@ -81,7 +81,7 @@ namespace NPacMan.Game.Tests.GameTests
         }
 
         [Fact]
-        public void GhostShouldGoHome()
+        public void GhostShouldScatter()
         {
             _gameSettings.PacMan = new PacMan(1, 1, Direction.Down, PacManStatus.Alive, 2);
             _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(1, 2), Direction.Left, new CellLocation(4, 4), new NPacMan.Game.StandingStillGhostStrategy()));

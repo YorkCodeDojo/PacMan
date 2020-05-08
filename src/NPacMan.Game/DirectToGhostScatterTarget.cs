@@ -1,11 +1,11 @@
 ﻿namespace NPacMan.Game
 {
-    public class DirectToGhostHomeLocation : IDirectToLocation
+    public class DirectToGhostScatterTarget : IDirectToLocation
     {
         private readonly CellLocation _home;
-        public DirectToGhostHomeLocation(Ghost ghost)
+        public DirectToGhostScatterTarget(Ghost ghost)
         {
-            _home = ghost.HomeLocation;
+            _home = ghost.ScatterTarget;
         }
 
         public CellLocation GetLocation(Game game)
