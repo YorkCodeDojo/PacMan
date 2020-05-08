@@ -1,14 +1,34 @@
-﻿using System;
+﻿using FluentAssertions;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using FluentAssertions;
-using FluentAssertions.Execution;
 using Xunit;
 
 namespace NPacMan.Game.Tests
 {
     public class BoardLoaderTests
     {
+        [Fact]
+        public void TheBoardCanBeLoadedFromATextFile()
+        {
+            var filename = "SimpleTestBoard.txt";
+
+            var gameBoard = GameSettingsLoader.LoadFromFile(filename);
+
+            gameBoard.Should().BeEquivalentTo(new
+            {
+                Walls = new[] { (0, 0), (1, 0), (2, 0), (0, 1), (2, 1), (0, 2), (1, 2) },
+                Coins = new[] { (1, 1), (2, 2) },
+                Doors = new[] { new CellLocation(0, 4), new CellLocation(1, 4), new CellLocation(2, 4) },
+                Width = 3,
+                Height = 5,
+                Portals = new Dictionary<(int, int), (int, int)>
+                {
+                    {(-1,3), (3,3) },{(3,3), (-1,3) }
+                }
+            });
+
+        }
+
         [Fact]
         public void ShouldItemsOnBoard()
         {
@@ -23,7 +43,7 @@ T ▲ T
             {
                 Walls = new[] { (0, 0), (1, 0), (2, 0), (0, 1), (2, 1), (0, 2), (1, 2) },
                 Coins = new[] { (1, 1), (2, 2) },
-                Doors = new []{new CellLocation(0, 4),new CellLocation(1, 4), new CellLocation(2, 4)},
+                Doors = new[] { new CellLocation(0, 4), new CellLocation(1, 4), new CellLocation(2, 4) },
                 Width = 3,
                 Height = 5,
                 Portals = new Dictionary<(int, int), (int, int)>
@@ -88,7 +108,7 @@ T ▲ T
             },
             new
             {
-                Location = new 
+                Location = new
                 {
                     X = 1,
                     Y = 1
@@ -127,7 +147,7 @@ T ▲ T
             loadedBoard.Ghosts.Should().BeEquivalentTo(
             new
             {
-                HomeLocation = new {X = 0, Y = 3},
+                HomeLocation = new { X = 0, Y = 3 },
                 Name = "Blinky",
             },
             new
@@ -156,7 +176,7 @@ T ▲ T
  bipc";
             var loadedBoard = GameSettingsLoader.Load(board);
 
-            loadedBoard.Coins.Should().BeEquivalentTo( (0,3), (1, 3), (2, 3), (3, 3) );
+            loadedBoard.Coins.Should().BeEquivalentTo((0, 3), (1, 3), (2, 3), (3, 3));
         }
 
     }

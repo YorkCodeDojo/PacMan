@@ -18,4 +18,10 @@
     <ProjectReference Include="..\..\src\NPacMan.Game\NPacMan.Game.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="SimpleTestBoard.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
