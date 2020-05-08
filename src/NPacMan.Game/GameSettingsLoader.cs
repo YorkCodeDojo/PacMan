@@ -49,7 +49,7 @@ namespace NPacMan.Game
                                                  new CellLocation(columnNumber - 1, rowNumber),
                                                  Direction.Left,
                                                  new CellLocation(homeP.X, homeP.Y),
-                                                 new StandingStillGhostStrategy()));
+                                                 new DirectToStrategy(new DirectToExpectedPacManLocation())));
                             break;
                         case 'I':
                             var homeI = homeLocations[GhostNames.Inky];
