@@ -1,5 +1,5 @@
 ﻿ XXXXXXXXXXXXXXXXXXXXXXXXXXXX
- Xp...........XX...........bX
+ X............XX............X
  X.XXXX.XXXXX.XX.XXXXX.XXXX.X
  X.X  X.X   X.XX.X   X.X  X.X
  X.XXXX.XXXXX.XX.XXXXX.XXXX.X
@@ -9,10 +9,10 @@
  X......XX....XX....XX......X
  XXXXXX.XXXXX XX XXXXX.XXXXXX
       X.XXXXX XX XXXXX.X     
-      X.XX   B  ICP XX.X     
+      X.XX   B      XX.X     
       X.XX XXX--XXX XX.X     
  XXXXXX.XX X      X XX.XXXXXX
-T      .   X      X   .      T
+T      .   X IC P X   .      T
  XXXXXX.XX X      X XX.XXXXXX
       X.XX XXXXXXXX XX.X     
       X.XX          XX.X     
@@ -27,5 +27,9 @@ T      .   X      X   .      T
  X......XX....XX....XX......X
  X.XXXXXXXXXX.XX.XXXXXXXXXX.X
  X.XXXXXXXXXX.XX.XXXXXXXXXX.X
- Xc........................iX
+ X..........................X
  XXXXXXXXXXXXXXXXXXXXXXXXXXXX
+{Pinky=2,-2}
+{Blinky=28,-2}
+{Clyde=0,31}
+{Inky=30,31}

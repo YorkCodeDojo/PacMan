@@ -92,7 +92,11 @@ T ▲ T
             var board = @" XXX 
  BIP 
  ▲XC
- bipc";
+ ....
+{Blinky=-10,-3}
+{Inky=1,3}
+{Pinky=2,3}
+{Clyde=20,33}";
 
             var loadedBoard = GameSettingsLoader.Load(board);
 
@@ -141,13 +145,17 @@ T ▲ T
             var board = @" XXX 
  BIP 
  ▲XC 
- bipc";
+ ....
+{Blinky=-10,-3}
+{Inky=1,3}
+{Pinky=2,3}
+{Clyde=20,33}";
 
             var loadedBoard = GameSettingsLoader.Load(board);
             loadedBoard.Ghosts.Should().BeEquivalentTo(
             new
             {
-                HomeLocation = new { X = 0, Y = 3 },
+                HomeLocation = new { X = -10, Y = -3 },
                 Name = "Blinky",
             },
             new
@@ -162,21 +170,9 @@ T ▲ T
             },
             new
             {
-                HomeLocation = new { X = 3, Y = 3 },
+                HomeLocation = new { X = 20, Y = 33 },
                 Name = "Clyde",
             });
-        }
-
-        [Fact]
-        public void AGhostsHomeLocationIsAlsoACoin()
-        {
-            var board = @" XXX 
- BIP 
- ▲XC 
- bipc";
-            var loadedBoard = GameSettingsLoader.Load(board);
-
-            loadedBoard.Coins.Should().BeEquivalentTo((0, 3), (1, 3), (2, 3), (3, 3));
         }
 
     }

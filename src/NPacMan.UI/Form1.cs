@@ -86,7 +86,7 @@ namespace NPacMan.UI
             {
                 // App closing - this.CreateGraphics() will fail
             }
-
         }
+
     }
 }
