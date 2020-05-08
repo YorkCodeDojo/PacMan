@@ -152,11 +152,12 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public void PacManShouldBeAliveAfter4SecondsWhenInRespawning()
         {
-            _gameSettings.PacMan = new PacMan(1, 1, Direction.Down, PacManStatus.Alive, 2);
-            _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(1, 2), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
+            _gameSettings.PacMan = new PacMan(5, 2, Direction.Left, PacManStatus.Alive, 2);
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(1, 2), Direction.Right, CellLocation.TopLeft, new GhostGoesRightStrategy()));
 
             var game = new Game(_gameClock, _gameSettings);
             var now = DateTime.UtcNow;
+            _gameClock.Tick(now);
             _gameClock.Tick(now);
             _gameClock.Tick(now.AddSeconds(4));
 

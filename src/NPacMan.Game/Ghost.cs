@@ -3,22 +3,26 @@
     public class Ghost
     {
         public string Name { get; }
+        
         public CellLocation Location { get; }
         public CellLocation ScatterTarget { get; }
 
         public Direction Direction { get; }
+
+        public CellLocation Home { get; }
         private IGhostStrategy Strategy { get; }
         private IGhostStrategy CurrentStrategy { get; }
 
         public Ghost(string name, CellLocation location, Direction direction, CellLocation scatterTarget, IGhostStrategy strategy) 
-        : this(name, location, direction, scatterTarget, strategy, strategy)
+        : this(name, location, location, direction, scatterTarget, strategy, strategy)
         {
         }
 
-        private Ghost(string name, CellLocation location, Direction direction, CellLocation scatterTarget, IGhostStrategy strategy, IGhostStrategy currentStrategy)
+        private Ghost(string name, CellLocation homeLocation, CellLocation currentLocation, Direction direction, CellLocation scatterTarget, IGhostStrategy strategy, IGhostStrategy currentStrategy)
         {
             Name = name;
-            Location = location;
+            Home = homeLocation;
+            Location = currentLocation;
             Direction = direction;
             Strategy = strategy;
             CurrentStrategy = currentStrategy;
@@ -38,14 +42,19 @@
                 _ => Location
             };
 
-            return new Ghost(Name, newLocation, newDirection ?? Direction, ScatterTarget, Strategy, CurrentStrategy);
+            return new Ghost(Name, Home, newLocation, newDirection ?? Direction, ScatterTarget, Strategy, CurrentStrategy);
         }
 
         public Ghost Scatter()
         {
             var strategy = new DirectToStrategy(new DirectToGhostScatterTarget(this));
             
-            return new Ghost(Name,Location, Direction, ScatterTarget, Strategy, currentStrategy: strategy);
+            return new Ghost(Name, Home, Location, Direction, ScatterTarget, Strategy, currentStrategy: strategy);
+        }
+
+        public Ghost SetToHome()
+        {
+            return new Ghost(Name, Home, Home, Direction, ScatterTarget, Strategy, CurrentStrategy);
         }
     }
 }

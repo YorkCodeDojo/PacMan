@@ -155,22 +155,22 @@ T ▲ T
             loadedBoard.Ghosts.Should().BeEquivalentTo(
             new
             {
-                HomeLocation = new { X = -10, Y = -3 },
+                ScatterTarget = new { X = -10, Y = -3 },
                 Name = "Blinky",
             },
             new
             {
-                HomeLocation = new { X = 1, Y = 3 },
+                ScatterTarget = new { X = 1, Y = 3 },
                 Name = "Inky",
             },
             new
             {
-                HomeLocation = new { X = 2, Y = 3 },
+                ScatterTarget = new { X = 2, Y = 3 },
                 Name = "Pinky",
             },
             new
             {
-                HomeLocation = new { X = 20, Y = 33 },
+                ScatterTarget = new { X = 20, Y = 33 },
                 Name = "Clyde",
             });
         }

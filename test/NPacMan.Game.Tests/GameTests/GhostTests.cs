@@ -72,33 +72,36 @@ namespace NPacMan.Game.Tests.GameTests
             game.Ghosts.Should().BeEmpty();
         }
 
-        // [Fact]
-        // public void GhostShouldBeHomeAfterRespawning()
-        // {
-        //     _gameSettings.PacMan = new PacMan(1, 1, Direction.Down, PacManStatus.Respawning, 2);
-        //     _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(1, 2), Direction.Left, new CellLocation(4, 4), new NPacMan.Game.StandingStillGhostStrategy()));
+        [Fact]
+        public void GhostShouldBeBackAtHomeAfterPacManDiesAndComesBackToLife()
+        {
+            _gameSettings.PacMan = new PacMan(3, 2, Direction.Left, PacManStatus.Alive, 2);
+            var homeLocation = new CellLocation(1, 2);
+            var strategy = new GhostGoesRightStrategy();
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", homeLocation, Direction.Right, CellLocation.TopLeft, strategy));
 
-        //     var game = new Game(_gameClock, _gameSettings);
-        //     var now = DateTime.UtcNow;
-        //     _gameClock.Tick(now.AddSeconds(4));
+            var game = new Game(_gameClock, _gameSettings);
+            var now = DateTime.UtcNow;
 
-        //     if (game.PacMan.Status != PacManStatus.Respawning)
-        //         throw new Exception($"Invalid PacMan State {game.PacMan.Status:G}");
+            _gameClock.Tick(now);
+            _gameClock.Tick(now.AddSeconds(4));
 
-        //     _gameClock.Tick();
-        //     _gameClock.Tick();
-        //     _gameClock.Tick();
-        //     _gameClock.Tick();
-        //     _gameClock.Tick();
+            if (game.PacMan.Status != PacManStatus.Respawning)
+                throw new Exception($"Invalid PacMan State {game.PacMan.Status:G} Should be Respawning");
 
-        //     game.Ghosts.Values.First()
-        //         .Should().BeEquivalentTo(new
-        //         {
-        //             Location = new {
-        //                 X = 4,
-        //                 Y = 4
-        //             }
-        //         });
-        // }
+            _gameClock.Tick(now.AddSeconds(8));
+            
+            if (game.PacMan.Status != PacManStatus.Alive)
+                throw new Exception($"Invalid PacMan State {game.PacMan.Status:G} Should be Alive");
+            
+            game.Ghosts.Values.First()
+                .Should().BeEquivalentTo(new
+                {
+                    Location = new {
+                        X = homeLocation.X,
+                        Y = homeLocation.Y
+                    }
+                });
+        }
     }
 }

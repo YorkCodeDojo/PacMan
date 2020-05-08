@@ -67,12 +67,12 @@ namespace NPacMan.Game
                 newPacMan = newPacMan.Transition(now);
             }
 
-            if (PacMan.Status == PacManStatus.Dying && newPacMan.Status == PacManStatus.Respawning)
+            if (PacMan.Status == PacManStatus.Respawning && newPacMan.Status == PacManStatus.Alive)
             {
-                ScatterAllGhosts();
+                MoveGhostsToHome();
             }
 
-            if (PacMan.Status != PacManStatus.Dying)
+            if (PacMan.Status == PacManStatus.Alive)
             {
                 MoveAllGhosts();
             }
@@ -120,7 +120,7 @@ namespace NPacMan.Game
         private void MoveAllGhosts()
         {
             var newPositionOfGhosts = new Dictionary<string, Ghost>();
-            foreach (var ghost in Ghosts.Values)
+            foreach (var ghost in _ghosts.Values)
             {
                 newPositionOfGhosts[ghost.Name] = ghost.Move(this);
             }
@@ -131,13 +131,26 @@ namespace NPacMan.Game
         private void ScatterAllGhosts()
         {
             var newPositionOfGhosts = new Dictionary<string, Ghost>();
-            foreach (var ghost in Ghosts.Values)
+            foreach (var ghost in _ghosts.Values)
             {
                 newPositionOfGhosts[ghost.Name] = ghost.Scatter();
             }
 
             _ghosts = newPositionOfGhosts;
         }
+
+        private void MoveGhostsToHome()
+        {
+            var newPositionOfGhosts = new Dictionary<string, Ghost>();
+            foreach (var ghost in _ghosts.Values)
+            {
+                newPositionOfGhosts[ghost.Name] = ghost.SetToHome();
+            }
+
+            _ghosts = newPositionOfGhosts;
+        }
+
+        
 
     }
 }
