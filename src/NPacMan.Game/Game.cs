@@ -69,12 +69,12 @@ namespace NPacMan.Game
 
             if (PacMan.Status == PacManStatus.Respawning && newPacMan.Status == PacManStatus.Alive)
             {
-                MoveGhostsToHome();
+                ApplyToGhosts(ghost => ghost.SetToHome());
             }
 
             if (PacMan.Status == PacManStatus.Alive)
             {
-                MoveAllGhosts();
+                ApplyToGhosts(ghost => ghost.Move(this));
             }
 
             if (newPacMan.Status != PacManStatus.Alive)
@@ -117,39 +117,16 @@ namespace NPacMan.Game
             return Ghosts.Values.Any(ghost => ghost.Location.X == PacMan.X && ghost.Location.Y == PacMan.Y);
         }
 
-        private void MoveAllGhosts()
+        private void ApplyToGhosts(Func<Ghost, Ghost> action)
         {
             var newPositionOfGhosts = new Dictionary<string, Ghost>();
             foreach (var ghost in _ghosts.Values)
             {
-                newPositionOfGhosts[ghost.Name] = ghost.Move(this);
+                newPositionOfGhosts[ghost.Name] = action(ghost);
             }
 
             _ghosts = newPositionOfGhosts;
         }
-
-        private void ScatterAllGhosts()
-        {
-            var newPositionOfGhosts = new Dictionary<string, Ghost>();
-            foreach (var ghost in _ghosts.Values)
-            {
-                newPositionOfGhosts[ghost.Name] = ghost.Scatter();
-            }
-
-            _ghosts = newPositionOfGhosts;
-        }
-
-        private void MoveGhostsToHome()
-        {
-            var newPositionOfGhosts = new Dictionary<string, Ghost>();
-            foreach (var ghost in _ghosts.Values)
-            {
-                newPositionOfGhosts[ghost.Name] = ghost.SetToHome();
-            }
-
-            _ghosts = newPositionOfGhosts;
-        }
-
         
 
     }
