@@ -203,7 +203,7 @@ namespace NPacMan.Game.Tests.GameTests
             var board = new TestGameSettings()
             {
                 PacMan = new PacMan(4, 1, Direction.Right, PacManStatus.Alive, 3),
-                Ghosts = { new Ghost("ghost-1", new CellLocation(1, 2), Direction.Up, CellLocation.TopLeft, new DirectToStrategy(new DirectToPacManLocation())) },                
+                Ghosts = { new Ghost("ghost-1", new CellLocation(1, 2), Direction.Up, CellLocation.TopLeft, new NullGhostStrategy()) },                
                 Walls = { }
             };
             var gameClock = new TestGameClock();
@@ -219,5 +219,54 @@ namespace NPacMan.Game.Tests.GameTests
             });
         }
 
+        [Fact]
+        public void StayCloseToPacManMovesTowardsHimWhileOutsideOf8Cells()
+        {
+            var board = new TestGameSettings()
+            {
+                PacMan = new PacMan(14, 1, Direction.Right, PacManStatus.Alive, 3),
+                Walls = { },
+                Ghosts = { new Ghost("ghost-1", new CellLocation(1, 2), Direction.Up, CellLocation.TopLeft, new NullGhostStrategy()) },                
+            };
+            var gameClock = new TestGameClock();
+            var game = new Game(gameClock, board);
+
+            var staysCloseToPacManLocation = new StaysCloseToPacManLocation("ghost-1");
+            var targetLocation = staysCloseToPacManLocation.GetLocation(game);
+
+            targetLocation.Should().BeEquivalentTo(new
+            {
+                X = 14,
+                Y = 1
+            });
+        }
+        
+        [Fact]
+        public void StayCloseToPacManScattersWhileInsideOf8Cells()
+        {
+            var board = new TestGameSettings()
+            {
+                PacMan = new PacMan(4, 1, Direction.Right, PacManStatus.Alive, 3),
+                Walls = { },
+                Ghosts = { new Ghost("ghost-1", new CellLocation(1, 2), Direction.Up, new CellLocation(11, 12), new NullGhostStrategy()) },                
+            };
+            var gameClock = new TestGameClock();
+            var game = new Game(gameClock, board);
+
+            var staysCloseToPacManLocation = new StaysCloseToPacManLocation("ghost-1");
+            var targetLocation = staysCloseToPacManLocation.GetLocation(game);
+
+            targetLocation.Should().BeEquivalentTo(new
+            {
+                X = 11,
+                Y = 12
+            });
+        }
+    }
+
+    public class NullGhostStrategy : IGhostStrategy
+    {
+        public Direction? GetNextDirection(Ghost ghost, Game game)
+            => null;
     }
 }
