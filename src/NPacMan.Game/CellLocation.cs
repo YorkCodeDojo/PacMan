@@ -30,16 +30,16 @@ namespace NPacMan.Game
                     => new CellLocation(location.x, location.y);
 
         public static CellLocation operator +(CellLocation location, Direction direction)
-            => direction switch 
-                {
-                    Direction.Up => location.Above,
-                    Direction.Down => location.Below,
-                    Direction.Left => location.Left,
-                    Direction.Right => location.Right,
-                    _ => location
-                };
+            => direction switch
+            {
+                Direction.Up => location.Above,
+                Direction.Down => location.Below,
+                Direction.Left => location.Left,
+                Direction.Right => location.Right,
+                _ => location
+            };
 
-        public static int operator -(CellLocation from, CellLocation to) => Math.Abs(to.X - from.X) + Math.Abs(to.Y - from.Y);
+        public static int operator -(CellLocation from, CellLocation to) => (int)(Math.Pow(to.X - from.X, 2) + Math.Pow(to.Y - from.Y, 2));
 
     }
 }
