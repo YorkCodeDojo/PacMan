@@ -168,5 +168,33 @@ namespace NPacMan.Game.Tests.GameTests
 
             game.PacMan.Status.Should().Be(PacManStatus.Alive);
         }
+
+        [Fact]
+        public void PacManShouldBeBackAtHomeLocationAfter4SecondsWhenBecomingBackAlive()
+        {
+            _gameSettings.PacMan = new PacMan(5, 2, Direction.Left, PacManStatus.Alive, 2);
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(1, 2), Direction.Right, CellLocation.TopLeft, new GhostGoesRightStrategy()));
+
+            var game = new Game(_gameClock, _gameSettings);
+            var now = DateTime.UtcNow;
+            _gameClock.Tick(now);
+            _gameClock.Tick(now);
+            _gameClock.Tick(now.AddSeconds(4));
+
+            if (game.PacMan.Status != PacManStatus.Respawning)
+                throw new Exception($"Invalid PacMan State {game.PacMan.Status:G}");
+
+            _gameClock.Tick(now.AddSeconds(8));
+
+            if (game.PacMan.Status != PacManStatus.Alive)
+                throw new Exception($"Invalid PacMan State {game.PacMan.Status:G}");
+
+            game.PacMan.Should().BeEquivalentTo(
+                new {
+                    X = 5,
+                    Y = 2
+                }
+            );
+        }
     }
 }

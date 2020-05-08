@@ -6,7 +6,12 @@ namespace NPacMan.Game
     {
         private readonly DateTime? _timeToChangeState;
         
-        public PacMan(int x, int y, Direction direction, PacManStatus newStatus, int lives, DateTime? timeToChangeState = null)
+        public PacMan(int x, int y, Direction direction, PacManStatus newStatus, int lives, DateTime? timeToChangeState = null) 
+        : this(x,y, new CellLocation(x,y), direction, newStatus, lives, timeToChangeState)
+        {
+        }
+
+        private PacMan(int x, int y, CellLocation home, Direction direction, PacManStatus newStatus, int lives, DateTime? timeToChangeState = null)
         {
             _timeToChangeState = timeToChangeState;
             X = x;
@@ -14,19 +19,22 @@ namespace NPacMan.Game
             Direction = direction;
             Status = newStatus;
             Lives = lives;
+            Home = home;
         }
+
 
         public int X { get; }
         public int Y { get; }
         public int Lives { get; }
+        public CellLocation Home { get; }
         public Direction Direction { get; }
         public PacManStatus Status { get; }
 
-        public PacMan WithNewX(int newX) => new PacMan(newX, Y, Direction, Status, Lives, _timeToChangeState);
-        public PacMan WithNewY(int newY) => new PacMan(X, newY, Direction, Status, Lives, _timeToChangeState);
-        public PacMan WithNewDirection(Direction newDirection) => new PacMan(X, Y, newDirection, Status, Lives, _timeToChangeState);
-        public PacMan WithNewStatus(PacManStatus newStatus) => new PacMan(X, Y, Direction, newStatus, Lives, _timeToChangeState);
-        public PacMan WithNewLives(int newLives) => new PacMan(X, Y, Direction, Status, newLives, _timeToChangeState);
+        public PacMan WithNewX(int newX) => new PacMan(newX, Y, Home, Direction, Status, Lives, _timeToChangeState);
+        public PacMan WithNewY(int newY) => new PacMan(X, newY, Home, Direction, Status, Lives, _timeToChangeState);
+        public PacMan WithNewDirection(Direction newDirection) => new PacMan(X, Y, Home, newDirection, Status, Lives, _timeToChangeState);
+        public PacMan WithNewStatus(PacManStatus newStatus) => new PacMan(X, Y, Home, Direction, newStatus, Lives, _timeToChangeState);
+        public PacMan WithNewLives(int newLives) => new PacMan(X, Y, Home, Direction, Status, newLives, _timeToChangeState);
 
 
         internal PacMan Transition(DateTime now)
@@ -50,7 +58,7 @@ namespace NPacMan.Game
             {
                 if (now >= _timeToChangeState)
                 {
-                    return WithNewStatus(PacManStatus.Alive);
+                    return Resurrect();
                 }
 
                 return this;
@@ -83,12 +91,19 @@ namespace NPacMan.Game
 
         public PacMan Kill(DateTime timeToDie)
         {
-            return new PacMan(X, Y, Direction, PacManStatus.Dying, Lives - 1, timeToDie);
+            return new PacMan(X, Y, Home, Direction, PacManStatus.Dying, Lives - 1, timeToDie);
         }
 
         public PacMan Respawn(DateTime timeToBecomeAlive)
         {
-            return new PacMan(X, Y, Direction, PacManStatus.Respawning, Lives, timeToBecomeAlive);
+            return new PacMan(X, Y, Home, Direction, PacManStatus.Respawning, Lives, timeToBecomeAlive);
         }
+
+        public PacMan Resurrect()
+        {
+            return new PacMan(Home.X, Home.Y, Home, Direction, PacManStatus.Alive, Lives, null);
+        }
+
+        
     }
 }
