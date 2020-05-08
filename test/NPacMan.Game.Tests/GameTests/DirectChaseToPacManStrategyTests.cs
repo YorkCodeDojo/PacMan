@@ -168,5 +168,29 @@ namespace NPacMan.Game.Tests.GameTests
                 Direction = Direction.Right
             });
         }
+
+
+        [Fact]
+        public void ShouldBeAbleToTargetWherePacManWillBe()
+        {
+            var board = new TestGameSettings()
+            {
+                PacMan = new PacMan(4, 1, Direction.Right, PacManStatus.Alive, 3),
+                Walls = { }
+            };
+            var gameClock = new TestGameClock();
+            var game = new Game(gameClock, board);
+
+            var directToExpectedPacManLocation = new DirectToExpectedPacManLocation();
+            var targetLocation = directToExpectedPacManLocation.GetLocation(game);
+
+            targetLocation.Should().BeEquivalentTo(new
+            {
+                X = 8,
+                Y = 1
+            });
+        }
+
+
     }
 }

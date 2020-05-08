@@ -10,6 +10,7 @@ namespace NPacMan.Game
         {
             _directToLocation = directToLocation;
         }
+        
         public Direction? GetNextDirection(Ghost ghost, Game game)
         {
             var availableMoves = GetAvailableMovesForLocation(ghost.Location, game.Walls);
