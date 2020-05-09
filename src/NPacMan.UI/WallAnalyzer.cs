@@ -1,3 +1,4 @@
+using NPacMan.Game;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -5,19 +6,19 @@ namespace NPacMan.UI
 {
     public class WallAnalyzer
     {
-        public static WallType GetWallType(IReadOnlyCollection<(int x, int y)> walls, (int x, int y) wall, int width, int height)
+        public static WallType GetWallType(IReadOnlyCollection<CellLocation> walls, CellLocation wall, int width, int height)
         {
-            var wallLeft = walls.Contains((wall.x - 1, wall.y));
-            var wallRight = walls.Contains((wall.x + 1, wall.y));
-            var wallAbove = walls.Contains((wall.x, wall.y - 1));
-            var wallBelow = walls.Contains((wall.x, wall.y + 1));
-            var wallAboveRight = walls.Contains((wall.x + 1, wall.y - 1));
-            var wallAboveLeft = walls.Contains((wall.x - 1, wall.y - 1));
-            var wallBelowLeft = walls.Contains((wall.x - 1, wall.y + 1));
-            var wallBelowRight = walls.Contains((wall.x + 1, wall.y + 1));
-            var topEdge = wall.y == 0;
-            var leftEdge = wall.y == 0;
-            var rightEdge = wall.x + 1 == width;
+            var wallLeft = walls.Contains((wall.X - 1, wall.Y));
+            var wallRight = walls.Contains((wall.X + 1, wall.Y));
+            var wallAbove = walls.Contains((wall.X, wall.Y - 1));
+            var wallBelow = walls.Contains((wall.X, wall.Y + 1));
+            var wallAboveRight = walls.Contains((wall.X + 1, wall.Y - 1));
+            var wallAboveLeft = walls.Contains((wall.X - 1, wall.Y - 1));
+            var wallBelowLeft = walls.Contains((wall.X - 1, wall.Y + 1));
+            var wallBelowRight = walls.Contains((wall.X + 1, wall.Y + 1));
+            var topEdge = wall.Y == 0;
+            var leftEdge = wall.Y == 0;
+            var rightEdge = wall.X + 1 == width;
 
             if (topEdge && wallLeft && wallRight && wallBelow && !wallBelowLeft)
                 return WallType.TopRightArc;

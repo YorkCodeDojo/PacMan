@@ -29,7 +29,7 @@ namespace NPacMan.Game
 
         }
 
-        public List<Direction> GetAvailableMovesForLocation(CellLocation location, IReadOnlyCollection<(int x, int y)> walls)
+        public List<Direction> GetAvailableMovesForLocation(CellLocation location, IReadOnlyCollection<CellLocation> walls)
         {
             var result = new List<Direction>(4);
 

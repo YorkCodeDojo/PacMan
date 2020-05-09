@@ -10,7 +10,7 @@ namespace NPacMan.Game
         public int Score { get; private set; }
 
         private readonly IGameSettings _settings;
-        private List<(int x, int y)> _collectedCoins;
+        private List<CellLocation> _collectedCoins;
         private Dictionary<string, Ghost> _ghosts;
 
 
@@ -19,7 +19,7 @@ namespace NPacMan.Game
             gameClock.Subscribe(Tick);
             _settings = settings;
             PacMan = settings.PacMan;
-            _collectedCoins = new List<(int x, int y)>();
+            _collectedCoins = new List<CellLocation>();
             _ghosts = settings.Ghosts.ToDictionary(x => x.Name, x => x);
         }
 
@@ -32,9 +32,9 @@ namespace NPacMan.Game
         }
 
         public PacMan PacMan { get; private set; }
-        public IReadOnlyCollection<(int x, int y)> Coins
+        public IReadOnlyCollection<CellLocation> Coins
             => _settings.Coins.Except(_collectedCoins).ToList().AsReadOnly();
-        public IReadOnlyCollection<(int x, int y)> Walls
+        public IReadOnlyCollection<CellLocation> Walls
             => _settings.Walls;
 
         public IReadOnlyCollection<CellLocation> Doors
@@ -61,9 +61,9 @@ namespace NPacMan.Game
         {
             var newPacMan = PacMan.Transition(now);
 
-            if (_settings.Portals.TryGetValue((newPacMan.X, newPacMan.Y), out var portal))
+            if (_settings.Portals.TryGetValue(newPacMan.Location, out var portal))
             {
-                newPacMan = PacMan.WithNewX(portal.x).WithNewY(portal.y);
+                newPacMan = PacMan.WithNewX(portal.X).WithNewY(portal.Y);
                 newPacMan = newPacMan.Transition(now);
             }
 
@@ -89,7 +89,7 @@ namespace NPacMan.Game
                 return;
             }
 
-            if (!_settings.Walls.Contains((newPacMan.X, newPacMan.Y)))
+            if (!_settings.Walls.Contains(newPacMan.Location))
             {
                 PacMan = newPacMan;
             }
@@ -100,11 +100,11 @@ namespace NPacMan.Game
                 return;
             }
 
-            if (_settings.Coins.Contains((newPacMan.X, newPacMan.Y)))
+            if (_settings.Coins.Contains(newPacMan.Location))
             {
-                var newCollectedCoins = new List<(int, int)>(_collectedCoins)
+                var newCollectedCoins = new List<CellLocation>(_collectedCoins)
                     {
-                        (newPacMan.X, newPacMan.Y)
+                        (newPacMan.Location)
                     };
                 _collectedCoins = newCollectedCoins;
                 Score += 10;
@@ -114,7 +114,7 @@ namespace NPacMan.Game
 
         private bool HasDied()
         {
-            return Ghosts.Values.Any(ghost => ghost.Location.X == PacMan.X && ghost.Location.Y == PacMan.Y);
+            return Ghosts.Values.Any(ghost => ghost.Location.X == PacMan.Location.X && ghost.Location.Y == PacMan.Location.Y);
         }
 
         private void ApplyToGhosts(Func<Ghost, Ghost> action)

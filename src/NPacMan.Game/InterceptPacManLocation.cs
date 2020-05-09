@@ -13,7 +13,7 @@ namespace NPacMan.Game
             var ghost = game.Ghosts[_ghostName]
                                 .Location;
 
-            var pacman = new CellLocation(game.PacMan.X, game.PacMan.Y)
+            var pacman = game.PacMan.Location
                 + game.PacMan.Direction
                 + game.PacMan.Direction;
 

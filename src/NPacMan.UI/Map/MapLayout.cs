@@ -75,8 +75,8 @@ namespace NPacMan.UI.Map
             
             foreach (var item in game.Walls)
             {
-                var x = item.x + 1;
-                var y = item.y + 1;
+                var x = item.X + 1;
+                var y = item.Y + 1;
                 _map[x, y] = new MapCellDetail(_map, x, y, BasicMapPiece.SingleWall);
             }
 

@@ -16,12 +16,12 @@ namespace NPacMan.Game.Tests
 
             gameBoard.Should().BeEquivalentTo(new
             {
-                Walls = new[] { (0, 0), (1, 0), (2, 0), (0, 1), (2, 1), (0, 2), (1, 2) },
-                Coins = new[] { (1, 1), (2, 2) },
-                Doors = new[] { new CellLocation(0, 4), new CellLocation(1, 4), new CellLocation(2, 4) },
+                Walls = new CellLocation[] { (0, 0), (1, 0), (2, 0), (0, 1), (2, 1), (0, 2), (1, 2) },
+                Coins = new CellLocation[] { (1, 1), (2, 2) },
+                Doors = new CellLocation[] { new CellLocation(0, 4), new CellLocation(1, 4), new CellLocation(2, 4) },
                 Width = 3,
                 Height = 5,
-                Portals = new Dictionary<(int, int), (int, int)>
+                Portals = new Dictionary<CellLocation, CellLocation >
                 {
                     {(-1,3), (3,3) },{(3,3), (-1,3) }
                 }
@@ -41,12 +41,12 @@ T ▲ T
 
             gameBoard.Should().BeEquivalentTo(new
             {
-                Walls = new[] { (0, 0), (1, 0), (2, 0), (0, 1), (2, 1), (0, 2), (1, 2) },
-                Coins = new[] { (1, 1), (2, 2) },
-                Doors = new[] { new CellLocation(0, 4), new CellLocation(1, 4), new CellLocation(2, 4) },
+                Walls = new CellLocation[] { (0, 0), (1, 0), (2, 0), (0, 1), (2, 1), (0, 2), (1, 2) },
+                Coins = new CellLocation[] { (1, 1), (2, 2) },
+                Doors = new CellLocation[] { new CellLocation(0, 4), new CellLocation(1, 4), new CellLocation(2, 4) },
                 Width = 3,
                 Height = 5,
-                Portals = new Dictionary<(int, int), (int, int)>
+                Portals = new Dictionary<CellLocation, CellLocation>
                 {
                     {(-1,3), (3,3) },{(3,3), (-1,3) }
                 }
@@ -80,8 +80,7 @@ T ▲ T
 
             loadedBoard.PacMan.Should().BeEquivalentTo(new
             {
-                X = 2,
-                Y = 1,
+                Location = new CellLocation(2,1),
                 Direction = expectedDirection
             });
         }

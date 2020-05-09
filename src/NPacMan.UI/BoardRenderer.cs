@@ -51,8 +51,8 @@ namespace NPacMan.UI
 
             foreach (var coin in coins)
             {
-                var x = coin.x * cellSize;
-                var y = coin.y * cellSize;
+                var x = coin.X * cellSize;
+                var y = coin.Y * cellSize;
 
                 g.FillRectangle(Brushes.Gold, x + (cellSize / 4), y + (cellSize / 4), cellSize / 2, cellSize / 2);
             }
@@ -64,8 +64,8 @@ namespace NPacMan.UI
         {
             var cellSize = Sprites.PixelGrid;
 
-            var x = game.PacMan.X * cellSize;
-            var y = game.PacMan.Y * cellSize;
+            var x = game.PacMan.Location.X * cellSize;
+            var y = game.PacMan.Location.Y * cellSize;
 
             _pacManAnimationDelay++;
             if (_pacManAnimationDelay == 3)

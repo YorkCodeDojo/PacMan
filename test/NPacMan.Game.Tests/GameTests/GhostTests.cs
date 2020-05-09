@@ -43,7 +43,7 @@ namespace NPacMan.Game.Tests.GameTests
             var y = 1;
 
             _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(x, y), Direction.Left, CellLocation.TopLeft, new DirectToStrategy(new DirectToPacManLocation())));
-            _gameSettings.PacMan = new PacMan(3, 3, Direction.Down, PacManStatus.Dying, 1);
+            _gameSettings.PacMan = new PacMan((3, 3), Direction.Down, PacManStatus.Dying, 1);
 
             var game = new Game(_gameClock, _gameSettings);
             _gameClock.Tick();
@@ -64,7 +64,7 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public void GhostShouldBeHiddenWhenPacManIsReSpawning()
         {
-            _gameSettings.PacMan = new PacMan(1, 1, Direction.Left, PacManStatus.Respawning, 1);
+            _gameSettings.PacMan = new PacMan((1, 1), Direction.Left, PacManStatus.Respawning, 1);
             _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(1, 2), Direction.Left, CellLocation.TopLeft, new GhostGoesRightStrategy()));
 
             var game = new Game(_gameClock, _gameSettings);
@@ -75,7 +75,7 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public void GhostShouldBeBackAtHomeAfterPacManDiesAndComesBackToLife()
         {
-            _gameSettings.PacMan = new PacMan(3, 2, Direction.Left, PacManStatus.Alive, 2);
+            _gameSettings.PacMan = new PacMan((3, 2), Direction.Left, PacManStatus.Alive, 2);
             var homeLocation = new CellLocation(1, 2);
             var strategy = new GhostGoesRightStrategy();
             _gameSettings.Ghosts.Add(new Ghost("Ghost1", homeLocation, Direction.Right, CellLocation.TopLeft, strategy));

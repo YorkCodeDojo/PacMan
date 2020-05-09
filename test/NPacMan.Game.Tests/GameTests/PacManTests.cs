@@ -18,13 +18,12 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public void PacManStartsInInitialPosition()
         {
-            _gameSettings.PacMan = new PacMan(5, 6, Direction.Right, PacManStatus.Alive, 3);
+            _gameSettings.PacMan = new PacMan((5, 6), Direction.Right, PacManStatus.Alive, 3);
             var game = new Game(_gameClock, _gameSettings);
 
             game.PacMan.Should().BeEquivalentTo(new
             {
-                X = 5,
-                Y = 6,
+                Location = new CellLocation(5, 6),
                 Direction = Direction.Right
             });
         }
@@ -38,8 +37,7 @@ namespace NPacMan.Game.Tests.GameTests
         public void PacManWalksInFacingDirection(Direction directionToFace, int changeInX, int changeInY)
         {
             var game = new Game(_gameClock, _gameSettings);
-            var x = game.PacMan.X;
-            var y = game.PacMan.Y;
+            var (x, y) = game.PacMan.Location;
 
             game.ChangeDirection(directionToFace);
 
@@ -47,8 +45,7 @@ namespace NPacMan.Game.Tests.GameTests
 
             game.PacMan.Should().BeEquivalentTo(new
             {
-                X = x + changeInX,
-                Y = y + changeInY,
+                Location = new CellLocation(x + changeInX, y + changeInY),
                 Direction = directionToFace
             });
         }
@@ -61,8 +58,8 @@ namespace NPacMan.Game.Tests.GameTests
         public void PacManCannotMoveIntoWalls(Direction directionToFace, int createWallXOffset, int createWallYOffset)
         {
             var game = new Game(_gameClock, _gameSettings);
-            var x = game.PacMan.X;
-            var y = game.PacMan.Y;
+            var x = game.PacMan.Location.X;
+            var y = game.PacMan.Location.Y;
             var score = game.Score;
 
             game.ChangeDirection(directionToFace);
@@ -73,8 +70,7 @@ namespace NPacMan.Game.Tests.GameTests
 
             game.PacMan.Should().BeEquivalentTo(new
             {
-                X = x,
-                Y = y,
+                Location = new CellLocation(x, y),
                 Direction = directionToFace
             });
 
@@ -85,8 +81,8 @@ namespace NPacMan.Game.Tests.GameTests
         public void PacManIsTeleportedWhenYouWalkIntoAPortal()
         {
             var game = new Game(_gameClock, _gameSettings);
-            var x = game.PacMan.X;
-            var y = game.PacMan.Y;
+            var x = game.PacMan.Location.X;
+            var y = game.PacMan.Location.Y;
             var score = game.Score;
 
             _gameSettings.Portals.Add((x - 1, y), (15, 15));
@@ -97,8 +93,7 @@ namespace NPacMan.Game.Tests.GameTests
 
             game.PacMan.Should().BeEquivalentTo(new
             {
-                X = 14,
-                Y = 15,
+                Location = new CellLocation(14, 15),
                 Direction = Direction.Left
             });
 
@@ -114,7 +109,7 @@ namespace NPacMan.Game.Tests.GameTests
             var x = 1;
             var y = 1;
 
-            _gameSettings.PacMan = new PacMan(x, y, Direction.Down, state, 1);
+            _gameSettings.PacMan = new PacMan((x, y), Direction.Down, state, 1);
 
             var game = new Game(_gameClock, _gameSettings);
             _gameClock.Tick();
@@ -122,15 +117,14 @@ namespace NPacMan.Game.Tests.GameTests
             game.PacMan
                 .Should().BeEquivalentTo(new
                 {
-                    X = x,
-                    Y = y
+                    Location = new CellLocation(x, y),
                 });
         }
 
         [Fact]
         public void PacManShouldRespawnAfter4Seconds()
         {
-            _gameSettings.PacMan = new PacMan(1, 1, Direction.Down, PacManStatus.Alive, 1);
+            _gameSettings.PacMan = new PacMan((1, 1), Direction.Down, PacManStatus.Alive, 1);
             _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(1, 2), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
 
             var game = new Game(_gameClock, _gameSettings);
@@ -152,7 +146,7 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public void PacManShouldBeAliveAfter4SecondsWhenInRespawning()
         {
-            _gameSettings.PacMan = new PacMan(5, 2, Direction.Left, PacManStatus.Alive, 2);
+            _gameSettings.PacMan = new PacMan((5, 2), Direction.Left, PacManStatus.Alive, 2);
             _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(1, 2), Direction.Right, CellLocation.TopLeft, new GhostGoesRightStrategy()));
 
             var game = new Game(_gameClock, _gameSettings);
@@ -172,7 +166,7 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public void PacManShouldBeBackAtHomeLocationAfter4SecondsWhenBecomingBackAlive()
         {
-            _gameSettings.PacMan = new PacMan(5, 2, Direction.Left, PacManStatus.Alive, 2);
+            _gameSettings.PacMan = new PacMan((5, 2), Direction.Left, PacManStatus.Alive, 2);
             _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(1, 2), Direction.Right, CellLocation.TopLeft, new GhostGoesRightStrategy()));
 
             var game = new Game(_gameClock, _gameSettings);
@@ -190,9 +184,9 @@ namespace NPacMan.Game.Tests.GameTests
                 throw new Exception($"Invalid PacMan State {game.PacMan.Status:G}");
 
             game.PacMan.Should().BeEquivalentTo(
-                new {
-                    X = 5,
-                    Y = 2
+                new
+                {
+                    Location = new CellLocation(5, 2),
                 }
             );
         }

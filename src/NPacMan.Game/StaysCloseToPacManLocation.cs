@@ -18,8 +18,7 @@ namespace NPacMan.Game
 
         public IDirectToLocation GetDirectToLocation(Game game, Ghost ghost)
         {
-            var pacManLocation = new CellLocation(game.PacMan.X, game.PacMan.Y);
-            var distance = ghost.Location - pacManLocation;
+            var distance = ghost.Location - game.PacMan.Location;
 
             if(distance > 8) {
                 return new DirectToPacManLocation();
