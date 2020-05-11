@@ -65,7 +65,7 @@ namespace NPacMan.ConsoleApp
 
                     Console.SetCursorPosition(coin.X, coin.Y);
        
-                    Console.Write('•');
+                    Console.Write('*');
                 }
             }
 
