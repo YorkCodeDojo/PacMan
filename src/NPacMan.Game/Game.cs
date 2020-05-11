@@ -206,7 +206,7 @@ namespace NPacMan.Game
             {
                 _gameStateMachine.RaiseEvent(_gameState, _gameStateMachine.PacManCaughtByGhost, new Tick { Now = now });
             }
-            else if (_settings.Coins.Contains(newPacMan.Location))
+            else if (Coins.Contains(newPacMan.Location))
             {
                 var newCollectedCoins = new List<CellLocation>(_collectedCoins)
                     {

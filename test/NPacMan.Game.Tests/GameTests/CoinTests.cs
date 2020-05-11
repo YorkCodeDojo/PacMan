@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using FluentAssertions.Execution;
 using Xunit;
+using System;
 
 namespace NPacMan.Game.Tests.GameTests
 {
@@ -41,6 +42,33 @@ namespace NPacMan.Game.Tests.GameTests
 
             game.Score.Should().Be(10);
         }
+
+        [Fact]
+        public void CannotCollectTheSameCoinTwice()
+        {
+            var game = new Game(_gameClock, _gameSettings);
+            var (x, y) = game.PacMan.Location;
+
+            game.ChangeDirection(Direction.Down);
+
+            _gameSettings.Coins.Add((x, y + 1));
+            _gameClock.Tick();
+
+            if (game.Score != 10)
+                throw new Exception($"Score should be 10 not {game.Score}");
+
+            game.ChangeDirection(Direction.Up);
+            _gameClock.Tick();
+
+            if (game.Score != 10)
+                throw new Exception($"Score should still be 10 not {game.Score}");
+
+            game.ChangeDirection(Direction.Down);
+            _gameClock.Tick();
+
+            game.Score.Should().Be(10);
+        }
+
 
         [Fact]
         public void IncrementsScoreBy20WhenTwoCoinsAreCollected()
