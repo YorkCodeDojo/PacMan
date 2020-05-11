@@ -5,6 +5,15 @@ using System.Collections.Immutable;
 
 namespace NPacMan.Game
 {
+    public class GameState
+    {
+        public GameStatus Status { get; set; }
+        
+        public DateTime? TimeToChangeState { get; set;}
+
+        public int Lives { get; set; }
+    }
+
     public class Game
     {
         public int Score { get; private set; }
@@ -15,6 +24,8 @@ namespace NPacMan.Game
 
         private ISoundSet _soundSet;
 
+        private GameState _gameState;
+
         public Game(IGameClock gameClock, IGameSettings settings, ISoundSet soundSet)
         {
             gameClock.Subscribe(Tick);
@@ -23,6 +34,10 @@ namespace NPacMan.Game
             _collectedCoins = new List<CellLocation>();
             _ghosts = settings.Ghosts.ToDictionary(x => x.Name, x => x);
             _soundSet = soundSet;
+            _gameState = new GameState{
+                Lives = settings.InitialLives,
+                Status = settings.InitialGameStatus
+            };
 
             // Play the beginning sound
             _soundSet.Beginning();
@@ -57,10 +72,12 @@ namespace NPacMan.Game
             => _settings.Height;
 
         public int Lives
-            => PacMan.Lives;
+            => _gameState.Lives;
 
         public IReadOnlyDictionary<string, Ghost> Ghosts
-            => PacMan.Status == PacManStatus.Respawning ? (IReadOnlyDictionary<string, Ghost>)ImmutableDictionary<string, Ghost>.Empty : _ghosts;
+            => _gameState.Status == GameStatus.Respawning ? (IReadOnlyDictionary<string, Ghost>)ImmutableDictionary<string, Ghost>.Empty : _ghosts;
+
+        public GameStatus Status => _gameState.Status;
 
         public void ChangeDirection(Direction direction)
         {
@@ -69,44 +86,46 @@ namespace NPacMan.Game
 
         private void Tick(DateTime now)
         {
+            var oldState = _gameState.Status;
+
+            UpdateStates(now);
             var newPacMan = PacMan.Transition(now);
 
             if (_settings.Portals.TryGetValue(newPacMan.Location, out var portal))
             {
                 newPacMan = PacMan.WithNewX(portal.X).WithNewY(portal.Y);
+                UpdateStates(now);
                 newPacMan = newPacMan.Transition(now);
             }
 
-            if (PacMan.Status == PacManStatus.Respawning && newPacMan.Status == PacManStatus.Alive)
-            {
-                ApplyToGhosts(ghost => ghost.SetToHome());
-            }
-
-            if (PacMan.Status == PacManStatus.Alive)
+            if (oldState == GameStatus.Alive)
             {
                 ApplyToGhosts(ghost => ghost.Move(this));
             }
 
-            if (newPacMan.Status != PacManStatus.Alive)
+            if (_gameState.Status != GameStatus.Alive)
             {
-                PacMan = newPacMan;
                 return;
             }
 
             if (HasDied())
             {
-                PacMan = PacMan.Kill(now.AddSeconds(4));
+                _gameState.TimeToChangeState = now.AddSeconds(4);
+                _gameState.Lives -= 1;
+                _gameState.Status  = GameStatus.Dying;
                 return;
             }
 
-            if (!_settings.Walls.Contains(newPacMan.Location))
+            if (oldState == GameStatus.Alive && !_settings.Walls.Contains(newPacMan.Location))
             {
                 PacMan = newPacMan;
             }
 
             if (HasDied())
             {
-                PacMan = PacMan.Kill(now.AddSeconds(4));
+                _gameState.TimeToChangeState = now.AddSeconds(4);
+                _gameState.Lives -= 1;
+                _gameState.Status  = GameStatus.Dying;
                 return;
             }
 
@@ -121,6 +140,39 @@ namespace NPacMan.Game
                 _soundSet.Chomp();
             }
 
+        }
+
+        private void UpdateStates(DateTime now)
+        {
+            
+            if (_gameState.Status == GameStatus.Dead)
+            {
+                return;
+            }
+            
+            if (_gameState.Status == GameStatus.Dying)
+            {
+                if (now >= _gameState.TimeToChangeState)
+                {
+                    _gameState.Status = GameStatus.Respawning;
+                    _gameState.TimeToChangeState = now.AddSeconds(4);
+                }
+
+                return;
+            }
+
+            if (_gameState.Status == GameStatus.Respawning)
+            {
+                if (now >= _gameState.TimeToChangeState)
+                {
+                    _gameState.Status = GameStatus.Alive;
+                    _gameState.TimeToChangeState = null;
+                    PacMan = PacMan.SetToHome();
+                    ApplyToGhosts(ghost => ghost.SetToHome());
+                }
+
+                return;
+            }
         }
 
         private bool HasDied()

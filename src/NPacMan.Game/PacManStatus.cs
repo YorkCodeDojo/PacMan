@@ -1,6 +1,6 @@
 ﻿namespace NPacMan.Game
 {
-    public enum PacManStatus
+    public enum GameStatus
     {
         Alive,
         Dying,

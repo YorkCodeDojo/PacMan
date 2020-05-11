@@ -46,7 +46,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameClock.Tick();
 
             game.Lives.Should().Be(currentLives - 1);
-            game.PacMan.Status.Should().Be(PacManStatus.Dying);
+            game.Status.Should().Be(GameStatus.Dying);
         }
 
 
@@ -93,8 +93,11 @@ namespace NPacMan.Game.Tests.GameTests
             var expectedLife = 1;
             var location = new CellLocation(1, 1);
 
+            _gameSettings.InitialGameStatus = GameStatus.Dying;
+            _gameSettings.InitialLives = expectedLife;
+
             _gameSettings.Ghosts.Add(new Ghost("Ghost1", location, Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
-            _gameSettings.PacMan = new PacMan(location, Direction.Down, PacManStatus.Dying, expectedLife);
+            _gameSettings.PacMan = new PacMan(location, Direction.Down);
 
             var game = new Game(_gameClock, _gameSettings);
             _gameClock.Tick();

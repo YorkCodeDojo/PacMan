@@ -32,5 +32,7 @@ namespace NPacMan.Game
         public int Height { get; }
         public IReadOnlyCollection<Ghost> Ghosts { get; }
         public IReadOnlyCollection<CellLocation> Doors { get; }
+        public GameStatus InitialGameStatus { get; } = GameStatus.Alive;
+        public int InitialLives { get; } = 3;
     }
 }

@@ -12,5 +12,7 @@ namespace NPacMan.Game
         int Width { get; }
         int Height { get; }
         IReadOnlyCollection<Ghost> Ghosts { get; }
+        GameStatus InitialGameStatus { get; }
+        int InitialLives { get; }
     }
 }

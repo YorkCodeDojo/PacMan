@@ -69,16 +69,16 @@ namespace NPacMan.Game
                                                  new DirectToStrategy(new StaysCloseToPacManLocation(GhostNames.Clyde))));
                             break;
                         case '▲':
-                            pacMan = new PacMan(location, Direction.Up, PacManStatus.Alive, 3);
+                            pacMan = new PacMan(location, Direction.Up);
                             break;
                         case '▼':
-                            pacMan = new PacMan(location, Direction.Down, PacManStatus.Alive, 3);
+                            pacMan = new PacMan(location, Direction.Down);
                             break;
                         case '►':
-                            pacMan = new PacMan(location, Direction.Right, PacManStatus.Alive, 3);
+                            pacMan = new PacMan(location, Direction.Right);
                             break;
                         case '◄':
-                            pacMan = new PacMan(location, Direction.Left, PacManStatus.Alive, 3);
+                            pacMan = new PacMan(location, Direction.Left);
                             break;
                         case 'X':
                             walls.Add((columnNumber - 1, rowNumber));
