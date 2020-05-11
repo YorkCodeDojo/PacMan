@@ -1,6 +1,7 @@
 using System;
 using System.Drawing;
 using NPacMan.Game;
+using NPacMan.UI.Map;
 
 namespace NPacMan.UI
 {
@@ -8,60 +9,31 @@ namespace NPacMan.UI
     {
         private readonly Font _scoreFont = new Font("Segoe UI", 20F, FontStyle.Regular, GraphicsUnit.Point, ((byte)(0)));
 
-        private int mouthSize = 60;
-        private int mouthDirection = 1;
-
         private bool animated = false;
 
         private Sprites _sprites;
         private ScoreBoard _scoreBoard;
+        private MapLayout _mapLayout;
 
         public BoardRenderer()
         {
             _sprites = new Sprites();
             _scoreBoard = new ScoreBoard(_sprites);
+            _mapLayout = new MapLayout();
         }
 
         public void RenderWalls(Graphics g, NPacMan.Game.Game game)
         {
+            _mapLayout.UpdateFromGame(game);
             var cellSize = Sprites.PixelGrid;
-            var wallWidth = cellSize / 5;
-            var wallPen = new Pen(Brushes.Blue, wallWidth);
-            var walls = game.Walls;
 
-            foreach (var wall in walls)
+            for (int y = 0; y < _mapLayout.DisplayHeight; y++)
             {
-                var x = wall.x * cellSize;
-                var y = wall.y * cellSize;
-                var offset = (cellSize - wallWidth) / 2;
-
-               // g.DrawRectangle(Pens.White, x, y, cellSize, cellSize);
-
-                var wallType = WallAnalyzer.GetWallType(walls, wall, game.Width, game.Height);
-
-                switch (wallType)
+                for (int x = 0; x < _mapLayout.DisplayWidth; x++)
                 {
-                    case WallType.VerticalLine:
-                        g.FillRectangle(Brushes.Blue, x + offset, y, wallWidth, cellSize);
-                        break;
-                    case WallType.HorizontalLine:
-                        g.FillRectangle(Brushes.Blue, x, y + offset, cellSize, wallWidth);
-                        break;
-                    case WallType.TopRightArc:
-                        g.DrawArc(wallPen, x - (cellSize / 2), y + (cellSize / 2), cellSize, cellSize, 270, 90);
-                        break;
-                    case WallType.BottomRightArc:
-                        g.DrawArc(wallPen, x - (cellSize / 2), y - (cellSize / 2), cellSize, cellSize, 0, 90);
-                        break;
-                    case WallType.TopLeftArc:
-                        g.DrawArc(wallPen, x + (cellSize / 2), y + (cellSize / 2), cellSize, cellSize, 180, 90);
-                        break;
-                    case WallType.BottomLeftArc:
-                        g.DrawArc(wallPen, x + (cellSize / 2), y - (cellSize / 2), cellSize, cellSize, 90, 90);
-                        break;
-                    default:
-                        g.FillRectangle(Brushes.Red, x, y, cellSize, cellSize);
-                        break;
+                    var posX = x * cellSize;
+                    var posY = y * cellSize;
+                    _sprites.RenderSprite(g, posX, posY, _sprites.Map(_mapLayout.BoardPieceToDisplay(x, y)));
                 }
             }
         }
@@ -79,49 +51,39 @@ namespace NPacMan.UI
 
             foreach (var coin in coins)
             {
-                var x = coin.x * cellSize;
-                var y = coin.y * cellSize;
+                var x = coin.X * cellSize;
+                var y = coin.Y * cellSize;
 
                 g.FillRectangle(Brushes.Gold, x + (cellSize / 4), y + (cellSize / 4), cellSize / 2, cellSize / 2);
             }
         }
 
+        private int _pacManAnimation = 0;
+        private int _pacManAnimationDelay = 0;
         public void RenderPacMan(Graphics g, NPacMan.Game.Game game)
         {
             var cellSize = Sprites.PixelGrid;
 
-            var x = game.PacMan.X * cellSize;
-            var y = game.PacMan.Y * cellSize;
+            var x = game.PacMan.Location.X * cellSize;
+            var y = game.PacMan.Location.Y * cellSize;
 
-            var offset = 0;
-
-            switch (game.PacMan.Direction)
+            _pacManAnimationDelay++;
+            if (_pacManAnimationDelay == 3)
             {
-                case Direction.Up:
-                    offset = -90;
-                    break;
-                case Direction.Left:
-                    offset = -180;
-                    break;
-                case Direction.Down:
-                    offset = 90;
-                    break;
+                if (game.PacMan.Status == PacManStatus.Alive)
+                {
+                    _pacManAnimation = (_pacManAnimation + 1) % 4;
+                }
+                else
+                {
+                    _pacManAnimation = (_pacManAnimation + 1) % 4;
+                }
+                _pacManAnimationDelay = 0;
             }
 
-            var halfSize = (mouthSize / 2);
-            g.FillPie(Brushes.Yellow, x, y, cellSize, cellSize, offset + halfSize, 360 - mouthSize);
-
-            mouthSize = (mouthSize + mouthDirection);
-            if (mouthSize >= 60)
-            {
-                mouthDirection = -5;
-            }
-            else if (mouthSize <= 0)
-            {
-                mouthDirection = +5;
-            }
-
+            _sprites.RenderSprite(g, x, y, _sprites.PacMan(game.PacMan.Direction, _pacManAnimation, game.PacMan.Status == PacManStatus.Dying));
         }
+
 
         public void RenderGhosts(Graphics g, NPacMan.Game.Game game)
         {
@@ -136,15 +98,15 @@ namespace NPacMan.UI
         }
         private void RenderGhost(Graphics g, int cellSize, Ghost ghost)
         {
-            var x = ghost.X * cellSize;
-            var y = ghost.Y * cellSize;
+            var x = ghost.Location.X * cellSize;
+            var y = ghost.Location.Y * cellSize;
 
             var ghostColour = ghost.Name switch
             {
-                "Blinky" => GhostColour.Red,
-                "Inky" => GhostColour.Cyan,
-                "Pinky" => GhostColour.Pink,
-                "Clyde" => GhostColour.Orange,
+                GhostNames.Blinky => GhostColour.Red,
+                GhostNames.Inky => GhostColour.Cyan,
+                GhostNames.Pinky => GhostColour.Pink,
+                GhostNames.Clyde => GhostColour.Orange,
                 _ => GhostColour.Red,
             };
 

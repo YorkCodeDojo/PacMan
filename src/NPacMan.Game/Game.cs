@@ -1,27 +1,16 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using System;
-using System.ComponentModel.Design;
-using System.Net.Http.Headers;
-using System.Xml.XPath;
+using System.Collections.Immutable;
 
 namespace NPacMan.Game
 {
-
-    public enum PacManStatus
-    {
-        Alive,
-        Dying,
-        Respawning,
-        Dead
-    }
     public class Game
     {
         public int Score { get; private set; }
 
         private readonly IGameSettings _settings;
-        private List<(int x, int y)> _collectedCoins;
+        private List<CellLocation> _collectedCoins;
         private Dictionary<string, Ghost> _ghosts;
 
 
@@ -30,52 +19,26 @@ namespace NPacMan.Game
             gameClock.Subscribe(Tick);
             _settings = settings;
             PacMan = settings.PacMan;
-            _collectedCoins = new List<(int x, int y)>();
+            _collectedCoins = new List<CellLocation>();
             _ghosts = settings.Ghosts.ToDictionary(x => x.Name, x => x);
         }
 
         public static Game Create()
         {
-            var board = @" XXXXXXXXXXXXXXXXXXXXXXXXXXXX
- X............XX............X
- X.XXXX.XXXXX.XX.XXXXX.XXXX.X
- X.X  X.X   X.XX.X   X.X  X.X
- X.XXXX.XXXXX.XX.XXXXX.XXXX.X
- X..........................X
- X.XXXX.XX.XXXXXXXX.XX.XXXX.X
- X.XXXX.XX.XXXXXXXX.XX.XXXX.X
- X......XX....XX....XX......X
- XXXXXX.XXXXX XX XXXXX.XXXXXX
-      X.XXXXX XX XXXXX.X     
-      X.XX          XX.X     
-      X.XX   B      XX.X     
- XXXXXX.XX  XXXXXX  XX.XXXXXX
-T      .    X IPCX    .      T
- XXXXXX.XX  XXXXXX  XX.XXXXXX
-      X.XX          XX.X     
-      X.XX          XX.X     
-      X.XX XXXXXXXX XX.X
- XXXXXX.XX XXXXXXXX XX.XXXXXX
- X............XX............X
- X.XXXX.XXXXX.XX.XXXXX.XXXX.X
- X.XXXX.XXXXX.XX.XXXXX.XXXX.X
- X...XX.......►........XX...X
- XXX.XX.XX.XXXXXXXX.XX.XX.XXX
- XXX.XX.XX.XXXXXXXX.XX.XX.XXX
- X......XX....XX....XX......X
- X.XXXXXXXXXX.XX.XXXXXXXXXX.X
- X.XXXXXXXXXX.XX.XXXXXXXXXX.X
- X..........................X
- XXXXXXXXXXXXXXXXXXXXXXXXXXXX";
+            var filename = "board.txt";
+            var gameSettings = GameSettingsLoader.LoadFromFile(filename);
 
-            return new Game(new GameClock(), GameSettingsLoader.Load(board));
+            return new Game(new GameClock(), gameSettings);
         }
 
         public PacMan PacMan { get; private set; }
-        public IReadOnlyCollection<(int x, int y)> Coins
+        public IReadOnlyCollection<CellLocation> Coins
             => _settings.Coins.Except(_collectedCoins).ToList().AsReadOnly();
-        public IReadOnlyCollection<(int x, int y)> Walls
+        public IReadOnlyCollection<CellLocation> Walls
             => _settings.Walls;
+
+        public IReadOnlyCollection<CellLocation> Doors
+            => _settings.Doors;
 
         public int Width
             => _settings.Width;
@@ -86,7 +49,8 @@ T      .    X IPCX    .      T
         public int Lives
             => PacMan.Lives;
 
-        public IReadOnlyDictionary<string, Ghost> Ghosts => _ghosts;
+        public IReadOnlyDictionary<string, Ghost> Ghosts
+            => PacMan.Status == PacManStatus.Respawning ? (IReadOnlyDictionary<string, Ghost>)ImmutableDictionary<string, Ghost>.Empty : _ghosts;
 
         public void ChangeDirection(Direction direction)
         {
@@ -97,20 +61,20 @@ T      .    X IPCX    .      T
         {
             var newPacMan = PacMan.Transition(now);
 
-            if (_settings.Portals.TryGetValue((newPacMan.X, newPacMan.Y), out var portal))
+            if (_settings.Portals.TryGetValue(newPacMan.Location, out var portal))
             {
-                newPacMan = PacMan.WithNewX(portal.x).WithNewY(portal.y);
+                newPacMan = PacMan.WithNewX(portal.X).WithNewY(portal.Y);
                 newPacMan = newPacMan.Transition(now);
             }
 
-            if (PacMan.Status == PacManStatus.Dying && newPacMan.Status == PacManStatus.Respawning)
+            if (PacMan.Status == PacManStatus.Respawning && newPacMan.Status == PacManStatus.Alive)
             {
-                SendAllGhostsHome();
+                ApplyToGhosts(ghost => ghost.SetToHome());
             }
 
-            if (PacMan.Status != PacManStatus.Dying)
+            if (PacMan.Status == PacManStatus.Alive)
             {
-                MoveAllGhosts();
+                ApplyToGhosts(ghost => ghost.Move(this));
             }
 
             if (newPacMan.Status != PacManStatus.Alive)
@@ -125,7 +89,7 @@ T      .    X IPCX    .      T
                 return;
             }
 
-            if (!_settings.Walls.Contains((newPacMan.X, newPacMan.Y)))
+            if (!_settings.Walls.Contains(newPacMan.Location))
             {
                 PacMan = newPacMan;
             }
@@ -136,11 +100,11 @@ T      .    X IPCX    .      T
                 return;
             }
 
-            if (_settings.Coins.Contains((newPacMan.X, newPacMan.Y)))
+            if (_settings.Coins.Contains(newPacMan.Location))
             {
-                var newCollectedCoins = new List<(int, int)>(_collectedCoins)
+                var newCollectedCoins = new List<CellLocation>(_collectedCoins)
                     {
-                        (newPacMan.X, newPacMan.Y)
+                        (newPacMan.Location)
                     };
                 _collectedCoins = newCollectedCoins;
                 Score += 10;
@@ -150,30 +114,20 @@ T      .    X IPCX    .      T
 
         private bool HasDied()
         {
-            return Ghosts.Values.Any(ghost => ghost.X == PacMan.X && ghost.Y == PacMan.Y);
+            return Ghosts.Values.Any(ghost => ghost.Location.X == PacMan.Location.X && ghost.Location.Y == PacMan.Location.Y);
         }
 
-        private void MoveAllGhosts()
+        private void ApplyToGhosts(Func<Ghost, Ghost> action)
         {
             var newPositionOfGhosts = new Dictionary<string, Ghost>();
-            foreach (var ghost in Ghosts.Values)
+            foreach (var ghost in _ghosts.Values)
             {
-                newPositionOfGhosts[ghost.Name] = ghost.Move(this);
+                newPositionOfGhosts[ghost.Name] = action(ghost);
             }
 
             _ghosts = newPositionOfGhosts;
         }
-
-        private void SendAllGhostsHome()
-        {
-            var newPositionOfGhosts = new Dictionary<string, Ghost>();
-            foreach (var ghost in Ghosts.Values)
-            {
-                newPositionOfGhosts[ghost.Name] = ghost.GoHome();
-            }
-
-            _ghosts = newPositionOfGhosts;
-        }
+        
 
     }
 }

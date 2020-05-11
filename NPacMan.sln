@@ -13,7 +13,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NPacMan.Game.Tests", "test\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NPacMan.UI", "src\NPacMan.UI\NPacMan.UI.csproj", "{530A5DB8-FAE2-44B0-84BD-B38FB9E4D38D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NPacMan.UI.Tests", "test\NPacMan.UI.Tests\NPacMan.UI.Tests.csproj", "{2D6C8AEB-6731-4028-A4E7-6F22FE743FBD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NPacMan.UI.Tests", "test\NPacMan.UI.Tests\NPacMan.UI.Tests.csproj", "{2D6C8AEB-6731-4028-A4E7-6F22FE743FBD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{70F9337E-FBEE-4EBB-AA71-ABB86B748C47}"
+	ProjectSection(SolutionItems) = preProject
+		GhostMovement.md = GhostMovement.md
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NPacMan.ConsoleApp", "src\NPacMan.ConsoleApp\NPacMan.ConsoleApp.csproj", "{7E5D00CC-D5A1-4D76-AA27-FFC529691212}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -73,6 +80,18 @@ Global
 		{2D6C8AEB-6731-4028-A4E7-6F22FE743FBD}.Release|x64.Build.0 = Release|Any CPU
 		{2D6C8AEB-6731-4028-A4E7-6F22FE743FBD}.Release|x86.ActiveCfg = Release|Any CPU
 		{2D6C8AEB-6731-4028-A4E7-6F22FE743FBD}.Release|x86.Build.0 = Release|Any CPU
+		{7E5D00CC-D5A1-4D76-AA27-FFC529691212}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E5D00CC-D5A1-4D76-AA27-FFC529691212}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E5D00CC-D5A1-4D76-AA27-FFC529691212}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7E5D00CC-D5A1-4D76-AA27-FFC529691212}.Debug|x64.Build.0 = Debug|Any CPU
+		{7E5D00CC-D5A1-4D76-AA27-FFC529691212}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7E5D00CC-D5A1-4D76-AA27-FFC529691212}.Debug|x86.Build.0 = Debug|Any CPU
+		{7E5D00CC-D5A1-4D76-AA27-FFC529691212}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E5D00CC-D5A1-4D76-AA27-FFC529691212}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E5D00CC-D5A1-4D76-AA27-FFC529691212}.Release|x64.ActiveCfg = Release|Any CPU
+		{7E5D00CC-D5A1-4D76-AA27-FFC529691212}.Release|x64.Build.0 = Release|Any CPU
+		{7E5D00CC-D5A1-4D76-AA27-FFC529691212}.Release|x86.ActiveCfg = Release|Any CPU
+		{7E5D00CC-D5A1-4D76-AA27-FFC529691212}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -82,6 +101,7 @@ Global
 		{9CA2F354-5203-4EEC-9613-67618DA1C87E} = {4111C40E-1F40-4AC6-B56C-C51AC5DFCF5A}
 		{530A5DB8-FAE2-44B0-84BD-B38FB9E4D38D} = {21ED40B0-C3C3-45A8-8436-6F4655B1FBC2}
 		{2D6C8AEB-6731-4028-A4E7-6F22FE743FBD} = {4111C40E-1F40-4AC6-B56C-C51AC5DFCF5A}
+		{7E5D00CC-D5A1-4D76-AA27-FFC529691212} = {21ED40B0-C3C3-45A8-8436-6F4655B1FBC2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8B94961E-5CF2-4100-B9C0-FD0648C42EBA}

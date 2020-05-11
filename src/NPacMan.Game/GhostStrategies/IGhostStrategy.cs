@@ -2,6 +2,6 @@
 {
     public interface IGhostStrategy
     {
-        (int x, int y) Move(Ghost ghost, Game game);
+        Direction? GetNextDirection(Ghost ghost, Game game);
     }
 }

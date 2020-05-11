@@ -1,26 +1,31 @@
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 namespace NPacMan.Game.Tests
 {
     public class TestGameSettings : IGameSettings
     {
-        public List<(int x, int y)> Walls { get; set; }
-            = new List<(int x, int y)>();
+        public List<CellLocation> Walls { get; set; }
+            = new List<CellLocation>();
 
-        IReadOnlyCollection<(int x, int y)> IGameSettings.Walls
+        IReadOnlyCollection<CellLocation> IGameSettings.Walls
             => this.Walls;
 
-        public List<(int x, int y)> Coins { get; set; }
-            = new List<(int x, int y)>();
+        public List<CellLocation> Coins { get; set; }
+            = new List<CellLocation>();
 
-        IReadOnlyCollection<(int x, int y)> IGameSettings.Coins
+        IReadOnlyCollection<CellLocation> IGameSettings.Coins
             => this.Coins;
 
-        public Dictionary<(int x, int y), (int x, int y)> Portals { get; set; }
-            = new Dictionary<(int x, int y), (int x, int y)>();
+        public List<CellLocation> Doors { get; set; }
+            = new List<CellLocation>();
 
-        IReadOnlyDictionary<(int x, int y), (int x, int y)> IGameSettings.Portals
+        IReadOnlyCollection<CellLocation> IGameSettings.Doors
+            => this.Doors;
+
+        public Dictionary<CellLocation, CellLocation> Portals { get; set; }
+            = new Dictionary<CellLocation, CellLocation>();
+
+        IReadOnlyDictionary<CellLocation, CellLocation> IGameSettings.Portals
             => this.Portals;
 
         public int Width { get; set; }
@@ -33,7 +38,7 @@ namespace NPacMan.Game.Tests
         IReadOnlyCollection<Ghost> IGameSettings.Ghosts
             => this.Ghosts;
 
-        public PacMan PacMan { get; set; } = new PacMan(10, 10, Direction.Right, PacManStatus.Alive, 3);
+        public PacMan PacMan { get; set; } = new PacMan(new CellLocation(10, 10), Direction.Right, PacManStatus.Alive, 3);
 
     }
 }

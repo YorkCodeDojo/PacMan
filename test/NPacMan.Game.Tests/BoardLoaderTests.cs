@@ -1,6 +1,6 @@
-﻿using System;
+﻿using FluentAssertions;
+using System;
 using System.Collections.Generic;
-using FluentAssertions;
 using Xunit;
 
 namespace NPacMan.Game.Tests
@@ -8,21 +8,45 @@ namespace NPacMan.Game.Tests
     public class BoardLoaderTests
     {
         [Fact]
+        public void TheBoardCanBeLoadedFromATextFile()
+        {
+            var filename = "SimpleTestBoard.txt";
+
+            var gameBoard = GameSettingsLoader.LoadFromFile(filename);
+
+            gameBoard.Should().BeEquivalentTo(new
+            {
+                Walls = new CellLocation[] { (0, 0), (1, 0), (2, 0), (0, 1), (2, 1), (0, 2), (1, 2) },
+                Coins = new CellLocation[] { (1, 1), (2, 2) },
+                Doors = new CellLocation[] { new CellLocation(0, 4), new CellLocation(1, 4), new CellLocation(2, 4) },
+                Width = 3,
+                Height = 5,
+                Portals = new Dictionary<CellLocation, CellLocation >
+                {
+                    {(-1,3), (3,3) },{(3,3), (-1,3) }
+                }
+            });
+
+        }
+
+        [Fact]
         public void ShouldItemsOnBoard()
         {
             var board = @" XXX 
  X.X 
  XX. 
-T ▲ T";
+T ▲ T
+ --- ";
             var gameBoard = GameSettingsLoader.Load(board);
 
             gameBoard.Should().BeEquivalentTo(new
             {
-                Walls = new[] { (0, 0), (1, 0), (2, 0), (0, 1), (2, 1), (0, 2), (1, 2) },
-                Coins = new[] { (1, 1), (2, 2) },
+                Walls = new CellLocation[] { (0, 0), (1, 0), (2, 0), (0, 1), (2, 1), (0, 2), (1, 2) },
+                Coins = new CellLocation[] { (1, 1), (2, 2) },
+                Doors = new CellLocation[] { new CellLocation(0, 4), new CellLocation(1, 4), new CellLocation(2, 4) },
                 Width = 3,
-                Height = 4,
-                Portals = new Dictionary<(int, int), (int, int)>
+                Height = 5,
+                Portals = new Dictionary<CellLocation, CellLocation>
                 {
                     {(-1,3), (3,3) },{(3,3), (-1,3) }
                 }
@@ -56,8 +80,7 @@ T ▲ T";
 
             loadedBoard.PacMan.Should().BeEquivalentTo(new
             {
-                X = 2,
-                Y = 1,
+                Location = new CellLocation(2,1),
                 Direction = expectedDirection
             });
         }
@@ -67,33 +90,86 @@ T ▲ T";
         {
             var board = @" XXX 
  BIP 
- ▲XC ";
+ ▲XC
+ ....
+{Blinky=-10,-3}
+{Inky=1,3}
+{Pinky=2,3}
+{Clyde=20,33}";
 
             var loadedBoard = GameSettingsLoader.Load(board);
 
             loadedBoard.Ghosts.Should().BeEquivalentTo(
             new
             {
-                X = 0,
-                Y = 1,
+                Location = new
+                {
+                    X = 0,
+                    Y = 1
+                },
                 Name = "Blinky",
             },
             new
             {
-                X = 1,
-                Y = 1,
+                Location = new
+                {
+                    X = 1,
+                    Y = 1
+                },
                 Name = "Inky",
             },
             new
             {
-                X = 2,
-                Y = 1,
+                Location = new
+                {
+                    X = 2,
+                    Y = 1
+                },
                 Name = "Pinky",
             },
             new
             {
-                X = 2,
-                Y = 2,
+                Location = new
+                {
+                    X = 2,
+                    Y = 2
+                },
+                Name = "Clyde",
+            });
+        }
+
+        [Fact]
+        public void ShouldHaveGhostsWithCorrectHomeLocations()
+        {
+            var board = @" XXX 
+ BIP 
+ ▲XC 
+ ....
+{Blinky=-10,-3}
+{Inky=1,3}
+{Pinky=2,3}
+{Clyde=20,33}";
+
+            var loadedBoard = GameSettingsLoader.Load(board);
+            loadedBoard.Ghosts.Should().BeEquivalentTo(
+            new
+            {
+                ScatterTarget = new { X = -10, Y = -3 },
+                Name = "Blinky",
+            },
+            new
+            {
+                ScatterTarget = new { X = 1, Y = 3 },
+                Name = "Inky",
+            },
+            new
+            {
+                ScatterTarget = new { X = 2, Y = 3 },
+                Name = "Pinky",
+            },
+            new
+            {
+                ScatterTarget = new { X = 20, Y = 33 },
                 Name = "Clyde",
             });
         }
