@@ -25,7 +25,7 @@ namespace NPacMan.Game
         public PacMan SetToHome() => new PacMan(Home, Home, Direction);
         
 
-        internal PacMan Transition(DateTime now)
+        internal PacMan Move()
         {
             switch (Direction)
             {

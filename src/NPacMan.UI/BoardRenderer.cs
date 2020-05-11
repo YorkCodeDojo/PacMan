@@ -70,7 +70,7 @@ namespace NPacMan.UI
             _pacManAnimationDelay++;
             if (_pacManAnimationDelay == 3)
             {
-                if (game.Status == GameStatus.Alive)
+                if (game.Status == GameStatus.Alive.ToString())
                 {
                     _pacManAnimation = (_pacManAnimation + 1) % 4;
                 }
@@ -81,7 +81,7 @@ namespace NPacMan.UI
                 _pacManAnimationDelay = 0;
             }
 
-            _sprites.RenderSprite(g, x, y, _sprites.PacMan(game.PacMan.Direction, _pacManAnimation, game.Status == GameStatus.Dying));
+            _sprites.RenderSprite(g, x, y, _sprites.PacMan(game.PacMan.Direction, _pacManAnimation, game.Status == GameStatus.Dying.ToString()));
         }
 
 

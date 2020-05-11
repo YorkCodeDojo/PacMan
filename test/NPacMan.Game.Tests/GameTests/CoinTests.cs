@@ -126,8 +126,13 @@ namespace NPacMan.Game.Tests.GameTests
             game.ChangeDirection(Direction.Right);
             _gameClock.Tick();
 
+            
+
             using var _ = new AssertionScope();
-            game.Coins.Should().Contain((x, y));
+            game.Coins.Should().ContainEquivalentOf(new {
+                X = x,
+                Y = y
+            });
             game.Score.Should().Be(score);
         }
     }

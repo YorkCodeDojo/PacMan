@@ -41,7 +41,7 @@ namespace NPacMan.Game.Tests.GameTests
         {
             var x = 1;
             var y = 1;
-            _gameSettings.InitialGameStatus = GameStatus.Dying;
+            _gameSettings.InitialGameStatus = GameStatus.Dying.ToString();
             _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(x, y), Direction.Left, CellLocation.TopLeft, new DirectToStrategy(new DirectToPacManLocation())));
             _gameSettings.PacMan = new PacMan((3, 3), Direction.Down);
 
@@ -64,12 +64,17 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public void GhostShouldBeHiddenWhenPacManIsReSpawning()
         {
-            _gameSettings.InitialGameStatus = GameStatus.Respawning;
-            _gameSettings.PacMan = new PacMan((1, 1), Direction.Left);
-            _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(1, 2), Direction.Left, CellLocation.TopLeft, new GhostGoesRightStrategy()));
+            _gameSettings.PacMan = new PacMan((3, 2), Direction.Left);
+            var homeLocation = new CellLocation(1, 2);
+            var strategy = new GhostGoesRightStrategy();
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", homeLocation, Direction.Right, CellLocation.TopLeft, strategy));
 
             var game = new Game(_gameClock, _gameSettings);
+            var now = DateTime.UtcNow;
 
+            _gameClock.Tick(now);
+            _gameClock.Tick(now.AddSeconds(4));
+            
             game.Ghosts.Should().BeEmpty();
         }
 
@@ -87,12 +92,12 @@ namespace NPacMan.Game.Tests.GameTests
             _gameClock.Tick(now);
             _gameClock.Tick(now.AddSeconds(4));
 
-            if (game.Status != GameStatus.Respawning)
+            if (game.Status != GameStatus.Respawning.ToString())
                 throw new Exception($"Invalid Game State {game.Status:G} Should be Respawning");
 
             _gameClock.Tick(now.AddSeconds(8));
             
-            if (game.Status != GameStatus.Alive)
+            if (game.Status != GameStatus.Alive.ToString())
                 throw new Exception($"Invalid Game State {game.Status:G} Should be Alive");
             
             game.Ghosts.Values.First()
