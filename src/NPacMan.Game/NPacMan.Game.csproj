@@ -10,4 +10,8 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Automatonymous" Version="4.2.1" />
+  </ItemGroup>
+
 </Project>

@@ -18,7 +18,7 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public void PacManStartsInInitialPosition()
         {
-            _gameSettings.PacMan = new PacMan((5, 6), Direction.Right, PacManStatus.Alive, 3);
+            _gameSettings.PacMan = new PacMan((5, 6), Direction.Right);
             var game = new Game(_gameClock, _gameSettings);
 
             game.PacMan.Should().BeEquivalentTo(new
@@ -101,15 +101,16 @@ namespace NPacMan.Game.Tests.GameTests
         }
 
         [Theory]
-        [InlineData(PacManStatus.Dead)]
-        [InlineData(PacManStatus.Dying)]
-        [InlineData(PacManStatus.Respawning)]
-        public void PacManShouldNotMoveInCertainStates(PacManStatus state)
+        [InlineData(GameStatus.Dead)]
+        [InlineData(GameStatus.Dying)]
+        [InlineData(GameStatus.Respawning)]
+        public void PacManShouldNotMoveInCertainStates(GameStatus state)
         {
             var x = 1;
             var y = 1;
 
-            _gameSettings.PacMan = new PacMan((x, y), Direction.Down, state, 1);
+            _gameSettings.InitialGameStatus = state.ToString();
+            _gameSettings.PacMan = new PacMan((x, y), Direction.Down);
 
             var game = new Game(_gameClock, _gameSettings);
             _gameClock.Tick();
@@ -117,14 +118,17 @@ namespace NPacMan.Game.Tests.GameTests
             game.PacMan
                 .Should().BeEquivalentTo(new
                 {
-                    Location = new CellLocation(x, y),
+                    Location = new {
+                        X = x,
+                        Y = y
+                    }
                 });
         }
 
         [Fact]
         public void PacManShouldRespawnAfter4Seconds()
         {
-            _gameSettings.PacMan = new PacMan((1, 1), Direction.Down, PacManStatus.Alive, 1);
+            _gameSettings.PacMan = new PacMan((1, 1), Direction.Down);
             _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(1, 2), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
 
             var game = new Game(_gameClock, _gameSettings);
@@ -135,38 +139,39 @@ namespace NPacMan.Game.Tests.GameTests
             _gameClock.Tick(now.AddSeconds(2));
             _gameClock.Tick(now.AddSeconds(3));
 
-            if (game.PacMan.Status != PacManStatus.Dying)
-                throw new Exception($"Invalid PacMan State {game.PacMan.Status:G}");
+            if (game.Status != GameStatus.Dying.ToString())
+                throw new Exception($"Invalid Game State {game.Status:G}");
 
             _gameClock.Tick(now.AddSeconds(4));
 
-            game.PacMan.Status.Should().Be(PacManStatus.Respawning);
+            game.Status.Should().Be(GameStatus.Respawning.ToString());
         }
 
         [Fact]
         public void PacManShouldBeAliveAfter4SecondsWhenInRespawning()
         {
-            _gameSettings.PacMan = new PacMan((5, 2), Direction.Left, PacManStatus.Alive, 2);
+            _gameSettings.PacMan = new PacMan((5, 2), Direction.Left);
             _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(1, 2), Direction.Right, CellLocation.TopLeft, new GhostGoesRightStrategy()));
 
             var game = new Game(_gameClock, _gameSettings);
             var now = DateTime.UtcNow;
+
             _gameClock.Tick(now);
             _gameClock.Tick(now);
             _gameClock.Tick(now.AddSeconds(4));
 
-            if (game.PacMan.Status != PacManStatus.Respawning)
-                throw new Exception($"Invalid PacMan State {game.PacMan.Status:G}");
+            if (game.Status != GameStatus.Respawning.ToString())
+                throw new Exception($"Invalid Game State {game.Status:G}");
 
             _gameClock.Tick(now.AddSeconds(8));
 
-            game.PacMan.Status.Should().Be(PacManStatus.Alive);
+            game.Status.Should().Be(GameStatus.Alive.ToString());
         }
 
         [Fact]
         public void PacManShouldBeBackAtHomeLocationAfter4SecondsWhenBecomingBackAlive()
         {
-            _gameSettings.PacMan = new PacMan((5, 2), Direction.Left, PacManStatus.Alive, 2);
+            _gameSettings.PacMan = new PacMan((5, 2), Direction.Left);
             _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(1, 2), Direction.Right, CellLocation.TopLeft, new GhostGoesRightStrategy()));
 
             var game = new Game(_gameClock, _gameSettings);
@@ -175,18 +180,21 @@ namespace NPacMan.Game.Tests.GameTests
             _gameClock.Tick(now);
             _gameClock.Tick(now.AddSeconds(4));
 
-            if (game.PacMan.Status != PacManStatus.Respawning)
-                throw new Exception($"Invalid PacMan State {game.PacMan.Status:G}");
+            if (game.Status != GameStatus.Respawning.ToString())
+                throw new Exception($"Invalid Game State {game.Status:G}");
 
             _gameClock.Tick(now.AddSeconds(8));
 
-            if (game.PacMan.Status != PacManStatus.Alive)
-                throw new Exception($"Invalid PacMan State {game.PacMan.Status:G}");
+            if (game.Status != GameStatus.Alive.ToString())
+                throw new Exception($"Invalid Game State {game.Status:G}");
 
             game.PacMan.Should().BeEquivalentTo(
                 new
                 {
-                    Location = new CellLocation(5, 2),
+                    Location = new {
+                        X = 5,
+                        Y = 2
+                    }
                 }
             );
         }

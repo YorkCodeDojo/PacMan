@@ -38,7 +38,10 @@ namespace NPacMan.Game.Tests
         IReadOnlyCollection<Ghost> IGameSettings.Ghosts
             => this.Ghosts;
 
-        public PacMan PacMan { get; set; } = new PacMan(new CellLocation(10, 10), Direction.Right, PacManStatus.Alive, 3);
-
+        public PacMan PacMan { get; set; } = new PacMan(new CellLocation(10, 10), Direction.Right);
+        public string InitialGameStatus { get; set; } = "Alive";
+        public int InitialLives { get; set; } = 3;
+        public int InitialScatterTimeInSeconds { get; set; } = 7;
+        public int ChaseTimeInSeconds { get; set; } = 7;
     }
 }

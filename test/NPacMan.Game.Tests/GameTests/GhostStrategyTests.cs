@@ -18,7 +18,7 @@ namespace NPacMan.Game.Tests.GameTests
             var board = new TestGameSettings()
             {
                 Ghosts = { new Ghost(name, new CellLocation(5, 5), Direction.Left, CellLocation.TopLeft, new DirectToStrategy(new DirectToPacManLocation())) },
-                PacMan = new PacMan((pacManX, pacManY), Direction.Left, PacManStatus.Alive, 3)
+                PacMan = new PacMan((pacManX, pacManY), Direction.Left)
             };
 
             var gameClock = new TestGameClock();
@@ -41,7 +41,7 @@ namespace NPacMan.Game.Tests.GameTests
             var board = new TestGameSettings()
             {
                 Ghosts = { new Ghost(name, new CellLocation(5, 5), Direction.Left, CellLocation.TopLeft, new DirectToStrategy(new DirectToPacManLocation())) },
-                PacMan = new PacMan((3, 5), Direction.Left, PacManStatus.Alive, 3),
+                PacMan = new PacMan((3, 5), Direction.Left),
                 Walls = {(4,5)}
             };
 
@@ -75,7 +75,7 @@ namespace NPacMan.Game.Tests.GameTests
             var board = new TestGameSettings()
             {
                 Ghosts = { new Ghost(name, new CellLocation(5, 5), Direction.Left, CellLocation.TopLeft, new DirectToStrategy(new DirectToPacManLocation())) },
-                PacMan = new PacMan((5, 3), Direction.Left, PacManStatus.Alive, 3),
+                PacMan = new PacMan((5, 3), Direction.Left),
                 Walls = { (5, 4) }
             };
 
@@ -112,7 +112,7 @@ namespace NPacMan.Game.Tests.GameTests
             var board = new TestGameSettings()
             {
                 Ghosts = { new Ghost(name, new CellLocation(1, 2), Direction.Up, CellLocation.TopLeft, new DirectToStrategy(new DirectToPacManLocation())) },
-                PacMan = new PacMan((4, 1), Direction.Right, PacManStatus.Alive, 3),
+                PacMan = new PacMan((4, 1), Direction.Right),
                 Walls = { (0, 0), (1, 0), (2, 0), (3, 0),
                     (0,1), (0,2), (2,2), (3,2)
                 }
@@ -146,7 +146,7 @@ namespace NPacMan.Game.Tests.GameTests
             var board = new TestGameSettings()
             {
                 Ghosts = { new Ghost(name, new CellLocation(1, 2), Direction.Up, CellLocation.TopLeft, new DirectToStrategy(new DirectToPacManLocation())) },
-                PacMan = new PacMan((4, 1), Direction.Right, PacManStatus.Alive, 3),
+                PacMan = new PacMan((4, 1), Direction.Right),
                 Walls = { (0, 0), (2, 0), (3, 0),
                    (0,2), (2,2), (3,2)
                 }
@@ -175,7 +175,7 @@ namespace NPacMan.Game.Tests.GameTests
         {
             var board = new TestGameSettings()
             {
-                PacMan = new PacMan((4, 1), Direction.Right, PacManStatus.Alive, 3),
+                PacMan = new PacMan((4, 1), Direction.Right),
                 Walls = { }
             };
             var gameClock = new TestGameClock();
@@ -202,7 +202,7 @@ namespace NPacMan.Game.Tests.GameTests
 
             var board = new TestGameSettings()
             {
-                PacMan = new PacMan((4, 1), Direction.Right, PacManStatus.Alive, 3),
+                PacMan = new PacMan((4, 1), Direction.Right),
                 Ghosts = { new Ghost("ghost-1", new CellLocation(1, 2), Direction.Up, CellLocation.TopLeft, new NullGhostStrategy()) },                
                 Walls = { }
             };
@@ -224,7 +224,7 @@ namespace NPacMan.Game.Tests.GameTests
         {
             var board = new TestGameSettings()
             {
-                PacMan = new PacMan((14, 1), Direction.Right, PacManStatus.Alive, 3),
+                PacMan = new PacMan((14, 1), Direction.Right),
                 Walls = { },
                 Ghosts = { new Ghost("ghost-1", new CellLocation(1, 2), Direction.Up, CellLocation.TopLeft, new NullGhostStrategy()) },                
             };
@@ -246,7 +246,7 @@ namespace NPacMan.Game.Tests.GameTests
         {
             var board = new TestGameSettings()
             {
-                PacMan = new PacMan((4, 1), Direction.Right, PacManStatus.Alive, 3),
+                PacMan = new PacMan((4, 1), Direction.Right),
                 Walls = { },
                 Ghosts = { new Ghost("ghost-1", new CellLocation(1, 2), Direction.Up, new CellLocation(11, 12), new NullGhostStrategy()) },                
             };
