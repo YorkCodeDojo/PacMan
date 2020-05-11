@@ -133,14 +133,29 @@ namespace NPacMan.Game
                     When(Tick)
                         .Then(context => game.MoveGhostsHome())
                         .Then(context => game.ShowGhosts())
-                        .TransitionTo(Alive));
+                        .Then(context => game.ScatterGhosts())
+                        .Then(context => context.Instance.TimeToChangeState = context.Data.Now.AddSeconds(game._settings.InitialScatterTimeInSeconds))
+                        .TransitionTo(InitialScatter));
+
+                During(InitialScatter,
+                     When(Tick, context => context.Data.Now >= context.Instance.TimeToChangeState)
+                        .Then(context => context.Instance.TimeToChangeState = context.Data.Now.AddSeconds(game._settings.ChaseTimeInSeconds))
+                         .Then(context => game.GhostToChase())
+                         .TransitionTo(Alive));
 
                 During(Alive,
+                     When(Tick, context => context.Data.Now >= context.Instance.TimeToChangeState)
+                        .Then(context => context.Instance.TimeToChangeState = context.Data.Now.AddSeconds(game._settings.InitialScatterTimeInSeconds))
+                         .Then(context => game.ScatterGhosts())
+                         .TransitionTo(InitialScatter));
+
+                During(InitialScatter, Alive,
                     When(Tick)
                         .Then(context => game.MoveGhosts(context.Data.Now))
                         .Then(context => game.MovePacMan(context.Data.Now)),
                     When(CoinEaten)
-                        .Then(context => context.Instance.Score += 10),
+                        .Then(context => context.Instance.Score += 10)
+                        .Then(context => game._soundSet.Chomp()),
                     When(PacManCaughtByGhost)
                         .Then(context => context.Instance.Lives -= 1)
                         .Then(context => context.Instance.TimeToChangeState = context.Data.Now.AddSeconds(4))
@@ -150,6 +165,7 @@ namespace NPacMan.Game
                     When(Tick, context => context.Data.Now >= context.Instance.TimeToChangeState)
                         .Then(context => game.HideGhosts())
                         .Then(context => context.Instance.TimeToChangeState = context.Data.Now.AddSeconds(4))
+                        .Then(context => game._soundSet.Death())
                         .IfElse(context => context.Instance.Lives > 0,
                             binder => binder.TransitionTo(Respawning),
                             binder => binder.Finalize()));
@@ -166,11 +182,22 @@ namespace NPacMan.Game
 
             public State Alive { get; private set; } = null!;
 
+            public State InitialScatter { get; private set; } = null!;
             public State Dying { get; private set; } = null!;
             public State Respawning { get; private set; } = null!;
             public Event<Tick> Tick { get; private set; } = null!;
             public Event<Tick> PacManCaughtByGhost { get; private set; } = null!;
             public Event CoinEaten { get; private set; } = null!;
+        }
+
+        private void ScatterGhosts()
+        {
+            ApplyToGhosts(ghost => ghost.Scatter());
+        }
+        
+        private void GhostToChase()
+        {
+            ApplyToGhosts(ghost => ghost.Chase());
         }
 
         private void HideGhosts()
@@ -223,7 +250,7 @@ namespace NPacMan.Game
             ApplyToGhosts(ghost => ghost.Move(this));
             if (HasDied())
             {
-                _gameStateMachine.RaiseEvent(_gameState, _gameStateMachine.PacManCaughtByGhost, new Tick{Now = now});
+                _gameStateMachine.RaiseEvent(_gameState, _gameStateMachine.PacManCaughtByGhost, new Tick { Now = now });
             }
         }
 

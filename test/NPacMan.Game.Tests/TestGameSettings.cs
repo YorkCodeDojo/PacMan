@@ -41,5 +41,7 @@ namespace NPacMan.Game.Tests
         public PacMan PacMan { get; set; } = new PacMan(new CellLocation(10, 10), Direction.Right);
         public string InitialGameStatus { get; set; } = "Alive";
         public int InitialLives { get; set; } = 3;
+        public int InitialScatterTimeInSeconds { get; set; } = 7;
+        public int ChaseTimeInSeconds { get; set; } = 7;
     }
 }

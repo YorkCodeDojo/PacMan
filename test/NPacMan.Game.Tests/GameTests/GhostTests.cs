@@ -74,7 +74,7 @@ namespace NPacMan.Game.Tests.GameTests
 
             _gameClock.Tick(now);
             _gameClock.Tick(now.AddSeconds(4));
-            
+
             game.Ghosts.Should().BeEmpty();
         }
 
@@ -109,5 +109,107 @@ namespace NPacMan.Game.Tests.GameTests
                     }
                 });
         }
+
+        [Fact]
+        public void GhostShouldScatterToStartWith()
+        {
+            _gameSettings.InitialGameStatus = "Initial";
+            _gameSettings.PacMan = new PacMan((10, 10), Direction.Left);
+            var startingLocation = new CellLocation(3, 1);
+            var scatterLocation = new CellLocation(1, 1);
+
+            var strategy = new GhostGoesRightStrategy();
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", startingLocation, Direction.Right, scatterLocation, strategy));
+
+            var game = new Game(_gameClock, _gameSettings);
+
+            _gameClock.Tick();
+            _gameClock.Tick();
+            _gameClock.Tick();
+
+            game.Ghosts.Values.First()
+                .Should().BeEquivalentTo(new
+                {
+                    Location = new {
+                        X = scatterLocation.X,
+                        Y = scatterLocation.Y
+                    }
+                });
+        }
+
+        [Fact]
+        public void GhostShouldChaseAfter7Seconds()
+        {
+            _gameSettings.InitialGameStatus = "Initial";
+            _gameSettings.PacMan = new PacMan((29, 10), Direction.Left);
+            var startingLocation = new CellLocation(30, 1);
+            var scatterLocation = new CellLocation(1, 1);
+
+            var strategy = new GhostGoesRightStrategy();
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", startingLocation, Direction.Right, scatterLocation, strategy));
+
+            var game = new Game(_gameClock, _gameSettings);
+
+            var now = DateTime.UtcNow;
+            _gameClock.Tick(now);
+            _gameClock.Tick(now);
+
+            if (game.Ghosts.Values.First().Location.X != 29 || game.Ghosts.Values.First().Location.Y != 1)
+                throw new System.Exception($"Ghost should be at 29,1 not {game.Ghosts.Values.First().Location.X}, {game.Ghosts.Values.First().Location.Y}");
+
+            _gameClock.Tick(now.AddSeconds(_gameSettings.InitialScatterTimeInSeconds + 1));
+            _gameClock.Tick(now.AddSeconds(_gameSettings.InitialScatterTimeInSeconds + 2));
+
+            game.Ghosts.Values.First()
+                .Should().BeEquivalentTo(new
+                {
+                    Location = new {
+                        X = 31,
+                        Y = scatterLocation.Y
+                    }
+                });
+        }
+
+        [Fact]
+        public void GhostShouldScatter7SecondsAfterChase()
+        {
+            _gameSettings.InitialGameStatus = "Initial";
+            _gameSettings.PacMan = new PacMan((29, 10), Direction.Left);
+            var startingLocation = new CellLocation(30, 1);
+            var scatterLocation = new CellLocation(1, 1);
+
+            var strategy = new GhostGoesRightStrategy();
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", startingLocation, Direction.Right, scatterLocation, strategy));
+
+            var game = new Game(_gameClock, _gameSettings);
+
+            var now = DateTime.UtcNow;
+            _gameClock.Tick(now);
+            _gameClock.Tick(now);
+
+            if (game.Ghosts.Values.First().Location.X != 29 || game.Ghosts.Values.First().Location.Y != 1)
+                throw new System.Exception($"Ghost should be at 29,1 not {game.Ghosts.Values.First().Location.X}, {game.Ghosts.Values.First().Location.Y}");
+
+            _gameClock.Tick(now.AddSeconds(_gameSettings.InitialScatterTimeInSeconds + 1));
+            _gameClock.Tick(now.AddSeconds(_gameSettings.InitialScatterTimeInSeconds + 2));
+
+            if (game.Ghosts.Values.First().Location.X != 31 || game.Ghosts.Values.First().Location.Y != 1)
+                throw new System.Exception($"Ghost should be at 31,1 not {game.Ghosts.Values.First().Location.X}, {game.Ghosts.Values.First().Location.Y}");
+
+            now = now.AddSeconds(_gameSettings.InitialScatterTimeInSeconds);
+
+            _gameClock.Tick(now.AddSeconds(_gameSettings.ChaseTimeInSeconds + 1));
+            _gameClock.Tick(now.AddSeconds(_gameSettings.ChaseTimeInSeconds + 2));
+
+            game.Ghosts.Values.First()
+                .Should().BeEquivalentTo(new
+                {
+                    Location = new {
+                        X = 29,
+                        Y = 1
+                    }
+                });
+        }
+
     }
 }

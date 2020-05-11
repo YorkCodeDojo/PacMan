@@ -34,5 +34,10 @@ namespace NPacMan.Game
         public IReadOnlyCollection<CellLocation> Doors { get; }
         public string InitialGameStatus { get; } = "Alive";
         public int InitialLives { get; } = 3;
+
+        public int InitialScatterTimeInSeconds { get; } = 7;
+
+        public int ChaseTimeInSeconds { get; } = 7;
+
     }
 }

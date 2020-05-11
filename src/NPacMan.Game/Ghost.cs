@@ -45,11 +45,18 @@
             return new Ghost(Name, Home, newLocation, newDirection ?? Direction, ScatterTarget, Strategy, CurrentStrategy);
         }
 
+        public Ghost Chase()
+        {
+            var strategy = Strategy;
+            
+            return new Ghost(Name, Home, Location, Direction.Opposite(), ScatterTarget, Strategy, currentStrategy: strategy);
+        }
+
         public Ghost Scatter()
         {
             var strategy = new DirectToStrategy(new DirectToGhostScatterTarget(this));
             
-            return new Ghost(Name, Home, Location, Direction, ScatterTarget, Strategy, currentStrategy: strategy);
+            return new Ghost(Name, Home, Location, Direction.Opposite(), ScatterTarget, Strategy, currentStrategy: strategy);
         }
 
         public Ghost SetToHome()
