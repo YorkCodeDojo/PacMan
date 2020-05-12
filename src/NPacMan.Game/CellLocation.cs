@@ -18,6 +18,8 @@ namespace NPacMan.Game
             y = Y;
         }
 
+        public override string ToString() => $"{X},{Y}";
+        
         public static CellLocation TopLeft => new CellLocation(0, 0);
 
         public CellLocation WithNewX(int newX) => new CellLocation(newX, Y);

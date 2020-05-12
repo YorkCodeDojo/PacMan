@@ -6,7 +6,7 @@ using Xunit;
 
 namespace NPacMan.Game.Tests.GameTests
 {
-    public class GhostTests
+    public partial class GhostTests
     {
         private readonly TestGameSettings _gameSettings;
         private readonly TestGameClock _gameClock;
@@ -185,20 +185,21 @@ namespace NPacMan.Game.Tests.GameTests
 
             var now = DateTime.UtcNow;
             _gameClock.Tick(now);
-            _gameClock.Tick(now);
+            EnsureThat(game.Ghosts.Values.First()).IsAt(startingLocation);
 
-            if (game.Ghosts.Values.First().Location.X != 29 || game.Ghosts.Values.First().Location.Y != 1)
-                throw new System.Exception($"Ghost should be at 29,1 not {game.Ghosts.Values.First().Location.X}, {game.Ghosts.Values.First().Location.Y}");
+            _gameClock.Tick(now);
+            EnsureThat(game.Ghosts.Values.First()).IsAt(startingLocation.Left);
 
             _gameClock.Tick(now.AddSeconds(_gameSettings.InitialScatterTimeInSeconds + 1));
-            _gameClock.Tick(now.AddSeconds(_gameSettings.InitialScatterTimeInSeconds + 2));
+            EnsureThat(game.Ghosts.Values.First()).IsAt(startingLocation.Left.Right);
 
-            if (game.Ghosts.Values.First().Location.X != 31 || game.Ghosts.Values.First().Location.Y != 1)
-                throw new System.Exception($"Ghost should be at 31,1 not {game.Ghosts.Values.First().Location.X}, {game.Ghosts.Values.First().Location.Y}");
+            _gameClock.Tick(now.AddSeconds(_gameSettings.InitialScatterTimeInSeconds + 2));
+            EnsureThat(game.Ghosts.Values.First()).IsAt(startingLocation.Left.Right.Right);
 
             now = now.AddSeconds(_gameSettings.InitialScatterTimeInSeconds);
-
             _gameClock.Tick(now.AddSeconds(_gameSettings.ChaseTimeInSeconds + 1));
+            EnsureThat(game.Ghosts.Values.First()).IsAt(startingLocation.Left.Right.Right.Left);
+
             _gameClock.Tick(now.AddSeconds(_gameSettings.ChaseTimeInSeconds + 2));
 
             game.Ghosts.Values.First()
@@ -210,6 +211,8 @@ namespace NPacMan.Game.Tests.GameTests
                     }
                 });
         }
+
+        private EnsureThatGhost EnsureThat(Ghost ghost) => new EnsureThatGhost(ghost);
 
     }
 }
