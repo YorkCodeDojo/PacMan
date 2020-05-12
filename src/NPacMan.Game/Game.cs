@@ -103,7 +103,7 @@ namespace NPacMan.Game
 
         private void Tick(DateTime now)
         {
-            _gameStateMachine.RaiseEvent(_gameState, _gameStateMachine.Tick, new Tick { Now = now });
+            _gameStateMachine?.RaiseEvent(_gameState, _gameStateMachine.Tick, new Tick { Now = now });
         }
 
         private bool HasDied()
