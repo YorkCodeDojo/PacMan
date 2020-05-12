@@ -6,7 +6,7 @@ using Xunit;
 
 namespace NPacMan.Game.Tests.GameTests
 {
-    public partial class GhostTests
+    public class GhostTests
     {
         private readonly TestGameSettings _gameSettings;
         private readonly TestGameClock _gameClock;
@@ -185,24 +185,24 @@ namespace NPacMan.Game.Tests.GameTests
 
             var now = DateTime.UtcNow;
             _gameClock.Tick(now);
-            EnsureThat(game.Ghosts.Values.First()).IsAt(startingLocation);
+            WeExpectThat(ourGhost()).IsAt(startingLocation);
 
             _gameClock.Tick(now);
-            EnsureThat(game.Ghosts.Values.First()).IsAt(startingLocation.Left);
+            WeExpectThat(ourGhost()).IsAt(startingLocation.Left);
 
             _gameClock.Tick(now.AddSeconds(_gameSettings.InitialScatterTimeInSeconds + 1));
-            EnsureThat(game.Ghosts.Values.First()).IsAt(startingLocation.Left.Right);
+            WeExpectThat(ourGhost()).IsAt(startingLocation.Left.Right);
 
             _gameClock.Tick(now.AddSeconds(_gameSettings.InitialScatterTimeInSeconds + 2));
-            EnsureThat(game.Ghosts.Values.First()).IsAt(startingLocation.Left.Right.Right);
+            WeExpectThat(ourGhost()).IsAt(startingLocation.Left.Right.Right);
 
             now = now.AddSeconds(_gameSettings.InitialScatterTimeInSeconds);
             _gameClock.Tick(now.AddSeconds(_gameSettings.ChaseTimeInSeconds + 1));
-            EnsureThat(game.Ghosts.Values.First()).IsAt(startingLocation.Left.Right.Right.Left);
+            WeExpectThat(ourGhost()).IsAt(startingLocation.Left.Right.Right.Left);
 
             _gameClock.Tick(now.AddSeconds(_gameSettings.ChaseTimeInSeconds + 2));
 
-            game.Ghosts.Values.First()
+            ourGhost()
                 .Should().BeEquivalentTo(new
                 {
                     Location = new {
@@ -210,9 +210,12 @@ namespace NPacMan.Game.Tests.GameTests
                         Y = 1
                     }
                 });
+
+
+            Ghost ourGhost() => game.Ghosts.Values.First();
         }
 
-        private EnsureThatGhost EnsureThat(Ghost ghost) => new EnsureThatGhost(ghost);
+        private EnsureThatGhost WeExpectThat(Ghost ghost) => new EnsureThatGhost(ghost);
 
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NPacMan.Game.Tests.GameTests
+namespace NPacMan.Game.Tests
 {
     public class EnsureThatGhost
     {
@@ -13,7 +13,7 @@ namespace NPacMan.Game.Tests.GameTests
 
         internal void IsAt(CellLocation expectedLocation)
         {
-            if (_ghost.Location.X != expectedLocation.X || _ghost.Location.Y != expectedLocation.Y)
+            if (_ghost.Location != expectedLocation)
                 throw new Exception($"Ghost should be at {expectedLocation} not {_ghost.Location}");
         }
 
