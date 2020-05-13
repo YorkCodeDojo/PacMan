@@ -14,4 +14,10 @@
     <PackageReference Include="Automatonymous" Version="4.2.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="System.CodeDom">
+      <HintPath>..\..\..\..\..\Program Files\dotnet\packs\Microsoft.WindowsDesktop.App.Ref\3.1.0\ref\netcoreapp3.1\System.CodeDom.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>
