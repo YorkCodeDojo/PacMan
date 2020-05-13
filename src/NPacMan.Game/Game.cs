@@ -90,7 +90,7 @@ namespace NPacMan.Game
 
         private async Task Tick(DateTime now)
         {
-            await _gameStateMachine.RaiseEvent(_gameState, _gameStateMachine.Tick, new Tick { Now = now });
+            await _gameStateMachine.RaiseEvent(_gameState, _gameStateMachine.Tick, new Tick(now));
         }
 
         private bool HasDied()
@@ -163,7 +163,7 @@ namespace NPacMan.Game
 
             if (HasDied())
             {
-                await _gameStateMachine.RaiseEvent(_gameState, _gameStateMachine.PacManCaughtByGhost, new Tick { Now = now });
+                await _gameStateMachine.RaiseEvent(_gameState, _gameStateMachine.PacManCaughtByGhost, new Tick(now));
             }
             else if (Coins.Contains(newPacMan.Location))
             {
@@ -182,7 +182,7 @@ namespace NPacMan.Game
             ApplyToGhosts(ghost => ghost.Move(this));
             if (HasDied())
             {
-                await _gameStateMachine.RaiseEvent(_gameState, _gameStateMachine.PacManCaughtByGhost, new Tick { Now = now });
+                await _gameStateMachine.RaiseEvent(_gameState, _gameStateMachine.PacManCaughtByGhost, new Tick(now));
             }
         }
     }

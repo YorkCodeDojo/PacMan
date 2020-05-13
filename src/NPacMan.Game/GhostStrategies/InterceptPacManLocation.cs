@@ -2,7 +2,7 @@ namespace NPacMan.Game
 {
     public class InterceptPacManLocation : IDirectToLocation
     {
-        private string _ghostName;
+        private readonly string _ghostName;
         public InterceptPacManLocation(string ghostName)
         {
             _ghostName = ghostName;
