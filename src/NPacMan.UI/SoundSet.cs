@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
-using NPacMan.Game;
 
 namespace NPacMan.UI
 {
-    public class SoundSet : ISoundSet
+    public class SoundSet
     {
         private readonly Sound _eatFruit;
         private readonly Sound _chomp;
@@ -25,12 +21,12 @@ namespace NPacMan.UI
             // Whether the sound can interrupt the current sound
 
             _eatFruit = new Sound("eatfruit", 1000, true);
-            _chomp = new Sound("chomp",600,false);
-            _death = new Sound("death",2000,true);
-            _beginning = new Sound("beginning",4000,true);
-            _intermission = new Sound("intermission",1000,true);
-            _extraPac = new Sound("extrapac",500,true);
-            _eatGhost = new Sound("eatghost",1000,true);
+            _chomp = new Sound("chomp", 600, false);
+            _death = new Sound("death", 2000, true);
+            _beginning = new Sound("beginning", 4000, true);
+            _intermission = new Sound("intermission", 1000, true);
+            _extraPac = new Sound("extrapac", 500, true);
+            _eatGhost = new Sound("eatghost", 1000, true);
 
             _nextSound = DateTime.Now;
         }
@@ -43,7 +39,7 @@ namespace NPacMan.UI
                 _nextSound = DateTime.Now.Add(sound.RepeatTime);
             }
         }
-        
+
         public void Chomp()
         {
             Play(_chomp);
