@@ -4,6 +4,10 @@ namespace NPacMan.Game
 {
     internal class Tick
     {
-        public DateTime Now { get; set; }
+        public Tick(DateTime now)
+        {
+            Now = now;
+        }
+        public DateTime Now { get; }
     }
 }

@@ -5,7 +5,7 @@ namespace NPacMan.Game
     internal class GameStateMachine :
         AutomatonymousStateMachine<GameState>
     {
-        public GameStateMachine(IGameActions game, IGameSettings settings)
+        public GameStateMachine(IGameActions game, IGameSettings settings, ISoundSet soundSet)
         {
             InstanceState(x => x.Status);
 
@@ -34,8 +34,8 @@ namespace NPacMan.Game
                     .ThenAsync(async context => await game.MoveGhosts(context.Data.Now))
                     .Then(context => game.MovePacMan(context.Data.Now)),
                 When(CoinEaten)
-                    .Then(context => context.Instance.Score += 10),
-                //.Then(context => game._soundSet.Chomp()),
+                    .Then(context => context.Instance.Score += 10)
+                    .Then(context => soundSet.Chomp()),
                 When(PacManCaughtByGhost)
                     .Then(context => context.Instance.Lives -= 1)
                     .Then(context => context.Instance.TimeToChangeState = context.Data.Now.AddSeconds(4))
@@ -45,7 +45,7 @@ namespace NPacMan.Game
                 When(Tick, context => context.Data.Now >= context.Instance.TimeToChangeState)
                     .Then(context => game.HideGhosts(context.Instance))
                     .Then(context => context.Instance.TimeToChangeState = context.Data.Now.AddSeconds(4))
-                    //.Then(context => game._soundSet.Death())
+                    .Then(context => soundSet.Death())
                     .IfElse(context => context.Instance.Lives > 0,
                         binder => binder.TransitionTo(Respawning),
                         binder => binder.Finalize()));

@@ -15,11 +15,12 @@ namespace NPacMan.Game
         private List<CellLocation> _collectedCoins;
         private Dictionary<string, Ghost> _ghosts;
 
-        private ISoundSet _soundSet;
+        private readonly ISoundSet _soundSet;
 
-        private GameState _gameState;
+        private readonly GameState _gameState;
 
-        private GameStateMachine _gameStateMachine;
+        private readonly GameStateMachine _gameStateMachine;
+
         public Game(IGameClock gameClock, IGameSettings settings, ISoundSet soundSet)
         {
             _settings = settings;
@@ -27,7 +28,7 @@ namespace NPacMan.Game
             _collectedCoins = new List<CellLocation>();
             _ghosts = settings.Ghosts.ToDictionary(x => x.Name, x => x);
             _soundSet = soundSet;
-            _gameStateMachine = new GameStateMachine(this, settings);
+            _gameStateMachine = new GameStateMachine(this, settings, soundSet);
             _gameState = new GameState(settings);
 
             // Play the beginning sound
@@ -49,8 +50,10 @@ namespace NPacMan.Game
         }
 
         public PacMan PacMan { get; private set; }
+
         public IReadOnlyCollection<CellLocation> Coins
             => _settings.Coins.Except(_collectedCoins).ToList().AsReadOnly();
+
         public IReadOnlyCollection<CellLocation> Walls
             => _settings.Walls;
 
