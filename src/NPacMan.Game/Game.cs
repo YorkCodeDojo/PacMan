@@ -178,6 +178,8 @@ namespace NPacMan.Game
                         .Then(context => game.MovePacManHome())
                         .Then(context => game.ShowGhosts())
                         .TransitionTo(Alive));
+
+                During(Dead, Ignore(Tick));
             }
 
 
@@ -186,6 +188,7 @@ namespace NPacMan.Game
             public State InitialScatter { get; private set; } = null!;
             public State Dying { get; private set; } = null!;
             public State Respawning { get; private set; } = null!;
+            public State Dead { get; private set; } = null!;
             public Event<Tick> Tick { get; private set; } = null!;
             public Event<Tick> PacManCaughtByGhost { get; private set; } = null!;
             public Event CoinEaten { get; private set; } = null!;
