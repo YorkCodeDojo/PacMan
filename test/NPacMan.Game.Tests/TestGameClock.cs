@@ -1,24 +1,28 @@
 using System;
+using System.Threading.Tasks;
 
 namespace NPacMan.Game.Tests
 {
     public class TestGameClock : IGameClock
     {
-        private Action<DateTime>? _action;
+        private Func<DateTime, Task>? _action;
 
-        public void Subscribe(Action<DateTime> action)
+        public void Subscribe(Func<DateTime, Task> action)
         {
             _action = action;
         }
 
-        public void Tick()
+        public async Task Tick()
         {
-            Tick(DateTime.UtcNow);
+            await Tick(DateTime.UtcNow);
         }
 
-        public void Tick(DateTime now)
+        public async Task Tick(DateTime now)
         {
-            _action?.Invoke(now);
+            if (_action is null)
+                return;
+
+            await _action.Invoke(now);
         }
     }
 }

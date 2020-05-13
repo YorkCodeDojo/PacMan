@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
 
@@ -34,14 +35,14 @@ namespace NPacMan.Game.Tests.GameTests
         [InlineData(Direction.Down, 0, +1)]
         [InlineData(Direction.Left, -1, 0)]
         [InlineData(Direction.Right, +1, 0)]
-        public void PacManWalksInFacingDirection(Direction directionToFace, int changeInX, int changeInY)
+        public async Task PacManWalksInFacingDirection(Direction directionToFace, int changeInX, int changeInY)
         {
             var game = new Game(_gameClock, _gameSettings);
             var (x, y) = game.PacMan.Location;
 
             game.ChangeDirection(directionToFace);
 
-            _gameClock.Tick();
+            await _gameClock.Tick();
 
             game.PacMan.Should().BeEquivalentTo(new
             {
@@ -55,7 +56,7 @@ namespace NPacMan.Game.Tests.GameTests
         [InlineData(Direction.Down, 0, +1)]
         [InlineData(Direction.Left, -1, 0)]
         [InlineData(Direction.Right, +1, 0)]
-        public void PacManCannotMoveIntoWalls(Direction directionToFace, int createWallXOffset, int createWallYOffset)
+        public async Task PacManCannotMoveIntoWalls(Direction directionToFace, int createWallXOffset, int createWallYOffset)
         {
             var game = new Game(_gameClock, _gameSettings);
             var x = game.PacMan.Location.X;
@@ -66,7 +67,7 @@ namespace NPacMan.Game.Tests.GameTests
 
             _gameSettings.Walls.Add((x + createWallXOffset, y + createWallYOffset));
 
-            _gameClock.Tick();
+            await _gameClock.Tick();
 
             game.PacMan.Should().BeEquivalentTo(new
             {
@@ -78,7 +79,7 @@ namespace NPacMan.Game.Tests.GameTests
         }
 
         [Fact]
-        public void PacManIsTeleportedWhenYouWalkIntoAPortal()
+        public async Task PacManIsTeleportedWhenYouWalkIntoAPortal()
         {
             var game = new Game(_gameClock, _gameSettings);
             var x = game.PacMan.Location.X;
@@ -89,7 +90,7 @@ namespace NPacMan.Game.Tests.GameTests
 
             game.ChangeDirection(Direction.Left);
 
-            _gameClock.Tick();
+            await _gameClock.Tick();
 
             game.PacMan.Should().BeEquivalentTo(new
             {
@@ -104,7 +105,7 @@ namespace NPacMan.Game.Tests.GameTests
         [InlineData(GameStatus.Dead)]
         [InlineData(GameStatus.Dying)]
         [InlineData(GameStatus.Respawning)]
-        public void PacManShouldNotMoveInCertainStates(GameStatus state)
+        public async Task PacManShouldNotMoveInCertainStates(GameStatus state)
         {
             var x = 1;
             var y = 1;
@@ -113,7 +114,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.PacMan = new PacMan((x, y), Direction.Down);
 
             var game = new Game(_gameClock, _gameSettings);
-            _gameClock.Tick();
+            await _gameClock.Tick();
 
             game.PacMan
                 .Should().BeEquivalentTo(new
@@ -126,29 +127,29 @@ namespace NPacMan.Game.Tests.GameTests
         }
 
         [Fact]
-        public void PacManShouldRespawnAfter4Seconds()
+        public async Task PacManShouldRespawnAfter4Seconds()
         {
             _gameSettings.PacMan = new PacMan((1, 1), Direction.Down);
             _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(1, 2), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
 
             var game = new Game(_gameClock, _gameSettings);
             var now = DateTime.UtcNow;
-            _gameClock.Tick(now);
+            await _gameClock.Tick(now);
 
-            _gameClock.Tick(now.AddSeconds(1));
-            _gameClock.Tick(now.AddSeconds(2));
-            _gameClock.Tick(now.AddSeconds(3));
+            await _gameClock.Tick(now.AddSeconds(1));
+            await _gameClock.Tick(now.AddSeconds(2));
+            await _gameClock.Tick(now.AddSeconds(3));
 
             if (game.Status != GameStatus.Dying.ToString())
                 throw new Exception($"Invalid Game State {game.Status:G}");
 
-            _gameClock.Tick(now.AddSeconds(4));
+            await _gameClock.Tick(now.AddSeconds(4));
 
             game.Status.Should().Be(GameStatus.Respawning.ToString());
         }
 
         [Fact]
-        public void PacManShouldBeAliveAfter4SecondsWhenInRespawning()
+        public async Task PacManShouldBeAliveAfter4SecondsWhenInRespawning()
         {
             _gameSettings.PacMan = new PacMan((5, 2), Direction.Left);
             _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(1, 2), Direction.Right, CellLocation.TopLeft, new GhostGoesRightStrategy()));
@@ -156,34 +157,34 @@ namespace NPacMan.Game.Tests.GameTests
             var game = new Game(_gameClock, _gameSettings);
             var now = DateTime.UtcNow;
 
-            _gameClock.Tick(now);
-            _gameClock.Tick(now);
-            _gameClock.Tick(now.AddSeconds(4));
+            await _gameClock.Tick(now);
+            await _gameClock.Tick(now);
+            await _gameClock.Tick(now.AddSeconds(4));
 
             if (game.Status != GameStatus.Respawning.ToString())
                 throw new Exception($"Invalid Game State {game.Status:G}");
 
-            _gameClock.Tick(now.AddSeconds(8));
+            await _gameClock.Tick(now.AddSeconds(8));
 
             game.Status.Should().Be(GameStatus.Alive.ToString());
         }
 
         [Fact]
-        public void PacManShouldBeBackAtHomeLocationAfter4SecondsWhenBecomingBackAlive()
+        public async Task PacManShouldBeBackAtHomeLocationAfter4SecondsWhenBecomingBackAlive()
         {
             _gameSettings.PacMan = new PacMan((5, 2), Direction.Left);
             _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(1, 2), Direction.Right, CellLocation.TopLeft, new GhostGoesRightStrategy()));
 
             var game = new Game(_gameClock, _gameSettings);
             var now = DateTime.UtcNow;
-            _gameClock.Tick(now);
-            _gameClock.Tick(now);
-            _gameClock.Tick(now.AddSeconds(4));
+            await _gameClock.Tick(now);
+            await _gameClock.Tick(now);
+            await _gameClock.Tick(now.AddSeconds(4));
 
             if (game.Status != GameStatus.Respawning.ToString())
                 throw new Exception($"Invalid Game State {game.Status:G}");
 
-            _gameClock.Tick(now.AddSeconds(8));
+            await _gameClock.Tick(now.AddSeconds(8));
 
             if (game.Status != GameStatus.Alive.ToString())
                 throw new Exception($"Invalid Game State {game.Status:G}");

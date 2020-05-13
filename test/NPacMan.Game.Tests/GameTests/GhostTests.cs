@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Xunit;
@@ -18,14 +19,14 @@ namespace NPacMan.Game.Tests.GameTests
         }
 
         [Fact]
-        public void GhostMovesInDirectionOfStrategy()
+        public async Task GhostMovesInDirectionOfStrategy()
         {
             var strategy = new GhostGoesRightStrategy();
             _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(0, 0), Direction.Left, CellLocation.TopLeft, strategy));
 
             var game = new Game(_gameClock, _gameSettings);
 
-            _gameClock.Tick();
+            await _gameClock.Tick();
             game.Ghosts["Ghost1"].Should().BeEquivalentTo(new
             {
                 Location = new {
@@ -37,7 +38,7 @@ namespace NPacMan.Game.Tests.GameTests
 
 
         [Fact]
-        public void GhostShouldNotMoveWhenPacManIsDying()
+        public async Task GhostShouldNotMoveWhenPacManIsDying()
         {
             var x = 1;
             var y = 1;
@@ -46,7 +47,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.PacMan = new PacMan((3, 3), Direction.Down);
 
             var game = new Game(_gameClock, _gameSettings);
-            _gameClock.Tick();
+            await _gameClock.Tick();
 
             using var _ = new AssertionScope();
             game.Ghosts.Values.First()
@@ -62,7 +63,7 @@ namespace NPacMan.Game.Tests.GameTests
 
 
         [Fact]
-        public void GhostShouldBeHiddenWhenPacManIsReSpawning()
+        public async Task GhostShouldBeHiddenWhenPacManIsReSpawning()
         {
             _gameSettings.PacMan = new PacMan((3, 2), Direction.Left);
             var homeLocation = new CellLocation(1, 2);
@@ -72,14 +73,14 @@ namespace NPacMan.Game.Tests.GameTests
             var game = new Game(_gameClock, _gameSettings);
             var now = DateTime.UtcNow;
 
-            _gameClock.Tick(now);
-            _gameClock.Tick(now.AddSeconds(4));
+            await _gameClock.Tick(now);
+            await _gameClock.Tick(now.AddSeconds(4));
 
             game.Ghosts.Should().BeEmpty();
         }
 
         [Fact]
-        public void GhostShouldBeBackAtHomeAfterPacManDiesAndComesBackToLife()
+        public async Task GhostShouldBeBackAtHomeAfterPacManDiesAndComesBackToLife()
         {
             _gameSettings.PacMan = new PacMan((3, 2), Direction.Left);
             var homeLocation = new CellLocation(1, 2);
@@ -89,13 +90,13 @@ namespace NPacMan.Game.Tests.GameTests
             var game = new Game(_gameClock, _gameSettings);
             var now = DateTime.UtcNow;
 
-            _gameClock.Tick(now);
-            _gameClock.Tick(now.AddSeconds(4));
+            await _gameClock.Tick(now);
+            await _gameClock.Tick(now.AddSeconds(4));
 
             if (game.Status != GameStatus.Respawning.ToString())
                 throw new Exception($"Invalid Game State {game.Status:G} Should be Respawning");
 
-            _gameClock.Tick(now.AddSeconds(8));
+            await _gameClock.Tick(now.AddSeconds(8));
             
             if (game.Status != GameStatus.Alive.ToString())
                 throw new Exception($"Invalid Game State {game.Status:G} Should be Alive");
@@ -111,7 +112,7 @@ namespace NPacMan.Game.Tests.GameTests
         }
 
         [Fact]
-        public void GhostShouldScatterToStartWith()
+        public async Task GhostShouldScatterToStartWith()
         {
             _gameSettings.InitialGameStatus = "Initial";
             _gameSettings.PacMan = new PacMan((10, 10), Direction.Left);
@@ -123,9 +124,9 @@ namespace NPacMan.Game.Tests.GameTests
 
             var game = new Game(_gameClock, _gameSettings);
 
-            _gameClock.Tick();
-            _gameClock.Tick();
-            _gameClock.Tick();
+            await _gameClock.Tick();
+            await _gameClock.Tick();
+            await _gameClock.Tick();
 
             game.Ghosts.Values.First()
                 .Should().BeEquivalentTo(new
@@ -138,7 +139,7 @@ namespace NPacMan.Game.Tests.GameTests
         }
 
         [Fact]
-        public void GhostShouldChaseAfter7Seconds()
+        public async Task GhostShouldChaseAfter7Seconds()
         {
             _gameSettings.InitialGameStatus = "Initial";
             _gameSettings.PacMan = new PacMan((29, 10), Direction.Left);
@@ -151,14 +152,14 @@ namespace NPacMan.Game.Tests.GameTests
             var game = new Game(_gameClock, _gameSettings);
 
             var now = DateTime.UtcNow;
-            _gameClock.Tick(now);
-            _gameClock.Tick(now);
+            await _gameClock.Tick(now);
+            await _gameClock.Tick(now);
 
             if (game.Ghosts.Values.First().Location.X != 29 || game.Ghosts.Values.First().Location.Y != 1)
                 throw new System.Exception($"Ghost should be at 29,1 not {game.Ghosts.Values.First().Location.X}, {game.Ghosts.Values.First().Location.Y}");
 
-            _gameClock.Tick(now.AddSeconds(_gameSettings.InitialScatterTimeInSeconds + 1));
-            _gameClock.Tick(now.AddSeconds(_gameSettings.InitialScatterTimeInSeconds + 2));
+            await _gameClock.Tick(now.AddSeconds(_gameSettings.InitialScatterTimeInSeconds + 1));
+            await _gameClock.Tick(now.AddSeconds(_gameSettings.InitialScatterTimeInSeconds + 2));
 
             game.Ghosts.Values.First()
                 .Should().BeEquivalentTo(new
@@ -171,7 +172,7 @@ namespace NPacMan.Game.Tests.GameTests
         }
 
         [Fact]
-        public void GhostShouldScatter7SecondsAfterChase()
+        public async Task GhostShouldScatter7SecondsAfterChase()
         {
             _gameSettings.InitialGameStatus = "Initial";
             _gameSettings.PacMan = new PacMan((29, 10), Direction.Left);
@@ -184,22 +185,22 @@ namespace NPacMan.Game.Tests.GameTests
             var game = new Game(_gameClock, _gameSettings);
 
             var now = DateTime.UtcNow;
-            _gameClock.Tick(now);
-            _gameClock.Tick(now);
+            await _gameClock.Tick(now);
+            await _gameClock.Tick(now);
 
             if (game.Ghosts.Values.First().Location.X != 29 || game.Ghosts.Values.First().Location.Y != 1)
                 throw new System.Exception($"Ghost should be at 29,1 not {game.Ghosts.Values.First().Location.X}, {game.Ghosts.Values.First().Location.Y}");
 
-            _gameClock.Tick(now.AddSeconds(_gameSettings.InitialScatterTimeInSeconds + 1));
-            _gameClock.Tick(now.AddSeconds(_gameSettings.InitialScatterTimeInSeconds + 2));
+            await _gameClock.Tick(now.AddSeconds(_gameSettings.InitialScatterTimeInSeconds + 1));
+            await _gameClock.Tick(now.AddSeconds(_gameSettings.InitialScatterTimeInSeconds + 2));
 
             if (game.Ghosts.Values.First().Location.X != 31 || game.Ghosts.Values.First().Location.Y != 1)
                 throw new System.Exception($"Ghost should be at 31,1 not {game.Ghosts.Values.First().Location.X}, {game.Ghosts.Values.First().Location.Y}");
 
             now = now.AddSeconds(_gameSettings.InitialScatterTimeInSeconds);
 
-            _gameClock.Tick(now.AddSeconds(_gameSettings.ChaseTimeInSeconds + 1));
-            _gameClock.Tick(now.AddSeconds(_gameSettings.ChaseTimeInSeconds + 2));
+            await _gameClock.Tick(now.AddSeconds(_gameSettings.ChaseTimeInSeconds + 1));
+            await _gameClock.Tick(now.AddSeconds(_gameSettings.ChaseTimeInSeconds + 2));
 
             game.Ghosts.Values.First()
                 .Should().BeEquivalentTo(new
