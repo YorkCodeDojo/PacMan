@@ -35,6 +35,7 @@ namespace NPacMan.Game.Tests.GameTests
         public async Task IncrementsScoreBy10WhenCoinCollected()
         {
             var game = new Game(_gameClock, _gameSettings);
+            game.StartGame(); 
             var (x, y) = game.PacMan.Location;
 
             game.ChangeDirection(Direction.Down);
@@ -49,6 +50,7 @@ namespace NPacMan.Game.Tests.GameTests
         public async Task CannotCollectTheSameCoinTwice()
         {
             var game = new Game(_gameClock, _gameSettings);
+            game.StartGame();
             var (x, y) = game.PacMan.Location;
 
             game.ChangeDirection(Direction.Down);
@@ -76,6 +78,7 @@ namespace NPacMan.Game.Tests.GameTests
         public async Task IncrementsScoreBy20WhenTwoCoinsAreCollected()
         {
             var game = new Game(_gameClock, _gameSettings);
+            game.StartGame(); 
             var (x, y) = game.PacMan.Location;
 
             game.ChangeDirection(Direction.Down);
@@ -93,6 +96,7 @@ namespace NPacMan.Game.Tests.GameTests
         public async Task CoinShouldBeCollected()
         {
             var game = new Game(_gameClock, _gameSettings);
+            game.StartGame(); 
             var (x, y) = game.PacMan.Location;
 
             game.ChangeDirection(Direction.Down);
@@ -108,6 +112,7 @@ namespace NPacMan.Game.Tests.GameTests
         public async Task JustTheCollectedCoinShouldBeCollected()
         {
             var game = new Game(_gameClock, _gameSettings);
+            game.StartGame(); 
             var (x, y) = game.PacMan.Location;
 
             game.ChangeDirection(Direction.Down);
@@ -131,7 +136,7 @@ namespace NPacMan.Game.Tests.GameTests
 
             var gameClock = new TestGameClock();
             var game = new Game(gameClock, gameBoard);
-
+            game.StartGame();
             await gameClock.Tick();
 
             game.Coins.Should().BeEquivalentTo(
@@ -151,6 +156,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Coins.Add((x, y));
 
             var game = new Game(_gameClock, _gameSettings);
+            game.StartGame(); 
             var score = game.Score;
 
             game.ChangeDirection(Direction.Right);
@@ -167,11 +173,11 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public async Task WhenPacManEatsACoinTheGameNotificationShouldFire()
         {
-            var gameNotifications = new GameNotifications();
-            var notificationTriggered = 0;
-            gameNotifications.Subscribe(GameNotification.EatCoin, () => notificationTriggered++);
+            var numberOfNotificationsTriggered = 0;
 
-            var game = new Game(_gameClock, _gameSettings, gameNotifications);
+            var game = new Game(_gameClock, _gameSettings);
+            game.Subscribe(GameNotification.EatCoin, () => numberOfNotificationsTriggered++);
+            game.StartGame(); 
             var (x, y) = game.PacMan.Location;
 
             game.ChangeDirection(Direction.Down);
@@ -180,7 +186,7 @@ namespace NPacMan.Game.Tests.GameTests
 
             await _gameClock.Tick();
 
-            notificationTriggered.Should().Be(1);
+            numberOfNotificationsTriggered.Should().Be(1);
         }
     }
 }

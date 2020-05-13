@@ -11,37 +11,48 @@ namespace NPacMan.Game
     {
         public int Score => _gameState.Score;
 
+        private readonly IGameClock _gameClock;
         private readonly IGameSettings _settings;
         private List<CellLocation> _collectedCoins;
         private Dictionary<string, Ghost> _ghosts;
 
-        private readonly GameNotifications _gameNotifications;
+        private readonly GameNotifications _gameNotifications = new GameNotifications();
 
         private readonly GameState _gameState;
 
         private readonly GameStateMachine _gameStateMachine;
 
-        public Game(IGameClock gameClock, IGameSettings settings, GameNotifications? gameNotifications = null)
+        public Game(IGameClock gameClock, IGameSettings settings)
         {
+            _gameClock = gameClock;
             _settings = settings;
             PacMan = settings.PacMan;
             _collectedCoins = new List<CellLocation>();
             _ghosts = settings.Ghosts.ToDictionary(x => x.Name, x => x);
-            _gameNotifications = gameNotifications ?? new GameNotifications();
             _gameStateMachine = new GameStateMachine(this, settings, _gameNotifications);
             _gameState = new GameState(settings);
-
-            // Play the beginning sound
-            gameClock.Subscribe(Tick);
-            _gameNotifications.Publish(GameNotification.Beginning);
         }
 
-        public static Game Create(GameNotifications gameNotifications)
+        public Game StartGame()
+        {
+            _gameClock.Subscribe(Tick);
+
+            return this;
+        }
+
+        public Game Subscribe(GameNotification gameNotification, Action action)
+        {
+            _gameNotifications.Subscribe(gameNotification, action);
+            
+            return this;
+        }
+
+        public static Game Create()
         {
             var filename = "board.txt";
             var gameSettings = GameSettingsLoader.LoadFromFile(filename);
 
-            return new Game(new GameClock(), gameSettings, gameNotifications);
+            return new Game(new GameClock(), gameSettings);
         }
 
         public PacMan PacMan { get; private set; }

@@ -16,7 +16,7 @@ namespace NPacMan.Game
         EatGhost,
     }
 
-    public class GameNotifications
+    internal class GameNotifications
     {
         private readonly Dictionary<GameNotification, List<Action>> _registrations = new Dictionary<GameNotification, List<Action>>();
 

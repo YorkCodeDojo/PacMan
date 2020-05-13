@@ -14,6 +14,7 @@ namespace NPacMan.Game
                     .Then(context => game.MoveGhostsHome())
                     .Then(context => game.ShowGhosts(context.Instance))
                     .Then(context => game.ScatterGhosts())
+                    .Then(context => gameNotifications.Publish(GameNotification.Beginning))
                     .Then(context => context.Instance.TimeToChangeState = context.Data.Now.AddSeconds(settings.InitialScatterTimeInSeconds))
                     .TransitionTo(Scatter));
 

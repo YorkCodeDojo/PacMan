@@ -1,12 +1,7 @@
-﻿using System;
+﻿using NPacMan.Game;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using NPacMan.Game;
 
 namespace NPacMan.UI
 {
@@ -15,28 +10,25 @@ namespace NPacMan.UI
         private readonly Timer _renderLoop = new Timer();
         private readonly BoardRenderer _boardRenderer = new BoardRenderer();
         private readonly GraphicsBuffers _graphicsBuffers;
-
         private readonly Game.Game _game;
-
 
         public Form1()
         {
             InitializeComponent();
 
-            var notifications = new GameNotifications();
             var soundSet = new SoundSet();
 
-            notifications.Subscribe(GameNotification.Beginning, soundSet.Beginning);
-            notifications.Subscribe(GameNotification.EatCoin, soundSet.Chomp);
-            notifications.Subscribe(GameNotification.Dying, soundSet.Death);
-            notifications.Subscribe(GameNotification.EatFruit, soundSet.EatFruit);
-            notifications.Subscribe(GameNotification.EatGhost, soundSet.EatGhost);
-            notifications.Subscribe(GameNotification.ExtraPac, soundSet.ExtraPac);
-            notifications.Subscribe(GameNotification.Intermission, soundSet.Intermission);
+            _game = Game.Game.Create()
+                             .Subscribe(GameNotification.Beginning, soundSet.Beginning)
+                             .Subscribe(GameNotification.EatCoin, soundSet.Chomp)
+                             .Subscribe(GameNotification.Respawning, soundSet.Death)
+                             .Subscribe(GameNotification.EatFruit, soundSet.EatFruit)
+                             .Subscribe(GameNotification.EatGhost, soundSet.EatGhost)
+                             .Subscribe(GameNotification.ExtraPac, soundSet.ExtraPac)
+                             .Subscribe(GameNotification.Intermission, soundSet.Intermission)
+                             .StartGame();
 
-            _game = Game.Game.Create(notifications);
-
-            _graphicsBuffers = new GraphicsBuffers(this) {ShowFps = true};
+            _graphicsBuffers = new GraphicsBuffers(this) { ShowFps = true };
 
             this.StartPosition = FormStartPosition.CenterScreen;
             this.Text = "PacMan";
@@ -57,7 +49,7 @@ namespace NPacMan.UI
             };
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
-            if(_keysMap.TryGetValue(e.KeyCode, out var direction))
+            if (_keysMap.TryGetValue(e.KeyCode, out var direction))
             {
                 _game.ChangeDirection(direction);
             }

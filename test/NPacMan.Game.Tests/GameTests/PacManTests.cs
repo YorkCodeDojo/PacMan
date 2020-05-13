@@ -22,7 +22,7 @@ namespace NPacMan.Game.Tests.GameTests
         {
             _gameSettings.PacMan = new PacMan((5, 6), Direction.Right);
             var game = new Game(_gameClock, _gameSettings);
-
+            game.StartGame();
             game.PacMan.Should().BeEquivalentTo(new
             {
                 Location = new CellLocation(5, 6),
@@ -39,6 +39,8 @@ namespace NPacMan.Game.Tests.GameTests
         public async Task PacManWalksInFacingDirection(Direction directionToFace, int changeInX, int changeInY)
         {
             var game = new Game(_gameClock, _gameSettings);
+            game.StartGame(); 
+            
             var (x, y) = game.PacMan.Location;
 
             game.ChangeDirection(directionToFace);
@@ -60,6 +62,7 @@ namespace NPacMan.Game.Tests.GameTests
         public async Task PacManCannotMoveIntoWalls(Direction directionToFace, int createWallXOffset, int createWallYOffset)
         {
             var game = new Game(_gameClock, _gameSettings);
+            game.StartGame(); 
             var x = game.PacMan.Location.X;
             var y = game.PacMan.Location.Y;
             var score = game.Score;
@@ -83,6 +86,7 @@ namespace NPacMan.Game.Tests.GameTests
         public async Task PacManIsTeleportedWhenYouWalkIntoAPortal()
         {
             var game = new Game(_gameClock, _gameSettings);
+            game.StartGame(); 
             var x = game.PacMan.Location.X;
             var y = game.PacMan.Location.Y;
             var score = game.Score;
@@ -115,6 +119,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.PacMan = new PacMan((x, y), Direction.Down);
 
             var game = new Game(_gameClock, _gameSettings);
+            game.StartGame(); 
             await _gameClock.Tick();
 
             game.PacMan
@@ -135,6 +140,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(1, 2), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
 
             var game = new Game(_gameClock, _gameSettings);
+            game.StartGame(); 
             var now = DateTime.UtcNow;
             await _gameClock.Tick(now);
 
@@ -156,11 +162,11 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.PacMan = new PacMan((1, 1), Direction.Down);
             _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(1, 2), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
 
-            var gameNotifications = new GameNotifications();
-            var notificationTriggered = 0;
-            gameNotifications.Subscribe(GameNotification.Dying, () => notificationTriggered++);
+            var numberOfNotificationsTriggered = 0;
 
-            var game = new Game(_gameClock, _gameSettings, gameNotifications);
+            var game = new Game(_gameClock, _gameSettings);
+            game.Subscribe(GameNotification.Dying, () => numberOfNotificationsTriggered++);
+            game.StartGame(); 
             var now = DateTime.UtcNow;
             await _gameClock.Tick(now);
 
@@ -171,7 +177,7 @@ namespace NPacMan.Game.Tests.GameTests
             if (game.Status != GameStatus.Dying)
                 throw new Exception($"Invalid Game State {game.Status:G} should be {nameof(GameStatus.Dying)}");
 
-            notificationTriggered.Should().Be(1);
+            numberOfNotificationsTriggered.Should().Be(1);
         }
 
         [Fact]
@@ -180,11 +186,11 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.PacMan = new PacMan((1, 1), Direction.Down);
             _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(1, 2), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
 
-            var gameNotifications = new GameNotifications();
-            var notificationTriggered = 0;
-            gameNotifications.Subscribe(GameNotification.Respawning, () => notificationTriggered++);
+            var numberOfNotificationsTriggered = 0;
 
-            var game = new Game(_gameClock, _gameSettings, gameNotifications);
+            var game = new Game(_gameClock, _gameSettings);
+            game.Subscribe(GameNotification.Respawning, () => numberOfNotificationsTriggered++);
+            game.StartGame(); 
             var now = DateTime.UtcNow;
             await _gameClock.Tick(now);
 
@@ -200,7 +206,7 @@ namespace NPacMan.Game.Tests.GameTests
             if (game.Status != GameStatus.Respawning)
                 throw new Exception($"Invalid Game State {game.Status:G} should be {nameof(GameStatus.Respawning)}");
 
-            notificationTriggered.Should().Be(1);
+            numberOfNotificationsTriggered.Should().Be(1);
         }
 
         [Fact]
@@ -210,6 +216,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(1, 2), Direction.Right, CellLocation.TopLeft, new GhostGoesRightStrategy()));
 
             var game = new Game(_gameClock, _gameSettings);
+            game.StartGame();
             var now = DateTime.UtcNow;
 
             await _gameClock.Tick(now);
@@ -231,6 +238,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(1, 2), Direction.Right, CellLocation.TopLeft, new GhostGoesRightStrategy()));
 
             var game = new Game(_gameClock, _gameSettings);
+            game.StartGame(); 
             var now = DateTime.UtcNow;
             await _gameClock.Tick(now);
             await _gameClock.Tick(now);
