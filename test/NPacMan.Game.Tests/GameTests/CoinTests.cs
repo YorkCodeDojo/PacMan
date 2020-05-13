@@ -163,5 +163,24 @@ namespace NPacMan.Game.Tests.GameTests
             });
             game.Score.Should().Be(score);
         }
+
+        [Fact]
+        public async Task WhenPacManEatsACoinTheGameNotificationShouldFire()
+        {
+            var gameNotifications = new GameNotifications();
+            var notificationTriggered = 0;
+            gameNotifications.Subscribe(GameNotification.EatCoin, () => notificationTriggered++);
+
+            var game = new Game(_gameClock, _gameSettings, gameNotifications);
+            var (x, y) = game.PacMan.Location;
+
+            game.ChangeDirection(Direction.Down);
+
+            _gameSettings.Coins.Add((x, y + 1));
+
+            await _gameClock.Tick();
+
+            notificationTriggered.Should().Be(1);
+        }
     }
 }

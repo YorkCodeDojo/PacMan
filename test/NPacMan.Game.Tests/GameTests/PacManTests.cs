@@ -120,7 +120,8 @@ namespace NPacMan.Game.Tests.GameTests
             game.PacMan
                 .Should().BeEquivalentTo(new
                 {
-                    Location = new {
+                    Location = new
+                    {
                         X = x,
                         Y = y
                     }
@@ -147,6 +148,59 @@ namespace NPacMan.Game.Tests.GameTests
             await _gameClock.Tick(now.AddSeconds(4));
 
             game.Status.Should().Be(GameStatus.Respawning);
+        }
+
+        [Fact]
+        public async Task WhenPacManDiesTheGameNotificationShouldFire()
+        {
+            _gameSettings.PacMan = new PacMan((1, 1), Direction.Down);
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(1, 2), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
+
+            var gameNotifications = new GameNotifications();
+            var notificationTriggered = 0;
+            gameNotifications.Subscribe(GameNotification.Dying, () => notificationTriggered++);
+
+            var game = new Game(_gameClock, _gameSettings, gameNotifications);
+            var now = DateTime.UtcNow;
+            await _gameClock.Tick(now);
+
+            await _gameClock.Tick(now.AddSeconds(1));
+            await _gameClock.Tick(now.AddSeconds(2));
+            await _gameClock.Tick(now.AddSeconds(3));
+
+            if (game.Status != GameStatus.Dying)
+                throw new Exception($"Invalid Game State {game.Status:G} should be {nameof(GameStatus.Dying)}");
+
+            notificationTriggered.Should().Be(1);
+        }
+
+        [Fact]
+        public async Task WhenPacManRespawnsTheGameNotificationShouldFire()
+        {
+            _gameSettings.PacMan = new PacMan((1, 1), Direction.Down);
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(1, 2), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
+
+            var gameNotifications = new GameNotifications();
+            var notificationTriggered = 0;
+            gameNotifications.Subscribe(GameNotification.Respawning, () => notificationTriggered++);
+
+            var game = new Game(_gameClock, _gameSettings, gameNotifications);
+            var now = DateTime.UtcNow;
+            await _gameClock.Tick(now);
+
+            await _gameClock.Tick(now.AddSeconds(1));
+            await _gameClock.Tick(now.AddSeconds(2));
+            await _gameClock.Tick(now.AddSeconds(3));
+
+            if (game.Status != GameStatus.Dying)
+                throw new Exception($"Invalid Game State {game.Status:G} should be {nameof(GameStatus.Dying)}");
+
+            await _gameClock.Tick(now.AddSeconds(4));
+
+            if (game.Status != GameStatus.Respawning)
+                throw new Exception($"Invalid Game State {game.Status:G} should be {nameof(GameStatus.Respawning)}");
+
+            notificationTriggered.Should().Be(1);
         }
 
         [Fact]
@@ -193,7 +247,8 @@ namespace NPacMan.Game.Tests.GameTests
             game.PacMan.Should().BeEquivalentTo(
                 new
                 {
-                    Location = new {
+                    Location = new
+                    {
                         X = 5,
                         Y = 2
                     }
