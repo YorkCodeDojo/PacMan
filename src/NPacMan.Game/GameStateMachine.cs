@@ -5,7 +5,7 @@ namespace NPacMan.Game
     internal class GameStateMachine :
         AutomatonymousStateMachine<GameState>
     {
-        public GameStateMachine(IGameActions game, IGameSettings settings, ISoundSet soundSet)
+        public GameStateMachine(IGameActions game, IGameSettings settings, GameNotifications gameNotifications)
         {
             InstanceState(x => x.Status);
 
@@ -35,20 +35,27 @@ namespace NPacMan.Game
                     .Then(context => game.MovePacMan(context.Data.Now)),
                 When(CoinEaten)
                     .Then(context => context.Instance.Score += 10)
-                    .Then(context => soundSet.Chomp()),
+                    .Then(context => gameNotifications.Publish(GameNotification.EatCoin)),
                 When(PacManCaughtByGhost)
                     .Then(context => context.Instance.Lives -= 1)
                     .Then(context => context.Instance.TimeToChangeState = context.Data.Now.AddSeconds(4))
                     .TransitionTo(Dying));
 
+            WhenEnter(Dying,
+                       binder => binder
+                                .Then(context => gameNotifications.Publish(GameNotification.Dying)));
+
             During(Dying,
                 When(Tick, context => context.Data.Now >= context.Instance.TimeToChangeState)
                     .Then(context => game.HideGhosts(context.Instance))
                     .Then(context => context.Instance.TimeToChangeState = context.Data.Now.AddSeconds(4))
-                    .Then(context => soundSet.Death())
                     .IfElse(context => context.Instance.Lives > 0,
                         binder => binder.TransitionTo(Respawning),
                         binder => binder.Finalize()));
+
+            WhenEnter(Respawning,
+                       binder => binder
+                                .Then(context => gameNotifications.Publish(GameNotification.Respawning)));
 
             During(Respawning,
                 When(Tick, context => context.Data.Now >= context.Instance.TimeToChangeState)

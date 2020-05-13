@@ -16,12 +16,25 @@ namespace NPacMan.UI
         private readonly BoardRenderer _boardRenderer = new BoardRenderer();
         private readonly GraphicsBuffers _graphicsBuffers;
 
-        private readonly Game.Game _game = Game.Game.Create(new SoundSet());
+        private readonly Game.Game _game;
 
 
         public Form1()
         {
             InitializeComponent();
+
+            var notifications = new GameNotifications();
+            var soundSet = new SoundSet();
+
+            notifications.Subscribe(GameNotification.Beginning, soundSet.Beginning);
+            notifications.Subscribe(GameNotification.EatCoin, soundSet.Chomp);
+            notifications.Subscribe(GameNotification.Dying, soundSet.Death);
+            notifications.Subscribe(GameNotification.EatFruit, soundSet.EatFruit);
+            notifications.Subscribe(GameNotification.EatGhost, soundSet.EatGhost);
+            notifications.Subscribe(GameNotification.ExtraPac, soundSet.ExtraPac);
+            notifications.Subscribe(GameNotification.Intermission, soundSet.Intermission);
+
+            _game = Game.Game.Create(notifications);
 
             _graphicsBuffers = new GraphicsBuffers(this) {ShowFps = true};
 

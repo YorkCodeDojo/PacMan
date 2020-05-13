@@ -15,38 +15,33 @@ namespace NPacMan.Game
         private List<CellLocation> _collectedCoins;
         private Dictionary<string, Ghost> _ghosts;
 
-        private readonly ISoundSet _soundSet;
+        private readonly GameNotifications _gameNotifications;
 
         private readonly GameState _gameState;
 
         private readonly GameStateMachine _gameStateMachine;
 
-        public Game(IGameClock gameClock, IGameSettings settings, ISoundSet soundSet)
+        public Game(IGameClock gameClock, IGameSettings settings, GameNotifications? gameNotifications = null)
         {
             _settings = settings;
             PacMan = settings.PacMan;
             _collectedCoins = new List<CellLocation>();
             _ghosts = settings.Ghosts.ToDictionary(x => x.Name, x => x);
-            _soundSet = soundSet;
-            _gameStateMachine = new GameStateMachine(this, settings, soundSet);
+            _gameNotifications = gameNotifications ?? new GameNotifications();
+            _gameStateMachine = new GameStateMachine(this, settings, _gameNotifications);
             _gameState = new GameState(settings);
 
             // Play the beginning sound
             gameClock.Subscribe(Tick);
-            _soundSet.Beginning();
+            _gameNotifications.Publish(GameNotification.Beginning);
         }
 
-        public Game(IGameClock gameClock, IGameSettings settings)
-            : this(gameClock, settings, new NullSoundSet())
-        {
-        }
-
-        public static Game Create(ISoundSet soundSet)
+        public static Game Create(GameNotifications gameNotifications)
         {
             var filename = "board.txt";
             var gameSettings = GameSettingsLoader.LoadFromFile(filename);
 
-            return new Game(new GameClock(), gameSettings, soundSet);
+            return new Game(new GameClock(), gameSettings, gameNotifications);
         }
 
         public PacMan PacMan { get; private set; }
