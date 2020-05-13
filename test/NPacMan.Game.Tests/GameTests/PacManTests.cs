@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using FluentAssertions;
+using NPacMan.Game.Tests.GhostStrategiesForTests;
 using Xunit;
 
 namespace NPacMan.Game.Tests.GameTests
@@ -110,7 +111,7 @@ namespace NPacMan.Game.Tests.GameTests
             var x = 1;
             var y = 1;
 
-            _gameSettings.InitialGameStatus = state.ToString();
+            _gameSettings.InitialGameStatus = state;
             _gameSettings.PacMan = new PacMan((x, y), Direction.Down);
 
             var game = new Game(_gameClock, _gameSettings);
@@ -140,12 +141,12 @@ namespace NPacMan.Game.Tests.GameTests
             await _gameClock.Tick(now.AddSeconds(2));
             await _gameClock.Tick(now.AddSeconds(3));
 
-            if (game.Status != GameStatus.Dying.ToString())
+            if (game.Status != GameStatus.Dying)
                 throw new Exception($"Invalid Game State {game.Status:G}");
 
             await _gameClock.Tick(now.AddSeconds(4));
 
-            game.Status.Should().Be(GameStatus.Respawning.ToString());
+            game.Status.Should().Be(GameStatus.Respawning);
         }
 
         [Fact]
@@ -161,12 +162,12 @@ namespace NPacMan.Game.Tests.GameTests
             await _gameClock.Tick(now);
             await _gameClock.Tick(now.AddSeconds(4));
 
-            if (game.Status != GameStatus.Respawning.ToString())
+            if (game.Status != GameStatus.Respawning)
                 throw new Exception($"Invalid Game State {game.Status:G}");
 
             await _gameClock.Tick(now.AddSeconds(8));
 
-            game.Status.Should().Be(GameStatus.Alive.ToString());
+            game.Status.Should().Be(GameStatus.Alive);
         }
 
         [Fact]
@@ -181,12 +182,12 @@ namespace NPacMan.Game.Tests.GameTests
             await _gameClock.Tick(now);
             await _gameClock.Tick(now.AddSeconds(4));
 
-            if (game.Status != GameStatus.Respawning.ToString())
+            if (game.Status != GameStatus.Respawning)
                 throw new Exception($"Invalid Game State {game.Status:G}");
 
             await _gameClock.Tick(now.AddSeconds(8));
 
-            if (game.Status != GameStatus.Alive.ToString())
+            if (game.Status != GameStatus.Alive)
                 throw new Exception($"Invalid Game State {game.Status:G}");
 
             game.PacMan.Should().BeEquivalentTo(

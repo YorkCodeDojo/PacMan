@@ -3,6 +3,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using NPacMan.Game.GhostStrategies;
+using NPacMan.Game.Tests.GhostStrategiesForTests;
 using Xunit;
 
 namespace NPacMan.Game.Tests.GameTests
@@ -42,7 +44,7 @@ namespace NPacMan.Game.Tests.GameTests
         {
             var x = 1;
             var y = 1;
-            _gameSettings.InitialGameStatus = GameStatus.Dying.ToString();
+            _gameSettings.InitialGameStatus = GameStatus.Dying;
             _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(x, y), Direction.Left, CellLocation.TopLeft, new DirectToStrategy(new DirectToPacManLocation())));
             _gameSettings.PacMan = new PacMan((3, 3), Direction.Down);
 
@@ -93,12 +95,12 @@ namespace NPacMan.Game.Tests.GameTests
             await _gameClock.Tick(now);
             await _gameClock.Tick(now.AddSeconds(4));
 
-            if (game.Status != GameStatus.Respawning.ToString())
+            if (game.Status != GameStatus.Respawning)
                 throw new Exception($"Invalid Game State {game.Status:G} Should be Respawning");
 
             await _gameClock.Tick(now.AddSeconds(8));
             
-            if (game.Status != GameStatus.Alive.ToString())
+            if (game.Status != GameStatus.Alive)
                 throw new Exception($"Invalid Game State {game.Status:G} Should be Alive");
             
             game.Ghosts.Values.First()
@@ -114,7 +116,7 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public async Task GhostShouldScatterToStartWith()
         {
-            _gameSettings.InitialGameStatus = "Initial";
+            _gameSettings.InitialGameStatus = GameStatus.Initial;
             _gameSettings.PacMan = new PacMan((10, 10), Direction.Left);
             var startingLocation = new CellLocation(3, 1);
             var scatterLocation = new CellLocation(1, 1);
@@ -141,7 +143,7 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public async Task GhostShouldChaseAfter7Seconds()
         {
-            _gameSettings.InitialGameStatus = "Initial";
+            _gameSettings.InitialGameStatus = GameStatus.Initial;
             _gameSettings.PacMan = new PacMan((29, 10), Direction.Left);
             var startingLocation = new CellLocation(30, 1);
             var scatterLocation = new CellLocation(1, 1);
@@ -174,7 +176,7 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public async Task GhostShouldScatter7SecondsAfterChase()
         {
-            _gameSettings.InitialGameStatus = "Initial";
+            _gameSettings.InitialGameStatus = GameStatus.Initial;
             _gameSettings.PacMan = new PacMan((29, 10), Direction.Left);
             var startingLocation = new CellLocation(30, 1);
             var scatterLocation = new CellLocation(1, 1);

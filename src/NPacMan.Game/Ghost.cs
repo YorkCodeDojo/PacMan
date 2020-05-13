@@ -1,4 +1,6 @@
-﻿namespace NPacMan.Game
+﻿using NPacMan.Game.GhostStrategies;
+
+namespace NPacMan.Game
 {
     public class Ghost
     {

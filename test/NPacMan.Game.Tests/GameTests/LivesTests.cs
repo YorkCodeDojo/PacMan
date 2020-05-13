@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using FluentAssertions;
+using NPacMan.Game.Tests.GhostStrategiesForTests;
 using Xunit;
 
 namespace NPacMan.Game.Tests.GameTests
@@ -47,7 +48,7 @@ namespace NPacMan.Game.Tests.GameTests
             await _gameClock.Tick();
 
             game.Lives.Should().Be(currentLives - 1);
-            game.Status.Should().Be(GameStatus.Dying.ToString());
+            game.Status.Should().Be(GameStatus.Dying);
         }
 
 
@@ -94,7 +95,7 @@ namespace NPacMan.Game.Tests.GameTests
             var expectedLife = 1;
             var location = new CellLocation(1, 1);
 
-            _gameSettings.InitialGameStatus = GameStatus.Dying.ToString();
+            _gameSettings.InitialGameStatus = GameStatus.Dying;
             _gameSettings.InitialLives = expectedLife;
 
             _gameSettings.Ghosts.Add(new Ghost("Ghost1", location, Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));

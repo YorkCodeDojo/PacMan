@@ -47,7 +47,8 @@ namespace NPacMan.Game
                 _ => location
             };
 
-        public static int operator -(CellLocation from, CellLocation to) => (int)(Math.Sqrt(Math.Pow(to.X - from.X, 2) + Math.Pow(to.Y - from.Y, 2)));
+        public static int operator -(CellLocation from, CellLocation to)
+            => (int)(Math.Sqrt(Math.Pow(to.X - from.X, 2) + Math.Pow(to.Y - from.Y, 2)));
 
     }
 }
