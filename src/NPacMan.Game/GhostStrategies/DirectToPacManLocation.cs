@@ -1,4 +1,4 @@
-﻿namespace NPacMan.Game
+﻿namespace NPacMan.Game.GhostStrategies
 {
     public class DirectToPacManLocation : IDirectToLocation
     {

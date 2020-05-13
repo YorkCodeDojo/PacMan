@@ -1,6 +1,8 @@
 ﻿using System.Threading.Tasks;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using NPacMan.Game.GhostStrategies;
+using NPacMan.Game.Tests.GhostStrategiesForTests;
 using Xunit;
 
 namespace NPacMan.Game.Tests.GameTests

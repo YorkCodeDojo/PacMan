@@ -1,4 +1,6 @@
-namespace NPacMan.Game.Tests
+using NPacMan.Game.GhostStrategies;
+
+namespace NPacMan.Game.Tests.GhostStrategiesForTests
 {
     public class GhostGoesRightStrategy : IGhostStrategy
     {
