@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using System.Threading.Tasks;
+using FluentAssertions;
 using Xunit;
 
 namespace NPacMan.Game.Tests.GameTests
@@ -15,7 +16,7 @@ namespace NPacMan.Game.Tests.GameTests
         }
 
         [Fact]
-        public void LivesStayTheSameWhenNotCollidingWithAGhost()
+        public async Task LivesStayTheSameWhenNotCollidingWithAGhost()
         {
             var x = _gameSettings.PacMan.Location.X + 1;
             var y = _gameSettings.PacMan.Location.Y;
@@ -26,13 +27,13 @@ namespace NPacMan.Game.Tests.GameTests
             var currentLives = game.Lives;
 
             game.ChangeDirection(Direction.Left);
-            _gameClock.Tick();
+            await _gameClock.Tick();
 
             game.Lives.Should().Be(currentLives);
         }
 
         [Fact]
-        public void LivesDecreaseByOneWhenCollidesWithGhost()
+        public async Task LivesDecreaseByOneWhenCollidesWithGhost()
         {
             var x = _gameSettings.PacMan.Location.X + 1;
             var y = _gameSettings.PacMan.Location.Y;
@@ -43,7 +44,7 @@ namespace NPacMan.Game.Tests.GameTests
             var currentLives = game.Lives;
 
             game.ChangeDirection(Direction.Right);
-            _gameClock.Tick();
+            await _gameClock.Tick();
 
             game.Lives.Should().Be(currentLives - 1);
             game.Status.Should().Be(GameStatus.Dying.ToString());
@@ -51,7 +52,7 @@ namespace NPacMan.Game.Tests.GameTests
 
 
         [Fact]
-        public void LivesDecreaseWhenCollidesWithGhostWalkingTowardsPacMan()
+        public async Task LivesDecreaseWhenCollidesWithGhostWalkingTowardsPacMan()
         {
             // G . . . P
             // . G . P .
@@ -63,14 +64,14 @@ namespace NPacMan.Game.Tests.GameTests
             var currentLives = game.Lives;
 
             game.ChangeDirection(Direction.Left);
-            _gameClock.Tick();
-            _gameClock.Tick();
+            await _gameClock.Tick();
+            await _gameClock.Tick();
 
             game.Lives.Should().Be(currentLives - 1);
         }
 
         [Fact]
-        public void LivesDecreaseWhenCollidesWithGhostWhenPacManIsFacingAWall()
+        public async Task LivesDecreaseWhenCollidesWithGhostWhenPacManIsFacingAWall()
         {
             var x = _gameSettings.PacMan.Location.X;
             var y = _gameSettings.PacMan.Location.Y;
@@ -82,13 +83,13 @@ namespace NPacMan.Game.Tests.GameTests
             var currentLives = game.Lives;
 
             game.ChangeDirection(Direction.Up);
-            _gameClock.Tick();
+            await _gameClock.Tick();
 
             game.Lives.Should().Be(currentLives - 1);
         }
 
         [Fact]
-        public void ShouldNotLoseLifeWhenAlreadyIsDying()
+        public async Task ShouldNotLoseLifeWhenAlreadyIsDying()
         {
             var expectedLife = 1;
             var location = new CellLocation(1, 1);
@@ -100,7 +101,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.PacMan = new PacMan(location, Direction.Down);
 
             var game = new Game(_gameClock, _gameSettings);
-            _gameClock.Tick();
+            await _gameClock.Tick();
 
             game.Lives.Should().Be(expectedLife);
         }

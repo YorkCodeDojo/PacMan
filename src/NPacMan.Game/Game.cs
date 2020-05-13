@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Collections.Immutable;
+using System.Threading.Tasks;
 using Automatonymous;
 
 namespace NPacMan.Game
@@ -40,7 +41,6 @@ namespace NPacMan.Game
         private GameStateMachine _gameStateMachine;
         public Game(IGameClock gameClock, IGameSettings settings, ISoundSet soundSet)
         {
-            gameClock.Subscribe(Tick);
             _settings = settings;
             PacMan = settings.PacMan;
             _collectedCoins = new List<CellLocation>();
@@ -57,6 +57,7 @@ namespace NPacMan.Game
             };
 
             // Play the beginning sound
+            gameClock.Subscribe(Tick);
             _soundSet.Beginning();
         }
 
@@ -101,9 +102,9 @@ namespace NPacMan.Game
             PacMan = PacMan.WithNewDirection(direction);
         }
 
-        private void Tick(DateTime now)
+        private async Task Tick(DateTime now)
         {
-            _gameStateMachine.RaiseEvent(_gameState, _gameStateMachine.Tick, new Tick { Now = now });
+            await _gameStateMachine.RaiseEvent(_gameState, _gameStateMachine.Tick, new Tick { Now = now });
         }
 
         private bool HasDied()
@@ -151,7 +152,7 @@ namespace NPacMan.Game
 
                 During(InitialScatter, Alive,
                     When(Tick)
-                        .Then(context => game.MoveGhosts(context.Data.Now))
+                        .ThenAsync(async context => await game.MoveGhosts(context.Data.Now))
                         .Then(context => game.MovePacMan(context.Data.Now)),
                     When(CoinEaten)
                         .Then(context => context.Instance.Score += 10)
@@ -245,12 +246,12 @@ namespace NPacMan.Game
             }
         }
 
-        private void MoveGhosts(DateTime now)
+        private async Task MoveGhosts(DateTime now)
         {
             ApplyToGhosts(ghost => ghost.Move(this));
             if (HasDied())
             {
-                _gameStateMachine.RaiseEvent(_gameState, _gameStateMachine.PacManCaughtByGhost, new Tick { Now = now });
+                await _gameStateMachine.RaiseEvent(_gameState, _gameStateMachine.PacManCaughtByGhost, new Tick { Now = now });
             }
         }
 

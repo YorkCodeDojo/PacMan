@@ -1,9 +1,10 @@
 using System;
+using System.Threading.Tasks;
 
 namespace NPacMan.Game
 {
     public interface IGameClock
     {
-        void Subscribe(Action<DateTime> action);
+        void Subscribe(Func<DateTime, Task> action);
     }
 }
