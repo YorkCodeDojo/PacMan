@@ -18,6 +18,8 @@ namespace NPacMan.Game
             y = Y;
         }
 
+        public override string ToString() => $"{X},{Y}";
+
         public static CellLocation TopLeft => new CellLocation(0, 0);
 
         public CellLocation WithNewX(int newX) => new CellLocation(newX, Y);
@@ -49,6 +51,35 @@ namespace NPacMan.Game
 
         public static int operator -(CellLocation from, CellLocation to)
             => (int)(Math.Sqrt(Math.Pow(to.X - from.X, 2) + Math.Pow(to.Y - from.Y, 2)));
+
+        public override bool Equals(object? obj)
+        {
+            if (obj is CellLocation cellLocation)
+            {
+                return Equals(cellLocation);
+            }
+            return false;
+        }
+
+        public bool Equals(CellLocation cellLocation)
+        {
+            return (X == cellLocation.X) && (Y == cellLocation.Y);
+        }
+
+        public override int GetHashCode()
+        {
+            return X ^ Y;
+        }
+
+        public static bool operator ==(CellLocation lhs, CellLocation rhs)
+        {
+            return lhs.Equals(rhs);
+        }
+
+        public static bool operator !=(CellLocation lhs, CellLocation rhs)
+        {
+            return !lhs.Equals(rhs);
+        }
 
     }
 }

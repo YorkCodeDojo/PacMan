@@ -187,24 +187,25 @@ namespace NPacMan.Game.Tests.GameTests
             var game = new Game(_gameClock, _gameSettings);
 
             var now = DateTime.UtcNow;
-            await _gameClock.Tick(now);
-            await _gameClock.Tick(now);
 
-            if (game.Ghosts.Values.First().Location.X != 29 || game.Ghosts.Values.First().Location.Y != 1)
-                throw new System.Exception($"Ghost should be at 29,1 not {game.Ghosts.Values.First().Location.X}, {game.Ghosts.Values.First().Location.Y}");
+            await _gameClock.Tick(now);
+            WeExpectThat(ourGhost()).IsAt(startingLocation);
+            await _gameClock.Tick(now);
+            WeExpectThat(ourGhost()).IsAt(startingLocation.Left);
 
             await _gameClock.Tick(now.AddSeconds(_gameSettings.InitialScatterTimeInSeconds + 1));
-            await _gameClock.Tick(now.AddSeconds(_gameSettings.InitialScatterTimeInSeconds + 2));
+            WeExpectThat(ourGhost()).IsAt(startingLocation.Left.Right);
 
-            if (game.Ghosts.Values.First().Location.X != 31 || game.Ghosts.Values.First().Location.Y != 1)
-                throw new System.Exception($"Ghost should be at 31,1 not {game.Ghosts.Values.First().Location.X}, {game.Ghosts.Values.First().Location.Y}");
+            await _gameClock.Tick(now.AddSeconds(_gameSettings.InitialScatterTimeInSeconds + 2));
+            WeExpectThat(ourGhost()).IsAt(startingLocation.Left.Right.Right);
 
             now = now.AddSeconds(_gameSettings.InitialScatterTimeInSeconds);
-
             await _gameClock.Tick(now.AddSeconds(_gameSettings.ChaseTimeInSeconds + 1));
+            WeExpectThat(ourGhost()).IsAt(startingLocation.Left.Right.Right.Left);
+
             await _gameClock.Tick(now.AddSeconds(_gameSettings.ChaseTimeInSeconds + 2));
 
-            game.Ghosts.Values.First()
+            ourGhost()
                 .Should().BeEquivalentTo(new
                 {
                     Location = new {
@@ -212,7 +213,12 @@ namespace NPacMan.Game.Tests.GameTests
                         Y = 1
                     }
                 });
+
+
+            Ghost ourGhost() => game.Ghosts.Values.First();
         }
+
+        private EnsureThatGhost WeExpectThat(Ghost ghost) => new EnsureThatGhost(ghost);
 
     }
 }
