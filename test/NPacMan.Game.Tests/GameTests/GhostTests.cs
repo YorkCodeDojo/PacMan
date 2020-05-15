@@ -328,8 +328,41 @@ namespace NPacMan.Game.Tests.GameTests
             }
         }
 
+        [Fact]
+        public async Task GhostGoHomeAfterCollidesWithPacManAfterEatingPowerPill()
+        {
+            var ghostStart1 = _gameSettings.PacMan.Location.Left.Left.Left;
+            var ghostStart2 = ghostStart1.Below;
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", ghostStart1, Direction.Left, CellLocation.TopLeft, new GhostGoesRightStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost2", ghostStart2, Direction.Left, CellLocation.TopLeft, new GhostGoesRightStrategy()));
+
+            _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Left);
+
+             var game = new Game(_gameClock, _gameSettings);
+            game.StartGame(); 
+
+            game.ChangeDirection(Direction.Left);
+
+            var now = DateTime.UtcNow;
+            await _gameClock.Tick(now);
+
+            WeExpectThat(game.PacMan).IsAt(_gameSettings.PacMan.Location.Left);
+            WeExpectThat(game.Ghosts["Ghost1"]).IsAt(ghostStart1.Right);
+
+            await _gameClock.Tick(now);
+            WeExpectThat(game.PacMan).IsAt(_gameSettings.PacMan.Location.Left.Left);
+            
+            game.Ghosts["Ghost1"].Should().BeEquivalentTo(new {
+                Location = ghostStart1
+            });
+
+            game.Ghosts["Ghost2"].Should().NotBeEquivalentTo(new {
+                Location = ghostStart2
+            });
+        }
 
         private EnsureThatGhost WeExpectThat(Ghost ghost) => new EnsureThatGhost(ghost);
+        private EnsureThatPacMan WeExpectThat(PacMan pacMan) => new EnsureThatPacMan(pacMan);
 
     }
 }

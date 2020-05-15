@@ -109,9 +109,11 @@ namespace NPacMan.Game
             await _gameStateMachine.RaiseEvent(_gameState, _gameStateMachine.Tick, new Tick(now));
         }
 
-        private bool HasDied()
+        private bool TryHasDied(out Ghost? ghost)
         {
-            return Ghosts.Values.Any(ghost => ghost.Location.X == PacMan.Location.X && ghost.Location.Y == PacMan.Location.Y);
+            ghost = Ghosts.Values.FirstOrDefault(ghost => ghost.Location.X == PacMan.Location.X && ghost.Location.Y == PacMan.Location.Y);
+
+            return !(ghost is null);
         }
 
         private void ApplyToGhosts(Func<Ghost, Ghost> action)
@@ -132,9 +134,9 @@ namespace NPacMan.Game
         }
 
 
-        Task IGameActions.MoveGhosts(DateTime now)
+        Task IGameActions.MoveGhosts(BehaviorContext<GameState, Tick> context, GameStateMachine gameStateMachine)
         {
-            return MoveGhosts(now);
+            return MoveGhosts(context, gameStateMachine);
         }
 
         void IGameActions.HideGhosts(GameState gameState)
@@ -173,6 +175,17 @@ namespace NPacMan.Game
             PacMan = PacMan.SetToHome();
         }
 
+
+        void IGameActions.SendGhostHome(Ghost ghostToSendHome)
+        {
+            ApplyToGhosts(ghost => {
+                if(ghost.Name == ghostToSendHome.Name){
+                    ghost = ghost.SetToHome();
+                }
+                return ghost;
+            });
+        }
+
         async Task IGameActions.MovePacMan(BehaviorContext<GameState, Tick> context, GameStateMachine gameStateMachine)
         {
             var newPacMan = PacMan.Move();
@@ -187,10 +200,17 @@ namespace NPacMan.Game
             {
                 PacMan = newPacMan;
             }
-
-            if (HasDied())
+            var died = false;
+            if(TryHasDied(out var ghost))
             {
-                await context.Raise(gameStateMachine.PacManCaughtByGhost, new Tick(context.Data.Now));
+                died = !ghost!.Edible;
+
+                await context.Raise(gameStateMachine.GhostCollision, new GhostCollision(ghost));
+            }
+
+            if (died)
+            {
+                
             }
             else if (Coins.Contains(newPacMan.Location))
             {
@@ -214,12 +234,12 @@ namespace NPacMan.Game
             }
         }
 
-        private async Task MoveGhosts(DateTime now)
+        private async Task MoveGhosts(BehaviorContext<GameState, Tick> context, GameStateMachine gameStateMachine)
         {
             ApplyToGhosts(ghost => ghost.Move(this));
-            if (HasDied())
+            if(TryHasDied(out var ghost))
             {
-                await _gameStateMachine.RaiseEvent(_gameState, _gameStateMachine.PacManCaughtByGhost, new Tick(now));
+                await context.Raise(gameStateMachine.GhostCollision, new GhostCollision(ghost!));
             }
         }
 

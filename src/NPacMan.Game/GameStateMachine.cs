@@ -46,7 +46,7 @@ namespace NPacMan.Game
 
             During(Scatter, GhostChase, Frightened,
                 When(Tick)
-                    .ThenAsync(async context => await game.MoveGhosts(context.Data.Now))
+                    .ThenAsync(async context => await game.MoveGhosts(context, this))
                     .Then(context => game.MovePacMan(context, this)),
                 When(CoinEaten)
                     .Then(context => context.Instance.Score += 10)
@@ -57,9 +57,11 @@ namespace NPacMan.Game
                     .Then(context => game.MakeGhostsEdible())
                     .Then(context => context.Instance.TimeToChangeState = context.Instance.LastTick.AddSeconds(7))
                     .TransitionTo(Frightened),
-                When(PacManCaughtByGhost)
-                    .Then(context => context.Instance.Lives -= 1)
-                    .TransitionTo(Dying));
+                When(GhostCollision)
+                    .IfElse(x => x.Data.Ghost.Edible,
+                    binder => binder.Then(x => game.SendGhostHome(x.Data.Ghost)),
+                    binder => binder.Then(context => context.Instance.Lives -= 1)
+                                    .TransitionTo(Dying)));
 
             WhenEnter(Dying,
                        binder => binder
@@ -97,7 +99,7 @@ namespace NPacMan.Game
         public State Respawning { get; private set; } = null!;
         public State Dead { get; private set; } = null!;
         public Event<Tick> Tick { get; private set; } = null!;
-        public Event<Tick> PacManCaughtByGhost { get; private set; } = null!;
+        public Event<GhostCollision> GhostCollision { get; private set; } = null!;
         public Event CoinEaten { get; private set; } = null!;
         public Event PowerPillEaten { get; private set; } = null!;
     }

@@ -92,9 +92,9 @@ namespace NPacMan.UI
             if(ghostColour != GhostColour.BlueFlash && ghostColour != GhostColour.WhiteFlash)
             {
                 switch (direction)
-             {
+                {
                     case Direction.Up:
-                    xpos += 12;
+                        xpos += 12;
                         break;
                     case Direction.Down:
                         xpos += 4;
