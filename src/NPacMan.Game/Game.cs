@@ -161,7 +161,7 @@ namespace NPacMan.Game
             PacMan = PacMan.SetToHome();
         }
 
-        async Task IGameActions.MovePacMan(BehaviorContext<GameState, Tick> context)
+        async Task IGameActions.MovePacMan(BehaviorContext<GameState, Tick> context, GameStateMachine gameStateMachine)
         {
             var newPacMan = PacMan.Move();
 
@@ -178,7 +178,7 @@ namespace NPacMan.Game
 
             if (HasDied())
             {
-                await context.Raise(_gameStateMachine.PacManCaughtByGhost, new Tick(context.Data.Now));
+                await context.Raise(gameStateMachine.PacManCaughtByGhost, new Tick(context.Data.Now));
             }
             else if (Coins.Contains(newPacMan.Location))
             {
@@ -188,7 +188,7 @@ namespace NPacMan.Game
                     };
                 _collectedCoins = newCollectedCoins;
 
-                await context.Raise(_gameStateMachine.CoinEaten);
+                await context.Raise(gameStateMachine.CoinEaten);
             }
             else if (PowerPills.Contains(newPacMan.Location))
             {
@@ -198,7 +198,7 @@ namespace NPacMan.Game
                 };
                 _collectedPowerPills = newCollectedPowerPills;
 
-                await context.Raise(_gameStateMachine.PowerPillEaten);
+                await context.Raise(gameStateMachine.PowerPillEaten);
             }
         }
 
