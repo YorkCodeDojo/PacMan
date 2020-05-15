@@ -8,7 +8,7 @@ namespace NPacMan.Game
         public GameStateMachine(IGameActions game, IGameSettings settings, GameNotifications gameNotifications)
         {
             InstanceState(x => x.Status);
-
+            
             Initially(
                 When(Tick)
                     .Then(context => game.MoveGhostsHome())
@@ -52,7 +52,7 @@ namespace NPacMan.Game
                     .Then(context => context.Instance.TimeToChangeState = context.Data.Now.AddSeconds(4))
                     .IfElse(context => context.Instance.Lives > 0,
                         binder => binder.TransitionTo(Respawning),
-                        binder => binder.Finalize()));
+                        binder => binder.TransitionTo(Dead)));
 
             WhenEnter(Respawning,
                        binder => binder

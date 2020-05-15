@@ -289,5 +289,23 @@ namespace NPacMan.Game.Tests.GameTests
                 Direction = expectedDirection
             });
         }
+
+        [Fact]
+        public async Task PacManShouldBeDeadWhenNoLivesLeft()
+        {
+            _gameSettings.InitialLives = 1;
+            _gameSettings.PacMan = new PacMan((5, 2), Direction.Left);
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(1, 2), Direction.Right, CellLocation.TopLeft, new GhostGoesRightStrategy()));
+
+            var game = new Game(_gameClock, _gameSettings);
+            game.StartGame();
+            var now = DateTime.UtcNow;
+
+            await _gameClock.Tick(now);
+            await _gameClock.Tick(now);
+            await _gameClock.Tick(now.AddSeconds(4));
+
+            game.Status.Should().Be(GameStatus.Dead);
+        }
     }
 }
