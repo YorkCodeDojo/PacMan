@@ -35,7 +35,7 @@ namespace NPacMan.Game.Tests
             var board = @" XXX 
  X.X 
  XX. 
-T ▲ T
+T*▲*T
  --- ";
             var gameBoard = GameSettingsLoader.Load(board);
 
@@ -43,6 +43,7 @@ T ▲ T
             {
                 Walls = new CellLocation[] { (0, 0), (1, 0), (2, 0), (0, 1), (2, 1), (0, 2), (1, 2) },
                 Coins = new CellLocation[] { (1, 1), (2, 2) },
+                PowerPills = new CellLocation[] { (0, 3), (2, 3) },
                 Doors = new CellLocation[] { new CellLocation(0, 4), new CellLocation(1, 4), new CellLocation(2, 4) },
                 Width = 3,
                 Height = 5,
