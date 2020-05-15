@@ -266,6 +266,68 @@ namespace NPacMan.Game.Tests.GameTests
             });
         }
 
+        [Fact]
+        public async Task AllGhostsShouldRemainInLocationAfterPowerPillIsEaten()
+        {
+            var ghostStart = _gameSettings.PacMan.Location.Below.Right;
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", ghostStart, Direction.Left, CellLocation.TopLeft, new GhostGoesRightStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost2", ghostStart, Direction.Left, CellLocation.TopLeft, new GhostGoesRightStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost3", ghostStart, Direction.Left, CellLocation.TopLeft, new GhostGoesRightStrategy()));
+
+            _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Right);
+
+             var game = new Game(_gameClock, _gameSettings);
+            game.StartGame(); 
+
+            game.ChangeDirection(Direction.Right);
+
+            var now = DateTime.UtcNow;
+            await _gameClock.Tick(now);
+
+            if (!game.Ghosts.Values.All(g => g.Edible))
+                throw new Exception("All ghosts are meant to be edible.");
+
+            game.Ghosts.Values.Should().AllBeEquivalentTo(new {
+                Location = ghostStart.Right
+            });
+        }
+
+        
+        [Fact]
+        public async Task AllGhostsShouldShouldStayInSameLocationWhenTransitioningToNoneEdiable()
+        {
+            var ghostStart = _gameSettings.PacMan.Location.Below.Right;
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", ghostStart, Direction.Left, CellLocation.TopLeft, new GhostGoesRightStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost2", ghostStart, Direction.Left, CellLocation.TopLeft, new GhostGoesRightStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost3", ghostStart, Direction.Left, CellLocation.TopLeft, new GhostGoesRightStrategy()));
+
+            _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Right);
+
+             var game = new Game(_gameClock, _gameSettings);
+            game.StartGame(); 
+
+            game.ChangeDirection(Direction.Right);
+
+            var now = DateTime.UtcNow;
+            await _gameClock.Tick(now);
+
+            if (!game.Ghosts.Values.All(g => g.Edible))
+                throw new Exception("All ghosts are meant to be edible.");
+
+            await _gameClock.Tick(now.AddSeconds(7));                
+
+            if (!game.Ghosts.Values.All(g => !g.Edible))
+                throw new Exception("All ghosts are meant to be nonedible.");
+
+            using var _ = new AssertionScope();
+
+            foreach(var ghost in game.Ghosts.Values){
+                ghost.Should().NotBeEquivalentTo(new {
+                    Location = ghostStart
+                });
+            }
+        }
+
 
         private EnsureThatGhost WeExpectThat(Ghost ghost) => new EnsureThatGhost(ghost);
 

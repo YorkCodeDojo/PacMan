@@ -116,12 +116,13 @@ namespace NPacMan.UI
             var x = ghost.Location.X * cellSize;
             var y = ghost.Location.Y * cellSize;
 
-            var ghostColour = ghost.Name switch
+            var ghostColour = (ghost.Name, ghost.Edible) switch
             {
-                GhostNames.Blinky => GhostColour.Red,
-                GhostNames.Inky => GhostColour.Cyan,
-                GhostNames.Pinky => GhostColour.Pink,
-                GhostNames.Clyde => GhostColour.Orange,
+                (GhostNames.Blinky, false) => GhostColour.Red,
+                (GhostNames.Inky, false) => GhostColour.Cyan,
+                (GhostNames.Pinky, false) => GhostColour.Pink,
+                (GhostNames.Clyde, false) => GhostColour.Orange,
+                (_, true) => GhostColour.BlueFlash,
                 _ => GhostColour.Red,
             };
 

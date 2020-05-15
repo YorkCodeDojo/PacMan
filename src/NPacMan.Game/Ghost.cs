@@ -72,12 +72,12 @@ namespace NPacMan.Game
 
         public Ghost SetToEdible()
         {
-            return new Ghost(Name, Home, Home, Direction, ScatterTarget, Strategy, CurrentStrategy, edible: true);
+            return new Ghost(Name, Home, Location, Direction, ScatterTarget, Strategy, CurrentStrategy, edible: true);
         }
 
         internal Ghost SetToNotEdible()
         {
-            return new Ghost(Name, Home, Home, Direction, ScatterTarget, Strategy, CurrentStrategy, edible: false);
+            return new Ghost(Name, Home, Location, Direction, ScatterTarget, Strategy, CurrentStrategy, edible: false);
         }
     }
 }

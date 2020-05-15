@@ -77,11 +77,11 @@ namespace NPacMan.UI
                     xpos = 0;
                     ypos = 22;
                     break;
-                case GhostColour.WhiteFlash:
+                case GhostColour.BlueFlash:
                     xpos = 24;
                     ypos = 12;
                     break;
-                case GhostColour.BlueFlash:
+                case GhostColour.WhiteFlash:
                     xpos = 28;
                     ypos = 12;
                     break;
@@ -89,21 +89,24 @@ namespace NPacMan.UI
                     throw new Exception("GhostColour?");
             }
 
-            switch (direction)
+            if(ghostColour != GhostColour.BlueFlash && ghostColour != GhostColour.WhiteFlash)
             {
-                case Direction.Up:
+                switch (direction)
+             {
+                    case Direction.Up:
                     xpos += 12;
-                    break;
-                case Direction.Down:
-                    xpos += 4;
-                    break;
-                case Direction.Left:
-                    xpos += 8;
-                    break;
-                case Direction.Right:
-                    break;
-                default:
-                    throw new Exception("Direction?");
+                        break;
+                    case Direction.Down:
+                        xpos += 4;
+                        break;
+                    case Direction.Left:
+                        xpos += 8;
+                        break;
+                    case Direction.Right:
+                        break;
+                    default:
+                        throw new Exception("Direction?");
+                }
             }
 
             if (animated)
