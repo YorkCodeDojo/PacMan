@@ -156,6 +156,11 @@ namespace NPacMan.Game
             ApplyToGhosts(ghost => ghost.SetToHome());
         }
 
+        void IGameActions.MakeGhostsEdible()
+        {
+            ApplyToGhosts(ghost => ghost.SetToEdible());
+        }
+
         void IGameActions.MovePacManHome()
         {
             PacMan = PacMan.SetToHome();

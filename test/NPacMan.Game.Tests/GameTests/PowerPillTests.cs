@@ -57,6 +57,71 @@ namespace NPacMan.Game.Tests.GameTests
         }
 
         [Fact]
+        public async Task GameContainsAllPowerPills()
+        {
+            var gameBoard = new TestGameSettings();
+            gameBoard.PowerPills.Add((1, 1));
+            gameBoard.PowerPills.Add((1, 2));
+            gameBoard.PowerPills.Add((2, 2));
+
+            var gameClock = new TestGameClock();
+            var game = new Game(gameClock, gameBoard);
+            game.StartGame();
+            await gameClock.Tick();
+
+            game.PowerPills.Should().BeEquivalentTo(
+                new CellLocation(1, 1),
+                new CellLocation(1, 2),
+                new CellLocation(2, 2)
+            );
+        }
+
+        [Fact]
+        public async Task PacManDoesNotEatPowerPillAndScoreStaysTheSameWhenCollidesWithGhost()
+        {
+            var x = _gameSettings.PacMan.Location.X + 1;
+            var y = _gameSettings.PacMan.Location.Y;
+
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", _gameSettings.PacMan.Location.Right, Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
+            _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Right);
+
+            var game = new Game(_gameClock, _gameSettings);
+            game.StartGame(); 
+            var score = game.Score;
+
+            game.ChangeDirection(Direction.Right);
+            await _gameClock.Tick();
+
+            using var _ = new AssertionScope();
+            game.PowerPills.Should().ContainEquivalentOf(new {
+                X = x,
+                Y = y
+            });
+            game.Score.Should().Be(score);
+        }
+
+
+        [Fact]
+        public async Task AllGhostsShouldChangetoEdibleWhenPacManEatsPowerPill()
+        {
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", _gameSettings.PacMan.Location.Right.Right, Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost2", _gameSettings.PacMan.Location.Right.Right, Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost3", _gameSettings.PacMan.Location.Right.Right, Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
+
+            _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Right);
+
+             var game = new Game(_gameClock, _gameSettings);
+            game.StartGame(); 
+
+            game.ChangeDirection(Direction.Right);
+            await _gameClock.Tick();
+
+            game.Ghosts.Values.Should().AllBeEquivalentTo(new {
+                Edible = true
+            });
+        }
+
+        [Fact]
         public async Task WhenPacManEatsAPowerPillTheGameNotificationShouldFire()
         {
             var numberOfNotificationsTriggered = 0;
@@ -72,6 +137,8 @@ namespace NPacMan.Game.Tests.GameTests
 
             numberOfNotificationsTriggered.Should().Be(1);
         }
+    
+        private EnsureThatGhost WeExpectThat(Ghost ghost) => new EnsureThatGhost(ghost);
     
     }
 }

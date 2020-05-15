@@ -221,6 +221,23 @@ namespace NPacMan.Game.Tests.GameTests
             Ghost ourGhost() => game.Ghosts.Values.First();
         }
 
+        [Fact]
+        public async Task GhostsDoNotStartOffAsEdible()
+        {
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", _gameSettings.PacMan.Location.Right.Right, Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost2", _gameSettings.PacMan.Location.Right.Right, Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost3", _gameSettings.PacMan.Location.Right.Right, Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
+
+             var game = new Game(_gameClock, _gameSettings);
+            game.StartGame(); 
+
+            await _gameClock.Tick();
+
+            game.Ghosts.Values.Should().AllBeEquivalentTo(new {
+                Edible = false
+            });
+        }
+
         private EnsureThatGhost WeExpectThat(Ghost ghost) => new EnsureThatGhost(ghost);
 
     }
