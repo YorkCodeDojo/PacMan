@@ -2,6 +2,7 @@
 using FluentAssertions.Execution;
 using Xunit;
 using System;
+using System.Threading.Tasks;
 
 namespace NPacMan.Game.Tests.GameTests
 {
@@ -17,20 +18,20 @@ namespace NPacMan.Game.Tests.GameTests
         }
 
         [Fact]
-        public void ScoreDoesNotChangeWhenNoCoinIsCollected()
+        public async Task ScoreDoesNotChangeWhenNoCoinIsCollected()
         {
             var game = new Game(_gameClock, _gameSettings);
             var score = game.Score;
 
             game.ChangeDirection(Direction.Down);
 
-            _gameClock.Tick();
+            await _gameClock.Tick();
 
             game.Score.Should().Be(score);
         }
 
         [Fact]
-        public void IncrementsScoreBy10WhenCoinCollected()
+        public async Task IncrementsScoreBy10WhenCoinCollected()
         {
             var game = new Game(_gameClock, _gameSettings);
             var (x, y) = game.PacMan.Location;
@@ -38,13 +39,13 @@ namespace NPacMan.Game.Tests.GameTests
             game.ChangeDirection(Direction.Down);
 
             _gameSettings.Coins.Add((x, y + 1));
-            _gameClock.Tick();
+            await _gameClock.Tick();
 
             game.Score.Should().Be(10);
         }
 
         [Fact]
-        public void CannotCollectTheSameCoinTwice()
+        public async Task CannotCollectTheSameCoinTwice()
         {
             var game = new Game(_gameClock, _gameSettings);
             var (x, y) = game.PacMan.Location;
@@ -52,26 +53,26 @@ namespace NPacMan.Game.Tests.GameTests
             game.ChangeDirection(Direction.Down);
 
             _gameSettings.Coins.Add((x, y + 1));
-            _gameClock.Tick();
+            await _gameClock.Tick();
 
             if (game.Score != 10)
                 throw new Exception($"Score should be 10 not {game.Score}");
 
             game.ChangeDirection(Direction.Up);
-            _gameClock.Tick();
+            await _gameClock.Tick();
 
             if (game.Score != 10)
                 throw new Exception($"Score should still be 10 not {game.Score}");
 
             game.ChangeDirection(Direction.Down);
-            _gameClock.Tick();
+            await _gameClock.Tick();
 
             game.Score.Should().Be(10);
         }
 
 
         [Fact]
-        public void IncrementsScoreBy20WhenTwoCoinsAreCollected()
+        public async Task IncrementsScoreBy20WhenTwoCoinsAreCollected()
         {
             var game = new Game(_gameClock, _gameSettings);
             var (x, y) = game.PacMan.Location;
@@ -81,14 +82,14 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Coins.Add((x, y + 1));
             _gameSettings.Coins.Add((x, y + 2));
 
-            _gameClock.Tick();
-            _gameClock.Tick();
+            await _gameClock.Tick();
+            await _gameClock.Tick();
 
             game.Score.Should().Be(20);
         }
 
         [Fact]
-        public void CoinShouldBeCollected()
+        public async Task CoinShouldBeCollected()
         {
             var game = new Game(_gameClock, _gameSettings);
             var (x, y) = game.PacMan.Location;
@@ -97,13 +98,13 @@ namespace NPacMan.Game.Tests.GameTests
 
             _gameSettings.Coins.Add((x, y + 1));
 
-            _gameClock.Tick();
+            await _gameClock.Tick();
 
             game.Coins.Should().NotContain((x, y + 1));
         }
 
         [Fact]
-        public void JustTheCollectedCoinShouldBeCollected()
+        public async Task JustTheCollectedCoinShouldBeCollected()
         {
             var game = new Game(_gameClock, _gameSettings);
             var (x, y) = game.PacMan.Location;
@@ -113,14 +114,14 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Coins.Add((x, y + 1));
             _gameSettings.Coins.Add((x, y + 2));
 
-            _gameClock.Tick();
+            await _gameClock.Tick();
 
             game.Coins.Should().NotContain((x, y + 1));
             game.Coins.Should().Contain((x, y + 2));
         }
 
         [Fact]
-        public void GameContainsAllCoins()
+        public async Task GameContainsAllCoins()
         {
             var gameBoard = new TestGameSettings();
             gameBoard.Coins.Add((1, 1));
@@ -130,7 +131,7 @@ namespace NPacMan.Game.Tests.GameTests
             var gameClock = new TestGameClock();
             var game = new Game(gameClock, gameBoard);
 
-            gameClock.Tick();
+            await gameClock.Tick();
 
             game.Coins.Should().BeEquivalentTo(
                 new CellLocation(1, 1),
@@ -140,7 +141,7 @@ namespace NPacMan.Game.Tests.GameTests
         }
 
         [Fact]
-        public void PacManDoesNotCollectCoinAndScoreStaysTheSameWhenCollidesWithGhost()
+        public async Task PacManDoesNotCollectCoinAndScoreStaysTheSameWhenCollidesWithGhost()
         {
             var x = _gameSettings.PacMan.Location.X + 1;
             var y = _gameSettings.PacMan.Location.Y;
@@ -152,9 +153,7 @@ namespace NPacMan.Game.Tests.GameTests
             var score = game.Score;
 
             game.ChangeDirection(Direction.Right);
-            _gameClock.Tick();
-
-            
+            await _gameClock.Tick();
 
             using var _ = new AssertionScope();
             game.Coins.Should().ContainEquivalentOf(new {
