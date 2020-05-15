@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NPacMan.Game.Tests
+namespace NPacMan.Game.Tests.Helpers
 {
     public class EnsureThatGhost
     {
@@ -15,23 +15,6 @@ namespace NPacMan.Game.Tests
         {
             if (_ghost.Location != expectedLocation)
                 throw new Exception($"Ghost should be at {expectedLocation} not {_ghost.Location}");
-        }
-
-    }
-
-    public class EnsureThatPacMan
-    {
-        private readonly PacMan _pacMan;
-
-        public EnsureThatPacMan(PacMan pacMan)
-        {
-            _pacMan = pacMan;
-        }
-
-        internal void IsAt(CellLocation expectedLocation)
-        {
-            if (_pacMan.Location != expectedLocation)
-                throw new Exception($"PacMan should be at {expectedLocation} not {_pacMan.Location}");
         }
 
     }

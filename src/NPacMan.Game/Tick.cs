@@ -10,14 +10,4 @@ namespace NPacMan.Game
         }
         public DateTime Now { get; }
     }
-
-    internal class GhostCollision
-    {
-        public GhostCollision(Ghost ghost)
-        {
-            Ghost = ghost;
-        }
-        
-        public Ghost Ghost { get; }
-    }
 }

@@ -4,6 +4,7 @@ using Xunit;
 using System;
 using System.Threading.Tasks;
 using NPacMan.Game.Tests.GhostStrategiesForTests;
+using NPacMan.Game.Tests.Helpers;
 
 namespace NPacMan.Game.Tests.GameTests
 {

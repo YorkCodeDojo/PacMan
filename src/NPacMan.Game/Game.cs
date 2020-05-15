@@ -208,11 +208,7 @@ namespace NPacMan.Game
                 await context.Raise(gameStateMachine.GhostCollision, new GhostCollision(ghost));
             }
 
-            if (died)
-            {
-                
-            }
-            else if (Coins.Contains(newPacMan.Location))
+            if (!died && Coins.Contains(newPacMan.Location))
             {
                 var newCollectedCoins = new List<CellLocation>(_collectedCoins)
                     {
@@ -222,7 +218,7 @@ namespace NPacMan.Game
 
                 await context.Raise(gameStateMachine.CoinEaten);
             }
-            else if (PowerPills.Contains(newPacMan.Location))
+            else if (!died && PowerPills.Contains(newPacMan.Location))
             {
                 var newCollectedPowerPills = new List<CellLocation>(_collectedPowerPills)
                 {

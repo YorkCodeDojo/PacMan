@@ -5,6 +5,7 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using NPacMan.Game.GhostStrategies;
 using NPacMan.Game.Tests.GhostStrategiesForTests;
+using NPacMan.Game.Tests.Helpers;
 using Xunit;
 
 namespace NPacMan.Game.Tests.GameTests
