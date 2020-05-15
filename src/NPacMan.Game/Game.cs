@@ -91,7 +91,11 @@ namespace NPacMan.Game
 
         public void ChangeDirection(Direction direction)
         {
-            PacMan = PacMan.WithNewDirection(direction);
+            var nextSpace = PacMan.Location + direction;
+            if(!Walls.Contains(nextSpace))
+            {
+                PacMan = PacMan.WithNewDirection(direction);
+            }
         }
 
         private async Task Tick(DateTime now)

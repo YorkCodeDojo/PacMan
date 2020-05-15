@@ -263,5 +263,31 @@ namespace NPacMan.Game.Tests.GameTests
                 }
             );
         }
+
+        [Theory]
+        [InlineData(Direction.Up)]
+        [InlineData(Direction.Down)]
+        [InlineData(Direction.Left)]
+        [InlineData(Direction.Right)]
+        public void PacManCantTurnToFaceWall(Direction direction)
+        {
+            var game = new Game(_gameClock, _gameSettings);
+            game.StartGame(); 
+
+            var pacManLocation = game.PacMan.Location;
+
+            var expectedDirection = direction.Opposite();
+            game.ChangeDirection(expectedDirection);
+
+            _gameSettings.Walls.Add(pacManLocation + direction);
+
+            game.ChangeDirection(direction);
+
+            game.PacMan.Should().BeEquivalentTo(new
+            {
+                Location = pacManLocation,
+                Direction = expectedDirection
+            });
+        }
     }
 }
