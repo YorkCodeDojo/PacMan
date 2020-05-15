@@ -26,6 +26,7 @@ namespace NPacMan.Game.Tests.GameTests
 
             var gameClock = new TestGameClock();
             var game = new Game(gameClock, board);
+            game.StartGame();
             await gameClock.Tick();
 
             game.Ghosts[name].Should().BeEquivalentTo(new
@@ -50,6 +51,7 @@ namespace NPacMan.Game.Tests.GameTests
 
             var gameClock = new TestGameClock();
             var game = new Game(gameClock, board);
+            game.StartGame();
             await gameClock.Tick();
 
             using var _ = new AssertionScope();
@@ -84,6 +86,7 @@ namespace NPacMan.Game.Tests.GameTests
 
             var gameClock = new TestGameClock();
             var game = new Game(gameClock, board);
+            game.StartGame(); 
             await gameClock.Tick();
 
             using var _ = new AssertionScope();
@@ -123,6 +126,7 @@ namespace NPacMan.Game.Tests.GameTests
 
             var gameClock = new TestGameClock();
             var game = new Game(gameClock, board);
+            game.StartGame(); 
             await gameClock.Tick();
             await gameClock.Tick();
             await gameClock.Tick();
@@ -157,6 +161,7 @@ namespace NPacMan.Game.Tests.GameTests
 
             var gameClock = new TestGameClock();
             var game = new Game(gameClock, board);
+            game.StartGame(); 
             await gameClock.Tick();
             await gameClock.Tick();
             await gameClock.Tick();
@@ -183,7 +188,7 @@ namespace NPacMan.Game.Tests.GameTests
             };
             var gameClock = new TestGameClock();
             var game = new Game(gameClock, board);
-
+            game.StartGame();
             var directToExpectedPacManLocation = new DirectToExpectedPacManLocation();
             var targetLocation = directToExpectedPacManLocation.GetLocation(game);
 
@@ -211,7 +216,7 @@ namespace NPacMan.Game.Tests.GameTests
             };
             var gameClock = new TestGameClock();
             var game = new Game(gameClock, board);
-
+            game.StartGame();
             var inkyTargetCell = new InterceptPacManLocation("ghost-1");
             var targetLocation = inkyTargetCell.GetLocation(game);
 
@@ -233,7 +238,7 @@ namespace NPacMan.Game.Tests.GameTests
             };
             var gameClock = new TestGameClock();
             var game = new Game(gameClock, board);
-
+            game.StartGame();
             var staysCloseToPacManLocation = new StaysCloseToPacManLocation("ghost-1");
             var targetLocation = staysCloseToPacManLocation.GetLocation(game);
 
@@ -255,7 +260,7 @@ namespace NPacMan.Game.Tests.GameTests
             };
             var gameClock = new TestGameClock();
             var game = new Game(gameClock, board);
-
+            game.StartGame();
             var staysCloseToPacManLocation = new StaysCloseToPacManLocation("ghost-1");
             var targetLocation = staysCloseToPacManLocation.GetLocation(game);
 

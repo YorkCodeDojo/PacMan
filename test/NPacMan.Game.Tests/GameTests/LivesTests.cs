@@ -25,6 +25,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(x, y), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
 
             var game = new Game(_gameClock, _gameSettings);
+            game.StartGame(); 
             var currentLives = game.Lives;
 
             game.ChangeDirection(Direction.Left);
@@ -42,6 +43,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(x, y), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
 
             var game = new Game(_gameClock, _gameSettings);
+            game.StartGame(); 
             var currentLives = game.Lives;
 
             game.ChangeDirection(Direction.Right);
@@ -62,6 +64,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Ghosts.Add(new Ghost("Ghost1", ghostLocation, Direction.Left, CellLocation.TopLeft, new GhostGoesRightStrategy()));
 
             var game = new Game(_gameClock, _gameSettings);
+            game.StartGame(); 
             var currentLives = game.Lives;
 
             game.ChangeDirection(Direction.Left);
@@ -81,6 +84,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(x - 1, y), Direction.Right, CellLocation.TopLeft, new GhostGoesRightStrategy()));
 
             var game = new Game(_gameClock, _gameSettings);
+            game.StartGame(); 
             var currentLives = game.Lives;
 
             game.ChangeDirection(Direction.Up);
@@ -102,6 +106,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.PacMan = new PacMan(location, Direction.Down);
 
             var game = new Game(_gameClock, _gameSettings);
+            game.StartGame(); 
             await _gameClock.Tick();
 
             game.Lives.Should().Be(expectedLife);

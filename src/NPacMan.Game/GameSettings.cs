@@ -32,7 +32,7 @@ namespace NPacMan.Game
         public int Height { get; }
         public IReadOnlyCollection<Ghost> Ghosts { get; }
         public IReadOnlyCollection<CellLocation> Doors { get; }
-        public GameStatus InitialGameStatus { get; } = GameStatus.Alive;
+        public GameStatus InitialGameStatus { get; } = GameStatus.Initial;
         public int InitialLives { get; } = 3;
 
         public int InitialScatterTimeInSeconds { get; } = 7;

@@ -22,7 +22,7 @@ namespace NPacMan.Game.Tests.GameTests
         {
             _gameSettings.PacMan = new PacMan((5, 6), Direction.Right);
             var game = new Game(_gameClock, _gameSettings);
-
+            game.StartGame();
             game.PacMan.Should().BeEquivalentTo(new
             {
                 Location = new CellLocation(5, 6),
@@ -39,6 +39,8 @@ namespace NPacMan.Game.Tests.GameTests
         public async Task PacManWalksInFacingDirection(Direction directionToFace, int changeInX, int changeInY)
         {
             var game = new Game(_gameClock, _gameSettings);
+            game.StartGame(); 
+            
             var (x, y) = game.PacMan.Location;
 
             game.ChangeDirection(directionToFace);
@@ -60,6 +62,7 @@ namespace NPacMan.Game.Tests.GameTests
         public async Task PacManCannotMoveIntoWalls(Direction directionToFace, int createWallXOffset, int createWallYOffset)
         {
             var game = new Game(_gameClock, _gameSettings);
+            game.StartGame(); 
             var x = game.PacMan.Location.X;
             var y = game.PacMan.Location.Y;
             var score = game.Score;
@@ -83,6 +86,7 @@ namespace NPacMan.Game.Tests.GameTests
         public async Task PacManIsTeleportedWhenYouWalkIntoAPortal()
         {
             var game = new Game(_gameClock, _gameSettings);
+            game.StartGame(); 
             var x = game.PacMan.Location.X;
             var y = game.PacMan.Location.Y;
             var score = game.Score;
@@ -115,12 +119,14 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.PacMan = new PacMan((x, y), Direction.Down);
 
             var game = new Game(_gameClock, _gameSettings);
+            game.StartGame(); 
             await _gameClock.Tick();
 
             game.PacMan
                 .Should().BeEquivalentTo(new
                 {
-                    Location = new {
+                    Location = new
+                    {
                         X = x,
                         Y = y
                     }
@@ -134,6 +140,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(1, 2), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
 
             var game = new Game(_gameClock, _gameSettings);
+            game.StartGame(); 
             var now = DateTime.UtcNow;
             await _gameClock.Tick(now);
 
@@ -150,12 +157,66 @@ namespace NPacMan.Game.Tests.GameTests
         }
 
         [Fact]
+        public async Task WhenPacManDiesTheGameNotificationShouldFire()
+        {
+            _gameSettings.PacMan = new PacMan((1, 1), Direction.Down);
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(1, 2), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
+
+            var numberOfNotificationsTriggered = 0;
+
+            var game = new Game(_gameClock, _gameSettings);
+            game.Subscribe(GameNotification.Dying, () => numberOfNotificationsTriggered++);
+            game.StartGame(); 
+            var now = DateTime.UtcNow;
+            await _gameClock.Tick(now);
+
+            await _gameClock.Tick(now.AddSeconds(1));
+            await _gameClock.Tick(now.AddSeconds(2));
+            await _gameClock.Tick(now.AddSeconds(3));
+
+            if (game.Status != GameStatus.Dying)
+                throw new Exception($"Invalid Game State {game.Status:G} should be {nameof(GameStatus.Dying)}");
+
+            numberOfNotificationsTriggered.Should().Be(1);
+        }
+
+        [Fact]
+        public async Task WhenPacManRespawnsTheGameNotificationShouldFire()
+        {
+            _gameSettings.PacMan = new PacMan((1, 1), Direction.Down);
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(1, 2), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
+
+            var numberOfNotificationsTriggered = 0;
+
+            var game = new Game(_gameClock, _gameSettings);
+            game.Subscribe(GameNotification.Respawning, () => numberOfNotificationsTriggered++);
+            game.StartGame(); 
+            var now = DateTime.UtcNow;
+            await _gameClock.Tick(now);
+
+            await _gameClock.Tick(now.AddSeconds(1));
+            await _gameClock.Tick(now.AddSeconds(2));
+            await _gameClock.Tick(now.AddSeconds(3));
+
+            if (game.Status != GameStatus.Dying)
+                throw new Exception($"Invalid Game State {game.Status:G} should be {nameof(GameStatus.Dying)}");
+
+            await _gameClock.Tick(now.AddSeconds(4));
+
+            if (game.Status != GameStatus.Respawning)
+                throw new Exception($"Invalid Game State {game.Status:G} should be {nameof(GameStatus.Respawning)}");
+
+            numberOfNotificationsTriggered.Should().Be(1);
+        }
+
+        [Fact]
         public async Task PacManShouldBeAliveAfter4SecondsWhenInRespawning()
         {
             _gameSettings.PacMan = new PacMan((5, 2), Direction.Left);
             _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(1, 2), Direction.Right, CellLocation.TopLeft, new GhostGoesRightStrategy()));
 
             var game = new Game(_gameClock, _gameSettings);
+            game.StartGame();
             var now = DateTime.UtcNow;
 
             await _gameClock.Tick(now);
@@ -177,6 +238,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(1, 2), Direction.Right, CellLocation.TopLeft, new GhostGoesRightStrategy()));
 
             var game = new Game(_gameClock, _gameSettings);
+            game.StartGame(); 
             var now = DateTime.UtcNow;
             await _gameClock.Tick(now);
             await _gameClock.Tick(now);
@@ -193,7 +255,8 @@ namespace NPacMan.Game.Tests.GameTests
             game.PacMan.Should().BeEquivalentTo(
                 new
                 {
-                    Location = new {
+                    Location = new
+                    {
                         X = 5,
                         Y = 2
                     }

@@ -27,7 +27,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(0, 0), Direction.Left, CellLocation.TopLeft, strategy));
 
             var game = new Game(_gameClock, _gameSettings);
-
+            game.StartGame();
             await _gameClock.Tick();
             game.Ghosts["Ghost1"].Should().BeEquivalentTo(new
             {
@@ -49,6 +49,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.PacMan = new PacMan((3, 3), Direction.Down);
 
             var game = new Game(_gameClock, _gameSettings);
+            game.StartGame(); 
             await _gameClock.Tick();
 
             using var _ = new AssertionScope();
@@ -73,6 +74,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Ghosts.Add(new Ghost("Ghost1", homeLocation, Direction.Right, CellLocation.TopLeft, strategy));
 
             var game = new Game(_gameClock, _gameSettings);
+            game.StartGame(); 
             var now = DateTime.UtcNow;
 
             await _gameClock.Tick(now);
@@ -90,6 +92,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Ghosts.Add(new Ghost("Ghost1", homeLocation, Direction.Right, CellLocation.TopLeft, strategy));
 
             var game = new Game(_gameClock, _gameSettings);
+            game.StartGame(); 
             var now = DateTime.UtcNow;
 
             await _gameClock.Tick(now);
@@ -125,7 +128,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Ghosts.Add(new Ghost("Ghost1", startingLocation, Direction.Right, scatterLocation, strategy));
 
             var game = new Game(_gameClock, _gameSettings);
-
+            game.StartGame();
             await _gameClock.Tick();
             await _gameClock.Tick();
             await _gameClock.Tick();
@@ -152,7 +155,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Ghosts.Add(new Ghost("Ghost1", startingLocation, Direction.Right, scatterLocation, strategy));
 
             var game = new Game(_gameClock, _gameSettings);
-
+            game.StartGame();
             var now = DateTime.UtcNow;
             await _gameClock.Tick(now);
             await _gameClock.Tick(now);
@@ -185,7 +188,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Ghosts.Add(new Ghost("Ghost1", startingLocation, Direction.Right, scatterLocation, strategy));
 
             var game = new Game(_gameClock, _gameSettings);
-
+            game.StartGame();
             var now = DateTime.UtcNow;
 
             await _gameClock.Tick(now);
