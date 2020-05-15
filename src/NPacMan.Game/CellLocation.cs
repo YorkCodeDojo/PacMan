@@ -53,9 +53,9 @@ namespace NPacMan.Game
 
         public override bool Equals(object? obj)
         {
-            if (obj is CellLocation)
+            if (obj is CellLocation cellLocation)
             {
-                return Equals((CellLocation)obj);
+                return Equals(cellLocation);
             }
             return false;
         }
