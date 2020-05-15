@@ -8,6 +8,7 @@ namespace NPacMan.Game
         IReadOnlyCollection<CellLocation> Walls { get; }
         IReadOnlyCollection<CellLocation> Doors { get; }
         IReadOnlyCollection<CellLocation> Coins { get; }
+        IReadOnlyCollection<CellLocation> PowerPills { get; }
         IReadOnlyDictionary<CellLocation, CellLocation> Portals { get; }
         int Width { get; }
         int Height { get; }

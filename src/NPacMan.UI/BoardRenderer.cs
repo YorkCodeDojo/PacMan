@@ -54,7 +54,22 @@ namespace NPacMan.UI
                 var x = coin.X * cellSize;
                 var y = coin.Y * cellSize;
 
-                g.FillRectangle(Brushes.Gold, x + (cellSize / 4), y + (cellSize / 4), cellSize / 2, cellSize / 2);
+                _sprites.RenderSprite(g, x,y, _sprites.Coin());
+            }
+        }
+
+        public void RenderPowerPills(Graphics g, NPacMan.Game.Game game)
+        {
+            var cellSize = Sprites.PixelGrid;
+
+            var powerPills = game.PowerPills;
+
+            foreach (var powerPill in powerPills)
+            {
+                var x = powerPill.X * cellSize;
+                var y = powerPill.Y * cellSize;
+
+                _sprites.RenderSprite(g, x,y, _sprites.PowerPill());
             }
         }
 

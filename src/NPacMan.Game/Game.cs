@@ -14,6 +14,7 @@ namespace NPacMan.Game
         private readonly IGameClock _gameClock;
         private readonly IGameSettings _settings;
         private List<CellLocation> _collectedCoins;
+        private List<CellLocation> _collectedPowerPills;
         private Dictionary<string, Ghost> _ghosts;
 
         private readonly GameNotifications _gameNotifications = new GameNotifications();
@@ -28,6 +29,7 @@ namespace NPacMan.Game
             _settings = settings;
             PacMan = settings.PacMan;
             _collectedCoins = new List<CellLocation>();
+            _collectedPowerPills = new List<CellLocation>();
             _ghosts = settings.Ghosts.ToDictionary(x => x.Name, x => x);
             _gameStateMachine = new GameStateMachine(this, settings, _gameNotifications);
             _gameState = new GameState(settings);
@@ -59,6 +61,9 @@ namespace NPacMan.Game
 
         public IReadOnlyCollection<CellLocation> Coins
             => _settings.Coins.Except(_collectedCoins).ToList().AsReadOnly();
+
+        public IReadOnlyCollection<CellLocation> PowerPills
+            => _settings.PowerPills.Except(_collectedPowerPills).ToList().AsReadOnly();
 
         public IReadOnlyCollection<CellLocation> Walls
             => _settings.Walls;

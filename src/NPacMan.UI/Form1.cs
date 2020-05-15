@@ -67,6 +67,7 @@ namespace NPacMan.UI
                 g.TranslateTransform(0, 3 * Sprites.PixelGrid);
                 _boardRenderer.RenderWalls(g, _game);
                 _boardRenderer.RenderCoins(g, _game);
+                _boardRenderer.RenderPowerPills(g, _game);
                 _boardRenderer.RenderPacMan(g, _game);
                 _boardRenderer.RenderGhosts(g, _game);
                 g.ResetTransform();

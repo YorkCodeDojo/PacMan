@@ -40,6 +40,10 @@ namespace NPacMan.UI
 
         public SpriteSource[] Bonus;
 
+        public SpriteSource Coin() => new SpriteSource(16, 0, 1);
+
+        public SpriteSource PowerPill() => new SpriteSource(20, 0, 1);
+
         /// <summary>
         /// Get source of ghost sprite
         /// </summary>

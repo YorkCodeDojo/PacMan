@@ -16,6 +16,12 @@ namespace NPacMan.Game.Tests
         IReadOnlyCollection<CellLocation> IGameSettings.Coins
             => this.Coins;
 
+        public List<CellLocation> PowerPills { get; set; }
+            = new List<CellLocation>();
+
+        IReadOnlyCollection<CellLocation> IGameSettings.PowerPills
+            => this.PowerPills;
+            
         public List<CellLocation> Doors { get; set; }
             = new List<CellLocation>();
 
