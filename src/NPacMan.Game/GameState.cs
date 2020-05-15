@@ -10,7 +10,7 @@ namespace NPacMan.Game
             Status = settings.InitialGameStatus switch
             {
                 GameStatus.Initial => nameof(GameStateMachine.Initial),
-                GameStatus.Alive => nameof(GameStateMachine.Alive),
+                GameStatus.Alive => nameof(GameStateMachine.GhostChase),
                 GameStatus.Dying => nameof(GameStateMachine.Dying),
                 GameStatus.Respawning => nameof(GameStateMachine.Respawning),
                 GameStatus.Dead => nameof(GameStateMachine.Dead),
@@ -30,5 +30,7 @@ namespace NPacMan.Game
         public bool GhostsVisible { get; set; }
 
         public int Score { get; set; }
+
+        public DateTime LastTick { get; set; }
     }
 }

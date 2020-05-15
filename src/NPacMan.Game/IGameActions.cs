@@ -15,5 +15,6 @@ namespace NPacMan.Game
         Task MoveGhosts(DateTime now);
         void HideGhosts(GameState gameState);
         void MovePacManHome();
+        void MakeGhostsNotEdible();
     }
 }

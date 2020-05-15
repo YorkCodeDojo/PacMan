@@ -86,7 +86,7 @@ namespace NPacMan.Game
         public GameStatus Status => _gameState.Status switch
         {
             nameof(GameStateMachine.Initial) => GameStatus.Initial,
-            nameof(GameStateMachine.Alive) => GameStatus.Alive,
+            nameof(GameStateMachine.GhostChase) => GameStatus.Alive,
             nameof(GameStateMachine.Scatter) => GameStatus.Alive,
             nameof(GameStateMachine.Dying) => GameStatus.Dying,
             nameof(GameStateMachine.Respawning) => GameStatus.Respawning,
@@ -161,6 +161,12 @@ namespace NPacMan.Game
             ApplyToGhosts(ghost => ghost.SetToEdible());
         }
 
+        
+        void IGameActions.MakeGhostsNotEdible()
+        {
+            ApplyToGhosts(ghost => ghost.SetToNotEdible());
+        }
+
         void IGameActions.MovePacManHome()
         {
             PacMan = PacMan.SetToHome();
@@ -215,5 +221,6 @@ namespace NPacMan.Game
                 await _gameStateMachine.RaiseEvent(_gameState, _gameStateMachine.PacManCaughtByGhost, new Tick(now));
             }
         }
+
     }
 }

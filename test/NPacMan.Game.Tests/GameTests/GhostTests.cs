@@ -238,6 +238,35 @@ namespace NPacMan.Game.Tests.GameTests
             });
         }
 
+
+        [Fact]
+        public async Task AllGhostsShouldReturnToNonEdibleAfter7Seconds()
+        {
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", _gameSettings.PacMan.Location.Right.Right, Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost2", _gameSettings.PacMan.Location.Right.Right, Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost3", _gameSettings.PacMan.Location.Right.Right, Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
+
+            _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Right);
+
+             var game = new Game(_gameClock, _gameSettings);
+            game.StartGame(); 
+
+            game.ChangeDirection(Direction.Right);
+
+            var now = DateTime.UtcNow;
+            await _gameClock.Tick(now);
+
+            if (!game.Ghosts.Values.All(g => g.Edible))
+                throw new Exception("All ghosts are meant to be edible.");
+
+            await _gameClock.Tick(now.AddSeconds(7));                
+
+            game.Ghosts.Values.Should().AllBeEquivalentTo(new {
+                Edible = false
+            });
+        }
+
+
         private EnsureThatGhost WeExpectThat(Ghost ghost) => new EnsureThatGhost(ghost);
 
     }

@@ -8,29 +8,43 @@ namespace NPacMan.Game
         public GameStateMachine(IGameActions game, IGameSettings settings, GameNotifications gameNotifications)
         {
             InstanceState(x => x.Status);
-            
+
+            DuringAny(
+                When(Tick)
+                    .Then(context => context.Instance.LastTick = context.Data.Now));
+
             Initially(
                 When(Tick)
+                    .Then(context => context.Instance.LastTick = context.Data.Now)
                     .Then(context => game.MoveGhostsHome())
                     .Then(context => game.ShowGhosts(context.Instance))
-                    .Then(context => game.ScatterGhosts())
                     .Then(context => gameNotifications.Publish(GameNotification.Beginning))
-                    .Then(context => context.Instance.TimeToChangeState = context.Data.Now.AddSeconds(settings.InitialScatterTimeInSeconds))
                     .TransitionTo(Scatter));
+
+            WhenEnter(Scatter,
+                       binder => binder
+                       .Then(context => context.Instance.TimeToChangeState = context.Instance.LastTick.AddSeconds(settings.InitialScatterTimeInSeconds))
+                       .Then(context => game.ScatterGhosts()));
 
             During(Scatter,
                 When(Tick, context => context.Data.Now >= context.Instance.TimeToChangeState)
-                    .Then(context => context.Instance.TimeToChangeState = context.Data.Now.AddSeconds(settings.ChaseTimeInSeconds))
-                    .Then(context => game.GhostToChase())
-                    .TransitionTo(Alive));
+                    .TransitionTo(GhostChase));
 
-            During(Alive,
+            WhenEnter(GhostChase,
+                       binder => binder
+                            .Then(context => context.Instance.TimeToChangeState = context.Instance.LastTick.AddSeconds(settings.ChaseTimeInSeconds))
+                            .Then(context => game.GhostToChase()));
+
+            During(GhostChase,
                 When(Tick, context => context.Data.Now >= context.Instance.TimeToChangeState)
-                    .Then(context => context.Instance.TimeToChangeState = context.Data.Now.AddSeconds(settings.InitialScatterTimeInSeconds))
-                    .Then(context => game.ScatterGhosts())
                     .TransitionTo(Scatter));
 
-            During(Scatter, Alive,
+            During(Frightened,
+                When(Tick, context => context.Data.Now >= context.Instance.TimeToChangeState)
+                    .Then(x => game.MakeGhostsNotEdible())
+                    .TransitionTo(Scatter));
+
+            During(Scatter, GhostChase, Frightened,
                 When(Tick)
                     .ThenAsync(async context => await game.MoveGhosts(context.Data.Now))
                     .Then(context => game.MovePacMan(context, this)),
@@ -40,14 +54,16 @@ namespace NPacMan.Game
                 When(PowerPillEaten)
                     .Then(context => context.Instance.Score += 50)
                     .Then(context => gameNotifications.Publish(GameNotification.EatPowerPill))
-                    .Then(context => game.MakeGhostsEdible()),
+                    .Then(context => game.MakeGhostsEdible())
+                    .Then(context => context.Instance.TimeToChangeState = context.Instance.LastTick.AddSeconds(7))
+                    .TransitionTo(Frightened),
                 When(PacManCaughtByGhost)
                     .Then(context => context.Instance.Lives -= 1)
-                    .Then(context => context.Instance.TimeToChangeState = context.Data.Now.AddSeconds(4))
                     .TransitionTo(Dying));
 
             WhenEnter(Dying,
                        binder => binder
+                                .Then(context => context.Instance.TimeToChangeState = context.Instance.LastTick.AddSeconds(4))
                                 .Then(context => gameNotifications.Publish(GameNotification.Dying)));
 
             During(Dying,
@@ -68,15 +84,15 @@ namespace NPacMan.Game
                     .Then(context => game.MoveGhostsHome())
                     .Then(context => game.MovePacManHome())
                     .Then(context => game.ShowGhosts(context.Instance))
-                    .TransitionTo(Alive));
+                    .TransitionTo(GhostChase));
 
             During(Dead, Ignore(Tick));
         }
 
 
-        public State Alive { get; private set; } = null!;
-
+        public State GhostChase { get; private set; } = null!;
         public State Scatter { get; private set; } = null!;
+        public State Frightened { get; private set; } = null!;
         public State Dying { get; private set; } = null!;
         public State Respawning { get; private set; } = null!;
         public State Dead { get; private set; } = null!;

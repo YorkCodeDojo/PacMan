@@ -1,4 +1,5 @@
-﻿using NPacMan.Game.GhostStrategies;
+﻿using System;
+using NPacMan.Game.GhostStrategies;
 
 namespace NPacMan.Game
 {
@@ -72,6 +73,11 @@ namespace NPacMan.Game
         public Ghost SetToEdible()
         {
             return new Ghost(Name, Home, Home, Direction, ScatterTarget, Strategy, CurrentStrategy, edible: true);
+        }
+
+        internal Ghost SetToNotEdible()
+        {
+            return new Ghost(Name, Home, Home, Direction, ScatterTarget, Strategy, CurrentStrategy, edible: false);
         }
     }
 }
