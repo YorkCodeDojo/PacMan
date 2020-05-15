@@ -92,7 +92,7 @@ namespace NPacMan.Game
             nameof(GameStateMachine.Dying) => GameStatus.Dying,
             nameof(GameStateMachine.Respawning) => GameStatus.Respawning,
             nameof(GameStateMachine.Dead) => GameStatus.Dead,
-            _ => throw new NotImplementedException($"No map for status '{_gameState.Status}")
+            _ => throw new NotImplementedException($"No map for status '{_gameState.Status}'")
         };
 
         public void ChangeDirection(Direction direction)

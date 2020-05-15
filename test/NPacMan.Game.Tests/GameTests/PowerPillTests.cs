@@ -31,7 +31,20 @@ namespace NPacMan.Game.Tests.GameTests
             game.Score.Should().Be(50);
         }
 
-             [Fact]
+        [Fact]
+        public async Task GameStateStaysAlivewhenPillCollected()
+        {
+            var game = new Game(_gameClock, _gameSettings);
+            _gameSettings.PowerPills.Add(game.PacMan.Location.Below);
+
+            game.StartGame(); 
+            game.ChangeDirection(Direction.Down);
+            await _gameClock.Tick();
+
+            game.Status.Should().Be(GameStatus.Alive);
+        }
+
+        [Fact]
         public async Task CannotCollectTheSamePowerPillTwice()
         {
             var game = new Game(_gameClock, _gameSettings);
