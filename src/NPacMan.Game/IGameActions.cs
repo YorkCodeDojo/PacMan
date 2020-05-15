@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Automatonymous;
 
 namespace NPacMan.Game
 {
@@ -9,7 +10,7 @@ namespace NPacMan.Game
         void ShowGhosts(GameState gameState);
         void ScatterGhosts();
         void GhostToChase();
-        Task MovePacMan(DateTime now);
+        Task MovePacMan(BehaviorContext<GameState, Tick> context);
         Task MoveGhosts(DateTime now);
         void HideGhosts(GameState gameState);
         void MovePacManHome();

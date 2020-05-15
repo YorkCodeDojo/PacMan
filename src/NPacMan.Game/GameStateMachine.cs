@@ -33,7 +33,7 @@ namespace NPacMan.Game
             During(Scatter, Alive,
                 When(Tick)
                     .ThenAsync(async context => await game.MoveGhosts(context.Data.Now))
-                    .Then(context => game.MovePacMan(context.Data.Now)),
+                    .Then(context => game.MovePacMan(context)),
                 When(CoinEaten)
                     .Then(context => context.Instance.Score += 10)
                     .Then(context => gameNotifications.Publish(GameNotification.EatCoin)),
