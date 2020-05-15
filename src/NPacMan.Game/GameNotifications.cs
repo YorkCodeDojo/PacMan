@@ -14,6 +14,7 @@ namespace NPacMan.Game
         Intermission,
         ExtraPac,
         EatGhost,
+        EatPowerPill
     }
 
     internal class GameNotifications

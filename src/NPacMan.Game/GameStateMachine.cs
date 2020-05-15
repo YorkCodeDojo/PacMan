@@ -38,7 +38,8 @@ namespace NPacMan.Game
                     .Then(context => context.Instance.Score += 10)
                     .Then(context => gameNotifications.Publish(GameNotification.EatCoin)),
                 When(PowerPillEaten)
-                    .Then(context => context.Instance.Score += 50),
+                    .Then(context => context.Instance.Score += 50)
+                    .Then(context => gameNotifications.Publish(GameNotification.EatPowerPill)),
                 When(PacManCaughtByGhost)
                     .Then(context => context.Instance.Lives -= 1)
                     .Then(context => context.Instance.TimeToChangeState = context.Data.Now.AddSeconds(4))

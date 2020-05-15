@@ -56,5 +56,22 @@ namespace NPacMan.Game.Tests.GameTests
             game.Score.Should().Be(50);
         }
 
+        [Fact]
+        public async Task WhenPacManEatsAPowerPillTheGameNotificationShouldFire()
+        {
+            var numberOfNotificationsTriggered = 0;
+
+            var game = new Game(_gameClock, _gameSettings);
+            _gameSettings.PowerPills.Add(game.PacMan.Location.Below);
+            game.Subscribe(GameNotification.EatPowerPill, () => numberOfNotificationsTriggered++);
+            game.StartGame(); 
+
+            game.ChangeDirection(Direction.Down);
+
+            await _gameClock.Tick();
+
+            numberOfNotificationsTriggered.Should().Be(1);
+        }
+    
     }
 }
