@@ -190,6 +190,16 @@ namespace NPacMan.Game
 
                 await _gameStateMachine.RaiseEvent(_gameState, _gameStateMachine.CoinEaten);
             }
+            else if (PowerPills.Contains(newPacMan.Location))
+            {
+                var newCollectedPowerPills = new List<CellLocation>(_collectedPowerPills)
+                {
+                    (newPacMan.Location)
+                };
+                _collectedPowerPills = newCollectedPowerPills;
+                
+                await _gameStateMachine.RaiseEvent(_gameState, _gameStateMachine.PowerPillEaten);
+            }
         }
 
         private async Task MoveGhosts(DateTime now)

@@ -37,6 +37,8 @@ namespace NPacMan.Game
                 When(CoinEaten)
                     .Then(context => context.Instance.Score += 10)
                     .Then(context => gameNotifications.Publish(GameNotification.EatCoin)),
+                When(PowerPillEaten)
+                    .Then(context => context.Instance.Score += 50),
                 When(PacManCaughtByGhost)
                     .Then(context => context.Instance.Lives -= 1)
                     .Then(context => context.Instance.TimeToChangeState = context.Data.Now.AddSeconds(4))
@@ -79,5 +81,6 @@ namespace NPacMan.Game
         public Event<Tick> Tick { get; private set; } = null!;
         public Event<Tick> PacManCaughtByGhost { get; private set; } = null!;
         public Event CoinEaten { get; private set; } = null!;
+        public Event PowerPillEaten { get; private set; } = null!;
     }
 }
