@@ -2,80 +2,69 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Collections.Immutable;
+using System.Threading.Tasks;
 using Automatonymous;
 
 namespace NPacMan.Game
 {
-    public class GameState
-    {
-        public string Status { get; set; } = null!;
-
-        public DateTime? TimeToChangeState { get; set; }
-
-        public int Lives { get; set; }
-
-        public bool GhostsVisible { get; set; }
-
-        public int Score { get; set; }
-    }
-
-
-    class Tick
-    {
-        public DateTime Now { get; set; }
-    }
-
-    public class Game
+    public class Game : IGameActions
     {
         public int Score => _gameState.Score;
 
+        private readonly IGameClock _gameClock;
         private readonly IGameSettings _settings;
         private List<CellLocation> _collectedCoins;
+        private List<CellLocation> _collectedPowerPills;
         private Dictionary<string, Ghost> _ghosts;
 
-        private ISoundSet _soundSet;
+        private readonly GameNotifications _gameNotifications = new GameNotifications();
 
-        private GameState _gameState;
+        private readonly GameState _gameState;
 
-        private GameStateMachine _gameStateMachine;
-        public Game(IGameClock gameClock, IGameSettings settings, ISoundSet soundSet)
+        private readonly GameStateMachine _gameStateMachine;
+
+        public Game(IGameClock gameClock, IGameSettings settings)
         {
-            gameClock.Subscribe(Tick);
+            _gameClock = gameClock;
             _settings = settings;
             PacMan = settings.PacMan;
             _collectedCoins = new List<CellLocation>();
+            _collectedPowerPills = new List<CellLocation>();
             _ghosts = settings.Ghosts.ToDictionary(x => x.Name, x => x);
-            _soundSet = soundSet;
-            _gameStateMachine = new GameStateMachine(this);
-            _gameState = new GameState
-            {
-                Lives = settings.InitialLives,
-                Status = settings.InitialGameStatus,
-                Score = 0,
-                GhostsVisible = true,
-                TimeToChangeState = null
-            };
-
-            // Play the beginning sound
-            _soundSet.Beginning();
+            _gameStateMachine = new GameStateMachine(this, settings, _gameNotifications);
+            _gameState = new GameState(settings);
         }
 
-        public Game(IGameClock gameClock, IGameSettings settings)
-            : this(gameClock, settings, new NullSoundSet())
+        public Game StartGame()
         {
+            _gameClock.Subscribe(Tick);
+
+            return this;
         }
 
-        public static Game Create(ISoundSet soundSet)
+        public Game Subscribe(GameNotification gameNotification, Action action)
+        {
+            _gameNotifications.Subscribe(gameNotification, action);
+            
+            return this;
+        }
+
+        public static Game Create()
         {
             var filename = "board.txt";
             var gameSettings = GameSettingsLoader.LoadFromFile(filename);
 
-            return new Game(new GameClock(), gameSettings, soundSet);
+            return new Game(new GameClock(), gameSettings);
         }
 
         public PacMan PacMan { get; private set; }
+
         public IReadOnlyCollection<CellLocation> Coins
             => _settings.Coins.Except(_collectedCoins).ToList().AsReadOnly();
+
+        public IReadOnlyCollection<CellLocation> PowerPills
+            => _settings.PowerPills.Except(_collectedPowerPills).ToList().AsReadOnly();
+
         public IReadOnlyCollection<CellLocation> Walls
             => _settings.Walls;
 
@@ -94,21 +83,37 @@ namespace NPacMan.Game
         public IReadOnlyDictionary<string, Ghost> Ghosts
             => _gameState.GhostsVisible ? _ghosts : (IReadOnlyDictionary<string, Ghost>)ImmutableDictionary<string, Ghost>.Empty;
 
-        public string Status => _gameState.Status;
+        public GameStatus Status => _gameState.Status switch
+        {
+            nameof(GameStateMachine.Initial) => GameStatus.Initial,
+            nameof(GameStateMachine.GhostChase) => GameStatus.Alive,
+            nameof(GameStateMachine.Scatter) => GameStatus.Alive,
+            nameof(GameStateMachine.Frightened) => GameStatus.Alive,
+            nameof(GameStateMachine.Dying) => GameStatus.Dying,
+            nameof(GameStateMachine.Respawning) => GameStatus.Respawning,
+            nameof(GameStateMachine.Dead) => GameStatus.Dead,
+            _ => throw new NotImplementedException($"No map for status '{_gameState.Status}'")
+        };
 
         public void ChangeDirection(Direction direction)
         {
-            PacMan = PacMan.WithNewDirection(direction);
+            var nextSpace = PacMan.Location + direction;
+            if(!Walls.Contains(nextSpace))
+            {
+                PacMan = PacMan.WithNewDirection(direction);
+            }
         }
 
-        private void Tick(DateTime now)
+        private async Task Tick(DateTime now)
         {
-            _gameStateMachine.RaiseEvent(_gameState, _gameStateMachine.Tick, new Tick { Now = now });
+            await _gameStateMachine.RaiseEvent(_gameState, _gameStateMachine.Tick, new Tick(now));
         }
 
-        private bool HasDied()
+        private bool TryHasDied(out Ghost? ghost)
         {
-            return Ghosts.Values.Any(ghost => ghost.Location.X == PacMan.Location.X && ghost.Location.Y == PacMan.Location.Y);
+            ghost = Ghosts.Values.FirstOrDefault(ghost => ghost.Location.X == PacMan.Location.X && ghost.Location.Y == PacMan.Location.Y);
+
+            return !(ghost is null);
         }
 
         private void ApplyToGhosts(Func<Ghost, Ghost> action)
@@ -122,99 +127,66 @@ namespace NPacMan.Game
             _ghosts = newPositionOfGhosts;
         }
 
-        class GameStateMachine :
-               AutomatonymousStateMachine<GameState>
+
+        void IGameActions.ShowGhosts(GameState gameState)
         {
-            public GameStateMachine(Game game)
-            {
-                InstanceState(x => x.Status);
-
-                Initially(
-                    When(Tick)
-                        .Then(context => game.MoveGhostsHome())
-                        .Then(context => game.ShowGhosts())
-                        .Then(context => game.ScatterGhosts())
-                        .Then(context => context.Instance.TimeToChangeState = context.Data.Now.AddSeconds(game._settings.InitialScatterTimeInSeconds))
-                        .TransitionTo(InitialScatter));
-
-                During(InitialScatter,
-                     When(Tick, context => context.Data.Now >= context.Instance.TimeToChangeState)
-                        .Then(context => context.Instance.TimeToChangeState = context.Data.Now.AddSeconds(game._settings.ChaseTimeInSeconds))
-                         .Then(context => game.GhostToChase())
-                         .TransitionTo(Alive));
-
-                During(Alive,
-                     When(Tick, context => context.Data.Now >= context.Instance.TimeToChangeState)
-                        .Then(context => context.Instance.TimeToChangeState = context.Data.Now.AddSeconds(game._settings.InitialScatterTimeInSeconds))
-                         .Then(context => game.ScatterGhosts())
-                         .TransitionTo(InitialScatter));
-
-                During(InitialScatter, Alive,
-                    When(Tick)
-                        .Then(context => game.MoveGhosts(context.Data.Now))
-                        .Then(context => game.MovePacMan(context.Data.Now)),
-                    When(CoinEaten)
-                        .Then(context => context.Instance.Score += 10)
-                        .Then(context => game._soundSet.Chomp()),
-                    When(PacManCaughtByGhost)
-                        .Then(context => context.Instance.Lives -= 1)
-                        .Then(context => context.Instance.TimeToChangeState = context.Data.Now.AddSeconds(4))
-                        .TransitionTo(Dying));
-
-                During(Dying,
-                    When(Tick, context => context.Data.Now >= context.Instance.TimeToChangeState)
-                        .Then(context => game.HideGhosts())
-                        .Then(context => context.Instance.TimeToChangeState = context.Data.Now.AddSeconds(4))
-                        .Then(context => game._soundSet.Death())
-                        .IfElse(context => context.Instance.Lives > 0,
-                            binder => binder.TransitionTo(Respawning),
-                            binder => binder.Finalize()));
-
-                During(Respawning,
-                    When(Tick, context => context.Data.Now >= context.Instance.TimeToChangeState)
-                        .Then(context => context.Instance.TimeToChangeState = context.Data.Now.AddSeconds(4))
-                        .Then(context => game.MoveGhostsHome())
-                        .Then(context => game.MovePacManHome())
-                        .Then(context => game.ShowGhosts())
-                        .TransitionTo(Alive));
-            }
-
-
-            public State Alive { get; private set; } = null!;
-
-            public State InitialScatter { get; private set; } = null!;
-            public State Dying { get; private set; } = null!;
-            public State Respawning { get; private set; } = null!;
-            public Event<Tick> Tick { get; private set; } = null!;
-            public Event<Tick> PacManCaughtByGhost { get; private set; } = null!;
-            public Event CoinEaten { get; private set; } = null!;
+            gameState.GhostsVisible = true;
         }
 
-        private void ScatterGhosts()
+
+        Task IGameActions.MoveGhosts(BehaviorContext<GameState, Tick> context, GameStateMachine gameStateMachine)
+        {
+            return MoveGhosts(context, gameStateMachine);
+        }
+
+        void IGameActions.HideGhosts(GameState gameState)
+        {
+            gameState.GhostsVisible = false;
+        }
+
+        void IGameActions.ScatterGhosts()
         {
             ApplyToGhosts(ghost => ghost.Scatter());
         }
-        
-        private void GhostToChase()
+
+        void IGameActions.GhostToChase()
         {
             ApplyToGhosts(ghost => ghost.Chase());
         }
 
-        private void HideGhosts()
-        {
-            _gameState.GhostsVisible = false;
-        }
-
-        private void MoveGhostsHome()
+        void IGameActions.MoveGhostsHome()
         {
             ApplyToGhosts(ghost => ghost.SetToHome());
         }
 
-        private void MovePacManHome()
+        void IGameActions.MakeGhostsEdible()
+        {
+            ApplyToGhosts(ghost => ghost.SetToEdible());
+        }
+
+        
+        void IGameActions.MakeGhostsNotEdible()
+        {
+            ApplyToGhosts(ghost => ghost.SetToNotEdible());
+        }
+
+        void IGameActions.MovePacManHome()
         {
             PacMan = PacMan.SetToHome();
         }
-        private void MovePacMan(DateTime now)
+
+
+        void IGameActions.SendGhostHome(Ghost ghostToSendHome)
+        {
+            ApplyToGhosts(ghost => {
+                if(ghost.Name == ghostToSendHome.Name){
+                    ghost = ghost.SetToHome();
+                }
+                return ghost;
+            });
+        }
+
+        async Task IGameActions.MovePacMan(BehaviorContext<GameState, Tick> context, GameStateMachine gameStateMachine)
         {
             var newPacMan = PacMan.Move();
 
@@ -228,12 +200,15 @@ namespace NPacMan.Game
             {
                 PacMan = newPacMan;
             }
-
-            if (HasDied())
+            var died = false;
+            if(TryHasDied(out var ghost))
             {
-                _gameStateMachine.RaiseEvent(_gameState, _gameStateMachine.PacManCaughtByGhost, new Tick { Now = now });
+                died = !ghost!.Edible;
+
+                await context.Raise(gameStateMachine.GhostCollision, new GhostCollision(ghost));
             }
-            else if (Coins.Contains(newPacMan.Location))
+
+            if (!died && Coins.Contains(newPacMan.Location))
             {
                 var newCollectedCoins = new List<CellLocation>(_collectedCoins)
                     {
@@ -241,22 +216,28 @@ namespace NPacMan.Game
                     };
                 _collectedCoins = newCollectedCoins;
 
-                _gameStateMachine.RaiseEvent(_gameState, _gameStateMachine.CoinEaten);
+                await context.Raise(gameStateMachine.CoinEaten);
+            }
+            else if (!died && PowerPills.Contains(newPacMan.Location))
+            {
+                var newCollectedPowerPills = new List<CellLocation>(_collectedPowerPills)
+                {
+                    (newPacMan.Location)
+                };
+                _collectedPowerPills = newCollectedPowerPills;
+
+                await context.Raise(gameStateMachine.PowerPillEaten);
             }
         }
 
-        private void MoveGhosts(DateTime now)
+        private async Task MoveGhosts(BehaviorContext<GameState, Tick> context, GameStateMachine gameStateMachine)
         {
             ApplyToGhosts(ghost => ghost.Move(this));
-            if (HasDied())
+            if(TryHasDied(out var ghost))
             {
-                _gameStateMachine.RaiseEvent(_gameState, _gameStateMachine.PacManCaughtByGhost, new Tick { Now = now });
+                await context.Raise(gameStateMachine.GhostCollision, new GhostCollision(ghost!));
             }
         }
 
-        private void ShowGhosts()
-        {
-            _gameState.GhostsVisible = true;
-        }
     }
 }

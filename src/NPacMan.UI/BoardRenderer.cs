@@ -54,7 +54,22 @@ namespace NPacMan.UI
                 var x = coin.X * cellSize;
                 var y = coin.Y * cellSize;
 
-                g.FillRectangle(Brushes.Gold, x + (cellSize / 4), y + (cellSize / 4), cellSize / 2, cellSize / 2);
+                _sprites.RenderSprite(g, x,y, _sprites.Coin());
+            }
+        }
+
+        public void RenderPowerPills(Graphics g, NPacMan.Game.Game game)
+        {
+            var cellSize = Sprites.PixelGrid;
+
+            var powerPills = game.PowerPills;
+
+            foreach (var powerPill in powerPills)
+            {
+                var x = powerPill.X * cellSize;
+                var y = powerPill.Y * cellSize;
+
+                _sprites.RenderSprite(g, x,y, _sprites.PowerPill());
             }
         }
 
@@ -70,7 +85,7 @@ namespace NPacMan.UI
             _pacManAnimationDelay++;
             if (_pacManAnimationDelay == 3)
             {
-                if (game.Status == GameStatus.Alive.ToString())
+                if (game.Status == GameStatus.Alive)
                 {
                     _pacManAnimation = (_pacManAnimation + 1) % 4;
                 }
@@ -81,7 +96,7 @@ namespace NPacMan.UI
                 _pacManAnimationDelay = 0;
             }
 
-            _sprites.RenderSprite(g, x, y, _sprites.PacMan(game.PacMan.Direction, _pacManAnimation, game.Status == GameStatus.Dying.ToString()));
+            _sprites.RenderSprite(g, x, y, _sprites.PacMan(game.PacMan.Direction, _pacManAnimation, game.Status == GameStatus.Dying));
         }
 
 
@@ -101,12 +116,13 @@ namespace NPacMan.UI
             var x = ghost.Location.X * cellSize;
             var y = ghost.Location.Y * cellSize;
 
-            var ghostColour = ghost.Name switch
+            var ghostColour = (ghost.Name, ghost.Edible) switch
             {
-                GhostNames.Blinky => GhostColour.Red,
-                GhostNames.Inky => GhostColour.Cyan,
-                GhostNames.Pinky => GhostColour.Pink,
-                GhostNames.Clyde => GhostColour.Orange,
+                (GhostNames.Blinky, false) => GhostColour.Red,
+                (GhostNames.Inky, false) => GhostColour.Cyan,
+                (GhostNames.Pinky, false) => GhostColour.Pink,
+                (GhostNames.Clyde, false) => GhostColour.Orange,
+                (_, true) => GhostColour.BlueFlash,
                 _ => GhostColour.Red,
             };
 

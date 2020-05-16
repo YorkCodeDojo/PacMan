@@ -1,7 +1,7 @@
 ﻿ XXXXXXXXXXXXXXXXXXXXXXXXXXXX
  X............XX............X
  X.XXXX.XXXXX.XX.XXXXX.XXXX.X
- X.X  X.X   X.XX.X   X.X  X.X
+ X*X  X.X   X.XX.X   X.X  X*X
  X.XXXX.XXXXX.XX.XXXXX.XXXX.X
  X..........................X
  X.XXXX.XX.XXXXXXXX.XX.XXXX.X
@@ -21,7 +21,7 @@ T      .   X IC P X   .      T
  X............XX............X
  X.XXXX.XXXXX.XX.XXXXX.XXXX.X
  X.XXXX.XXXXX.XX.XXXXX.XXXX.X
- X...XX.......►........XX...X
+ X*..XX.......►........XX..*X
  XXX.XX.XX.XXXXXXXX.XX.XX.XXX
  XXX.XX.XX.XXXXXXXX.XX.XX.XXX
  X......XX....XX....XX......X

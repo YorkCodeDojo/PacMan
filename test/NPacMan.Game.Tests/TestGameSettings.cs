@@ -16,6 +16,12 @@ namespace NPacMan.Game.Tests
         IReadOnlyCollection<CellLocation> IGameSettings.Coins
             => this.Coins;
 
+        public List<CellLocation> PowerPills { get; set; }
+            = new List<CellLocation>();
+
+        IReadOnlyCollection<CellLocation> IGameSettings.PowerPills
+            => this.PowerPills;
+            
         public List<CellLocation> Doors { get; set; }
             = new List<CellLocation>();
 
@@ -39,7 +45,7 @@ namespace NPacMan.Game.Tests
             => this.Ghosts;
 
         public PacMan PacMan { get; set; } = new PacMan(new CellLocation(10, 10), Direction.Right);
-        public string InitialGameStatus { get; set; } = "Alive";
+        public GameStatus InitialGameStatus { get; set; } = GameStatus.Alive;
         public int InitialLives { get; set; } = 3;
         public int InitialScatterTimeInSeconds { get; set; } = 7;
         public int ChaseTimeInSeconds { get; set; } = 7;

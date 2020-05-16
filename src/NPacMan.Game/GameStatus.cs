@@ -2,9 +2,10 @@
 {
     public enum GameStatus
     {
+        Initial,
         Alive,
         Dying,
         Respawning,
-        Dead
+        Dead,
     }
 }

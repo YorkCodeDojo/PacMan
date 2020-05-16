@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace NPacMan.Game
+namespace NPacMan.Game.GhostStrategies
 {
     public class DirectToStrategy : IGhostStrategy
     {

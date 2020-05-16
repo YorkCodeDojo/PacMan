@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using NPacMan.Game.GhostStrategies;
 
 namespace NPacMan.Game
 {
@@ -23,6 +24,7 @@ namespace NPacMan.Game
             var homeLocations = FindHomeLocations(instructions);
 
             var coins = new List<CellLocation>();
+            var powerPills = new List<CellLocation>();
             var walls = new List<CellLocation>();
             var doors = new List<CellLocation>();
             var portalParts = new List<CellLocation>();
@@ -81,17 +83,20 @@ namespace NPacMan.Game
                             pacMan = new PacMan(location, Direction.Left);
                             break;
                         case 'X':
-                            walls.Add((columnNumber - 1, rowNumber));
+                            walls.Add(location);
                             break;
                         case '-':
                             doors.Add(location);
                             break;
                         case 'T':
-                            portalParts.Add((columnNumber - 1, rowNumber));
+                            portalParts.Add(location);
                             break;
                         case '.':
-                            coins.Add((columnNumber - 1, rowNumber));
+                            coins.Add(location);
                             break;
+                        case '*':
+                            powerPills.Add(location);
+                            break;                            
                         default:
                             break;
                     }
@@ -113,7 +118,7 @@ namespace NPacMan.Game
             if (pacMan is null)
                 throw new Exception("Pacman seems to be missing from the board.");
 
-            return new GameSettings(width - 2, height, walls, coins, portals, pacMan, ghosts, doors);
+            return new GameSettings(width - 2, height, walls, coins, powerPills, portals, pacMan, ghosts, doors);
         }
 
         private static Dictionary<string, CellLocation> FindHomeLocations(string[] instructions)

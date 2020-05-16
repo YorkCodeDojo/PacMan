@@ -1,4 +1,7 @@
-﻿namespace NPacMan.Game
+﻿using System;
+using NPacMan.Game.GhostStrategies;
+
+namespace NPacMan.Game
 {
     public class Ghost
     {
@@ -13,12 +16,14 @@
         private IGhostStrategy Strategy { get; }
         private IGhostStrategy CurrentStrategy { get; }
 
+        public bool Edible { get; }
+
         public Ghost(string name, CellLocation location, Direction direction, CellLocation scatterTarget, IGhostStrategy strategy) 
-        : this(name, location, location, direction, scatterTarget, strategy, strategy)
+        : this(name, location, location, direction, scatterTarget, strategy, strategy, false)
         {
         }
 
-        private Ghost(string name, CellLocation homeLocation, CellLocation currentLocation, Direction direction, CellLocation scatterTarget, IGhostStrategy strategy, IGhostStrategy currentStrategy)
+        private Ghost(string name, CellLocation homeLocation, CellLocation currentLocation, Direction direction, CellLocation scatterTarget, IGhostStrategy strategy, IGhostStrategy currentStrategy, bool edible)
         {
             Name = name;
             Home = homeLocation;
@@ -27,6 +32,7 @@
             Strategy = strategy;
             CurrentStrategy = currentStrategy;
             ScatterTarget = scatterTarget;
+            Edible = edible;
         }
 
         public Ghost Move(Game game)
@@ -42,26 +48,36 @@
                 _ => Location
             };
 
-            return new Ghost(Name, Home, newLocation, newDirection ?? Direction, ScatterTarget, Strategy, CurrentStrategy);
+            return new Ghost(Name, Home, newLocation, newDirection ?? Direction, ScatterTarget, Strategy, CurrentStrategy, Edible);
         }
 
         public Ghost Chase()
         {
             var strategy = Strategy;
             
-            return new Ghost(Name, Home, Location, Direction.Opposite(), ScatterTarget, Strategy, currentStrategy: strategy);
+            return new Ghost(Name, Home, Location, Direction.Opposite(), ScatterTarget, Strategy, currentStrategy: strategy, Edible);
         }
 
         public Ghost Scatter()
         {
             var strategy = new DirectToStrategy(new DirectToGhostScatterTarget(this));
             
-            return new Ghost(Name, Home, Location, Direction.Opposite(), ScatterTarget, Strategy, currentStrategy: strategy);
+            return new Ghost(Name, Home, Location, Direction.Opposite(), ScatterTarget, Strategy, currentStrategy: strategy, Edible);
         }
 
         public Ghost SetToHome()
         {
-            return new Ghost(Name, Home, Home, Direction, ScatterTarget, Strategy, CurrentStrategy);
+            return new Ghost(Name, Home, Home, Direction, ScatterTarget, Strategy, CurrentStrategy, Edible);
+        }
+
+        public Ghost SetToEdible()
+        {
+            return new Ghost(Name, Home, Location, Direction, ScatterTarget, Strategy, CurrentStrategy, edible: true);
+        }
+
+        internal Ghost SetToNotEdible()
+        {
+            return new Ghost(Name, Home, Location, Direction, ScatterTarget, Strategy, CurrentStrategy, edible: false);
         }
     }
 }
