@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Automatonymous;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Threading.Tasks;
-using Automatonymous;
 
 namespace NPacMan.Game
 {
@@ -109,11 +109,9 @@ namespace NPacMan.Game
             await _gameStateMachine.RaiseEvent(_gameState, _gameStateMachine.Tick, new Tick(now));
         }
 
-        private bool TryHasCollidedWithGhost(out Ghost? ghost)
+        private IEnumerable<Ghost> GhostsCollidedWithPacMan()
         {
-            ghost = Ghosts.Values.FirstOrDefault(ghost => ghost.Location.X == PacMan.Location.X && ghost.Location.Y == PacMan.Location.Y);
-
-            return !(ghost is null);
+            return Ghosts.Values.Where(ghost => ghost.Location == PacMan.Location);
         }
 
         private void ApplyToGhosts(Func<Ghost, Ghost> action)
@@ -221,7 +219,8 @@ namespace NPacMan.Game
                 PacMan = newPacMan;
             }
 
-            if (TryHasCollidedWithGhost(out var ghost))
+            var ghosts = GhostsCollidedWithPacMan();
+            foreach (var ghost in ghosts)
             {
                 await context.Raise(gameStateMachine.GhostCollision, new GhostCollision(ghost!));
             }
@@ -240,7 +239,8 @@ namespace NPacMan.Game
         private async Task MoveGhosts(BehaviorContext<GameState, Tick> context, GameStateMachine gameStateMachine)
         {
             ApplyToGhosts(ghost => ghost.Move(this));
-            if (TryHasCollidedWithGhost(out var ghost))
+            var ghosts = GhostsCollidedWithPacMan();
+            foreach (var ghost in ghosts)
             {
                 await context.Raise(gameStateMachine.GhostCollision, new GhostCollision(ghost!));
             }
