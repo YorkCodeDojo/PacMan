@@ -109,7 +109,7 @@ namespace NPacMan.Game
             await _gameStateMachine.RaiseEvent(_gameState, _gameStateMachine.Tick, new Tick(now));
         }
 
-        private bool TryHasDied(out Ghost? ghost)
+        private bool TryHasCollidedWithGhost(out Ghost? ghost)
         {
             ghost = Ghosts.Values.FirstOrDefault(ghost => ghost.Location.X == PacMan.Location.X && ghost.Location.Y == PacMan.Location.Y);
 
@@ -221,26 +221,26 @@ namespace NPacMan.Game
                 PacMan = newPacMan;
             }
 
-            if (TryHasDied(out var ghost))
+            if (TryHasCollidedWithGhost(out var ghost))
             {
                 await context.Raise(gameStateMachine.GhostCollision, new GhostCollision(ghost!));
             }
 
             if (Coins.Contains(newPacMan.Location))
             {
-                await context.Raise(gameStateMachine.CoinEaten, new CoinEaten(newPacMan.Location));
+                await context.Raise(gameStateMachine.CoinCollision, new CoinCollision(newPacMan.Location));
             }
 
             if (PowerPills.Contains(newPacMan.Location))
             {
-                await context.Raise(gameStateMachine.PowerPillEaten, new PowerPillEaten(newPacMan.Location));
+                await context.Raise(gameStateMachine.PowerPillCollision, new PowerPillCollision(newPacMan.Location));
             }
         }
 
         private async Task MoveGhosts(BehaviorContext<GameState, Tick> context, GameStateMachine gameStateMachine)
         {
             ApplyToGhosts(ghost => ghost.Move(this));
-            if (TryHasDied(out var ghost))
+            if (TryHasCollidedWithGhost(out var ghost))
             {
                 await context.Raise(gameStateMachine.GhostCollision, new GhostCollision(ghost!));
             }

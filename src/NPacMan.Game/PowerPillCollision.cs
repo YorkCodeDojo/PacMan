@@ -1,8 +1,8 @@
 ﻿namespace NPacMan.Game
 {
-    internal class CoinEaten
+    internal class PowerPillCollision
     {
-        public CoinEaten(CellLocation location)
+        public PowerPillCollision(CellLocation location)
         {
             Location = location;
         }
