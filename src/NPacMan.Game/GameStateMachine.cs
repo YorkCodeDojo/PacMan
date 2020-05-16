@@ -50,11 +50,13 @@ namespace NPacMan.Game
                     .Then(context => game.MovePacMan(context, this)),
                 When(CoinEaten)
                     .Then(context => context.Instance.Score += 10)
-                    .Then(context => gameNotifications.Publish(GameNotification.EatCoin)),
+                    .Then(context => gameNotifications.Publish(GameNotification.EatCoin))
+                    .Then(context => game.RemoveCoin(context.Data.Location)),
                 When(PowerPillEaten)
                     .Then(context => context.Instance.Score += 50)
                     .Then(context => gameNotifications.Publish(GameNotification.EatPowerPill))
                     .Then(context => game.MakeGhostsEdible())
+                    .Then(context => game.RemovePowerPill(context.Data.Location))
                     .Then(context => context.Instance.TimeToChangeState = context.Instance.LastTick.AddSeconds(7))
                     .TransitionTo(Frightened),
                 When(GhostCollision)
@@ -100,7 +102,7 @@ namespace NPacMan.Game
         public State Dead { get; private set; } = null!;
         public Event<Tick> Tick { get; private set; } = null!;
         public Event<GhostCollision> GhostCollision { get; private set; } = null!;
-        public Event CoinEaten { get; private set; } = null!;
-        public Event PowerPillEaten { get; private set; } = null!;
+        public Event<CoinEaten> CoinEaten { get; private set; } = null!;
+        public Event<PowerPillEaten>  PowerPillEaten { get; private set; } = null!;
     }
 }

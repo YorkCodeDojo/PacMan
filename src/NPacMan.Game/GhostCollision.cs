@@ -6,7 +6,7 @@
         {
             Ghost = ghost;
         }
-        
+
         public Ghost Ghost { get; }
     }
 }

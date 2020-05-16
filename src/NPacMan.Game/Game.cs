@@ -45,7 +45,7 @@ namespace NPacMan.Game
         public Game Subscribe(GameNotification gameNotification, Action action)
         {
             _gameNotifications.Subscribe(gameNotification, action);
-            
+
             return this;
         }
 
@@ -98,7 +98,7 @@ namespace NPacMan.Game
         public void ChangeDirection(Direction direction)
         {
             var nextSpace = PacMan.Location + direction;
-            if(!Walls.Contains(nextSpace))
+            if (!Walls.Contains(nextSpace))
             {
                 PacMan = PacMan.WithNewDirection(direction);
             }
@@ -164,7 +164,7 @@ namespace NPacMan.Game
             ApplyToGhosts(ghost => ghost.SetToEdible());
         }
 
-        
+
         void IGameActions.MakeGhostsNotEdible()
         {
             ApplyToGhosts(ghost => ghost.SetToNotEdible());
@@ -178,12 +178,32 @@ namespace NPacMan.Game
 
         void IGameActions.SendGhostHome(Ghost ghostToSendHome)
         {
-            ApplyToGhosts(ghost => {
-                if(ghost.Name == ghostToSendHome.Name){
+            ApplyToGhosts(ghost =>
+            {
+                if (ghost.Name == ghostToSendHome.Name)
+                {
                     ghost = ghost.SetToHome();
                 }
                 return ghost;
             });
+        }
+
+        void IGameActions.RemoveCoin(CellLocation coinLocation)
+        {
+            var newCollectedCoins = new List<CellLocation>(_collectedCoins)
+                    {
+                        (coinLocation)
+                    };
+            _collectedCoins = newCollectedCoins;
+        }
+
+        void IGameActions.RemovePowerPill(CellLocation powerPillLocation)
+        {
+            var newCollectedPowerPills = new List<CellLocation>(_collectedPowerPills)
+                {
+                    (powerPillLocation)
+                };
+            _collectedPowerPills = newCollectedPowerPills;
         }
 
         async Task IGameActions.MovePacMan(BehaviorContext<GameState, Tick> context, GameStateMachine gameStateMachine)
@@ -200,40 +220,27 @@ namespace NPacMan.Game
             {
                 PacMan = newPacMan;
             }
-            var died = false;
-            if(TryHasDied(out var ghost))
-            {
-                died = !ghost!.Edible;
 
-                await context.Raise(gameStateMachine.GhostCollision, new GhostCollision(ghost));
+            if (TryHasDied(out var ghost))
+            {
+                await context.Raise(gameStateMachine.GhostCollision, new GhostCollision(ghost!));
             }
 
-            if (!died && Coins.Contains(newPacMan.Location))
+            if (Coins.Contains(newPacMan.Location))
             {
-                var newCollectedCoins = new List<CellLocation>(_collectedCoins)
-                    {
-                        (newPacMan.Location)
-                    };
-                _collectedCoins = newCollectedCoins;
-
-                await context.Raise(gameStateMachine.CoinEaten);
+                await context.Raise(gameStateMachine.CoinEaten, new CoinEaten(newPacMan.Location));
             }
-            else if (!died && PowerPills.Contains(newPacMan.Location))
-            {
-                var newCollectedPowerPills = new List<CellLocation>(_collectedPowerPills)
-                {
-                    (newPacMan.Location)
-                };
-                _collectedPowerPills = newCollectedPowerPills;
 
-                await context.Raise(gameStateMachine.PowerPillEaten);
+            if (PowerPills.Contains(newPacMan.Location))
+            {
+                await context.Raise(gameStateMachine.PowerPillEaten, new PowerPillEaten(newPacMan.Location));
             }
         }
 
         private async Task MoveGhosts(BehaviorContext<GameState, Tick> context, GameStateMachine gameStateMachine)
         {
             ApplyToGhosts(ghost => ghost.Move(this));
-            if(TryHasDied(out var ghost))
+            if (TryHasDied(out var ghost))
             {
                 await context.Raise(gameStateMachine.GhostCollision, new GhostCollision(ghost!));
             }
