@@ -1,12 +1,11 @@
-﻿using System;
-using NPacMan.Game.GhostStrategies;
+﻿using NPacMan.Game.GhostStrategies;
 
 namespace NPacMan.Game
 {
     public class Ghost
     {
         public string Name { get; }
-        
+
         public CellLocation Location { get; }
         public CellLocation ScatterTarget { get; }
 
@@ -18,7 +17,7 @@ namespace NPacMan.Game
 
         public bool Edible { get; }
 
-        public Ghost(string name, CellLocation location, Direction direction, CellLocation scatterTarget, IGhostStrategy strategy) 
+        public Ghost(string name, CellLocation location, Direction direction, CellLocation scatterTarget, IGhostStrategy strategy)
         : this(name, location, location, direction, scatterTarget, strategy, strategy, false)
         {
         }
@@ -38,8 +37,8 @@ namespace NPacMan.Game
         public Ghost Move(Game game)
         {
             var newDirection = CurrentStrategy.GetNextDirection(this, game);
-            
-            var newLocation = newDirection switch 
+
+            var newLocation = newDirection switch
             {
                 Direction.Up => Location.Above,
                 Direction.Down => Location.Below,
@@ -48,36 +47,37 @@ namespace NPacMan.Game
                 _ => Location
             };
 
-            return new Ghost(Name, Home, newLocation, newDirection ?? Direction, ScatterTarget, Strategy, CurrentStrategy, Edible);
+            return WithNewLocationAndDirection(newLocation, newDirection ?? Direction);
         }
 
         public Ghost Chase()
         {
-            var strategy = Strategy;
-            
-            return new Ghost(Name, Home, Location, Direction.Opposite(), ScatterTarget, Strategy, currentStrategy: strategy, Edible);
+            return WithNewCurrentStrategyAndDirection(Strategy, Direction.Opposite());
         }
 
         public Ghost Scatter()
         {
             var strategy = new DirectToStrategy(new DirectToGhostScatterTarget(this));
-            
-            return new Ghost(Name, Home, Location, Direction.Opposite(), ScatterTarget, Strategy, currentStrategy: strategy, Edible);
+            return WithNewCurrentStrategyAndDirection(strategy, Direction.Opposite());
         }
 
-        public Ghost SetToHome()
-        {
-            return new Ghost(Name, Home, Home, Direction, ScatterTarget, Strategy, CurrentStrategy, Edible);
-        }
+        public Ghost SetToHome() => WithNewLocation(Home);
 
-        public Ghost SetToEdible()
-        {
-            return new Ghost(Name, Home, Location, Direction, ScatterTarget, Strategy, CurrentStrategy, edible: true);
-        }
+        public Ghost SetToEdible() => WithNewEdible(true);
 
-        internal Ghost SetToNotEdible()
-        {
-            return new Ghost(Name, Home, Location, Direction, ScatterTarget, Strategy, CurrentStrategy, edible: false);
-        }
+        internal Ghost SetToNotEdible() => WithNewEdible(false);
+
+        public Ghost WithNewEdible(bool isEdible)
+            => new Ghost(Name, Home, Location, Direction, ScatterTarget, Strategy, CurrentStrategy, isEdible);
+
+        public Ghost WithNewCurrentStrategyAndDirection(IGhostStrategy newCurrentStategy, Direction newDirection)
+            => new Ghost(Name, Home, Location, newDirection, ScatterTarget, Strategy, newCurrentStategy, Edible);
+
+        public Ghost WithNewLocation(CellLocation newLocation)
+            => new Ghost(Name, Home, newLocation, Direction, ScatterTarget, Strategy, CurrentStrategy, Edible);
+
+        public Ghost WithNewLocationAndDirection(CellLocation newLocation, Direction newDirection)
+            => new Ghost(Name, Home, newLocation, newDirection, ScatterTarget, Strategy, CurrentStrategy, Edible);
+
     }
 }
