@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace NPacMan.Game
 {
@@ -19,6 +20,8 @@ namespace NPacMan.Game
             Score = 0;
             GhostsVisible = true;
             TimeToChangeState = null;
+            RemainingCoins = new List<CellLocation> ( settings.Coins );
+            RemainingPowerPills = new List<CellLocation> ( settings.PowerPills );
         }
 
         public string Status { get; set; } = null!;
@@ -32,5 +35,9 @@ namespace NPacMan.Game
         public int Score { get; set; }
 
         public DateTime LastTick { get; set; }
+
+        public List<CellLocation> RemainingCoins { get; set; }
+
+        public List<CellLocation> RemainingPowerPills { get; set; }
     }
 }

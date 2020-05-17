@@ -22,8 +22,8 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public async Task IncrementsScoreBy50WhenPowerPillCollected()
         {
+            _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Below);
             var game = new Game(_gameClock, _gameSettings);
-            _gameSettings.PowerPills.Add(game.PacMan.Location.Below);
 
             game.StartGame(); 
             game.ChangeDirection(Direction.Down);
@@ -48,8 +48,8 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public async Task CannotCollectTheSamePowerPillTwice()
         {
+            _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Below);
             var game = new Game(_gameClock, _gameSettings);
-            _gameSettings.PowerPills.Add(game.PacMan.Location.Below);
             game.StartGame();
 
             game.ChangeDirection(Direction.Down);
@@ -140,8 +140,8 @@ namespace NPacMan.Game.Tests.GameTests
         {
             var numberOfNotificationsTriggered = 0;
 
+            _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Below);
             var game = new Game(_gameClock, _gameSettings);
-            _gameSettings.PowerPills.Add(game.PacMan.Location.Below);
             game.Subscribe(GameNotification.EatPowerPill, () => numberOfNotificationsTriggered++);
             game.StartGame(); 
 
