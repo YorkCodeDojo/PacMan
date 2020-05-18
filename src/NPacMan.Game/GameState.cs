@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace NPacMan.Game
 {
@@ -20,8 +21,10 @@ namespace NPacMan.Game
             Score = 0;
             GhostsVisible = true;
             TimeToChangeState = null;
-            RemainingCoins = new List<CellLocation> ( settings.Coins );
-            RemainingPowerPills = new List<CellLocation> ( settings.PowerPills );
+            RemainingCoins = new List<CellLocation>(settings.Coins);
+            RemainingPowerPills = new List<CellLocation>(settings.PowerPills);
+            PacMan = settings.PacMan;
+            Ghosts = settings.Ghosts.ToDictionary(x => x.Name, x => x);
         }
 
         public string Status { get; set; } = null!;
@@ -39,5 +42,9 @@ namespace NPacMan.Game
         public List<CellLocation> RemainingCoins { get; set; }
 
         public List<CellLocation> RemainingPowerPills { get; set; }
+
+        public Dictionary<string, Ghost> Ghosts { get; set; }
+        
+        public PacMan PacMan { get; set; }
     }
 }
