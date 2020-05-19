@@ -43,7 +43,7 @@ namespace NPacMan.Game
 
         public List<CellLocation> RemainingPowerPills { get; private set; }
 
-        public Dictionary<string, Ghost> Ghosts { get; set; }
+        public Dictionary<string, Ghost> Ghosts { get; private set; }
         
         public PacMan PacMan { get; set; }
 
@@ -89,6 +89,17 @@ namespace NPacMan.Game
         internal void ChangeStateIn(int timeInSeconds)
         {
             TimeToChangeState = LastTick.AddSeconds(timeInSeconds);
+        }
+
+        internal void ApplyToGhosts(Func<Ghost, Ghost> action)
+        {
+            var newPositionOfGhosts = new Dictionary<string, Ghost>();
+            foreach (var ghost in Ghosts.Values)
+            {
+                newPositionOfGhosts[ghost.Name] = action(ghost);
+            }
+
+            Ghosts = newPositionOfGhosts;
         }
     }
 }

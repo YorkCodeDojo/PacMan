@@ -23,40 +23,29 @@ namespace NPacMan.Game
             return gameState.Ghosts.Values.Where(ghost => ghost.Location == gameState.PacMan.Location);
         }
 
-        private static void ApplyToGhosts(GameState gameState, Func<Ghost, Ghost> action)
-        {
-            var newPositionOfGhosts = new Dictionary<string, Ghost>();
-            foreach (var ghost in gameState.Ghosts.Values)
-            {
-                newPositionOfGhosts[ghost.Name] = action(ghost);
-            }
-
-            gameState.Ghosts = newPositionOfGhosts;
-        }
-
         public static void ScatterGhosts(GameState gameState)
         {
-            ApplyToGhosts(gameState, ghost => ghost.Scatter());
+            gameState.ApplyToGhosts(ghost => ghost.Scatter());
         }
 
         public static void GhostToChase(GameState gameState)
         {
-            ApplyToGhosts(gameState, ghost => ghost.Chase());
+            gameState.ApplyToGhosts(ghost => ghost.Chase());
         }
 
         public static void MoveGhostsHome(GameState gameState)
         {
-            ApplyToGhosts(gameState, ghost => ghost.SetToHome());
+            gameState.ApplyToGhosts(ghost => ghost.SetToHome());
         }
 
         public static void MakeGhostsEdible(GameState gameState)
         {
-            ApplyToGhosts(gameState, ghost => ghost.SetToEdible());
+            gameState.ApplyToGhosts(ghost => ghost.SetToEdible());
         }
 
         public static void MakeGhostsNotEdible(GameState gameState)
         {
-            ApplyToGhosts(gameState, ghost => ghost.SetToNotEdible());
+            gameState.ApplyToGhosts(ghost => ghost.SetToNotEdible());
         }
 
         public static void MovePacManHome(GameState gameState)
@@ -66,7 +55,7 @@ namespace NPacMan.Game
 
         public static void SendGhostHome(GameState gameState, Ghost ghostToSendHome)
         {
-            ApplyToGhosts(gameState, ghost =>
+            gameState.ApplyToGhosts(ghost =>
             {
                 if (ghost.Name == ghostToSendHome.Name)
                 {
@@ -110,7 +99,7 @@ namespace NPacMan.Game
 
         public static async Task MoveGhosts(Game game, GameState gameState, BehaviorContext<GameState, Tick> context, GameStateMachine gameStateMachine)
         {
-            ApplyToGhosts(gameState, ghost => ghost.Move(game));
+            gameState.ApplyToGhosts(ghost => ghost.Move(game));
 
             var ghosts = GhostsCollidedWithPacMan(gameState);
             foreach (var ghost in ghosts)
