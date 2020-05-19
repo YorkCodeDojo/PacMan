@@ -34,13 +34,14 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public async Task IncrementsScoreBy10WhenCoinCollected()
         {
+            var pacManStartingLocation = _gameSettings.PacMan.Location;
+            _gameSettings.Coins.Add(pacManStartingLocation.Below);
+
             var game = new Game(_gameClock, _gameSettings);
             game.StartGame(); 
-            var (x, y) = game.PacMan.Location;
 
             game.ChangeDirection(Direction.Down);
 
-            _gameSettings.Coins.Add((x, y + 1));
             await _gameClock.Tick();
 
             game.Score.Should().Be(10);
@@ -49,13 +50,14 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public async Task CannotCollectTheSameCoinTwice()
         {
+            var pacManStartingLocation = _gameSettings.PacMan.Location;
+            _gameSettings.Coins.Add(pacManStartingLocation.Below);
+
             var game = new Game(_gameClock, _gameSettings);
             game.StartGame();
-            var (x, y) = game.PacMan.Location;
 
             game.ChangeDirection(Direction.Down);
 
-            _gameSettings.Coins.Add((x, y + 1));
             await _gameClock.Tick();
 
             if (game.Score != 10)
@@ -77,14 +79,14 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public async Task IncrementsScoreBy20WhenTwoCoinsAreCollected()
         {
+            var pacManStartingLocation = _gameSettings.PacMan.Location;
+            _gameSettings.Coins.Add(pacManStartingLocation.Below);
+            _gameSettings.Coins.Add(pacManStartingLocation.Below.Below);
+
             var game = new Game(_gameClock, _gameSettings);
             game.StartGame(); 
-            var (x, y) = game.PacMan.Location;
 
             game.ChangeDirection(Direction.Down);
-
-            _gameSettings.Coins.Add((x, y + 1));
-            _gameSettings.Coins.Add((x, y + 2));
 
             await _gameClock.Tick();
             await _gameClock.Tick();
@@ -111,19 +113,19 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public async Task JustTheCollectedCoinShouldBeCollected()
         {
+            var pacManStartingLocation = _gameSettings.PacMan.Location;
+            _gameSettings.Coins.Add(pacManStartingLocation.Below);
+            _gameSettings.Coins.Add(pacManStartingLocation.Below.Below);
+
             var game = new Game(_gameClock, _gameSettings);
             game.StartGame(); 
-            var (x, y) = game.PacMan.Location;
 
             game.ChangeDirection(Direction.Down);
 
-            _gameSettings.Coins.Add((x, y + 1));
-            _gameSettings.Coins.Add((x, y + 2));
-
             await _gameClock.Tick();
 
-            game.Coins.Should().NotContain((x, y + 1));
-            game.Coins.Should().Contain((x, y + 2));
+            game.Coins.Should().NotContain(pacManStartingLocation.Below);
+            game.Coins.Should().Contain(pacManStartingLocation.Below.Below);
         }
 
         [Fact]
@@ -173,16 +175,16 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public async Task WhenPacManEatsACoinTheGameNotificationShouldFire()
         {
+            var pacManStartingLocation = _gameSettings.PacMan.Location;
+            _gameSettings.Coins.Add(pacManStartingLocation.Below);
+
             var numberOfNotificationsTriggered = 0;
 
             var game = new Game(_gameClock, _gameSettings);
             game.Subscribe(GameNotification.EatCoin, () => numberOfNotificationsTriggered++);
             game.StartGame(); 
-            var (x, y) = game.PacMan.Location;
 
             game.ChangeDirection(Direction.Down);
-
-            _gameSettings.Coins.Add((x, y + 1));
 
             await _gameClock.Tick();
 

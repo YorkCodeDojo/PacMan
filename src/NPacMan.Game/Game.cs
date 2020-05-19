@@ -13,8 +13,6 @@ namespace NPacMan.Game
 
         private readonly IGameClock _gameClock;
         private readonly IGameSettings _settings;
-        private List<CellLocation> _collectedCoins;
-        private List<CellLocation> _collectedPowerPills;
         private Dictionary<string, Ghost> _ghosts;
 
         private readonly GameNotifications _gameNotifications = new GameNotifications();
@@ -28,8 +26,6 @@ namespace NPacMan.Game
             _gameClock = gameClock;
             _settings = settings;
             PacMan = settings.PacMan;
-            _collectedCoins = new List<CellLocation>();
-            _collectedPowerPills = new List<CellLocation>();
             _ghosts = settings.Ghosts.ToDictionary(x => x.Name, x => x);
             _gameStateMachine = new GameStateMachine(this, settings, _gameNotifications);
             _gameState = new GameState(settings);
@@ -60,10 +56,10 @@ namespace NPacMan.Game
         public PacMan PacMan { get; private set; }
 
         public IReadOnlyCollection<CellLocation> Coins
-            => _settings.Coins.Except(_collectedCoins).ToList().AsReadOnly();
+            => _gameState.RemainingCoins.AsReadOnly();
 
         public IReadOnlyCollection<CellLocation> PowerPills
-            => _settings.PowerPills.Except(_collectedPowerPills).ToList().AsReadOnly();
+            => _gameState.RemainingPowerPills.AsReadOnly();
 
         public IReadOnlyCollection<CellLocation> Walls
             => _settings.Walls;
@@ -125,21 +121,9 @@ namespace NPacMan.Game
             _ghosts = newPositionOfGhosts;
         }
 
-
-        void IGameActions.ShowGhosts(GameState gameState)
-        {
-            gameState.GhostsVisible = true;
-        }
-
-
         Task IGameActions.MoveGhosts(BehaviorContext<GameState, Tick> context, GameStateMachine gameStateMachine)
         {
             return MoveGhosts(context, gameStateMachine);
-        }
-
-        void IGameActions.HideGhosts(GameState gameState)
-        {
-            gameState.GhostsVisible = false;
         }
 
         void IGameActions.ScatterGhosts()
@@ -162,7 +146,6 @@ namespace NPacMan.Game
             ApplyToGhosts(ghost => ghost.SetToEdible());
         }
 
-
         void IGameActions.MakeGhostsNotEdible()
         {
             ApplyToGhosts(ghost => ghost.SetToNotEdible());
@@ -172,7 +155,6 @@ namespace NPacMan.Game
         {
             PacMan = PacMan.SetToHome();
         }
-
 
         void IGameActions.SendGhostHome(Ghost ghostToSendHome)
         {
@@ -184,24 +166,6 @@ namespace NPacMan.Game
                 }
                 return ghost;
             });
-        }
-
-        void IGameActions.RemoveCoin(CellLocation coinLocation)
-        {
-            var newCollectedCoins = new List<CellLocation>(_collectedCoins)
-                    {
-                        (coinLocation)
-                    };
-            _collectedCoins = newCollectedCoins;
-        }
-
-        void IGameActions.RemovePowerPill(CellLocation powerPillLocation)
-        {
-            var newCollectedPowerPills = new List<CellLocation>(_collectedPowerPills)
-                {
-                    (powerPillLocation)
-                };
-            _collectedPowerPills = newCollectedPowerPills;
         }
 
         async Task IGameActions.MovePacMan(BehaviorContext<GameState, Tick> context, GameStateMachine gameStateMachine)
@@ -222,7 +186,7 @@ namespace NPacMan.Game
             var ghosts = GhostsCollidedWithPacMan();
             foreach (var ghost in ghosts)
             {
-                await context.Raise(gameStateMachine.GhostCollision, new GhostCollision(ghost!));
+                await context.Raise(gameStateMachine.GhostCollision, new GhostCollision(ghost));
             }
 
             if (Coins.Contains(newPacMan.Location))
@@ -239,10 +203,11 @@ namespace NPacMan.Game
         private async Task MoveGhosts(BehaviorContext<GameState, Tick> context, GameStateMachine gameStateMachine)
         {
             ApplyToGhosts(ghost => ghost.Move(this));
+
             var ghosts = GhostsCollidedWithPacMan();
             foreach (var ghost in ghosts)
             {
-                await context.Raise(gameStateMachine.GhostCollision, new GhostCollision(ghost!));
+                await context.Raise(gameStateMachine.GhostCollision, new GhostCollision(ghost));
             }
         }
 
