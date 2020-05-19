@@ -79,12 +79,9 @@ namespace NPacMan.Game
                     .IfElse(context => context.Instance.Lives > 0,
                         binder => binder.TransitionTo(Respawning),
                         binder => binder.TransitionTo(Dead)),
-                When(CoinCollision)
-                    .Then(_ => { }),
-                When(PowerPillCollision)
-                    .Then(_ => { }),
-                When(GhostCollision)
-                    .Then(_ => { }));
+                Ignore(CoinCollision),
+                Ignore(PowerPillCollision),
+                Ignore(GhostCollision));
 
             WhenEnter(Respawning,
                        binder => binder
