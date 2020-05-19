@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace NPacMan.Game
@@ -79,7 +78,7 @@ namespace NPacMan.Game
         public PacMan PacMan => _gameState.PacMan;
 
         public IReadOnlyDictionary<string, Ghost> Ghosts
-            => _gameState.GhostsVisible ? _gameState.Ghosts : (IReadOnlyDictionary<string, Ghost>)ImmutableDictionary<string, Ghost>.Empty;
+            => _gameState.GhostsVisible ? _gameState.Ghosts : ImmutableDictionary<string, Ghost>.Empty;
 
         public GameStatus Status => _gameState.Status switch
         {
@@ -97,13 +96,9 @@ namespace NPacMan.Game
         {
             await _gameStateMachineInstance.Raise(_gameStateMachine.Tick, new Tick(now));
         }
-        public void ChangeDirection(Direction direction)
+        public async Task ChangeDirection(Direction direction)
         {
-            var nextSpace = _gameState.PacMan.Location + direction;
-            if (!Walls.Contains(nextSpace))
-            {
-                ((GameState)_gameState).PacMan = _gameState.PacMan.WithNewDirection(direction);
-            }
+            await _gameStateMachineInstance.Raise(_gameStateMachine.PlayersWishesToChangeDirection, new PlayersWishesToChangeDirection(direction));
         }
     }
 }

@@ -113,5 +113,14 @@ namespace NPacMan.Game
         {
             gameState.RemovePowerPill(location);
         }
+
+        public static void ChangeDirection(IGameSettings gameSettings, GameState gameState, Direction direction)
+        {
+            var nextSpace = gameState.PacMan.Location + direction;
+            if (!gameSettings.Walls.Contains(nextSpace))
+            {
+                gameState.PacMan = gameState.PacMan.WithNewDirection(direction);
+            }
+        }
     }
 }

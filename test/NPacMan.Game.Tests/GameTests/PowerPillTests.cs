@@ -26,7 +26,7 @@ namespace NPacMan.Game.Tests.GameTests
             var game = new Game(_gameClock, _gameSettings);
 
             game.StartGame(); 
-            game.ChangeDirection(Direction.Down);
+            await game.ChangeDirection(Direction.Down);
             await _gameClock.Tick();
 
             game.Score.Should().Be(50);
@@ -39,7 +39,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.PowerPills.Add(game.PacMan.Location.Below);
 
             game.StartGame(); 
-            game.ChangeDirection(Direction.Down);
+            await game.ChangeDirection(Direction.Down);
             await _gameClock.Tick();
 
             game.Status.Should().Be(GameStatus.Alive);
@@ -52,19 +52,19 @@ namespace NPacMan.Game.Tests.GameTests
             var game = new Game(_gameClock, _gameSettings);
             game.StartGame();
 
-            game.ChangeDirection(Direction.Down);
+            await game.ChangeDirection(Direction.Down);
             await _gameClock.Tick();
 
             if (game.Score != 50)
                 throw new Exception($"Score should be 50 not {game.Score}");
 
-            game.ChangeDirection(Direction.Up);
+            await game.ChangeDirection(Direction.Up);
             await _gameClock.Tick();
 
             if (game.Score != 50)
                 throw new Exception($"Score should still be 50 not {game.Score}");
 
-            game.ChangeDirection(Direction.Down);
+            await game.ChangeDirection(Direction.Down);
             await _gameClock.Tick();
 
             game.Score.Should().Be(50);
@@ -103,7 +103,7 @@ namespace NPacMan.Game.Tests.GameTests
             game.StartGame(); 
             var score = game.Score;
 
-            game.ChangeDirection(Direction.Right);
+            await game.ChangeDirection(Direction.Right);
             await _gameClock.Tick();
 
             using var _ = new AssertionScope();
@@ -127,7 +127,7 @@ namespace NPacMan.Game.Tests.GameTests
              var game = new Game(_gameClock, _gameSettings);
             game.StartGame(); 
 
-            game.ChangeDirection(Direction.Right);
+            await game.ChangeDirection(Direction.Right);
             await _gameClock.Tick();
 
             game.Ghosts.Values.Should().AllBeEquivalentTo(new {
@@ -145,7 +145,7 @@ namespace NPacMan.Game.Tests.GameTests
             game.Subscribe(GameNotification.EatPowerPill, () => numberOfNotificationsTriggered++);
             game.StartGame(); 
 
-            game.ChangeDirection(Direction.Down);
+            await game.ChangeDirection(Direction.Down);
 
             await _gameClock.Tick();
 

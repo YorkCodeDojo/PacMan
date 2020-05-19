@@ -252,7 +252,7 @@ namespace NPacMan.Game.Tests.GameTests
              var game = new Game(_gameClock, _gameSettings);
             game.StartGame(); 
 
-            game.ChangeDirection(Direction.Right);
+            await game.ChangeDirection(Direction.Right);
 
             var now = DateTime.UtcNow;
             await _gameClock.Tick(now);
@@ -280,7 +280,7 @@ namespace NPacMan.Game.Tests.GameTests
              var game = new Game(_gameClock, _gameSettings);
             game.StartGame(); 
 
-            game.ChangeDirection(Direction.Right);
+            await game.ChangeDirection(Direction.Right);
 
             var now = DateTime.UtcNow;
             await _gameClock.Tick(now);
@@ -307,7 +307,7 @@ namespace NPacMan.Game.Tests.GameTests
              var game = new Game(_gameClock, _gameSettings);
             game.StartGame(); 
 
-            game.ChangeDirection(Direction.Right);
+            await game.ChangeDirection(Direction.Right);
 
             var now = DateTime.UtcNow;
             await _gameClock.Tick(now);
@@ -343,7 +343,7 @@ namespace NPacMan.Game.Tests.GameTests
              var game = new Game(_gameClock, _gameSettings);
             game.StartGame(); 
 
-            game.ChangeDirection(Direction.Left);
+            await game.ChangeDirection(Direction.Left);
 
             var now = DateTime.UtcNow;
             await _gameClock.Tick(now);

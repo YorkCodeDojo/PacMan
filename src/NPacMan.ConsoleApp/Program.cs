@@ -31,7 +31,7 @@ namespace NPacMan.ConsoleApp
                     _ => (Direction?)null
                 }).Where(x => x != null).ToList();
                 
-                directions.ForEach(x => game.ChangeDirection(x!.Value));
+                directions.ForEach(async x => await game.ChangeDirection(x!.Value));
 
                 DrawGame(game);
                
