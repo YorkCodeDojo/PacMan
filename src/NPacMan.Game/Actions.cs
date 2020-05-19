@@ -48,10 +48,7 @@ namespace NPacMan.Game
             gameState.ApplyToGhosts(ghost => ghost.SetToNotEdible());
         }
 
-        public static void MovePacManHome(GameState gameState)
-        {
-            gameState.PacMan = gameState.PacMan.SetToHome();
-        }
+        public static void MovePacManHome(GameState gameState) => gameState.MovePacManHome();
 
         public static void SendGhostHome(GameState gameState, Ghost ghostToSendHome)
         {
@@ -67,17 +64,16 @@ namespace NPacMan.Game
 
         public async static Task MovePacMan(IGameSettings gameSettings, GameState gameState, BehaviorContext<GameState, Tick> context, GameStateMachine gameStateMachine)
         {
-            var newPacMan = gameState.PacMan.Move();
+            var newPacManLocation = gameState.PacMan.Location + gameState.PacMan.Direction;
 
-            if (gameSettings.Portals.TryGetValue(newPacMan.Location, out var portal))
+            if (gameSettings.Portals.TryGetValue(newPacManLocation, out var otherEndOfThePortal))
             {
-                newPacMan = gameState.PacMan.WithNewX(portal.X).WithNewY(portal.Y);
-                newPacMan = newPacMan.Move();
+                newPacManLocation = otherEndOfThePortal + gameState.PacMan.Direction;
             }
 
-            if (!gameSettings.Walls.Contains(newPacMan.Location))
+            if (!gameSettings.Walls.Contains(newPacManLocation))
             {
-                gameState.PacMan = newPacMan;
+                gameState.MovePacManTo(newPacManLocation);
             }
 
             var ghosts = GhostsCollidedWithPacMan(gameState);
@@ -86,14 +82,14 @@ namespace NPacMan.Game
                 await context.Raise(gameStateMachine.GhostCollision, new GhostCollision(ghost));
             }
 
-            if (gameState.RemainingCoins.Contains(newPacMan.Location))
+            if (gameState.RemainingCoins.Contains(newPacManLocation))
             {
-                await context.Raise(gameStateMachine.CoinCollision, new CoinCollision(newPacMan.Location));
+                await context.Raise(gameStateMachine.CoinCollision, new CoinCollision(newPacManLocation));
             }
 
-            if (gameState.RemainingPowerPills.Contains(newPacMan.Location))
+            if (gameState.RemainingPowerPills.Contains(newPacManLocation))
             {
-                await context.Raise(gameStateMachine.PowerPillCollision, new PowerPillCollision(newPacMan.Location));
+                await context.Raise(gameStateMachine.PowerPillCollision, new PowerPillCollision(newPacManLocation));
             }
         }
 

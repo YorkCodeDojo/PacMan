@@ -61,6 +61,11 @@ namespace NPacMan.Game
             RemainingPowerPills = RemainingPowerPills.Where(p => p != location).ToList();
         }
 
+        internal void MovePacManTo(CellLocation newPacManLocation)
+        {
+            PacMan = PacMan.WithNewLocation(newPacManLocation);
+        }
+
         internal void IncreaseScore(int amount)
         {
             Score += amount;
@@ -100,6 +105,11 @@ namespace NPacMan.Game
             }
 
             Ghosts = newPositionOfGhosts;
+        }
+
+        internal void MovePacManHome()
+        {
+            PacMan = PacMan.SetToHome();
         }
     }
 }
