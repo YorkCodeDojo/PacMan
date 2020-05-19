@@ -10,12 +10,12 @@ namespace NPacMan.Game
     {
         public static void ShowGhosts(GameState gameState)
         {
-            gameState.GhostsVisible = true;
+            gameState.ShowGhosts();
         }
 
         public static void HideGhosts(GameState gameState)
         {
-            gameState.GhostsVisible = false;
+            gameState.HideGhosts();
         }
 
         private static IEnumerable<Ghost> GhostsCollidedWithPacMan(GameState gameState)
@@ -121,16 +121,12 @@ namespace NPacMan.Game
 
         public static void RemoveCoin(GameState gameState, CellLocation location)
         {
-            // Note - this is not the same as gameState.RemainingCoins = gameState.RemainingCoins.Remove(location)
-            // We have to allow for the UI to be iterating over the list whilst we are removing elements from it.
-            gameState.RemainingCoins = gameState.RemainingCoins.Where(c => c != location).ToList();
+            gameState.RemoveCoin(location);
         }
 
         public static void RemovePowerPill(GameState gameState, CellLocation location)
         {
-            // Note - this is not the same as gameState.RemainingPowerPills = gameState.RemainingPowerPills.Remove(location)
-            // We have to allow for the UI to be iterating over the list whilst we are removing elements from it.
-            gameState.RemainingPowerPills = gameState.RemainingPowerPills.Where(p => p != location).ToList();
+            gameState.RemovePowerPill(location);
         }
     }
 }

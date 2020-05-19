@@ -29,22 +29,66 @@ namespace NPacMan.Game
 
         public string Status { get; set; } = null!;
 
-        public DateTime? TimeToChangeState { get; set; }
+        public DateTime? TimeToChangeState { get;private set; }
 
-        public int Lives { get; set; }
+        public int Lives { get; private set; }
 
-        public bool GhostsVisible { get; set; }
+        public bool GhostsVisible { get; private set; }
 
-        public int Score { get; set; }
+        public int Score { get; private set; }
 
-        public DateTime LastTick { get; set; }
+        public DateTime LastTick { get; private set; }
 
-        public List<CellLocation> RemainingCoins { get; set; }
+        public List<CellLocation> RemainingCoins { get; private set; }
 
-        public List<CellLocation> RemainingPowerPills { get; set; }
+        public List<CellLocation> RemainingPowerPills { get; private set; }
 
         public Dictionary<string, Ghost> Ghosts { get; set; }
         
         public PacMan PacMan { get; set; }
+
+        internal void RemoveCoin(CellLocation location)
+        {
+            // Note - this is not the same as gameState.RemainingCoins = gameState.RemainingCoins.Remove(location)
+            // We have to allow for the UI to be iterating over the list whilst we are removing elements from it.
+            RemainingCoins = RemainingCoins.Where(c => c != location).ToList();
+        }
+
+        internal void RemovePowerPill(CellLocation location)
+        {
+            // Note - this is not the same as gameState.RemainingPowerPills = gameState.RemainingPowerPills.Remove(location)
+            // We have to allow for the UI to be iterating over the list whilst we are removing elements from it.
+            RemainingPowerPills = RemainingPowerPills.Where(p => p != location).ToList();
+        }
+
+        internal void IncreaseScore(int amount)
+        {
+            Score += amount;
+        }
+
+        internal void DecreaseLives()
+        {
+            Lives--;
+        }
+
+        internal void ShowGhosts()
+        {
+            GhostsVisible = true;
+        }
+
+        internal void HideGhosts()
+        {
+            GhostsVisible = false;
+        }
+
+        internal void RecordLastTick(DateTime now)
+        {
+            LastTick = now;
+        }
+
+        internal void ChangeStateIn(int timeInSeconds)
+        {
+            TimeToChangeState = LastTick.AddSeconds(timeInSeconds);
+        }
     }
 }
