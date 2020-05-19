@@ -7,28 +7,29 @@ using System.Threading.Tasks;
 
 namespace NPacMan.Game
 {
-    public class Game : IGameActions
+    public class Game
     {
-        public int Score => _gameState.Score;
 
         private readonly IGameClock _gameClock;
+
         private readonly IGameSettings _settings;
-        private Dictionary<string, Ghost> _ghosts;
 
         private readonly GameNotifications _gameNotifications = new GameNotifications();
 
-        private readonly GameState _gameState;
+        private readonly IReadOnlyGameState _gameState;
 
         private readonly GameStateMachine _gameStateMachine;
+
+        private readonly InstanceLift<GameStateMachine> _gameStateMachineInstance;
 
         public Game(IGameClock gameClock, IGameSettings settings)
         {
             _gameClock = gameClock;
             _settings = settings;
-            PacMan = settings.PacMan;
-            _ghosts = settings.Ghosts.ToDictionary(x => x.Name, x => x);
-            _gameStateMachine = new GameStateMachine(this, settings, _gameNotifications);
-            _gameState = new GameState(settings);
+            _gameStateMachine = new GameStateMachine(settings, _gameNotifications, this);
+            var gameState = new GameState(settings);
+            _gameState = gameState;
+            _gameStateMachineInstance = _gameStateMachine.CreateInstanceLift(gameState);
         }
 
         public Game StartGame()
@@ -53,13 +54,11 @@ namespace NPacMan.Game
             return new Game(new GameClock(), gameSettings);
         }
 
-        public PacMan PacMan { get; private set; }
-
         public IReadOnlyCollection<CellLocation> Coins
-            => _gameState.RemainingCoins.AsReadOnly();
+            => _gameState.RemainingCoins;
 
         public IReadOnlyCollection<CellLocation> PowerPills
-            => _gameState.RemainingPowerPills.AsReadOnly();
+            => _gameState.RemainingPowerPills;
 
         public IReadOnlyCollection<CellLocation> Walls
             => _settings.Walls;
@@ -76,8 +75,11 @@ namespace NPacMan.Game
         public int Lives
             => _gameState.Lives;
 
+        public int Score => _gameState.Score;
+        public PacMan PacMan => _gameState.PacMan;
+
         public IReadOnlyDictionary<string, Ghost> Ghosts
-            => _gameState.GhostsVisible ? _ghosts : (IReadOnlyDictionary<string, Ghost>)ImmutableDictionary<string, Ghost>.Empty;
+            => _gameState.GhostsVisible ? _gameState.Ghosts : (IReadOnlyDictionary<string, Ghost>)ImmutableDictionary<string, Ghost>.Empty;
 
         public GameStatus Status => _gameState.Status switch
         {
@@ -91,125 +93,17 @@ namespace NPacMan.Game
             _ => throw new NotImplementedException($"No map for status '{_gameState.Status}'")
         };
 
-        public void ChangeDirection(Direction direction)
-        {
-            var nextSpace = PacMan.Location + direction;
-            if (!Walls.Contains(nextSpace))
-            {
-                PacMan = PacMan.WithNewDirection(direction);
-            }
-        }
-
         private async Task Tick(DateTime now)
         {
-            await _gameStateMachine.RaiseEvent(_gameState, _gameStateMachine.Tick, new Tick(now));
+            await _gameStateMachineInstance.Raise(_gameStateMachine.Tick, new Tick(now));
         }
-
-        private IEnumerable<Ghost> GhostsCollidedWithPacMan()
+        public void ChangeDirection(Direction direction)
         {
-            return Ghosts.Values.Where(ghost => ghost.Location == PacMan.Location);
-        }
-
-        private void ApplyToGhosts(Func<Ghost, Ghost> action)
-        {
-            var newPositionOfGhosts = new Dictionary<string, Ghost>();
-            foreach (var ghost in _ghosts.Values)
+            var nextSpace = _gameState.PacMan.Location + direction;
+            if (!Walls.Contains(nextSpace))
             {
-                newPositionOfGhosts[ghost.Name] = action(ghost);
-            }
-
-            _ghosts = newPositionOfGhosts;
-        }
-
-        Task IGameActions.MoveGhosts(BehaviorContext<GameState, Tick> context, GameStateMachine gameStateMachine)
-        {
-            return MoveGhosts(context, gameStateMachine);
-        }
-
-        void IGameActions.ScatterGhosts()
-        {
-            ApplyToGhosts(ghost => ghost.Scatter());
-        }
-
-        void IGameActions.GhostToChase()
-        {
-            ApplyToGhosts(ghost => ghost.Chase());
-        }
-
-        void IGameActions.MoveGhostsHome()
-        {
-            ApplyToGhosts(ghost => ghost.SetToHome());
-        }
-
-        void IGameActions.MakeGhostsEdible()
-        {
-            ApplyToGhosts(ghost => ghost.SetToEdible());
-        }
-
-        void IGameActions.MakeGhostsNotEdible()
-        {
-            ApplyToGhosts(ghost => ghost.SetToNotEdible());
-        }
-
-        void IGameActions.MovePacManHome()
-        {
-            PacMan = PacMan.SetToHome();
-        }
-
-        void IGameActions.SendGhostHome(Ghost ghostToSendHome)
-        {
-            ApplyToGhosts(ghost =>
-            {
-                if (ghost.Name == ghostToSendHome.Name)
-                {
-                    ghost = ghost.SetToHome();
-                }
-                return ghost;
-            });
-        }
-
-        async Task IGameActions.MovePacMan(BehaviorContext<GameState, Tick> context, GameStateMachine gameStateMachine)
-        {
-            var newPacMan = PacMan.Move();
-
-            if (_settings.Portals.TryGetValue(newPacMan.Location, out var portal))
-            {
-                newPacMan = PacMan.WithNewX(portal.X).WithNewY(portal.Y);
-                newPacMan = newPacMan.Move();
-            }
-
-            if (!_settings.Walls.Contains(newPacMan.Location))
-            {
-                PacMan = newPacMan;
-            }
-
-            var ghosts = GhostsCollidedWithPacMan();
-            foreach (var ghost in ghosts)
-            {
-                await context.Raise(gameStateMachine.GhostCollision, new GhostCollision(ghost));
-            }
-
-            if (Coins.Contains(newPacMan.Location))
-            {
-                await context.Raise(gameStateMachine.CoinCollision, new CoinCollision(newPacMan.Location));
-            }
-
-            if (PowerPills.Contains(newPacMan.Location))
-            {
-                await context.Raise(gameStateMachine.PowerPillCollision, new PowerPillCollision(newPacMan.Location));
+                ((GameState)_gameState).PacMan = _gameState.PacMan.WithNewDirection(direction);
             }
         }
-
-        private async Task MoveGhosts(BehaviorContext<GameState, Tick> context, GameStateMachine gameStateMachine)
-        {
-            ApplyToGhosts(ghost => ghost.Move(this));
-
-            var ghosts = GhostsCollidedWithPacMan();
-            foreach (var ghost in ghosts)
-            {
-                await context.Raise(gameStateMachine.GhostCollision, new GhostCollision(ghost));
-            }
-        }
-
     }
 }

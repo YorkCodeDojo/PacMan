@@ -19,31 +19,11 @@ namespace NPacMan.Game
         public CellLocation Location { get; }
         public Direction Direction { get; }
 
-        public PacMan WithNewX(int newX) => new PacMan(Location.WithNewX(newX), Home, Direction);
-        public PacMan WithNewY(int newY) => new PacMan(Location.WithNewY(newY), Home, Direction);
-        public PacMan WithNewDirection(Direction newDirection) => new PacMan(Location, Home, newDirection);
-        public PacMan SetToHome() => new PacMan(Home, Home, Direction);
+        public PacMan WithNewLocation(CellLocation newLocation) => new PacMan(newLocation, Home, Direction);
         
+        public PacMan WithNewDirection(Direction newDirection) => new PacMan(Location, Home, newDirection);
+        
+        public PacMan SetToHome() => new PacMan(Home, Home, Direction);
 
-        internal PacMan Move()
-        {
-            switch (Direction)
-            {
-                case Direction.Up:
-                    return WithNewY(Location.Y - 1);
-
-                case Direction.Down:
-                    return WithNewY(Location.Y + 1);
-
-                case Direction.Left:
-                    return WithNewX(Location.X - 1);
-
-                case Direction.Right:
-                    return WithNewX(Location.X + 1);
-
-                default:
-                    throw new NotImplementedException();
-            }
-        }
     }
 }
