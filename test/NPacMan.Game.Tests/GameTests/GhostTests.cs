@@ -330,12 +330,13 @@ namespace NPacMan.Game.Tests.GameTests
         }
 
         [Fact]
-        public async Task GhostGoHomeAfterCollidesWithPacManAfterEatingPowerPill()
+        public async Task GhostsGoHomeAfterCollidesWithPacManAfterEatingPowerPill()
         {
-            var ghostStart1 = _gameSettings.PacMan.Location.Left.Left.Left;
-            var ghostStart2 = ghostStart1.Below;
-            _gameSettings.Ghosts.Add(new Ghost("Ghost1", ghostStart1, Direction.Left, CellLocation.TopLeft, new GhostGoesRightStrategy()));
+            var ghostStart1and3 = _gameSettings.PacMan.Location.Left.Left.Left;
+            var ghostStart2 = ghostStart1and3.Below;
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", ghostStart1and3, Direction.Left, CellLocation.TopLeft, new GhostGoesRightStrategy()));
             _gameSettings.Ghosts.Add(new Ghost("Ghost2", ghostStart2, Direction.Left, CellLocation.TopLeft, new GhostGoesRightStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost3", ghostStart1and3, Direction.Left, CellLocation.TopLeft, new GhostGoesRightStrategy()));
 
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Left);
 
@@ -348,17 +349,22 @@ namespace NPacMan.Game.Tests.GameTests
             await _gameClock.Tick(now);
 
             WeExpectThat(game.PacMan).IsAt(_gameSettings.PacMan.Location.Left);
-            WeExpectThat(game.Ghosts["Ghost1"]).IsAt(ghostStart1.Right);
+            WeExpectThat(game.Ghosts["Ghost1"]).IsAt(ghostStart1and3.Right);
 
             await _gameClock.Tick(now);
             WeExpectThat(game.PacMan).IsAt(_gameSettings.PacMan.Location.Left.Left);
             
             game.Ghosts["Ghost1"].Should().BeEquivalentTo(new {
-                Location = ghostStart1
+                Location = ghostStart1and3
             });
 
             game.Ghosts["Ghost2"].Should().NotBeEquivalentTo(new {
                 Location = ghostStart2
+            });
+
+            game.Ghosts["Ghost3"].Should().BeEquivalentTo(new
+            {
+                Location = ghostStart1and3
             });
         }
 

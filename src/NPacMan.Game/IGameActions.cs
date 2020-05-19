@@ -17,5 +17,7 @@ namespace NPacMan.Game
         void MovePacManHome();
         void MakeGhostsNotEdible();
         void SendGhostHome(Ghost ghost);
+        void RemoveCoin(CellLocation coinLocation);
+        void RemovePowerPill(CellLocation powerPillLocation);
     }
 }
