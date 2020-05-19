@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace NPacMan.Game
 {
-    internal class GameState
+    internal class GameState : IReadOnlyGameState
     {
         public GameState(IGameSettings settings)
         {
@@ -39,11 +39,11 @@ namespace NPacMan.Game
 
         public DateTime LastTick { get; private set; }
 
-        public List<CellLocation> RemainingCoins { get; private set; }
+        public IReadOnlyCollection<CellLocation> RemainingCoins { get; private set; }
 
-        public List<CellLocation> RemainingPowerPills { get; private set; }
+        public IReadOnlyCollection<CellLocation> RemainingPowerPills { get; private set; }
 
-        public Dictionary<string, Ghost> Ghosts { get; private set; }
+        public IReadOnlyDictionary<string, Ghost> Ghosts { get; private set; }
         
         public PacMan PacMan { get; set; }
 

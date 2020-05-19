@@ -16,16 +16,20 @@ namespace NPacMan.Game
 
         private readonly GameNotifications _gameNotifications = new GameNotifications();
 
-        private readonly GameState _gameState;
+        private readonly IReadOnlyGameState _gameState;
 
         private readonly GameStateMachine _gameStateMachine;
+
+        private readonly InstanceLift<GameStateMachine> _gameStateMachineInstance;
 
         public Game(IGameClock gameClock, IGameSettings settings)
         {
             _gameClock = gameClock;
             _settings = settings;
             _gameStateMachine = new GameStateMachine(settings, _gameNotifications, this);
-            _gameState = new GameState(settings);
+            var gameState = new GameState(settings);
+            _gameState = gameState;
+            _gameStateMachineInstance = _gameStateMachine.CreateInstanceLift(gameState);
         }
 
         public Game StartGame()
@@ -51,10 +55,10 @@ namespace NPacMan.Game
         }
 
         public IReadOnlyCollection<CellLocation> Coins
-            => _gameState.RemainingCoins.AsReadOnly();
+            => _gameState.RemainingCoins;
 
         public IReadOnlyCollection<CellLocation> PowerPills
-            => _gameState.RemainingPowerPills.AsReadOnly();
+            => _gameState.RemainingPowerPills;
 
         public IReadOnlyCollection<CellLocation> Walls
             => _settings.Walls;
@@ -91,14 +95,14 @@ namespace NPacMan.Game
 
         private async Task Tick(DateTime now)
         {
-            await _gameStateMachine.RaiseEvent(_gameState, _gameStateMachine.Tick, new Tick(now));
+            await _gameStateMachineInstance.Raise(_gameStateMachine.Tick, new Tick(now));
         }
         public void ChangeDirection(Direction direction)
         {
             var nextSpace = _gameState.PacMan.Location + direction;
             if (!Walls.Contains(nextSpace))
             {
-                _gameState.PacMan = _gameState.PacMan.WithNewDirection(direction);
+                ((GameState)_gameState).PacMan = _gameState.PacMan.WithNewDirection(direction);
             }
         }
     }
