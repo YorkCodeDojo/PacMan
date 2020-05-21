@@ -119,7 +119,7 @@ namespace NPacMan.Game
             var nextSpace = gameState.PacMan.Location + direction;
             if (!gameSettings.Walls.Contains(nextSpace))
             {
-                gameState.PacMan = gameState.PacMan.WithNewDirection(direction);
+                gameState.ChangeDirectionOfPacMan(direction);
             }
         }
     }

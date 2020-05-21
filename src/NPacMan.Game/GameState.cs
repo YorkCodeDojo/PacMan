@@ -45,7 +45,7 @@ namespace NPacMan.Game
 
         public IReadOnlyDictionary<string, Ghost> Ghosts { get; private set; }
         
-        public PacMan PacMan { get; set; }
+        public PacMan PacMan { get; private set; }
 
         internal void RemoveCoin(CellLocation location)
         {
@@ -110,6 +110,14 @@ namespace NPacMan.Game
         internal void MovePacManHome()
         {
             PacMan = PacMan.SetToHome();
+        }
+
+        internal void ChangeDirectionOfPacMan(Direction direction)
+        {
+            if (direction != PacMan.Direction)
+            {
+                PacMan = PacMan.WithNewDirection(direction);
+            }
         }
     }
 }
