@@ -185,7 +185,12 @@ namespace NPacMan.Game.Tests.GameTests
             numberOfNotificationsTriggered.Should().Be(1);
         }
     
-        private EnsureThatGhost WeExpectThat(Ghost ghost) => new EnsureThatGhost(ghost);
     
+    }
+
+    public static class GhostHelper
+    {
+        public static EnsureThatGhost WeExpectThat(Ghost ghost) => new EnsureThatGhost(ghost);
+        public static EnsureThatPacMan WeExpectThat(PacMan pacMan) => new EnsureThatPacMan(pacMan);
     }
 }

@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using NPacMan.Game.Tests.GhostStrategiesForTests;
 using Xunit;
+using static NPacMan.Game.Tests.GameTests.GhostHelper;
 
 namespace NPacMan.Game.Tests.GameTests
 {
@@ -306,6 +307,42 @@ namespace NPacMan.Game.Tests.GameTests
             await _gameClock.Tick(now.AddSeconds(4));
 
             game.Status.Should().Be(GameStatus.Dead);
+        }
+
+        [Theory]
+        [InlineData(1, 200)]
+        [InlineData(2, 600)]
+        [InlineData(3, 1400)]
+        [InlineData(4, 3000)]
+        [InlineData(5, 6200)]
+        public async Task ScoreShouldIncreaseExponentiallyAfterEatingEachGhost(int numberOfGhosts, int totalScore)
+        {
+            var ghostStart = _gameSettings.PacMan.Location.Left.Left.Left;
+            for(int g = 0;g<numberOfGhosts;g++)
+{            _gameSettings.Ghosts.Add(new Ghost($"Ghost{g}", ghostStart, Direction.Left, CellLocation.TopLeft, new GhostGoesRightStrategy()));}
+       
+            _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Left);
+
+             var game = new Game(_gameClock, _gameSettings);
+            game.StartGame(); 
+
+            await game.ChangeDirection(Direction.Left);
+
+            await _gameClock.Tick();
+
+            var scoreBeforeGhost = game.Score;
+
+            WeExpectThat(game.PacMan).IsAt(_gameSettings.PacMan.Location.Left);
+            for(int g =0;g<numberOfGhosts;g++)
+            {            
+                WeExpectThat(game.Ghosts[$"Ghost{g}"]).IsAt(ghostStart.Right);
+            }
+
+            await _gameClock.Tick();
+
+            WeExpectThat(game.PacMan).IsAt(_gameSettings.PacMan.Location.Left.Left);
+
+            game.Score.Should().Be(scoreBeforeGhost+totalScore);
         }
     }
 }

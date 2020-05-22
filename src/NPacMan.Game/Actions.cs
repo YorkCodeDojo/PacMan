@@ -102,6 +102,13 @@ namespace NPacMan.Game
             }
         }
 
+        internal static void IncreaseScoreAfterEatingGhost(GameState gameState, Game game)
+        {
+            var numberOfInEdibleGhosts = game.Ghosts.Values.Count(g => !g.Edible);
+            var increaseInScore = (int)Math.Pow(2, numberOfInEdibleGhosts) * 200;
+            gameState.IncreaseScore(increaseInScore);
+        }
+
         public static void RemoveCoin(GameState gameState, CellLocation location)
         {
             gameState.RemoveCoin(location);

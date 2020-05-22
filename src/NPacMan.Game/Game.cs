@@ -21,6 +21,8 @@ namespace NPacMan.Game
 
         private readonly InstanceLift<GameStateMachine> _gameStateMachineInstance;
 
+        public int TickCounter { get;private set; }
+
         public Game(IGameClock gameClock, IGameSettings settings)
         {
             _gameClock = gameClock;
