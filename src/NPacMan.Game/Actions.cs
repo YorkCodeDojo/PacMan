@@ -8,6 +8,12 @@ namespace NPacMan.Game
 {
     internal static class Actions
     {
+        public static void Tick(GameState gameState, DateTime now, GameNotifications gameNotifications)
+        {
+            gameNotifications.Publish(GameNotification.PreTick);
+            gameState.RecordLastTick(now);
+        }
+
         public static void ShowGhosts(GameState gameState)
         {
             gameState.ShowGhosts();
@@ -48,7 +54,7 @@ namespace NPacMan.Game
             gameState.ApplyToGhosts(ghost => ghost.SetToNotEdible());
         }
 
-         public static void MakeGhostNotEdible(GameState gameState,  Ghost ghostToUpdate)
+        public static void MakeGhostNotEdible(GameState gameState, Ghost ghostToUpdate)
         {
             gameState.ApplyToGhost(ghost => ghost.SetToNotEdible(), ghostToUpdate);
         }
