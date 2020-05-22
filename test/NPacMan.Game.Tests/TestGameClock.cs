@@ -7,6 +7,16 @@ namespace NPacMan.Game.Tests
     {
         private Func<DateTime, Task>? _action;
 
+        public void Pause()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Resume()
+        {
+            throw new NotImplementedException();
+        }
+
         public void Subscribe(Func<DateTime, Task> action)
         {
             _action = action;

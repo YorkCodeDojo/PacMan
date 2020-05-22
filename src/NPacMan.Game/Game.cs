@@ -32,6 +32,9 @@ namespace NPacMan.Game
             _gameStateMachineInstance = _gameStateMachine.CreateInstanceLift(gameState);
         }
 
+        public void Pause() => _gameClock.Pause();
+        public void Resume() => _gameClock.Resume();
+
         public Game StartGame()
         {
             _gameClock.Subscribe(Tick);

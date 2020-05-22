@@ -29,7 +29,7 @@ namespace NPacMan.UI
         private int _fpsLast = 0;
 
         private readonly Font _fpsFont = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point, ((byte)(0)));
-        private readonly Brush _fpsBrush = new SolidBrush(Color.DarkRed); 
+        private readonly Brush _fpsBrush = new SolidBrush(Color.DarkRed);
 
         public GraphicsBuffers(Form forms)
         {
@@ -37,7 +37,7 @@ namespace NPacMan.UI
             _currentContext = BufferedGraphicsManager.Current;
             _formSize = _form.DisplayRectangle;
 
-            _fpsStopWatch=new Stopwatch();
+            _fpsStopWatch = new Stopwatch();
             _fpsStopWatch.Start();
         }
 
@@ -100,8 +100,8 @@ namespace NPacMan.UI
             if (_screenGraphics != null && _gameBuffer != null)
             {
                 // Scale to fit, with aspect ratio
-                var scale = Math.Min((float) _formSize.Width / _gameBuffer.Width,
-                    (float) _formSize.Height / _gameBuffer.Height);
+                var scale = Math.Min((float)_formSize.Width / _gameBuffer.Width,
+                    (float)_formSize.Height / _gameBuffer.Height);
 
                 // Centre in the form
                 var x = (_formSize.Width - _gameBuffer.Width * scale) / 2;
@@ -128,7 +128,13 @@ namespace NPacMan.UI
                 }
             }
 
-            _screenBuffer?.Render();
+            try
+            {
+                _screenBuffer?.Render();
+            }
+            catch (Exception)
+            {
+            }
         }
 
         public void Dispose()

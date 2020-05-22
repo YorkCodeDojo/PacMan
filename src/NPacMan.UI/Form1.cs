@@ -1,4 +1,5 @@
-﻿using NPacMan.Game;
+﻿using GreenPipes.Filters;
+using NPacMan.Game;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
@@ -26,6 +27,7 @@ namespace NPacMan.UI
                              .Subscribe(GameNotification.EatGhost, soundSet.EatGhost)
                              .Subscribe(GameNotification.ExtraPac, soundSet.ExtraPac)
                              .Subscribe(GameNotification.Intermission, soundSet.Intermission)
+                             .Subscribe(GameNotification.PreTick, BeforeTick)
                              .StartGame();
 
             _graphicsBuffers = new GraphicsBuffers(this) { ShowFps = true };
@@ -38,6 +40,25 @@ namespace NPacMan.UI
             _renderLoop.Interval = 16; //40fps
             _renderLoop.Enabled = true;
             _renderLoop.Tick += _renderLoop_Tick;
+        }
+
+        private void BeforeTick()
+        {
+            if (_game.Status == GameStatus.Alive)
+            {
+                try
+                {
+                    IBot bot = new GreedyBot();
+
+                    var nextDirection = bot.SuggestNextDirection(_game);
+                    _game.ChangeDirection(nextDirection);
+                }
+                catch (Exception ex)
+                {
+                    var a = ex.Message;
+                    throw;
+                }
+            }
         }
 
         private static readonly IReadOnlyDictionary<Keys, Direction> _keysMap

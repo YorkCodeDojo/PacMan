@@ -23,5 +23,15 @@ namespace NPacMan.Game
         {
             _timer.Dispose();
         }
+
+        public void Pause()
+        {
+            _timer.Change(Timeout.Infinite, Timeout.Infinite);
+        }
+
+        public void Resume()
+        {
+            _timer.Change(0, 200);
+        }
     }
 }

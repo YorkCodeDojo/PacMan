@@ -11,7 +11,8 @@ namespace NPacMan.Game
 
             DuringAny(
                 When(Tick)
-                    .Then(context => context.Instance.RecordLastTick(context.Data.Now)));
+                    .Then(context => context.Instance.RecordLastTick(context.Data.Now))
+                    .Then(context => gameNotifications.Publish(GameNotification.PreTick)));
 
             Initially(
                 When(Tick)
