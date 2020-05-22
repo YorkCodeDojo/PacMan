@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using FluentAssertions;
 using Xunit;
 
@@ -38,5 +39,15 @@ namespace NPacMan.Game.Tests.GameTests
 
             _game.Height.Should().Be(gameBoardHeight);
         }
+
+        [Fact]
+        public void CanReadPortalsFromGame(){
+            _gameSettings.Portals.Add((1,2),(3,4));
+
+            _game.Portals.Should().BeEquivalentTo(new Dictionary<CellLocation, CellLocation> {
+                [(1,2)] = (3,4)
+            });
+        }
+
     }
 }
