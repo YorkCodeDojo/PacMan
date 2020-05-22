@@ -7,6 +7,7 @@ using NPacMan.Game.GhostStrategies;
 using NPacMan.Game.Tests.GhostStrategiesForTests;
 using NPacMan.Game.Tests.Helpers;
 using Xunit;
+using static NPacMan.Game.Tests.GameTests.Ensure;
 
 namespace NPacMan.Game.Tests.GameTests
 {
@@ -450,9 +451,5 @@ namespace NPacMan.Game.Tests.GameTests
                     Location = portalExit.Right
                 });
         }
-
-        private EnsureThatGhost WeExpectThat(Ghost ghost) => new EnsureThatGhost(ghost);
-        private EnsureThatPacMan WeExpectThat(PacMan pacMan) => new EnsureThatPacMan(pacMan);
-
     }
 }

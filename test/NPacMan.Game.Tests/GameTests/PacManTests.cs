@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using NPacMan.Game.Tests.GhostStrategiesForTests;
 using Xunit;
-using static NPacMan.Game.Tests.GameTests.GhostHelper;
+using static NPacMan.Game.Tests.GameTests.Ensure;
 
 namespace NPacMan.Game.Tests.GameTests
 {
