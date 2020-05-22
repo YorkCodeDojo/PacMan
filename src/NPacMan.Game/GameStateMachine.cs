@@ -52,6 +52,8 @@ namespace NPacMan.Game
                 When(Tick)
                     .ThenAsync(async context => await Actions.MoveGhosts(game, context.Instance, context, this))
                     .ThenAsync(async context => await Actions.MovePacMan(settings, context.Instance, context, this)),
+                When (PlayersWishesToChangeDirection)
+                    .Then(context => Actions.ChangeDirection(settings, context.Instance, context.Data.NewDirection)),
                 When(CoinCollision)
                     .Then(context => Actions.RemoveCoin(context.Instance, context.Data.Location))
                     .Then(context => context.Instance.IncreaseScore(10))
@@ -78,10 +80,7 @@ namespace NPacMan.Game
                 When(Tick, context => context.Data.Now >= context.Instance.TimeToChangeState)
                     .IfElse(context => context.Instance.Lives > 0,
                         binder => binder.TransitionTo(Respawning),
-                        binder => binder.TransitionTo(Dead)),
-                Ignore(CoinCollision),
-                Ignore(PowerPillCollision),
-                Ignore(GhostCollision));
+                        binder => binder.TransitionTo(Dead)));
 
             WhenEnter(Respawning,
                        binder => binder
@@ -97,6 +96,12 @@ namespace NPacMan.Game
                     .TransitionTo(GhostChase));
 
             During(Dead, Ignore(Tick));
+
+            During(Dying, Respawning, Dead,
+                    Ignore(PlayersWishesToChangeDirection),
+                    Ignore(CoinCollision),
+                    Ignore(PowerPillCollision),
+                    Ignore(GhostCollision));
         }
 
         public State GhostChase { get; private set; } = null!;
@@ -109,7 +114,6 @@ namespace NPacMan.Game
         public Event<GhostCollision> GhostCollision { get; private set; } = null!;
         public Event<CoinCollision> CoinCollision { get; private set; } = null!;
         public Event<PowerPillCollision> PowerPillCollision { get; private set; } = null!;
-
-
+        public Event<PlayersWishesToChangeDirection> PlayersWishesToChangeDirection { get; private set; } = null!;
     }
 }

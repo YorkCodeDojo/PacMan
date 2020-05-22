@@ -43,7 +43,7 @@ namespace NPacMan.Game.Tests.GameTests
             
             var (x, y) = game.PacMan.Location;
 
-            game.ChangeDirection(directionToFace);
+            await game.ChangeDirection(directionToFace);
 
             await _gameClock.Tick();
 
@@ -67,7 +67,7 @@ namespace NPacMan.Game.Tests.GameTests
             var y = game.PacMan.Location.Y;
             var score = game.Score;
 
-            game.ChangeDirection(directionToFace);
+            await game.ChangeDirection(directionToFace);
 
             _gameSettings.Walls.Add((x + createWallXOffset, y + createWallYOffset));
 
@@ -93,7 +93,7 @@ namespace NPacMan.Game.Tests.GameTests
 
             _gameSettings.Portals.Add((x - 1, y), (15, 15));
 
-            game.ChangeDirection(Direction.Left);
+            await game.ChangeDirection(Direction.Left);
 
             await _gameClock.Tick();
 
@@ -269,7 +269,7 @@ namespace NPacMan.Game.Tests.GameTests
         [InlineData(Direction.Down)]
         [InlineData(Direction.Left)]
         [InlineData(Direction.Right)]
-        public void PacManCantTurnToFaceWall(Direction direction)
+        public async Task PacManCantTurnToFaceWall(Direction direction)
         {
             var game = new Game(_gameClock, _gameSettings);
             game.StartGame(); 
@@ -277,11 +277,11 @@ namespace NPacMan.Game.Tests.GameTests
             var pacManLocation = game.PacMan.Location;
 
             var expectedDirection = direction.Opposite();
-            game.ChangeDirection(expectedDirection);
+            await game.ChangeDirection(expectedDirection);
 
             _gameSettings.Walls.Add(pacManLocation + direction);
 
-            game.ChangeDirection(direction);
+            await game.ChangeDirection(direction);
 
             game.PacMan.Should().BeEquivalentTo(new
             {
