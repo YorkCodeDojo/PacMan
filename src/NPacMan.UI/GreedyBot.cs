@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Forms;
 
 namespace NPacMan.UI
 {
@@ -16,6 +15,39 @@ namespace NPacMan.UI
         {
             var currentLocation = game.PacMan.Location;
 
+            var shortestDistances = CalculateDistances(game, currentLocation);
+
+            var nearestCoin = FindNearestCoin(game.Coins, shortestDistances);
+
+            var bestDirectionToNearestCoin = DirectionToTarget(game, shortestDistances, nearestCoin);
+
+            var nearestGhost = FindNearestGhost(game.Ghosts, shortestDistances);
+
+            bestDirectionToNearestCoin = AvoidGhost(game, currentLocation, shortestDistances, bestDirectionToNearestCoin, nearestGhost);
+
+            return bestDirectionToNearestCoin;
+        }
+
+        private Direction AvoidGhost(Game.Game game, CellLocation currentLocation, int[,] shortestDistances, Direction bestDirectionToNearestCoin, Ghost? nearestGhost)
+        {
+            if (nearestGhost is object)
+            {
+                var distanceToGhost = shortestDistances[nearestGhost.Location.X, nearestGhost.Location.Y];
+                if (distanceToGhost < 5)
+                {
+                    var directionToScaryGhost = DirectionToTarget(game, shortestDistances, nearestGhost.Location);
+                    if (directionToScaryGhost == bestDirectionToNearestCoin)
+                    {
+                        bestDirectionToNearestCoin = PickDifferentDirection(game, currentLocation, directionToScaryGhost);
+                    }
+                }
+            }
+
+            return bestDirectionToNearestCoin;
+        }
+
+        private int[,] CalculateDistances(Game.Game game, CellLocation currentLocation)
+        {
             //1
             var shortestDistances = new int[game.Width, game.Height];
             var visited = new bool[game.Width, game.Height];
@@ -39,8 +71,6 @@ namespace NPacMan.UI
                 foreach (var possibleDirection in GetAvailableMovesForLocation(currentNode.Value, game))
                 {
                     var newLocation = currentNode.Value + possibleDirection;
-                    if (newLocation.X < 0 || newLocation.X + 1 > game.Width) throw new Exception($"X is {newLocation.X} but the board width is only 0 to {game.Width}");
-                    if (newLocation.Y < 0 || newLocation.Y + 1 > game.Height) throw new Exception($"Y is {newLocation.Y} but the board height is only 0 to {game.Height}");
                     if (!visited[newLocation.X, newLocation.Y])
                     {
                         var tentativeDistance = shortestDistances[currentNode.Value.X, currentNode.Value.Y] + 1;
@@ -73,25 +103,7 @@ namespace NPacMan.UI
 
             }
 
-            var nearestCoin = FindNearestCoin(game.Coins, shortestDistances);
-            
-            var bestDirectionToNearestCoin = DirectionToTarget(game, shortestDistances, nearestCoin);
-
-            var nearestGhost = FindNearestGhost(game.Ghosts, shortestDistances);
-            if (nearestGhost is object)
-            {
-                var distanceToGhost = shortestDistances[nearestGhost.Location.X, nearestGhost.Location.Y];
-                if (distanceToGhost < 5)
-                {
-                    var directionToScaryGhost = DirectionToTarget(game, shortestDistances, nearestGhost.Location);
-                    if (directionToScaryGhost == bestDirectionToNearestCoin)
-                    {
-                        bestDirectionToNearestCoin = PickDifferentDirection(game, currentLocation, directionToScaryGhost);
-                    }
-                }
-            }
-
-            return bestDirectionToNearestCoin;
+            return shortestDistances;
         }
 
         private Direction PickDifferentDirection(Game.Game game, CellLocation currentLocation, Direction directionToScaryGhost)
