@@ -74,17 +74,46 @@ namespace NPacMan.UI
             }
 
             var nearestCoin = FindNearestCoin(game.Coins, shortestDistances);
+            
+            var bestDirectionToNearestCoin = DirectionToTarget(game, shortestDistances, nearestCoin);
 
+            var nearestGhost = FindNearestGhost(game.Ghosts, shortestDistances);
+            if (nearestGhost is object)
+            {
+                var distanceToGhost = shortestDistances[nearestGhost.Location.X, nearestGhost.Location.Y];
+                if (distanceToGhost < 5)
+                {
+                    var directionToScaryGhost = DirectionToTarget(game, shortestDistances, nearestGhost.Location);
+                    if (directionToScaryGhost == bestDirectionToNearestCoin)
+                    {
+                        bestDirectionToNearestCoin = PickDifferentDirection(game, currentLocation, directionToScaryGhost);
+                    }
+                }
+            }
+
+            return bestDirectionToNearestCoin;
+        }
+
+        private Direction PickDifferentDirection(Game.Game game, CellLocation currentLocation, Direction directionToScaryGhost)
+        {
+            var possibleDirections = GetAvailableMovesForLocation(currentLocation, game);
+            possibleDirections.Remove(directionToScaryGhost);
+
+            return possibleDirections.First();
+        }
+
+        private Direction DirectionToTarget(Game.Game game, int[,] shortestDistances, CellLocation targetLocation)
+        {
             var bestDirection = default(Direction);
-            var distanceToCoin = shortestDistances[nearestCoin.X, nearestCoin.Y];
-            currentNode = nearestCoin;
+            var distanceToCoin = shortestDistances[targetLocation.X, targetLocation.Y];
+            var currentNode = targetLocation;
             while (distanceToCoin > 0)
             {
                 var bestScore = int.MaxValue;
-                
-                foreach (var possibleDirection in GetAvailableMovesForLocation(currentNode.Value, game))
+
+                foreach (var possibleDirection in GetAvailableMovesForLocation(currentNode, game))
                 {
-                    var possibleLocation = currentNode.Value + possibleDirection;
+                    var possibleLocation = currentNode + possibleDirection;
                     if (shortestDistances[possibleLocation.X, possibleLocation.Y] < bestScore)
                     {
                         bestScore = shortestDistances[possibleLocation.X, possibleLocation.Y];
@@ -118,47 +147,29 @@ namespace NPacMan.UI
             return bestCoin;
         }
 
-        //private void CalculateDistance(Game.Game game, CellLocation currentLocation,
-        //                                int[,] shortestDistances,
-        //                                bool[,] visited)
-        //{
-        //    var distanceToHere = shortestDistances[currentLocation];
-        //    var availableMoves = GetAvailableMovesForLocation(currentLocation, game.Walls);
+        private Ghost? FindNearestGhost(IReadOnlyDictionary<string, Ghost> ghosts, int[,] shortestDistances)
+        {
+            var closestGhost = default(Ghost);
+            var shortestDistance = int.MaxValue;
 
-        //    foreach (var possibleDirection in availableMoves)
-        //    {
-        //        var newLocation = currentLocation + possibleDirection;
-        //        if (!visited.ContainsKey(newLocation))
-        //        {
-        //            if (shortestDistances.TryGetValue(newLocation, out var previousDistance))
-        //            {
-        //                if (previousDistance > distanceToHere + 1)
-        //                {
-        //                    shortestDistances[newLocation] = distanceToHere + 1;
-        //                }
-        //            }
-        //            else
-        //            {
-        //                shortestDistances[newLocation] = distanceToHere + 1;
-        //            }
-        //        }
-        //    }
+            foreach (var ghost in ghosts.Values.Where(g => !g.Edible))
+            {
+                var distanceToGhost = shortestDistances[ghost.Location.X, ghost.Location.Y];
 
-        //    //4
-        //    visited[currentLocation] = true;
+                if (distanceToGhost < shortestDistance)
+                {
+                    shortestDistance = distanceToGhost;
+                    closestGhost = ghost;
+                }
+            }
 
-        //    foreach (var possibleDirection in availableMoves)
-        //    {
-        //        if (!visited.ContainsKey(currentLocation + possibleDirection))
-        //        {
-        //            CalculateDistance(game, currentLocation + possibleDirection, shortestDistances, visited);
-        //        }
-        //    }
-
-        //}
+            return closestGhost;
+        }
 
         private List<Direction> GetAvailableMovesForLocation(CellLocation location, Game.Game game)
         {
+            //Currently ignores portals
+
             var result = new List<Direction>(4);
 
             if (!game.Walls.Contains(location.Above) && location.Y > 0)
