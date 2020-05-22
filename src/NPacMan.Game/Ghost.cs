@@ -38,7 +38,14 @@ namespace NPacMan.Game
         {
             var nextDirection = CurrentStrategy.GetNextDirection(this, game);
             if (nextDirection is Direction newDirection)
-                return WithNewLocationAndDirection(Location + newDirection, newDirection);
+            {
+                var newGhostLocation = Location + newDirection;
+                if (game.Portals.TryGetValue(newGhostLocation, out var otherEndOfThePortal))
+                {
+                    newGhostLocation = otherEndOfThePortal + newDirection;
+                }
+                return WithNewLocationAndDirection(newGhostLocation, newDirection);
+            }
             else
                 return this;
         }

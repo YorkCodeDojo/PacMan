@@ -368,6 +368,27 @@ namespace NPacMan.Game.Tests.GameTests
             });
         }
 
+        
+        [Fact]
+        public async Task GhostIsTeleportedWhenWalkingIntoAPortal()
+        {
+            CellLocation portalEntrance = (10, 1);
+            CellLocation portalExit = (1, 5);
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", portalEntrance.Left, Direction.Left, CellLocation.TopLeft, new GhostGoesRightStrategy()));
+            var game = new Game(_gameClock, _gameSettings);
+            game.StartGame();
+
+            _gameSettings.Portals.Add(portalEntrance, portalExit);
+
+            await _gameClock.Tick();
+
+            game.Ghosts.Values.First()
+                .Should()
+                .BeEquivalentTo(new {
+                    Location = portalExit.Right
+                });
+        }
+
         private EnsureThatGhost WeExpectThat(Ghost ghost) => new EnsureThatGhost(ghost);
         private EnsureThatPacMan WeExpectThat(PacMan pacMan) => new EnsureThatPacMan(pacMan);
 

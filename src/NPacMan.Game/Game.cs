@@ -65,6 +65,9 @@ namespace NPacMan.Game
         public IReadOnlyCollection<CellLocation> Doors
             => _settings.Doors;
 
+        public IReadOnlyDictionary<CellLocation, CellLocation> Portals
+            => _settings.Portals;
+
         public int Width
             => _settings.Width;
 
