@@ -98,13 +98,25 @@ namespace NPacMan.Game
 
         internal void ApplyToGhosts(Func<Ghost, Ghost> action)
         {
-            var newPositionOfGhosts = new Dictionary<string, Ghost>();
+            var newPositionOfGhosts = new Dictionary<string, Ghost>(Ghosts.Count);
             foreach (var ghost in Ghosts.Values)
             {
                 newPositionOfGhosts[ghost.Name] = action(ghost);
             }
 
             Ghosts = newPositionOfGhosts;
+        }
+
+        internal void ApplyToGhost(Func<Ghost, Ghost> action, Ghost ghostToUpdate)
+        {
+            ApplyToGhosts(ghost =>
+            {
+                if (ghost.Name == ghostToUpdate.Name)
+                {
+                    ghost = action(ghost);
+                }
+                return ghost;
+            });
         }
 
         internal void MovePacManHome()

@@ -50,28 +50,14 @@ namespace NPacMan.Game
 
          public static void MakeGhostNotEdible(GameState gameState,  Ghost ghostToUpdate)
         {
-            gameState.ApplyToGhosts(ghost =>
-            {
-                if (ghost.Name == ghostToUpdate.Name)
-                {
-                    ghost = ghost.SetToNotEdible();
-                }
-                return ghost;
-            });
+            gameState.ApplyToGhost(ghost => ghost.SetToNotEdible(), ghostToUpdate);
         }
 
         public static void MovePacManHome(GameState gameState) => gameState.MovePacManHome();
 
-        public static void SendGhostHome(GameState gameState, Ghost ghostToSendHome)
+        public static void SendGhostHome(GameState gameState, Ghost ghostToUpdate)
         {
-            gameState.ApplyToGhosts(ghost =>
-            {
-                if (ghost.Name == ghostToSendHome.Name)
-                {
-                    ghost = ghost.SetToHome();
-                }
-                return ghost;
-            });
+            gameState.ApplyToGhost(ghost => ghost.SetToHome(), ghostToUpdate);
         }
 
         public async static Task MovePacMan(IGameSettings gameSettings, GameState gameState, BehaviorContext<GameState, Tick> context, GameStateMachine gameStateMachine)
