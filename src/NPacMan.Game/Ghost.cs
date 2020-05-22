@@ -65,12 +65,12 @@ namespace NPacMan.Game
 
         internal Ghost SetToHome() => WithNewLocation(Home);
 
-        internal Ghost SetToEdible() => WithNewEdible(true);
+        internal Ghost SetToEdible() => WithNewEdibleAndDirection(true, Direction.Opposite());
 
-        internal Ghost SetToNotEdible() => WithNewEdible(false);
+        internal Ghost SetToNotEdible() => WithNewEdibleAndDirection(false, Direction);
 
-        private Ghost WithNewEdible(bool isEdible)
-            => new Ghost(Name, Home, Location, Direction, ScatterTarget, Strategy, CurrentStrategy, isEdible);
+        private Ghost WithNewEdibleAndDirection(bool isEdible, Direction newDirection)
+            => new Ghost(Name, Home, Location, newDirection, ScatterTarget, Strategy, CurrentStrategy, isEdible);
 
         private Ghost WithNewCurrentStrategyAndDirection(IGhostStrategy newCurrentStrategy, Direction newDirection)
             => new Ghost(Name, Home, Location, newDirection, ScatterTarget, Strategy, newCurrentStrategy, Edible);
