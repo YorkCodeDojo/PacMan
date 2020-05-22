@@ -48,6 +48,18 @@ namespace NPacMan.Game
             gameState.ApplyToGhosts(ghost => ghost.SetToNotEdible());
         }
 
+         public static void MakeGhostNotEdible(GameState gameState,  Ghost ghostToUpdate)
+        {
+            gameState.ApplyToGhosts(ghost =>
+            {
+                if (ghost.Name == ghostToUpdate.Name)
+                {
+                    ghost = ghost.SetToNotEdible();
+                }
+                return ghost;
+            });
+        }
+
         public static void MovePacManHome(GameState gameState) => gameState.MovePacManHome();
 
         public static void SendGhostHome(GameState gameState, Ghost ghostToSendHome)
