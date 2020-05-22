@@ -93,7 +93,7 @@ namespace NPacMan.Game
 
         public static async Task MoveGhosts(Game game, GameState gameState, BehaviorContext<GameState, Tick> context, GameStateMachine gameStateMachine)
         {
-            gameState.ApplyToGhosts(ghost => ghost.Move(game));
+            gameState.ApplyToGhosts(ghost => ghost.Move(game, gameState));
 
             var ghosts = GhostsCollidedWithPacMan(gameState);
             foreach (var ghost in ghosts)

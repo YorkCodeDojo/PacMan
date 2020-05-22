@@ -49,11 +49,11 @@ namespace NPacMan.Game
                     .TransitionTo(Scatter));
 
             During(Scatter, GhostChase, Frightened,
+                When (PlayersWishesToChangeDirection)
+                    .Then(context => Actions.ChangeDirection(settings, context.Instance, context.Data.NewDirection)),
                 When(Tick)
                     .ThenAsync(async context => await Actions.MoveGhosts(game, context.Instance, context, this))
                     .ThenAsync(async context => await Actions.MovePacMan(settings, context.Instance, context, this)),
-                When (PlayersWishesToChangeDirection)
-                    .Then(context => Actions.ChangeDirection(settings, context.Instance, context.Data.NewDirection)),
                 When(CoinCollision)
                     .Then(context => Actions.RemoveCoin(context.Instance, context.Data.Location))
                     .Then(context => context.Instance.IncreaseScore(10))

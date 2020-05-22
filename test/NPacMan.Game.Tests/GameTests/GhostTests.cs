@@ -404,6 +404,32 @@ namespace NPacMan.Game.Tests.GameTests
 
         }
 
+        [Fact]
+        public async Task TheEdibleGhostMovesAtHalfSpeedWhileFrightened()
+        {
+            var ghostStart1 = _gameSettings.PacMan.Location.Below.Below;
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", ghostStart1, Direction.Left, CellLocation.TopLeft, new GhostGoesRightStrategy()));
+           
+            _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Left);
+
+             var game = new Game(_gameClock, _gameSettings);
+            game.StartGame(); 
+
+            await game.ChangeDirection(Direction.Left);
+
+            await _gameClock.Tick();
+            
+            await _gameClock.Tick();
+            await _gameClock.Tick();
+            await _gameClock.Tick();
+            await _gameClock.Tick();
+
+            using var _ = new AssertionScope();
+            game.Ghosts["Ghost1"].Should().BeEquivalentTo(new {
+                Location = ghostStart1.Right.Right.Right
+            });
+        }
+
         
         [Fact]
         public async Task GhostIsTeleportedWhenWalkingIntoAPortal()

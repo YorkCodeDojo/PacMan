@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace NPacMan.Game
 {
@@ -38,6 +39,10 @@ namespace NPacMan.Game
         public int Score { get; private set; }
 
         public DateTime LastTick { get; private set; }
+
+        public int TickCounter => _tickCounter;
+
+        private int _tickCounter;
 
         public IReadOnlyCollection<CellLocation> RemainingCoins { get; private set; }
 
@@ -88,6 +93,8 @@ namespace NPacMan.Game
 
         internal void RecordLastTick(DateTime now)
         {
+            Interlocked.Increment(ref _tickCounter);
+
             LastTick = now;
         }
 

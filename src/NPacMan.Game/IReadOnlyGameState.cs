@@ -12,6 +12,8 @@ namespace NPacMan.Game
 
         public int Score { get; }
 
+        public int TickCounter { get; }
+
         public IReadOnlyCollection<CellLocation> RemainingCoins { get; }
 
         public IReadOnlyCollection<CellLocation> RemainingPowerPills { get; }
