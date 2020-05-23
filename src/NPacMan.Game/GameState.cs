@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace NPacMan.Game
 {
@@ -39,13 +40,17 @@ namespace NPacMan.Game
 
         public DateTime LastTick { get; private set; }
 
+        public int TickCounter => _tickCounter;
+
+        private int _tickCounter;
+
         public IReadOnlyCollection<CellLocation> RemainingCoins { get; private set; }
 
         public IReadOnlyCollection<CellLocation> RemainingPowerPills { get; private set; }
 
         public IReadOnlyDictionary<string, Ghost> Ghosts { get; private set; }
         
-        public PacMan PacMan { get; set; }
+        public PacMan PacMan { get; private set; }
 
         internal void RemoveCoin(CellLocation location)
         {
@@ -88,6 +93,8 @@ namespace NPacMan.Game
 
         internal void RecordLastTick(DateTime now)
         {
+            Interlocked.Increment(ref _tickCounter);
+
             LastTick = now;
         }
 
@@ -98,7 +105,7 @@ namespace NPacMan.Game
 
         internal void ApplyToGhosts(Func<Ghost, Ghost> action)
         {
-            var newPositionOfGhosts = new Dictionary<string, Ghost>();
+            var newPositionOfGhosts = new Dictionary<string, Ghost>(Ghosts.Count);
             foreach (var ghost in Ghosts.Values)
             {
                 newPositionOfGhosts[ghost.Name] = action(ghost);
@@ -107,9 +114,29 @@ namespace NPacMan.Game
             Ghosts = newPositionOfGhosts;
         }
 
+        internal void ApplyToGhost(Func<Ghost, Ghost> action, Ghost ghostToUpdate)
+        {
+            ApplyToGhosts(ghost =>
+            {
+                if (ghost.Name == ghostToUpdate.Name)
+                {
+                    ghost = action(ghost);
+                }
+                return ghost;
+            });
+        }
+
         internal void MovePacManHome()
         {
             PacMan = PacMan.SetToHome();
+        }
+
+        internal void ChangeDirectionOfPacMan(Direction direction)
+        {
+            if (direction != PacMan.Direction)
+            {
+                PacMan = PacMan.WithNewDirection(direction);
+            }
         }
     }
 }

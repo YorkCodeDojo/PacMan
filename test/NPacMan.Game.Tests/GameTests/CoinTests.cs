@@ -24,7 +24,7 @@ namespace NPacMan.Game.Tests.GameTests
             var game = new Game(_gameClock, _gameSettings);
             var score = game.Score;
 
-            game.ChangeDirection(Direction.Down);
+            await game.ChangeDirection(Direction.Down);
 
             await _gameClock.Tick();
 
@@ -40,7 +40,7 @@ namespace NPacMan.Game.Tests.GameTests
             var game = new Game(_gameClock, _gameSettings);
             game.StartGame(); 
 
-            game.ChangeDirection(Direction.Down);
+            await game.ChangeDirection(Direction.Down);
 
             await _gameClock.Tick();
 
@@ -56,20 +56,20 @@ namespace NPacMan.Game.Tests.GameTests
             var game = new Game(_gameClock, _gameSettings);
             game.StartGame();
 
-            game.ChangeDirection(Direction.Down);
+            await game.ChangeDirection(Direction.Down);
 
             await _gameClock.Tick();
 
             if (game.Score != 10)
                 throw new Exception($"Score should be 10 not {game.Score}");
 
-            game.ChangeDirection(Direction.Up);
+            await game.ChangeDirection(Direction.Up);
             await _gameClock.Tick();
 
             if (game.Score != 10)
                 throw new Exception($"Score should still be 10 not {game.Score}");
 
-            game.ChangeDirection(Direction.Down);
+            await game.ChangeDirection(Direction.Down);
             await _gameClock.Tick();
 
             game.Score.Should().Be(10);
@@ -86,7 +86,7 @@ namespace NPacMan.Game.Tests.GameTests
             var game = new Game(_gameClock, _gameSettings);
             game.StartGame(); 
 
-            game.ChangeDirection(Direction.Down);
+            await game.ChangeDirection(Direction.Down);
 
             await _gameClock.Tick();
             await _gameClock.Tick();
@@ -101,7 +101,7 @@ namespace NPacMan.Game.Tests.GameTests
             game.StartGame(); 
             var (x, y) = game.PacMan.Location;
 
-            game.ChangeDirection(Direction.Down);
+            await game.ChangeDirection(Direction.Down);
 
             _gameSettings.Coins.Add((x, y + 1));
 
@@ -120,7 +120,7 @@ namespace NPacMan.Game.Tests.GameTests
             var game = new Game(_gameClock, _gameSettings);
             game.StartGame(); 
 
-            game.ChangeDirection(Direction.Down);
+            await game.ChangeDirection(Direction.Down);
 
             await _gameClock.Tick();
 
@@ -161,7 +161,7 @@ namespace NPacMan.Game.Tests.GameTests
             game.StartGame(); 
             var score = game.Score;
 
-            game.ChangeDirection(Direction.Right);
+            await game.ChangeDirection(Direction.Right);
             await _gameClock.Tick();
 
             using var _ = new AssertionScope();
@@ -184,7 +184,7 @@ namespace NPacMan.Game.Tests.GameTests
             game.Subscribe(GameNotification.EatCoin, () => numberOfNotificationsTriggered++);
             game.StartGame(); 
 
-            game.ChangeDirection(Direction.Down);
+            await game.ChangeDirection(Direction.Down);
 
             await _gameClock.Tick();
 

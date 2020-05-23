@@ -5,6 +5,7 @@ using System;
 using System.Threading.Tasks;
 using NPacMan.Game.Tests.GhostStrategiesForTests;
 using NPacMan.Game.Tests.Helpers;
+using System.Collections.Generic;
 
 namespace NPacMan.Game.Tests.GameTests
 {
@@ -26,7 +27,7 @@ namespace NPacMan.Game.Tests.GameTests
             var game = new Game(_gameClock, _gameSettings);
 
             game.StartGame(); 
-            game.ChangeDirection(Direction.Down);
+            await game.ChangeDirection(Direction.Down);
             await _gameClock.Tick();
 
             game.Score.Should().Be(50);
@@ -39,7 +40,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.PowerPills.Add(game.PacMan.Location.Below);
 
             game.StartGame(); 
-            game.ChangeDirection(Direction.Down);
+            await game.ChangeDirection(Direction.Down);
             await _gameClock.Tick();
 
             game.Status.Should().Be(GameStatus.Alive);
@@ -52,19 +53,19 @@ namespace NPacMan.Game.Tests.GameTests
             var game = new Game(_gameClock, _gameSettings);
             game.StartGame();
 
-            game.ChangeDirection(Direction.Down);
+            await game.ChangeDirection(Direction.Down);
             await _gameClock.Tick();
 
             if (game.Score != 50)
                 throw new Exception($"Score should be 50 not {game.Score}");
 
-            game.ChangeDirection(Direction.Up);
+            await game.ChangeDirection(Direction.Up);
             await _gameClock.Tick();
 
             if (game.Score != 50)
                 throw new Exception($"Score should still be 50 not {game.Score}");
 
-            game.ChangeDirection(Direction.Down);
+            await game.ChangeDirection(Direction.Down);
             await _gameClock.Tick();
 
             game.Score.Should().Be(50);
@@ -103,7 +104,7 @@ namespace NPacMan.Game.Tests.GameTests
             game.StartGame(); 
             var score = game.Score;
 
-            game.ChangeDirection(Direction.Right);
+            await game.ChangeDirection(Direction.Right);
             await _gameClock.Tick();
 
             using var _ = new AssertionScope();
@@ -127,11 +128,43 @@ namespace NPacMan.Game.Tests.GameTests
              var game = new Game(_gameClock, _gameSettings);
             game.StartGame(); 
 
-            game.ChangeDirection(Direction.Right);
+            await game.ChangeDirection(Direction.Right);
             await _gameClock.Tick();
 
             game.Ghosts.Values.Should().AllBeEquivalentTo(new {
                 Edible = true
+            });
+        }
+
+        [Fact]
+        public async Task AllGhostsShouldChangeDirectionWhenPacManEatsPowerPill()
+        {
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", _gameSettings.PacMan.Location.Right.Right, Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost2", _gameSettings.PacMan.Location.Right.Right, Direction.Right, CellLocation.TopLeft, new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost3", _gameSettings.PacMan.Location.Right.Right, Direction.Down, CellLocation.TopLeft, new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost4", _gameSettings.PacMan.Location.Right.Right, Direction.Up, CellLocation.TopLeft, new StandingStillGhostStrategy()));
+
+            _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Right);
+
+             var game = new Game(_gameClock, _gameSettings);
+            game.StartGame(); 
+
+            await game.ChangeDirection(Direction.Right);
+            await _gameClock.Tick();
+
+            game.Ghosts.Should().BeEquivalentTo(new Dictionary<string, object> {
+                ["Ghost1"] = new {
+                    Direction = Direction.Left.Opposite()
+                },
+                ["Ghost2"] = new {
+                    Direction = Direction.Right.Opposite()
+                },
+                ["Ghost3"] = new {
+                    Direction = Direction.Down.Opposite()
+                },
+                ["Ghost4"] = new {
+                    Direction = Direction.Up.Opposite()
+                }
             });
         }
 
@@ -145,14 +178,19 @@ namespace NPacMan.Game.Tests.GameTests
             game.Subscribe(GameNotification.EatPowerPill, () => numberOfNotificationsTriggered++);
             game.StartGame(); 
 
-            game.ChangeDirection(Direction.Down);
+            await game.ChangeDirection(Direction.Down);
 
             await _gameClock.Tick();
 
             numberOfNotificationsTriggered.Should().Be(1);
         }
     
-        private EnsureThatGhost WeExpectThat(Ghost ghost) => new EnsureThatGhost(ghost);
     
+    }
+
+    public static class GhostHelper
+    {
+        public static EnsureThatGhost WeExpectThat(Ghost ghost) => new EnsureThatGhost(ghost);
+        public static EnsureThatPacMan WeExpectThat(PacMan pacMan) => new EnsureThatPacMan(pacMan);
     }
 }

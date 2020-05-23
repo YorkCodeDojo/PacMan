@@ -34,42 +34,51 @@ namespace NPacMan.Game
             Edible = edible;
         }
 
-        public Ghost Move(Game game)
+        internal Ghost Move(Game game, IReadOnlyGameState gameState)
         {
+            if (Edible && gameState.TickCounter % 2 == 1) return this;
+
             var nextDirection = CurrentStrategy.GetNextDirection(this, game);
             if (nextDirection is Direction newDirection)
-                return WithNewLocationAndDirection(Location + newDirection, newDirection);
+            {
+                var newGhostLocation = Location + newDirection;
+                if (game.Portals.TryGetValue(newGhostLocation, out var otherEndOfThePortal))
+                {
+                    newGhostLocation = otherEndOfThePortal + newDirection;
+                }
+                return WithNewLocationAndDirection(newGhostLocation, newDirection);
+            }
             else
                 return this;
         }
 
-        public Ghost Chase()
+        internal Ghost Chase()
         {
             return WithNewCurrentStrategyAndDirection(Strategy, Direction.Opposite());
         }
 
-        public Ghost Scatter()
+        internal Ghost Scatter()
         {
             var strategy = new DirectToStrategy(new DirectToGhostScatterTarget(this));
             return WithNewCurrentStrategyAndDirection(strategy, Direction.Opposite());
         }
 
-        public Ghost SetToHome() => WithNewLocation(Home);
+        internal Ghost SetToHome() => WithNewLocation(Home);
 
-        public Ghost SetToEdible() => WithNewEdible(true);
+        internal Ghost SetToEdible() => WithNewEdibleAndDirection(true, Direction.Opposite());
 
-        internal Ghost SetToNotEdible() => WithNewEdible(false);
+        internal Ghost SetToNotEdible() => WithNewEdibleAndDirection(false, Direction);
 
-        public Ghost WithNewEdible(bool isEdible)
-            => new Ghost(Name, Home, Location, Direction, ScatterTarget, Strategy, CurrentStrategy, isEdible);
+        private Ghost WithNewEdibleAndDirection(bool isEdible, Direction newDirection)
+            => new Ghost(Name, Home, Location, newDirection, ScatterTarget, Strategy, CurrentStrategy, isEdible);
 
-        public Ghost WithNewCurrentStrategyAndDirection(IGhostStrategy newCurrentStategy, Direction newDirection)
-            => new Ghost(Name, Home, Location, newDirection, ScatterTarget, Strategy, newCurrentStategy, Edible);
+        private Ghost WithNewCurrentStrategyAndDirection(IGhostStrategy newCurrentStrategy, Direction newDirection)
+            => new Ghost(Name, Home, Location, newDirection, ScatterTarget, Strategy, newCurrentStrategy, Edible);
 
-        public Ghost WithNewLocation(CellLocation newLocation)
+        private Ghost WithNewLocation(CellLocation newLocation)
             => new Ghost(Name, Home, newLocation, Direction, ScatterTarget, Strategy, CurrentStrategy, Edible);
 
-        public Ghost WithNewLocationAndDirection(CellLocation newLocation, Direction newDirection)
+        private Ghost WithNewLocationAndDirection(CellLocation newLocation, Direction newDirection)
             => new Ghost(Name, Home, newLocation, newDirection, ScatterTarget, Strategy, CurrentStrategy, Edible);
 
     }

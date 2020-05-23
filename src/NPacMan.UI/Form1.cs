@@ -42,7 +42,7 @@ namespace NPacMan.UI
             _renderLoop.Tick += _renderLoop_Tick;
         }
 
-        private void BeforeTick()
+        private async void BeforeTick()
         {
             if (_game.Status == GameStatus.Alive)
             {
@@ -51,7 +51,7 @@ namespace NPacMan.UI
                     IBot bot = new GreedyBot();
 
                     var nextDirection = bot.SuggestNextDirection(_game);
-                    _game.ChangeDirection(nextDirection);
+                    await _game.ChangeDirection(nextDirection);
                 }
                 catch (Exception ex)
                 {
@@ -68,11 +68,11 @@ namespace NPacMan.UI
                 {Keys.Left, Direction.Left},
                 {Keys.Right, Direction.Right},
             };
-        private void Form1_KeyDown(object sender, KeyEventArgs e)
+        private async void Form1_KeyDown(object sender, KeyEventArgs e)
         {
             if (_keysMap.TryGetValue(e.KeyCode, out var direction))
             {
-                _game.ChangeDirection(direction);
+                await _game.ChangeDirection(direction);
             }
         }
 

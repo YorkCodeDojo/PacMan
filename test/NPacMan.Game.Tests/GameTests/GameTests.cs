@@ -1,4 +1,7 @@
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using FluentAssertions;
+using FluentAssertions.Execution;
 using Xunit;
 
 namespace NPacMan.Game.Tests.GameTests
@@ -38,5 +41,39 @@ namespace NPacMan.Game.Tests.GameTests
 
             _game.Height.Should().Be(gameBoardHeight);
         }
+
+        [Fact]
+        public void CanReadPortalsFromGame(){
+            _gameSettings.Portals.Add((1,2),(3,4));
+
+            _game.Portals.Should().BeEquivalentTo(new Dictionary<CellLocation, CellLocation> {
+                [(1,2)] = (3,4)
+            });
+        }
+
+        [Fact]
+        public async Task BeforeATickIfProcessedTheGameNotificationShouldFire()
+        {
+            var numberOfNotificationsTriggered = 0;
+
+            var gameClock = new TestGameClock();
+            var game = new Game(gameClock, _gameSettings);
+            game.Subscribe(GameNotification.PreTick, () => numberOfNotificationsTriggered++);
+            game.StartGame();
+
+            using var _ = new AssertionScope();
+
+            numberOfNotificationsTriggered.Should().Be(0);
+
+            await gameClock.Tick();
+            numberOfNotificationsTriggered.Should().Be(1);
+
+            await gameClock.Tick();
+            numberOfNotificationsTriggered.Should().Be(2);
+
+            await gameClock.Tick();
+            numberOfNotificationsTriggered.Should().Be(3);
+        }
+
     }
 }

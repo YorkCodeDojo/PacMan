@@ -8,6 +8,12 @@ namespace NPacMan.Game
 {
     internal static class Actions
     {
+        public static void Tick(GameState gameState, DateTime now, GameNotifications gameNotifications)
+        {
+            gameNotifications.Publish(GameNotification.PreTick);
+            gameState.RecordLastTick(now);
+        }
+
         public static void ShowGhosts(GameState gameState)
         {
             gameState.ShowGhosts();
@@ -48,18 +54,16 @@ namespace NPacMan.Game
             gameState.ApplyToGhosts(ghost => ghost.SetToNotEdible());
         }
 
+        public static void MakeGhostNotEdible(GameState gameState, Ghost ghostToUpdate)
+        {
+            gameState.ApplyToGhost(ghost => ghost.SetToNotEdible(), ghostToUpdate);
+        }
+
         public static void MovePacManHome(GameState gameState) => gameState.MovePacManHome();
 
-        public static void SendGhostHome(GameState gameState, Ghost ghostToSendHome)
+        public static void SendGhostHome(GameState gameState, Ghost ghostToUpdate)
         {
-            gameState.ApplyToGhosts(ghost =>
-            {
-                if (ghost.Name == ghostToSendHome.Name)
-                {
-                    ghost = ghost.SetToHome();
-                }
-                return ghost;
-            });
+            gameState.ApplyToGhost(ghost => ghost.SetToHome(), ghostToUpdate);
         }
 
         public async static Task MovePacMan(IGameSettings gameSettings, GameState gameState, BehaviorContext<GameState, Tick> context, GameStateMachine gameStateMachine)
@@ -95,13 +99,20 @@ namespace NPacMan.Game
 
         public static async Task MoveGhosts(Game game, GameState gameState, BehaviorContext<GameState, Tick> context, GameStateMachine gameStateMachine)
         {
-            gameState.ApplyToGhosts(ghost => ghost.Move(game));
+            gameState.ApplyToGhosts(ghost => ghost.Move(game, gameState));
 
             var ghosts = GhostsCollidedWithPacMan(gameState);
             foreach (var ghost in ghosts)
             {
                 await context.Raise(gameStateMachine.GhostCollision, new GhostCollision(ghost));
             }
+        }
+
+        internal static void IncreaseScoreAfterEatingGhost(GameState gameState, Game game)
+        {
+            var numberOfInEdibleGhosts = game.Ghosts.Values.Count(g => !g.Edible);
+            var increaseInScore = (int)Math.Pow(2, numberOfInEdibleGhosts) * 200;
+            gameState.IncreaseScore(increaseInScore);
         }
 
         public static void RemoveCoin(GameState gameState, CellLocation location)
@@ -112,6 +123,15 @@ namespace NPacMan.Game
         public static void RemovePowerPill(GameState gameState, CellLocation location)
         {
             gameState.RemovePowerPill(location);
+        }
+
+        public static void ChangeDirection(IGameSettings gameSettings, GameState gameState, Direction direction)
+        {
+            var nextSpace = gameState.PacMan.Location + direction;
+            if (!gameSettings.Walls.Contains(nextSpace))
+            {
+                gameState.ChangeDirectionOfPacMan(direction);
+            }
         }
     }
 }
