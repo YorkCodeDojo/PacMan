@@ -47,11 +47,11 @@ namespace NPacMan.UI
                 {Keys.Left, Direction.Left},
                 {Keys.Right, Direction.Right},
             };
-        private void Form1_KeyDown(object sender, KeyEventArgs e)
+        private async void Form1_KeyDown(object sender, KeyEventArgs e)
         {
             if (_keysMap.TryGetValue(e.KeyCode, out var direction))
             {
-                _game.ChangeDirection(direction);
+                await _game.ChangeDirection(direction);
             }
         }
 

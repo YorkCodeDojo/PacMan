@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using NPacMan.Game.Tests.GhostStrategiesForTests;
 using Xunit;
+using static NPacMan.Game.Tests.GameTests.GhostHelper;
 
 namespace NPacMan.Game.Tests.GameTests
 {
@@ -43,7 +44,7 @@ namespace NPacMan.Game.Tests.GameTests
             
             var (x, y) = game.PacMan.Location;
 
-            game.ChangeDirection(directionToFace);
+            await game.ChangeDirection(directionToFace);
 
             await _gameClock.Tick();
 
@@ -67,7 +68,7 @@ namespace NPacMan.Game.Tests.GameTests
             var y = game.PacMan.Location.Y;
             var score = game.Score;
 
-            game.ChangeDirection(directionToFace);
+            await game.ChangeDirection(directionToFace);
 
             _gameSettings.Walls.Add((x + createWallXOffset, y + createWallYOffset));
 
@@ -93,7 +94,7 @@ namespace NPacMan.Game.Tests.GameTests
 
             _gameSettings.Portals.Add((x - 1, y), (15, 15));
 
-            game.ChangeDirection(Direction.Left);
+            await game.ChangeDirection(Direction.Left);
 
             await _gameClock.Tick();
 
@@ -269,7 +270,7 @@ namespace NPacMan.Game.Tests.GameTests
         [InlineData(Direction.Down)]
         [InlineData(Direction.Left)]
         [InlineData(Direction.Right)]
-        public void PacManCantTurnToFaceWall(Direction direction)
+        public async Task PacManCantTurnToFaceWall(Direction direction)
         {
             var game = new Game(_gameClock, _gameSettings);
             game.StartGame(); 
@@ -277,11 +278,11 @@ namespace NPacMan.Game.Tests.GameTests
             var pacManLocation = game.PacMan.Location;
 
             var expectedDirection = direction.Opposite();
-            game.ChangeDirection(expectedDirection);
+            await game.ChangeDirection(expectedDirection);
 
             _gameSettings.Walls.Add(pacManLocation + direction);
 
-            game.ChangeDirection(direction);
+            await game.ChangeDirection(direction);
 
             game.PacMan.Should().BeEquivalentTo(new
             {
@@ -306,6 +307,42 @@ namespace NPacMan.Game.Tests.GameTests
             await _gameClock.Tick(now.AddSeconds(4));
 
             game.Status.Should().Be(GameStatus.Dead);
+        }
+
+        [Theory]
+        [InlineData(1, 200)]
+        [InlineData(2, 600)]
+        [InlineData(3, 1400)]
+        [InlineData(4, 3000)]
+        [InlineData(5, 6200)]
+        public async Task ScoreShouldIncreaseExponentiallyAfterEatingEachGhost(int numberOfGhosts, int totalScore)
+        {
+            var ghostStart = _gameSettings.PacMan.Location.Left.Left.Left;
+            for(int g = 0;g<numberOfGhosts;g++)
+{            _gameSettings.Ghosts.Add(new Ghost($"Ghost{g}", ghostStart, Direction.Left, CellLocation.TopLeft, new GhostGoesRightStrategy()));}
+       
+            _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Left);
+
+             var game = new Game(_gameClock, _gameSettings);
+            game.StartGame(); 
+
+            await game.ChangeDirection(Direction.Left);
+
+            await _gameClock.Tick();
+
+            var scoreBeforeGhost = game.Score;
+
+            WeExpectThat(game.PacMan).IsAt(_gameSettings.PacMan.Location.Left);
+            for(int g =0;g<numberOfGhosts;g++)
+            {            
+                WeExpectThat(game.Ghosts[$"Ghost{g}"]).IsAt(ghostStart.Right);
+            }
+
+            await _gameClock.Tick();
+
+            WeExpectThat(game.PacMan).IsAt(_gameSettings.PacMan.Location.Left.Left);
+
+            game.Score.Should().Be(scoreBeforeGhost+totalScore);
         }
     }
 }

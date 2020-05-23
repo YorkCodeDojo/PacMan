@@ -252,7 +252,7 @@ namespace NPacMan.Game.Tests.GameTests
              var game = new Game(_gameClock, _gameSettings);
             game.StartGame(); 
 
-            game.ChangeDirection(Direction.Right);
+            await game.ChangeDirection(Direction.Right);
 
             var now = DateTime.UtcNow;
             await _gameClock.Tick(now);
@@ -280,7 +280,7 @@ namespace NPacMan.Game.Tests.GameTests
              var game = new Game(_gameClock, _gameSettings);
             game.StartGame(); 
 
-            game.ChangeDirection(Direction.Right);
+            await game.ChangeDirection(Direction.Right);
 
             var now = DateTime.UtcNow;
             await _gameClock.Tick(now);
@@ -307,7 +307,7 @@ namespace NPacMan.Game.Tests.GameTests
              var game = new Game(_gameClock, _gameSettings);
             game.StartGame(); 
 
-            game.ChangeDirection(Direction.Right);
+            await game.ChangeDirection(Direction.Right);
 
             var now = DateTime.UtcNow;
             await _gameClock.Tick(now);
@@ -330,19 +330,58 @@ namespace NPacMan.Game.Tests.GameTests
         }
 
         [Fact]
-        public async Task GhostGoHomeAfterCollidesWithPacManAfterEatingPowerPill()
+        public async Task GhostsGoHomeAfterCollidesWithPacManAfterEatingPowerPill()
         {
-            var ghostStart1 = _gameSettings.PacMan.Location.Left.Left.Left;
-            var ghostStart2 = ghostStart1.Below;
-            _gameSettings.Ghosts.Add(new Ghost("Ghost1", ghostStart1, Direction.Left, CellLocation.TopLeft, new GhostGoesRightStrategy()));
+            var ghostStart1and3 = _gameSettings.PacMan.Location.Left.Left.Left;
+            var ghostStart2 = ghostStart1and3.Below;
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", ghostStart1and3, Direction.Left, CellLocation.TopLeft, new GhostGoesRightStrategy()));
             _gameSettings.Ghosts.Add(new Ghost("Ghost2", ghostStart2, Direction.Left, CellLocation.TopLeft, new GhostGoesRightStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost3", ghostStart1and3, Direction.Left, CellLocation.TopLeft, new GhostGoesRightStrategy()));
 
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Left);
 
              var game = new Game(_gameClock, _gameSettings);
             game.StartGame(); 
 
-            game.ChangeDirection(Direction.Left);
+            await game.ChangeDirection(Direction.Left);
+
+            var now = DateTime.UtcNow;
+            await _gameClock.Tick(now);
+
+            WeExpectThat(game.PacMan).IsAt(_gameSettings.PacMan.Location.Left);
+            WeExpectThat(game.Ghosts["Ghost1"]).IsAt(ghostStart1and3.Right);
+
+            await _gameClock.Tick(now);
+            WeExpectThat(game.PacMan).IsAt(_gameSettings.PacMan.Location.Left.Left);
+            
+            game.Ghosts["Ghost1"].Should().BeEquivalentTo(new {
+                Location = ghostStart1and3
+            });
+
+            game.Ghosts["Ghost2"].Should().NotBeEquivalentTo(new {
+                Location = ghostStart2
+            });
+
+            game.Ghosts["Ghost3"].Should().BeEquivalentTo(new
+            {
+                Location = ghostStart1and3
+            });
+        }
+
+        [Fact]
+        public async Task TheEdibleGhostBecomesNonEdibleAfterBeingEaten()
+        {
+            var ghostStart1 = _gameSettings.PacMan.Location.Left.Left.Left;
+            var ghostStart2 = _gameSettings.PacMan.Location.Below.Below.Below;
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", ghostStart1, Direction.Left, CellLocation.TopLeft, new GhostGoesRightStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost2", ghostStart2, Direction.Left, CellLocation.TopLeft, new GhostGoesRightStrategy()));
+       
+            _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Left);
+
+             var game = new Game(_gameClock, _gameSettings);
+            game.StartGame(); 
+
+            await game.ChangeDirection(Direction.Left);
 
             var now = DateTime.UtcNow;
             await _gameClock.Tick(now);
@@ -353,13 +392,63 @@ namespace NPacMan.Game.Tests.GameTests
             await _gameClock.Tick(now);
             WeExpectThat(game.PacMan).IsAt(_gameSettings.PacMan.Location.Left.Left);
             
+
+            using var _ = new AssertionScope();
             game.Ghosts["Ghost1"].Should().BeEquivalentTo(new {
-                Location = ghostStart1
+                Edible = false
             });
 
-            game.Ghosts["Ghost2"].Should().NotBeEquivalentTo(new {
-                Location = ghostStart2
+            game.Ghosts["Ghost2"].Should().BeEquivalentTo(new {
+                Edible = true
             });
+
+        }
+
+        [Fact]
+        public async Task TheEdibleGhostMovesAtHalfSpeedWhileFrightened()
+        {
+            var ghostStart1 = _gameSettings.PacMan.Location.Below.Below;
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", ghostStart1, Direction.Left, CellLocation.TopLeft, new GhostGoesRightStrategy()));
+           
+            _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Left);
+
+             var game = new Game(_gameClock, _gameSettings);
+            game.StartGame(); 
+
+            await game.ChangeDirection(Direction.Left);
+
+            await _gameClock.Tick();
+            
+            await _gameClock.Tick();
+            await _gameClock.Tick();
+            await _gameClock.Tick();
+            await _gameClock.Tick();
+
+            using var _ = new AssertionScope();
+            game.Ghosts["Ghost1"].Should().BeEquivalentTo(new {
+                Location = ghostStart1.Right.Right.Right
+            });
+        }
+
+        
+        [Fact]
+        public async Task GhostIsTeleportedWhenWalkingIntoAPortal()
+        {
+            CellLocation portalEntrance = (10, 1);
+            CellLocation portalExit = (1, 5);
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", portalEntrance.Left, Direction.Left, CellLocation.TopLeft, new GhostGoesRightStrategy()));
+            var game = new Game(_gameClock, _gameSettings);
+            game.StartGame();
+
+            _gameSettings.Portals.Add(portalEntrance, portalExit);
+
+            await _gameClock.Tick();
+
+            game.Ghosts.Values.First()
+                .Should()
+                .BeEquivalentTo(new {
+                    Location = portalExit.Right
+                });
         }
 
         private EnsureThatGhost WeExpectThat(Ghost ghost) => new EnsureThatGhost(ghost);

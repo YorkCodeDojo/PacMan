@@ -28,7 +28,7 @@ namespace NPacMan.Game.Tests.GameTests
             game.StartGame(); 
             var currentLives = game.Lives;
 
-            game.ChangeDirection(Direction.Left);
+            await game.ChangeDirection(Direction.Left);
             await _gameClock.Tick();
 
             game.Lives.Should().Be(currentLives);
@@ -46,7 +46,7 @@ namespace NPacMan.Game.Tests.GameTests
             game.StartGame(); 
             var currentLives = game.Lives;
 
-            game.ChangeDirection(Direction.Right);
+            await game.ChangeDirection(Direction.Right);
             await _gameClock.Tick();
 
             game.Lives.Should().Be(currentLives - 1);
@@ -67,7 +67,7 @@ namespace NPacMan.Game.Tests.GameTests
             game.StartGame(); 
             var currentLives = game.Lives;
 
-            game.ChangeDirection(Direction.Left);
+            await game.ChangeDirection(Direction.Left);
             await _gameClock.Tick();
             await _gameClock.Tick();
 
@@ -87,7 +87,7 @@ namespace NPacMan.Game.Tests.GameTests
             game.StartGame(); 
             var currentLives = game.Lives;
 
-            game.ChangeDirection(Direction.Up);
+            await game.ChangeDirection(Direction.Up);
             await _gameClock.Tick();
 
             game.Lives.Should().Be(currentLives - 1);
