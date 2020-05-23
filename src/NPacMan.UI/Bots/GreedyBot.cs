@@ -1,8 +1,8 @@
 ﻿using NPacMan.Game;
+using NPacMan.UI.Bots;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Forms;
 
 namespace NPacMan.UI
 {
@@ -14,77 +14,8 @@ namespace NPacMan.UI
 
         public GreedyBot(Game.Game game)
         {
-            _cells = new LinkedCell[game.Width, game.Height];
-
-            for (int row = 0; row < game.Height; row++)
-            {
-                for (int column = 0; column < game.Width; column++)
-                {
-                    if (!game.Walls.Contains((column, row)))
-                    {
-                        _cells[column, row] = new LinkedCell((column, row));
-                    }
-                }
-            }
-
-            for (int row = 0; row < game.Height; row++)
-            {
-                for (int column = 0; column < game.Width; column++)
-                {
-                    CellLocation location = (column, row);
-                    if (!game.Walls.Contains((column, row)))
-                    {
-                        LinkedCell? above = null;
-                        if (!game.Walls.Contains(location.Above) && location.Y > 0)
-                        {
-                            above = _cells[location.X, location.Y - 1];
-                        }
-                        else if (game.Portals.TryGetValue(location.Above, out var otherSideOfPortal))
-                        {
-                            var exit = otherSideOfPortal + Direction.Up;
-                            above = _cells[exit.X, exit.Y];
-                        }
-
-                        LinkedCell? below = null;
-                        if (!game.Walls.Contains(location.Below) && location.Y < game.Height - 1)
-                        {
-                            below = _cells[location.X, location.Y + 1];
-                        }
-                        else if (game.Portals.TryGetValue(location.Below, out var otherSideOfPortal))
-                        {
-                            var exit = otherSideOfPortal + Direction.Down;
-                            below = _cells[exit.X, exit.Y];
-                        }
-
-                        LinkedCell? left = null;
-                        if (!game.Walls.Contains(location.Left) && location.X > 0)
-                        {
-                            left = _cells[location.X - 1, location.Y];
-                        }
-                        else if (game.Portals.TryGetValue(location.Left, out var otherSideOfPortal))
-                        {
-                            var exit = otherSideOfPortal + Direction.Left;
-                            left = _cells[exit.X, exit.Y];
-                        }
-
-                        LinkedCell? right = null;
-                        if (!game.Walls.Contains(location.Right) && location.X < game.Width - 1)
-                        {
-                            right = _cells[location.X + 1, location.Y];
-                        }
-                        else if (game.Portals.TryGetValue(location.Right, out var otherSideOfPortal))
-                        {
-                            var exit = otherSideOfPortal + Direction.Right;
-                            right = _cells[exit.X, exit.Y];
-                        }
-
-
-                        _cells[column, row].DefineNeighbours(left, right, above, below);
-                    }
-                }
-            }
-
-            this._game = game;
+            _cells = GraphBuilder.Build(game);
+            _game = game;
         }
 
         public Direction SuggestNextDirection()
