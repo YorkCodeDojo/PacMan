@@ -4,7 +4,7 @@ using System.Xml.XPath;
 
 namespace NPacMan.SharedUi
 {
-    public class Display
+    internal class Display
     {
         private SpriteSource[,] _screen;
         private SpriteSource[,] _buffer;

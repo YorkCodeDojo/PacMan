@@ -4,7 +4,7 @@ using NPacMan.SharedUi.Map;
 
 namespace NPacMan.SharedUi
 {
-    public class Sprites
+    internal class Sprites
     {
         public Sprites()
         {

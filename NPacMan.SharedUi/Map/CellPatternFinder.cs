@@ -6,7 +6,7 @@ namespace NPacMan.SharedUi.Map
     /// <summary>
     /// Checks for patterns in the given cell (and it's surrounding cells) and sets the detailed map piece
     /// </summary>
-    public class CellPatternFinder
+    internal class CellPatternFinder
     {
         private readonly List<CellPattern> _patterns;
 

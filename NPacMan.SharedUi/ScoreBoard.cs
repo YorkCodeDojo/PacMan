@@ -5,7 +5,7 @@ using NPacMan.SharedUi;
 
 namespace NPacMan.SharedUi
 {
-    public class ScoreBoard
+    internal class ScoreBoard
     {
         private readonly Sprites _sprites;
         private readonly Display _display;

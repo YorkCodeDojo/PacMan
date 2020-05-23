@@ -1,6 +1,6 @@
 ﻿namespace NPacMan.SharedUi.Map
 {
-    public enum BoardPiece
+    internal enum BoardPiece
     {
         Blank, Pill, PowerAnim1, PowerAnim2,
         DoubleTopRight, DoubleTopLeft, DoubleRight, DoubleLeft, DoubleBottomRight, DoubleBottomLeft,

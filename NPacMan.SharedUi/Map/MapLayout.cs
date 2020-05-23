@@ -4,7 +4,7 @@ using NPacMan.Game;
 
 namespace NPacMan.SharedUi.Map
 {
-    public class MapLayout
+    internal class MapLayout
     {
         public int DisplayHeight => _height - 2;
         public int DisplayWidth => _width - 2;

@@ -1,6 +1,6 @@
 ﻿namespace NPacMan.SharedUi
 {
-    public enum GhostColour
+    internal enum GhostColour
     {
         Red, Pink, Cyan, Orange, 
         Eyes,
