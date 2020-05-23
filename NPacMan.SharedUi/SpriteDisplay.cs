@@ -6,11 +6,11 @@ namespace NPacMan.SharedUi
 {
     public readonly struct SpriteDisplay
     {
-        public int XPos { get; }
-        public int YPos { get; }
+        public decimal XPos { get; }
+        public decimal YPos { get; }
         public SpriteSource Sprite { get; }
 
-        public SpriteDisplay(int x, int y, SpriteSource sprite)
+        public SpriteDisplay(decimal x, decimal y, SpriteSource sprite)
         {
             XPos = x;
             YPos = y;
