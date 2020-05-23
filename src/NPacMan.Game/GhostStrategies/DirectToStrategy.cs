@@ -26,7 +26,6 @@ namespace NPacMan.Game.GhostStrategies
                 .OrderBy(possibleDirection => (ghost.Location + possibleDirection) - target)
                 .ThenBy(p => (int) p)
                 .First();
-
         }
 
         public List<Direction> GetAvailableMovesForLocation(CellLocation location, IReadOnlyCollection<CellLocation> walls)

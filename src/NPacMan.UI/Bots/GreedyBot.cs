@@ -156,7 +156,7 @@ namespace NPacMan.UI
                     }
                 }
 
-                currentNode = bestNewNode;
+                currentNode = bestNewNode!;
                 distanceToCoin--;
             }
 
