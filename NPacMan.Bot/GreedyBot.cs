@@ -155,7 +155,7 @@ namespace NPacMan.Bot
                     }
                 }
 
-                currentNode = bestNewNode;
+                currentNode = bestNewNode!;
                 distanceToCoin--;
             }
 
