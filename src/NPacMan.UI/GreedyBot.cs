@@ -2,20 +2,113 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace NPacMan.UI
 {
+    public class LinkedCell
+    {
+        public LinkedCell(CellLocation location, LinkedCell? left, LinkedCell? right, LinkedCell? up, LinkedCell? down)
+        {
+            Location = location;
+            Left = left;
+            Right = right;
+            Up = up;
+            Down = down;
+
+            var tempAvailableMoves = new List<LinkedCell>(4);
+            var tempAvailableDirections = new List<Direction>(4);
+            
+            if (left is object)
+            {
+                tempAvailableMoves.Add(left);
+                tempAvailableDirections.Add(Direction.Left);
+            }
+
+            if (right is object)
+            {
+                tempAvailableMoves.Add(right);
+                tempAvailableDirections.Add(Direction.Right);
+            }
+
+            if (up is object)
+            {
+                tempAvailableMoves.Add(up);
+                tempAvailableDirections.Add(Direction.Up);
+            }
+
+            if (down is object)
+            {
+                tempAvailableMoves.Add(down);
+                tempAvailableDirections.Add(Direction.Down);
+            }
+
+            AvailableMoves = tempAvailableMoves.ToArray();
+            AvailableDirections = tempAvailableDirections.ToArray();
+        }
+
+        public CellLocation Location { get; }
+        public LinkedCell? Left { get; }
+        public LinkedCell? Right { get; }
+        public LinkedCell? Up { get; }
+        public LinkedCell? Down { get; }
+        public LinkedCell[] AvailableMoves { get; }
+        public Direction[] AvailableDirections { get; }
+    }
+
     internal class GreedyBot : IBot
     {
         public GreedyBot()
         {
         }
 
+        private LinkedCell CreateCell(Lazy<LinkedCell>[,] cells, Game.Game game, CellLocation location)
+        {
+
+            LinkedCell? above = null;
+            if (!game.Walls.Contains(location.Above) && location.Y > 0)
+                above = cells[location.X, location.Y - 1].Value;
+
+            LinkedCell? below = null;
+            if (!game.Walls.Contains(location.Below) && location.Y < game.Height - 1)
+                below = cells[location.X, location.Y + 1].Value;
+
+            LinkedCell? left = null;
+            if (!game.Walls.Contains(location.Left) && location.X > 0)
+                left = cells[location.X - 1, location.Y].Value;
+
+            LinkedCell? right = null;
+            if (!game.Walls.Contains(location.Right) && location.X < game.Width - 1)
+                right = cells[location.X + 1, location.Y].Value;
+
+            return new LinkedCell(location, left, right, above, below);
+        }
+
+
         public Direction SuggestNextDirection(Game.Game game)
         {
-            var currentLocation = game.PacMan.Location;
+            var cells = new Lazy<LinkedCell>[game.Width, game.Height];
 
-            var shortestDistances = CalculateDistances(game, currentLocation);
+            for (int row = 0; row < game.Height; row++)
+            {
+                for (int column = 0; column < game.Width; column++)
+                {
+                    if (!game.Walls.Contains((column, row)))
+                    {
+                        var c = column;
+                        var r = row;
+
+                        cells[column, row] = new Lazy<LinkedCell>(() => {
+                            return CreateCell(cells, game, (c, r));
+                        });
+                    }
+                }
+            }
+
+
+            var currentLocation = cells[game.PacMan.Location.X, game.PacMan.Location.Y].Value;
+
+            var shortestDistances = CalculateDistances(game, currentLocation, cells);
 
             var nearestCoin = FindNearestCoin(game.Coins, shortestDistances);
 
@@ -28,7 +121,8 @@ namespace NPacMan.UI
             return bestDirectionToNearestCoin;
         }
 
-        private Direction AvoidGhost(Game.Game game, CellLocation currentLocation, int[,] shortestDistances, Direction bestDirectionToNearestCoin, Ghost? nearestGhost)
+
+        private Direction AvoidGhost(Game.Game game, LinkedCell currentLocation, int[,] shortestDistances, Direction bestDirectionToNearestCoin, Ghost? nearestGhost)
         {
             if (nearestGhost is object)
             {
@@ -46,7 +140,7 @@ namespace NPacMan.UI
             return bestDirectionToNearestCoin;
         }
 
-        private int[,] CalculateDistances(Game.Game game, CellLocation currentLocation)
+        private int[,] CalculateDistances(Game.Game game, LinkedCell currentLocation, Lazy<LinkedCell>[,] cells)
         {
             //1
             var shortestDistances = new int[game.Width, game.Height];
@@ -60,22 +154,24 @@ namespace NPacMan.UI
             }
 
             //2
-            shortestDistances[currentLocation.X, currentLocation.Y] = 0;
-            visited[currentLocation.X, currentLocation.Y] = true;
+            shortestDistances[currentLocation.Location.X, currentLocation.Location.Y] = 0;
+            visited[currentLocation.Location.X, currentLocation.Location.Y] = true;
 
             //3
-            CellLocation? currentNode = currentLocation;
+            CellLocation? currentNode = currentLocation.Location;
 
             while (currentNode is object)
             {
-                foreach (var possibleDirection in GetAvailableMovesForLocation(currentNode.Value, game))
+                var distanceToCurrentNode = shortestDistances[currentNode.Value.X, currentNode.Value.Y];
+                var linkedCell = cells[currentNode.Value.X, currentNode.Value.Y].Value;
+
+                foreach (var newLocation in linkedCell.AvailableMoves)
                 {
-                    var newLocation = currentNode.Value + possibleDirection;
-                    if (!visited[newLocation.X, newLocation.Y])
+                    if (!visited[newLocation.Location.X, newLocation.Location.Y])
                     {
-                        var tentativeDistance = shortestDistances[currentNode.Value.X, currentNode.Value.Y] + 1;
-                        var currentValue = shortestDistances[newLocation.X, newLocation.Y];
-                        shortestDistances[newLocation.X, newLocation.Y] = Math.Min(tentativeDistance, currentValue);
+                        var tentativeDistance = distanceToCurrentNode + 1;
+                        var currentValue = shortestDistances[newLocation.Location.X, newLocation.Location.Y];
+                        shortestDistances[newLocation.Location.X, newLocation.Location.Y] = Math.Min(tentativeDistance, currentValue);
                     }
                 }
 
@@ -106,9 +202,9 @@ namespace NPacMan.UI
             return shortestDistances;
         }
 
-        private Direction PickDifferentDirection(Game.Game game, CellLocation currentLocation, Direction directionToScaryGhost)
+        private Direction PickDifferentDirection(Game.Game game, LinkedCell currentLocation, Direction directionToScaryGhost)
         {
-            var possibleDirections = GetAvailableMovesForLocation(currentLocation, game);
+            var possibleDirections = currentLocation.AvailableDirections.ToList();
             possibleDirections.Remove(directionToScaryGhost);
 
             return possibleDirections.First();
