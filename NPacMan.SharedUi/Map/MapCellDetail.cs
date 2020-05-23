@@ -1,4 +1,4 @@
-﻿namespace NPacMan.UI.Map
+﻿namespace NPacMan.SharedUi.Map
 {
     /// <summary>
     /// Holds the detail of one cell of the map

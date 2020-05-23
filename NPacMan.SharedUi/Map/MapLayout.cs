@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using NPacMan.Game;
 
-namespace NPacMan.UI.Map
+namespace NPacMan.SharedUi.Map
 {
     public class MapLayout
     {

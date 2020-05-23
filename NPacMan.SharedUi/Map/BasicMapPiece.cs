@@ -1,4 +1,4 @@
-﻿namespace NPacMan.UI.Map
+﻿namespace NPacMan.SharedUi.Map
 {
     /// <summary>
     /// Layout in simple pieces for first parse

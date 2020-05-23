@@ -1,4 +1,4 @@
-﻿namespace NPacMan.UI
+﻿namespace NPacMan.SharedUi.Map
 {
     public enum BoardPiece
     {

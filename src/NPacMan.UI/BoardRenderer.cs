@@ -1,7 +1,7 @@
 using System;
 using System.Drawing;
 using NPacMan.Game;
-using NPacMan.UI.Map;
+using NPacMan.SharedUi.Map;
 
 namespace NPacMan.UI
 {
