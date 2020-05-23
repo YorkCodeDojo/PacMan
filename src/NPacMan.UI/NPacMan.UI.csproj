@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
   <ItemGroup>
-    <ProjectReference Include="..\..\NPacMan.SharedUi\NPacMan.SharedUi.csproj" />
     <ProjectReference Include="..\NPacMan.Game\NPacMan.Game.csproj" />
+    <ProjectReference Include="..\NPacMan.SharedUi\NPacMan.SharedUi.csproj" />
   </ItemGroup>
 
   <ItemGroup>
