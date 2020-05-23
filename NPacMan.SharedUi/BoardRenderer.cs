@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using NPacMan.Game;
 using NPacMan.SharedUi.Map;
 
@@ -11,23 +12,29 @@ namespace NPacMan.SharedUi
         private ScoreBoard _scoreBoard;
         private MapLayout _mapLayout;
 
-        public  Display Display { get; private set; }
+        private Display _display;
+
+        public int DisplayHeight => _display.Height;
+        public int DisplayWidth => _display.Width;
+
+        public IEnumerable<SpriteDisplay> BackgroundToUpdate => _display.GetBackgroundToDraw();
+        public IEnumerable<SpriteDisplay> SpritesToDisplay => _display.SpritesToDisplay;
 
         private int _boardY = 3;
 
         public BoardRenderer()
         {
-            Display = new Display();
+            _display = new Display();
 
             _sprites = new Sprites();
-            _scoreBoard = new ScoreBoard(Display, _sprites);
+            _scoreBoard = new ScoreBoard(_display, _sprites);
             _mapLayout = new MapLayout();
         }
         
         public void RenderStart(Game.Game game)
         {
             // Resize if necessary (required for first tick)
-            Display.Size(game.Width, game.Height+5);
+            _display.Size(game.Width, game.Height+5);
 
             // Blank the rows outside of the board area
             foreach(var row in new int[] { 0,1,2, game.Height+3, game.Height+4})
@@ -49,7 +56,7 @@ namespace NPacMan.SharedUi
         {
             for (int x = 0; x < _mapLayout.DisplayWidth; x++)
             {
-                Display.DrawOnBackground(x,row, _sprites.Map(BoardPiece.Blank));
+                _display.DrawOnBackground(x,row, _sprites.Map(BoardPiece.Blank));
             }
         }
 
@@ -61,7 +68,7 @@ namespace NPacMan.SharedUi
             {
                 for (int x = 0; x < _mapLayout.DisplayWidth; x++)
                 {
-                    Display.DrawOnBackground(x, y+_boardY, _sprites.Map(_mapLayout.BoardPieceToDisplay(x, y)));
+                    _display.DrawOnBackground(x, y+_boardY, _sprites.Map(_mapLayout.BoardPieceToDisplay(x, y)));
                 }
             }
         }
@@ -72,7 +79,7 @@ namespace NPacMan.SharedUi
 
             foreach (var coin in coins)
             {
-                Display.DrawOnBackground(coin.X,coin.Y+_boardY, _sprites.Coin());
+                _display.DrawOnBackground(coin.X,coin.Y+_boardY, _sprites.Coin());
             }
         }
 
@@ -82,7 +89,7 @@ namespace NPacMan.SharedUi
 
             foreach (var powerPill in powerPills)
             {
-                Display.DrawOnBackground(powerPill.X, powerPill.Y+_boardY, _sprites.PowerPill());
+                _display.DrawOnBackground(powerPill.X, powerPill.Y+_boardY, _sprites.PowerPill());
             }
         }
         
@@ -108,7 +115,7 @@ namespace NPacMan.SharedUi
                 _pacManAnimationDelay = 0;
             }
 
-            Display.AddSprite(x, y+_boardY, _sprites.PacMan(game.PacMan.Direction, _pacManAnimation, game.Status == GameStatus.Dying));
+            _display.AddSprite(x, y+_boardY, _sprites.PacMan(game.PacMan.Direction, _pacManAnimation, game.Status == GameStatus.Dying));
         }
 
         private void RenderGhosts(Game.Game game)
@@ -134,7 +141,7 @@ namespace NPacMan.SharedUi
             };
 
             var sprite = _sprites.Ghost(ghostColour, Direction.Up, animated);
-            Display.AddSprite(ghost.Location.X, ghost.Location.Y+_boardY, sprite);
+            _display.AddSprite(ghost.Location.X, ghost.Location.Y+_boardY, sprite);
         }
 
         private void RenderScore(Game.Game game)

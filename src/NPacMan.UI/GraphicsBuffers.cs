@@ -188,11 +188,12 @@ namespace NPacMan.UI
         /// Update the screen from the board render/display
         /// </summary>
         /// <param name="display"></param>
-        public void RenderBackgroundUpdate(Display display)
+        public void RenderBackgroundUpdate(BoardRenderer boardRenderer)
         {
             // Update the static background with any changes
-            var gBack = GetBitmapBackgroundBuffer(display.Width * PixelGrid, display.Height * PixelGrid);
-            foreach (var sprite in display.GetBackgroundToDraw())
+            var gBack = GetBitmapBackgroundBuffer(boardRenderer.DisplayWidth * PixelGrid, 
+                boardRenderer.DisplayHeight * PixelGrid);
+            foreach (var sprite in boardRenderer.BackgroundToUpdate)
             {
                 RenderSprite(gBack, sprite.XPos, sprite.YPos, sprite.Sprite);
             }
@@ -201,8 +202,9 @@ namespace NPacMan.UI
             BackBufferToGameBuffer();
 
             // Draw any sprites onto the foreground
-            var gSprite = GetBitmapBuffer(display.Width * PixelGrid, display.Height * PixelGrid);
-            foreach (var sprite in display.SpritesToDisplay)
+            var gSprite = GetBitmapBuffer(boardRenderer.DisplayWidth * PixelGrid,
+                boardRenderer.DisplayHeight * PixelGrid);
+            foreach (var sprite in boardRenderer.SpritesToDisplay)
             {
                 RenderSprite(gSprite, sprite.XPos, sprite.YPos, sprite.Sprite);
             }

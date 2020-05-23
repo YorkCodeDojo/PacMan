@@ -61,7 +61,7 @@ namespace NPacMan.UI
             try
             {
                 _boardRenderer.RenderStart(_game);
-                _graphicsBuffers.RenderBackgroundUpdate(_boardRenderer.Display);
+                _graphicsBuffers.RenderBackgroundUpdate(_boardRenderer);
             }
             catch (System.ObjectDisposedException)
             {
