@@ -12,6 +12,7 @@ namespace NPacMan.UI
         private readonly BoardRenderer _boardRenderer = new BoardRenderer();
         private readonly GraphicsBuffers _graphicsBuffers;
         private readonly Game.Game _game;
+        private readonly IBot _bot;
 
         public Form1()
         {
@@ -29,6 +30,8 @@ namespace NPacMan.UI
                              .Subscribe(GameNotification.Intermission, soundSet.Intermission)
                              .Subscribe(GameNotification.PreTick, BeforeTick)
                              .StartGame();
+
+            _bot = new GreedyBot(_game);
 
             _graphicsBuffers = new GraphicsBuffers(this) { ShowFps = true };
 
@@ -48,9 +51,7 @@ namespace NPacMan.UI
             {
                 try
                 {
-                    IBot bot = new GreedyBot();
-
-                    var nextDirection = bot.SuggestNextDirection(_game);
+                    var nextDirection = _bot.SuggestNextDirection();
                     await _game.ChangeDirection(nextDirection);
                 }
                 catch (Exception ex)

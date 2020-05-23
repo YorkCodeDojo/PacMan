@@ -7,11 +7,14 @@ namespace NPacMan.UI
 {
     internal class SimpleBot : IBot
     {
-        public SimpleBot()
+        private readonly Game.Game game;
+
+        public SimpleBot(Game.Game game)
         {
+            this.game = game;
         }
 
-        public Direction SuggestNextDirection(Game.Game game)
+        public Direction SuggestNextDirection()
         {
             var currentLocation = game.PacMan.Location;
             var availableMoves = GetAvailableMovesForLocation(currentLocation, game.Walls);
