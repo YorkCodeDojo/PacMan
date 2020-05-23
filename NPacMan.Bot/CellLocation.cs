@@ -1,11 +1,11 @@
 ﻿using System;
 
-namespace NPacMan.Game
+namespace NPacMan.Bot
 {
-    public readonly struct CellLocation
+    public struct CellLocation
     {
-        public int X { get; }
-        public int Y { get; }
+        public int X { get; set; }
+        public int Y { get; set;  }
 
         public CellLocation(int x, int y)
         {
@@ -25,16 +25,12 @@ namespace NPacMan.Game
         public CellLocation WithNewX(int newX) => new CellLocation(newX, Y);
         public CellLocation WithNewY(int newY) => new CellLocation(X, newY);
 
-        [System.Text.Json.Serialization.JsonIgnore]
         public CellLocation Above => new CellLocation(X, Y - 1);
 
-        [System.Text.Json.Serialization.JsonIgnore]
         public CellLocation Below => new CellLocation(X, Y + 1);
 
-        [System.Text.Json.Serialization.JsonIgnore]
         public CellLocation Left => new CellLocation(X - 1, Y);
 
-        [System.Text.Json.Serialization.JsonIgnore]
         public CellLocation Right => new CellLocation(X + 1, Y);
 
         public static implicit operator (int X, int Y)(CellLocation cellLocation)
