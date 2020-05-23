@@ -148,7 +148,7 @@ namespace NPacMan.UI
                 var bestScore = int.MaxValue;
                 foreach (var (possibleDirection, possibleLocation) in currentNode!.AvailableMoves)
                 {
-                    if (shortestDistances[possibleLocation!.Location.X, possibleLocation.Location.Y] < bestScore)
+                    if (shortestDistances[possibleLocation.Location.X, possibleLocation.Location.Y] < bestScore)
                     {
                         bestScore = shortestDistances[possibleLocation.Location.X, possibleLocation.Location.Y];
                         bestDirection = possibleDirection;
