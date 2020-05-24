@@ -20,7 +20,7 @@ namespace NPacMan.Bot
         {
             _game = game;
 
-            var currentLocation = _cells[_game.PacMan.X, _game.PacMan.Y];
+            var currentLocation = _cells[_game.PacMan.Location.X, _game.PacMan.Location.Y];
 
             var shortestDistances = CalculateDistances(currentLocation);
 

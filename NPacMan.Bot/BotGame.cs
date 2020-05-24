@@ -22,9 +22,16 @@ namespace NPacMan.Bot
 
         public int Score { get; set; }
 
-        public CellLocation PacMan { get; set; }
+        public PacMan PacMan { get; set; } = default!;
 
         public BotGhost[] Ghosts { get; set; } = default!;
+    }
+
+    public class PacMan
+    {
+        public Direction CurrentDirection { get; set; }
+
+        public CellLocation Location { get; set; }
     }
 
     public class BotGhost
