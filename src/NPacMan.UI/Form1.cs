@@ -64,18 +64,17 @@ namespace NPacMan.UI
             {
                 var botGame = new BotGame
                 {
-                    Coins = _game.Coins.ToArray(),
-                    Doors = _game.Doors.ToArray(),
-                    PortalEntrances = _game.Portals.Select(kv => kv.Key).ToArray(),
-                    PortalExits = _game.Portals.Select(kv => kv.Value).ToArray(),
-                    PowerPills = _game.PowerPills.ToArray(),
+                    Coins = _game.Coins,
+                    Doors = _game.Doors,
+                    Portals = _game.Portals.Select(kv => new BotPortal { Entry = kv.Key, Exit = kv.Value }),
+                    PowerPills = _game.PowerPills,
                     Height = _game.Height,
                     Width = _game.Width,
                     Lives = _game.Lives,
                     Score = _game.Score,
-                    Walls = _game.Walls.ToArray(),
+                    Walls = _game.Walls,
                     PacMan = _game.PacMan.Location,
-                    Ghosts = _game.Ghosts.Values.Select(g => new BotGhost { Edible = g.Edible, Location = g.Location, Name = g.Name }).ToArray(),
+                    Ghosts = _game.Ghosts.Values.Select(g => new BotGhost { Edible = g.Edible, Location = g.Location, Name = g.Name }),
                 };
 
                 var json = JsonSerializer.Serialize(botGame);

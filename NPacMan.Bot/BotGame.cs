@@ -12,9 +12,7 @@ namespace NPacMan.Bot
 
         public CellLocation[] Doors { get; set; } = default!;
 
-        public CellLocation[] PortalEntrances { get; set; } = default!;
-
-        public CellLocation[] PortalExits { get; set; } = default!;
+        public BotPortal[] Portals { get; set; } = default!;
 
         public int Width { get; set; }
 
@@ -36,5 +34,11 @@ namespace NPacMan.Bot
         public bool Edible { get; set; }
 
         public CellLocation Location { get; set; }
+    }
+    public class BotPortal
+    {
+        public CellLocation Entry { get; set; }
+
+        public CellLocation Exit { get; set; }
     }
 }

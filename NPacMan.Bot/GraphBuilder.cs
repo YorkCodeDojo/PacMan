@@ -20,11 +20,8 @@ namespace NPacMan.Bot
                     }
                 }
             }
-            var portals = new Dictionary<CellLocation, CellLocation>();
-            for (int i = 0; i < game.PortalEntrances.Length; i++)
-            {
-                portals[game.PortalEntrances[i]] = game.PortalExits[i];
-            }
+
+            var portals = game.Portals.ToDictionary(p => p.Entry, p => p.Exit);
 
             for (int row = 0; row < game.Height; row++)
             {

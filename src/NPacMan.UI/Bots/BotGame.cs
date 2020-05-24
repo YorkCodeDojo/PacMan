@@ -5,17 +5,15 @@ namespace NPacMan.UI.Bots
 {
     public class BotGame
     {
-        public CellLocation[] Coins { get; set; } = default!;
+        public IEnumerable<CellLocation> Coins { get; set; } = default!;
 
-        public CellLocation[] PowerPills { get; set; } = default!;
+        public IEnumerable<CellLocation> PowerPills { get; set; } = default!;
 
-        public CellLocation[] Walls { get; set; } = default!;
+        public IEnumerable<CellLocation> Walls { get; set; } = default!;
 
-        public CellLocation[] Doors { get; set; } = default!;
+        public IEnumerable<CellLocation> Doors { get; set; } = default!;
 
-        public CellLocation[] PortalEntrances { get; set; } = default!;
-
-        public CellLocation[] PortalExits { get; set; } = default!;
+        public IEnumerable<BotPortal> Portals { get; set; } = default!;
 
         public int Width { get; set; }
 
@@ -27,7 +25,7 @@ namespace NPacMan.UI.Bots
 
         public CellLocation PacMan { get; set; }
 
-        public BotGhost[] Ghosts { get; set; } = default!;
+        public IEnumerable<BotGhost> Ghosts { get; set; } = default!;
     }
 
     public class BotGhost
@@ -37,5 +35,12 @@ namespace NPacMan.UI.Bots
         public bool Edible { get; set; }
 
         public CellLocation Location { get; set; }
+    }
+
+    public class BotPortal
+    {
+        public CellLocation Entry { get; set; }
+
+        public CellLocation Exit { get; set; }
     }
 }
