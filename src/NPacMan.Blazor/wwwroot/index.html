@@ -83,6 +83,16 @@
             // Transfer to the screen
 
             screenContext.drawImage(gameCanvas, 0, 0);
+
+            // Scale canvas is not stretch to screen
+
+            var scale = Math.min(window.innerWidth / width, window.innerHeight / height);
+            var h = Math.floor(height * scale);
+            var w = Math.floor(width * scale);
+            if (screenCanvas.style.height != h) {
+                screenCanvas.style.height = Math.floor(height * scale) + "px";
+                screenCanvas.style.width = Math.floor(width * scale) + "px";
+            }
         }
         catch (e) {
         }
