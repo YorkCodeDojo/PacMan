@@ -1,7 +1,116 @@
 ﻿@page "/"
+@using NPacMan.SharedUi
+@using NPacMan.Game
 
-<h1>Hello, world!</h1>
+@inject IJSRuntime jsRuntime
 
-Welcome to your new app.
+<button @onclick="SetupSprite" @onkeydown="KeyPressed">Start</button>
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+<canvas tabindex="0" @ref="_canvas" height="288" width="224" style="height: 100%; width: 100%;" @onkeydown="KeyPressed"></canvas>
+<img @ref="_spriteMap" src="gfx.png" hidden />
+
+
+
+@code
+{
+    private NPacMan.Game.Game? _game;
+
+    private ElementReference _canvas;
+    private ElementReference _spriteMap;
+
+    private BoardRenderer? _boardRenderer;
+
+
+    protected async Task SetupSprite()
+    {
+        _game = Game.Create()
+            .StartGame();
+
+        await jsRuntime.InvokeVoidAsync("SetupCanvas", _canvas, _spriteMap);
+        _boardRenderer = new BoardRenderer();
+
+
+
+        var timer = new DateTime().AddSeconds(0.5);
+        while (true)
+        {
+            await Task.Delay(1);
+            if (DateTime.Now > timer)
+            {
+                timer = DateTime.Now.AddMilliseconds(50);
+                Tick();
+            }
+        }
+    }
+
+    protected void Tick()
+    {
+        try
+        {
+            if (_boardRenderer != null && _game != null)
+            {
+                _boardRenderer.RenderStart(_game);
+
+                _jsData = new List<int>();
+
+                foreach (var sprite in _boardRenderer.BackgroundToUpdate)
+                {
+                    DrawSprite(true, sprite.XPos, sprite.YPos, sprite.Sprite);
+                }
+
+                foreach (var sprite in _boardRenderer.SpritesToDisplay)
+                {
+                    DrawSprite(false, sprite.XPos, sprite.YPos, sprite.Sprite);
+                }
+
+    // Push out onto the screen
+                jsRuntime.InvokeVoidAsync("SpriteSet", _boardRenderer.DisplayWidth * PixelGrid, _boardRenderer.DisplayHeight * PixelGrid, _jsData.ToArray());
+            }
+        }
+        catch
+        {
+
+        }
+    }
+
+        private const int PixelGrid = 8;
+
+    private List<int> _jsData = new List<int>();
+
+
+    private void DrawSprite(bool onBuffer, decimal x, decimal y, SpriteSource source)
+    {
+        x = x + (1 - source.Size) *0.5m;
+        y = y + (1 - source.Size) *0.5m;
+        var size = PixelGrid * source.Size;
+        _jsData.AddRange(new[]
+        {
+            onBuffer ? 1 : 0,
+            PixelGrid * source.XPos, PixelGrid * source.YPos, size,
+            (int) (PixelGrid * x), (int) (PixelGrid * y)
+        });
+    }
+
+
+    private static readonly IReadOnlyDictionary<string, Direction> _keysMap
+        = new Dictionary<string, Direction>{
+            {"ArrowUp", Direction.Up},
+            {"ArrowDown", Direction.Down},
+            {"ArrowLeft", Direction.Left},
+            {"ArrowRight", Direction.Right},
+        };
+   
+    private async void KeyPressed(KeyboardEventArgs e)
+    {
+        if (_game !=null && _keysMap.TryGetValue(e.Key, out var direction))
+        {
+            await _game.ChangeDirection(direction);
+        }
+    }
+
+    private void RenderCanvas()
+    {
+
+    }
+
+}
