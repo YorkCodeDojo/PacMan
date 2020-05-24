@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NPacMan.BotSDK;
+using System;
 using System.IO.Pipes;
 using System.Security.Principal;
 using System.Text.Json;

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace NPacMan.Bot
+namespace NPacMan.BotSDK
 {
     public class LinkedCell
     {
@@ -16,7 +16,7 @@ namespace NPacMan.Bot
             Location = location;
         }
 
-        public void DefineNeighbours(LinkedCell? left, LinkedCell? right, LinkedCell? up, LinkedCell? down)
+        internal void DefineNeighbours(LinkedCell? left, LinkedCell? right, LinkedCell? up, LinkedCell? down)
         {
             Left = left;
             Right = right;

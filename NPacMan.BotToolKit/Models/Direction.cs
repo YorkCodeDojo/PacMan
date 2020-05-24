@@ -1,4 +1,4 @@
-namespace NPacMan.Bot
+namespace NPacMan.BotSDK
 {
     public enum Direction
     {

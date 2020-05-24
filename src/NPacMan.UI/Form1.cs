@@ -73,7 +73,7 @@ namespace NPacMan.UI
                     Lives = _game.Lives,
                     Score = _game.Score,
                     Walls = _game.Walls,
-                    PacMan = new Bots.PacMan { Location = _game.PacMan.Location, CurrentDirection = _game.PacMan.Direction },
+                    PacMan = new Bots.BotPacMan { Location = _game.PacMan.Location, CurrentDirection = _game.PacMan.Direction },
                     Ghosts = _game.Ghosts.Values.Select(g => new BotGhost { Edible = g.Edible, Location = g.Location, Name = g.Name }),
                 };
 

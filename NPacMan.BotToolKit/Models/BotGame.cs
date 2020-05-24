@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace NPacMan.Bot
+﻿namespace NPacMan.BotSDK
 {
     public class BotGame
     {
@@ -22,30 +20,8 @@ namespace NPacMan.Bot
 
         public int Score { get; set; }
 
-        public PacMan PacMan { get; set; } = default!;
+        public BotPacMan PacMan { get; set; } = default!;
 
         public BotGhost[] Ghosts { get; set; } = default!;
-    }
-
-    public class PacMan
-    {
-        public Direction CurrentDirection { get; set; }
-
-        public CellLocation Location { get; set; }
-    }
-
-    public class BotGhost
-    {
-        public string Name { get; set; } = default!;
-
-        public bool Edible { get; set; }
-
-        public CellLocation Location { get; set; }
-    }
-    public class BotPortal
-    {
-        public CellLocation Entry { get; set; }
-
-        public CellLocation Exit { get; set; }
     }
 }

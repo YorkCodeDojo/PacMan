@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 
-namespace NPacMan.Bot
+namespace NPacMan.BotSDK
 {
-    internal static class GraphBuilder
+    public static class GraphBuilder
     {
-        public static LinkedCell[,] Build(BotGame game)
+        public static Graph Build(BotGame game)
         {
             var cells = new LinkedCell[game.Width, game.Height];
 
@@ -80,7 +78,7 @@ namespace NPacMan.Bot
                 }
             }
 
-            return cells;
+            return new Graph(cells);
         }
     }
 }

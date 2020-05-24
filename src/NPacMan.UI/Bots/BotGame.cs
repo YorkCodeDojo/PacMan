@@ -23,12 +23,12 @@ namespace NPacMan.UI.Bots
 
         public int Score { get; set; }
 
-        public PacMan PacMan { get; set; } = default!;
+        public BotPacMan PacMan { get; set; } = default!;
 
         public IEnumerable<BotGhost> Ghosts { get; set; } = default!;
     }
 
-    public class PacMan
+    public class BotPacMan
     {
         public Direction CurrentDirection{ get; set; }
 
