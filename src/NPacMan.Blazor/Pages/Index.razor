@@ -4,12 +4,8 @@
 
 @inject IJSRuntime jsRuntime
 
-<button @onclick="SetupSprite" @onkeydown="KeyPressed">Start</button>
-
-<canvas tabindex="0" @ref="_canvas" height="288" width="224" style="height: 100%; width: 100%;" @onkeydown="KeyPressed"></canvas>
+<canvas tabindex="0" @ref="_canvas" style="height: 100%; width: 100%;" @onkeydown="KeyPressed"></canvas>
 <img @ref="_spriteMap" src="gfx.png" hidden />
-
-
 
 @code
 {
@@ -20,16 +16,27 @@
 
     private BoardRenderer? _boardRenderer;
 
-
-    protected async Task SetupSprite()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (firstRender)
+        {
+            await Setup();
+        }
+    }
+
+    private async Task Setup()
+    {
+        // Create and start game
+
         _game = Game.Create()
             .StartGame();
+
+        // Pass references of the canvas and spritemap to the javascript code
 
         await jsRuntime.InvokeVoidAsync("SetupCanvas", _canvas, _spriteMap);
         _boardRenderer = new BoardRenderer();
 
-
+        // Timer loop
 
         var timer = new DateTime().AddSeconds(0.5);
         while (true)
@@ -43,28 +50,37 @@
         }
     }
 
-    protected void Tick()
+    private void Tick()
     {
         try
         {
             if (_boardRenderer != null && _game != null)
             {
+                // Get a render plan from the game
+
                 _boardRenderer.RenderStart(_game);
 
-                _jsData = new List<int>();
+                var jsData = new List<int>();
+
+                // Add any changes to the background
 
                 foreach (var sprite in _boardRenderer.BackgroundToUpdate)
                 {
-                    DrawSprite(true, sprite.XPos, sprite.YPos, sprite.Sprite);
+                    jsData.AddRange(Sprite(true, sprite.XPos, sprite.YPos, sprite.Sprite));
                 }
+
+                // Add all the sprites for the foreground
 
                 foreach (var sprite in _boardRenderer.SpritesToDisplay)
                 {
-                    DrawSprite(false, sprite.XPos, sprite.YPos, sprite.Sprite);
+                    jsData.AddRange(Sprite(false, sprite.XPos, sprite.YPos, sprite.Sprite));
                 }
 
-    // Push out onto the screen
-                jsRuntime.InvokeVoidAsync("SpriteSet", _boardRenderer.DisplayWidth * PixelGrid, _boardRenderer.DisplayHeight * PixelGrid, _jsData.ToArray());
+                // Call javascript code to push out onto the screen
+
+                jsRuntime.InvokeVoidAsync("SpriteSet", 
+                    _boardRenderer.DisplayWidth * PixelGrid, _boardRenderer.DisplayHeight * PixelGrid, 
+                    jsData.ToArray());
             }
         }
         catch
@@ -73,22 +89,21 @@
         }
     }
 
-        private const int PixelGrid = 8;
+    private const int PixelGrid = 8;
 
-    private List<int> _jsData = new List<int>();
+    // Format a sprite into an array of ints for the javascript code
 
-
-    private void DrawSprite(bool onBuffer, decimal x, decimal y, SpriteSource source)
+    private int[] Sprite(bool onBuffer, decimal x, decimal y, SpriteSource source)
     {
         x = x + (1 - source.Size) *0.5m;
         y = y + (1 - source.Size) *0.5m;
         var size = PixelGrid * source.Size;
-        _jsData.AddRange(new[]
+        return new[]
         {
             onBuffer ? 1 : 0,
             PixelGrid * source.XPos, PixelGrid * source.YPos, size,
             (int) (PixelGrid * x), (int) (PixelGrid * y)
-        });
+        };
     }
 
 
@@ -99,7 +114,9 @@
             {"ArrowLeft", Direction.Left},
             {"ArrowRight", Direction.Right},
         };
-   
+
+    // Keyboard event
+
     private async void KeyPressed(KeyboardEventArgs e)
     {
         if (_game !=null && _keysMap.TryGetValue(e.Key, out var direction))
@@ -107,10 +124,4 @@
             await _game.ChangeDirection(direction);
         }
     }
-
-    private void RenderCanvas()
-    {
-
-    }
-
 }
