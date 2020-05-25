@@ -65,7 +65,7 @@ namespace NPacMan.BotSDK
                 }
             }
 
-            return new Distances(shortestDistances);
+            return new Distances(shortestDistances, graph);
         }
     }
 }

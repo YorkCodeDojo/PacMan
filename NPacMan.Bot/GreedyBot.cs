@@ -33,7 +33,7 @@ namespace NPacMan.Bot
             }
             else
             {
-                bestDirectionToNearestCoin = DirectionToTarget(shortestDistances, nearestCoin);
+                bestDirectionToNearestCoin = shortestDistances.DirectionToTarget(nearestCoin);
             }
 
             var nearestGhost = FindNearestGhost(_game.Ghosts, shortestDistances);
@@ -43,7 +43,6 @@ namespace NPacMan.Bot
             return bestDirectionToNearestCoin;
         }
 
-
         private Direction AvoidGhost(LinkedCell currentLocation,
                                      Distances shortestDistances, Direction bestDirectionToNearestCoin, BotGhost? nearestGhost)
         {
@@ -52,7 +51,7 @@ namespace NPacMan.Bot
                 var distanceToGhost = shortestDistances.DistanceTo(nearestGhost.Location);
                 if (distanceToGhost < 5)
                 {
-                    var directionToScaryGhost = DirectionToTarget(shortestDistances, nearestGhost.Location);
+                    var directionToScaryGhost = shortestDistances.DirectionToTarget(nearestGhost.Location);
                     if (directionToScaryGhost == bestDirectionToNearestCoin)
                     {
                         bestDirectionToNearestCoin = PickDifferentDirection(currentLocation, directionToScaryGhost);
@@ -63,8 +62,6 @@ namespace NPacMan.Bot
             return bestDirectionToNearestCoin;
         }
 
-       
-
         private Direction PickDifferentDirection(LinkedCell currentLocation, Direction directionToScaryGhost)
         {
             var possibleDirections = currentLocation.AvailableMoves.ToList();
@@ -72,32 +69,6 @@ namespace NPacMan.Bot
             possibleDirections.Remove(directionWeDontWantToTake);
 
             return possibleDirections.First().Direction;
-        }
-
-        private Direction DirectionToTarget(Distances shortestDistances, CellLocation targetLocation)
-        {
-            var bestDirection = default(Direction);
-            var bestNewNode = default(LinkedCell);
-            var distanceToCoin = shortestDistances.DistanceTo(targetLocation);
-            var currentNode = _graph.GetNodeForLocation(targetLocation);
-            while (distanceToCoin > 0)
-            {
-                var bestScore = int.MaxValue;
-                foreach (var (possibleDirection, possibleLocation) in currentNode!.AvailableMoves)
-                {
-                    if (shortestDistances.DistanceTo(possibleLocation.Location) < bestScore)
-                    {
-                        bestScore = shortestDistances.DistanceTo(possibleLocation.Location);
-                        bestDirection = possibleDirection;
-                        bestNewNode = possibleLocation;
-                    }
-                }
-
-                currentNode = bestNewNode!;
-                distanceToCoin--;
-            }
-
-            return bestDirection.Opposite();
         }
 
         private CellLocation FindNearestCoin(IReadOnlyCollection<CellLocation> coins, Distances shortestDistances)
