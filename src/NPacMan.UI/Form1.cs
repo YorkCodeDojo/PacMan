@@ -2,6 +2,7 @@
 using NPacMan.UI.Bots;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Windows.Forms;
 
 namespace NPacMan.UI
@@ -12,9 +13,9 @@ namespace NPacMan.UI
         private readonly BoardRenderer _boardRenderer = new BoardRenderer();
         private readonly GraphicsBuffers _graphicsBuffers;
         private readonly Game.Game _game;
-        private readonly BotConnector _botConnector;
+        private readonly BotConnector? _botConnector;
 
-        public Form1()
+        internal Form1(string[] args)
         {
             InitializeComponent();
 
@@ -28,11 +29,24 @@ namespace NPacMan.UI
                              //.Subscribe(GameNotification.EatGhost, soundSet.EatGhost)
                              //.Subscribe(GameNotification.ExtraPac, soundSet.ExtraPac)
                              //.Subscribe(GameNotification.Intermission, soundSet.Intermission)
-                             .Subscribe(GameNotification.PreTick, BeforeTick)
-                             .StartGame();
+                             ;
 
-            _botConnector = new BotConnector();
-            _botConnector.Initialise(_game);
+            if (args.Length > 0)
+            {
+                if (args[0].Equals("--pipename"))
+                {
+                    var pipename = args[1];
+                    var transport = new NamedPipesTransport(pipename);
+
+                    _botConnector = new BotConnector(transport);
+                    _botConnector.Initialise(_game);
+
+                    _game.Subscribe(GameNotification.PreTick, RequestNextMoveFromBot);
+                }
+            }
+
+            _game.StartGame();
+
 
             _graphicsBuffers = new GraphicsBuffers(this) { ShowFps = true };
 
@@ -46,8 +60,11 @@ namespace NPacMan.UI
             _renderLoop.Tick += _renderLoop_Tick;
         }
 
-        private async void BeforeTick()
+
+        private async void RequestNextMoveFromBot()
         {
+            Debug.Assert(_botConnector is object);
+
             if (_game.Status == GameStatus.Alive)
             {
                 var nextDirection = _botConnector.NextMove();
@@ -65,6 +82,7 @@ namespace NPacMan.UI
                 {Keys.Left, Direction.Left},
                 {Keys.Right, Direction.Right},
             };
+
         private async void Form1_KeyDown(object sender, KeyEventArgs e)
         {
             if (_keysMap.TryGetValue(e.KeyCode, out var direction))

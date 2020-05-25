@@ -1,5 +1,4 @@
 ﻿using NPacMan.Game;
-using System.IO.Pipes;
 using System.Linq;
 using System.Text.Json;
 
@@ -8,9 +7,13 @@ namespace NPacMan.UI.Bots
     class BotConnector
     {
         private Game.Game? _game;
-        private NamedPipeServerStream? _pipeServer;
-        private StreamString? _pipeStream;
-        private object _lock = new object();
+        private readonly IBotTransport _transport;
+
+        public BotConnector(IBotTransport namedPipesTransport)
+        {
+            _transport = namedPipesTransport;
+        }
+
         public void Initialise(Game.Game game)
         {
             _game = game;
@@ -23,11 +26,9 @@ namespace NPacMan.UI.Bots
                 Walls = game.Walls,
             };
             var json = JsonSerializer.Serialize(board);
+            var payload = $"initialise:{json}";
 
-            _pipeServer = new NamedPipeServerStream("pacmanbot", PipeDirection.InOut, 1);
-            _pipeServer.WaitForConnection();
-            _pipeStream = new StreamString(_pipeServer);
-            _pipeStream.WriteString("initialise:" + json);
+            _transport.SendCommand(payload);
         }
 
         public Direction? NextMove()
@@ -51,14 +52,9 @@ namespace NPacMan.UI.Bots
             };
 
             var json = JsonSerializer.Serialize(botGame);
+                var payload = $"play:{json}";
 
-            var nextDirection = string.Empty;
-            lock (_lock)
-            {
-                _pipeStream!.WriteString("play:" + json);
-
-                nextDirection = _pipeStream.ReadString();
-            }
+            var nextDirection = _transport.SendCommand(payload);
 
             switch (nextDirection)
             {

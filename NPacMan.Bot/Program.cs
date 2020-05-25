@@ -73,6 +73,7 @@ namespace NPacMan.Bot
                     var boardState = command[("initialise:".Length)..];
                     var board = JsonSerializer.Deserialize<BotBoard>(boardState);
                     bot = new GreedyBot(board);
+                    ss.WriteString("ok");
                 }
                 else if (command.StartsWith("play:"))
                 {
