@@ -37,10 +37,6 @@ namespace NPacMan.Game
                 When(Tick, context => context.Data.Now >= context.Instance.TimeToChangeState)
                     .TransitionTo(Scatter));
 
-            WhenEnter(Frightened,
-                       binder => binder
-                                .Then(context => context.Instance.ChangeStateIn(settings.FrightenedTimeInSeconds)));
-
             During(Frightened,
                 When(Tick, context => context.Data.Now >= context.Instance.TimeToChangeState)
                     .Then(context => Actions.MakeGhostsNotEdible(context.Instance))
@@ -55,6 +51,7 @@ namespace NPacMan.Game
                 When(CoinCollision)
                     .Then(context => Actions.CoinEaten(context.Instance, context.Data.Location, gameNotifications)),
                 When(PowerPillCollision)
+                    .Then(context => context.Instance.ChangeStateIn(settings.FrightenedTimeInSeconds))
                     .Then(context => Actions.PowerPillEaten(settings, context.Instance, context.Data.Location, gameNotifications))
                     .TransitionTo(Frightened),
                 When(GhostCollision)

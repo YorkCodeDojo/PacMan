@@ -285,6 +285,45 @@ namespace NPacMan.Game.Tests.GameTests
             });
         }
 
+        [Theory]
+        [InlineData(5)]
+        [InlineData(7)]
+        [InlineData(10)]
+        public async Task GhostShouldReturnToNonEdibleAfterGivenAmountSecondsWhenEatingSecondPowerPills(int seconds)
+        {
+            _gameSettings.FrightenedTimeInSeconds = seconds;
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", FarAway(_gameSettings.PacMan.Location), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost2", FarAway(_gameSettings.PacMan.Location), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost3", FarAway(_gameSettings.PacMan.Location), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
+
+            _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Right);
+            _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Right.Right.Right);
+
+            var game = new Game(_gameClock, _gameSettings);
+            game.StartGame();
+
+            await game.ChangeDirection(Direction.Right);
+
+            var now = DateTime.UtcNow;
+            await _gameClock.Tick(now);
+            await _gameClock.Tick(now.AddSeconds(seconds - 1));
+            await _gameClock.Tick(now.AddSeconds(seconds - 1));
+
+            if (!game.Ghosts.Values.All(g => g.Edible))
+                throw new Exception("All ghosts are meant to be edible.");
+
+            await _gameClock.Tick(now.AddSeconds(seconds * 2 - 1).AddMilliseconds(-100));
+            if (!game.Ghosts.Values.All(g => g.Edible))
+                throw new Exception("All ghosts are meant to be edible.");
+
+            await _gameClock.Tick(now.AddSeconds(seconds * 2 - 1));
+
+            game.Ghosts.Values.Should().AllBeEquivalentTo(new
+            {
+                Edible = false
+            });
+        }
+
         [Fact]
         public async Task AllGhostsShouldRemainInLocationAfterPowerPillIsEaten()
         {
