@@ -4,32 +4,32 @@ namespace NPacMan.BotSDK
 {
     public static class GraphBuilder
     {
-        public static Graph Build(BotGame game)
+        public static Graph Build(BotBoard board)
         {
-            var cells = new LinkedCell[game.Width, game.Height];
+            var cells = new LinkedCell[board.Width, board.Height];
 
-            for (int row = 0; row < game.Height; row++)
+            for (int row = 0; row < board.Height; row++)
             {
-                for (int column = 0; column < game.Width; column++)
+                for (int column = 0; column < board.Width; column++)
                 {
-                    if (!game.Walls.Contains((column, row)))
+                    if (!board.Walls.Contains((column, row)))
                     {
                         cells[column, row] = new LinkedCell((column, row));
                     }
                 }
             }
 
-            var portals = game.Portals.ToDictionary(p => p.Entry, p => p.Exit);
+            var portals = board.Portals.ToDictionary(p => p.Entry, p => p.Exit);
 
-            for (int row = 0; row < game.Height; row++)
+            for (int row = 0; row < board.Height; row++)
             {
-                for (int column = 0; column < game.Width; column++)
+                for (int column = 0; column < board.Width; column++)
                 {
                     CellLocation location = (column, row);
-                    if (!game.Walls.Contains((column, row)))
+                    if (!board.Walls.Contains((column, row)))
                     {
                         LinkedCell? above = null;
-                        if (!game.Walls.Contains(location.Above) && location.Y > 0)
+                        if (!board.Walls.Contains(location.Above) && location.Y > 0)
                         {
                             above = cells[location.X, location.Y - 1];
                         }
@@ -40,7 +40,7 @@ namespace NPacMan.BotSDK
                         }
 
                         LinkedCell? below = null;
-                        if (!game.Walls.Contains(location.Below) && location.Y < game.Height - 1)
+                        if (!board.Walls.Contains(location.Below) && location.Y < board.Height - 1)
                         {
                             below = cells[location.X, location.Y + 1];
                         }
@@ -51,7 +51,7 @@ namespace NPacMan.BotSDK
                         }
 
                         LinkedCell? left = null;
-                        if (!game.Walls.Contains(location.Left) && location.X > 0)
+                        if (!board.Walls.Contains(location.Left) && location.X > 0)
                         {
                             left = cells[location.X - 1, location.Y];
                         }
@@ -62,7 +62,7 @@ namespace NPacMan.BotSDK
                         }
 
                         LinkedCell? right = null;
-                        if (!game.Walls.Contains(location.Right) && location.X < game.Width - 1)
+                        if (!board.Walls.Contains(location.Right) && location.X < board.Width - 1)
                         {
                             right = cells[location.X + 1, location.Y];
                         }

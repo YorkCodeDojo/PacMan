@@ -9,15 +9,9 @@ namespace NPacMan.UI.Bots
 
         public IEnumerable<CellLocation> PowerPills { get; set; } = default!;
 
-        public IEnumerable<CellLocation> Walls { get; set; } = default!;
-
         public IEnumerable<CellLocation> Doors { get; set; } = default!;
 
-        public IEnumerable<BotPortal> Portals { get; set; } = default!;
-
-        public int Width { get; set; }
-
-        public int Height { get; set; }
+        public BotBoard Board { get; set; } = default!;
 
         public int Lives { get; set; }
 
@@ -42,6 +36,18 @@ namespace NPacMan.UI.Bots
         public bool Edible { get; set; }
 
         public CellLocation Location { get; set; }
+    }
+
+    public class BotBoard
+    {
+        public IEnumerable<CellLocation> Walls { get; set; } = default!;
+
+        public IEnumerable<BotPortal> Portals { get; set; } = default!;
+
+        public int Width { get; set; }
+
+        public int Height { get; set; }
+
     }
 
     public class BotPortal

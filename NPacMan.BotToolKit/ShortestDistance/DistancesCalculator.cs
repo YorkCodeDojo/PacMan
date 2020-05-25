@@ -7,11 +7,14 @@ namespace NPacMan.BotSDK
         public static Distances CalculateDistances(BotGame game, Graph graph, LinkedCell currentLocation)
         {
             //1
-            var shortestDistances = new int[game.Width, game.Height];
-            var visited = new bool[game.Width, game.Height];
-            for (int r = 0; r < game.Height; r++)
+            var width = game.Board.Width;
+            var height = game.Board.Height;
+
+            var shortestDistances = new int[width, height];
+            var visited = new bool[width, height];
+            for (int r = 0; r < height; r++)
             {
-                for (int c = 0; c < game.Width; c++)
+                for (int c = 0; c < width; c++)
                 {
                     shortestDistances[c, r] = int.MaxValue;
                 }
@@ -45,9 +48,9 @@ namespace NPacMan.BotSDK
 
                 var bestScore = int.MaxValue;
                 currentNode = null;
-                for (int r = 0; r < game.Height; r++)
+                for (int r = 0; r < height; r++)
                 {
-                    for (int c = 0; c < game.Width; c++)
+                    for (int c = 0; c < width; c++)
                     {
                         var seen = visited[c, r];
                         if (!seen)

@@ -22,53 +22,37 @@ namespace NPacMan.Bot
             pipeClient.Connect();
 
             var ss = new StreamString(pipeClient);
-            if (ss.ReadString() == "I am the one true server!")
+            GreedyBot? bot = null;
+            var done = false;
+            while (!done)
             {
-                // The client security token is sent with the first write.
-                // Send the name of the file whose contents are returned
-                // by the server.
+                var command = ss.ReadString();
 
-                GreedyBot? bot = null;
-                var done = false;
-                while (!done)
+                if (command.StartsWith("exit:"))
                 {
-                    var gameState = ss.ReadString();
-                    if (gameState.Equals("exit"))
-                    {
-                        done = true;
-                    }
-                    else
-                    {
-                        try
-                        {
-                            var game = JsonSerializer.Deserialize<BotGame>(gameState);
-
-                            if (bot is null)
-                            {
-                                Console.WriteLine("First request - building bot");
-                                bot = new GreedyBot(game);
-                            }
-
-                            Console.WriteLine($"PacMan is currently at {game.PacMan}");
-                            var nextDirection = bot.SuggestNextDirection(game).ToString().ToLower();
-
-                            Console.WriteLine($"Suggesting {nextDirection}");
-
-                            ss.WriteString(nextDirection);
-                        }
-                        catch (System.Text.Json.JsonException ex)
-                        {
-                            Console.WriteLine(">> Sent Rubbish? " + ex.Message);
-                        }
-
-
-                    }
+                    Console.WriteLine("Exit");
+                    done = true;
+                }
+                else if (command.StartsWith("initialise:"))
+                {
+                    Console.WriteLine("Initialise");
+                    var boardState = command[("initialise:".Length)..];
+                    Console.WriteLine(boardState.Substring(0,10));
+                    var board = JsonSerializer.Deserialize<BotBoard>(boardState);
+                    bot = new GreedyBot(board);
+                }
+                else if (command.StartsWith("play:"))
+                {
+                    Console.WriteLine("Play");
+                    var gameState = command[("play:".Length)..];
+                    var game = JsonSerializer.Deserialize<BotGame>(gameState);
+                    if (bot is null) bot = new GreedyBot(game.Board);
+                    var nextDirection = bot.SuggestNextDirection(game).ToString().ToLower();
+                    Console.WriteLine($"    Responding with {nextDirection}");
+                    ss.WriteString(nextDirection);
                 }
             }
-            else
-            {
-                Console.WriteLine("Server could not be verified.");
-            }
+
             pipeClient.Close();
             // Give the client process some time to display results before exiting.
             Thread.Sleep(4000);

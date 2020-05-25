@@ -1,5 +1,4 @@
-﻿using GreenPipes.Filters;
-using NPacMan.Game;
+﻿using NPacMan.Game;
 using NPacMan.UI.Bots;
 using System;
 using System.Collections.Generic;
@@ -40,7 +39,17 @@ namespace NPacMan.UI
             _pipeServer = new NamedPipeServerStream("pacmanbot", PipeDirection.InOut, 1);
             _pipeServer.WaitForConnection();
             _pipeStream = new StreamString(_pipeServer);
-            _pipeStream.WriteString("I am the one true server!");
+
+            var board = new BotBoard
+            {
+                Portals = _game.Portals.Select(kv => new BotPortal { Entry = kv.Key, Exit = kv.Value }),
+                Height = _game.Height,
+                Width = _game.Width,
+                Walls = _game.Walls,
+            };
+            var json = JsonSerializer.Serialize(board);
+
+            _pipeStream.WriteString("initialise:" + json);
 
             _bot = new GreedyBot(_game);
 
@@ -66,15 +75,18 @@ namespace NPacMan.UI
                 {
                     Coins = _game.Coins,
                     Doors = _game.Doors,
-                    Portals = _game.Portals.Select(kv => new BotPortal { Entry = kv.Key, Exit = kv.Value }),
                     PowerPills = _game.PowerPills,
-                    Height = _game.Height,
-                    Width = _game.Width,
                     Lives = _game.Lives,
                     Score = _game.Score,
-                    Walls = _game.Walls,
                     PacMan = new Bots.BotPacMan { Location = _game.PacMan.Location, CurrentDirection = _game.PacMan.Direction },
                     Ghosts = _game.Ghosts.Values.Select(g => new BotGhost { Edible = g.Edible, Location = g.Location, Name = g.Name }),
+                    Board = new BotBoard
+                    {
+                        Portals = _game.Portals.Select(kv => new BotPortal { Entry = kv.Key, Exit = kv.Value }),
+                        Height = _game.Height,
+                        Width = _game.Width,
+                        Walls = _game.Walls,
+                    }
                 };
 
                 var json = JsonSerializer.Serialize(botGame);
@@ -82,7 +94,7 @@ namespace NPacMan.UI
                 var nextDirection = string.Empty;
                 lock (_lock)
                 {
-                    _pipeStream.WriteString(json);
+                    _pipeStream.WriteString("play:" + json);
 
                     nextDirection = _pipeStream.ReadString();
                 }

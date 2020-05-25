@@ -4,16 +4,14 @@ using System.Linq;
 
 namespace NPacMan.Bot
 {
-
     internal class GreedyBot
     {
         private readonly Graph _graph;
-        private BotGame _game;
+        private BotGame _game = default!;
 
-        public GreedyBot(BotGame game)
+        public GreedyBot(BotBoard board) 
         {
-            _graph = GraphBuilder.Build(game);
-            _game = game;
+            _graph = GraphBuilder.Build(board);
         }
 
         public Direction SuggestNextDirection(BotGame game)
