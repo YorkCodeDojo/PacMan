@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using FluentAssertions;
 using Xunit;
+using static NPacMan.Game.Tests.GameTests.Ensure;
 
 namespace NPacMan.Game.Tests.GameTests
 {
