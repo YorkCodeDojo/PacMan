@@ -2,9 +2,6 @@
 using NPacMan.UI.Bots;
 using System;
 using System.Collections.Generic;
-using System.IO.Pipes;
-using System.Linq;
-using System.Text.Json;
 using System.Windows.Forms;
 
 namespace NPacMan.UI
@@ -15,9 +12,7 @@ namespace NPacMan.UI
         private readonly BoardRenderer _boardRenderer = new BoardRenderer();
         private readonly GraphicsBuffers _graphicsBuffers;
         private readonly Game.Game _game;
-        private readonly NamedPipeServerStream _pipeServer;
-        private readonly StreamString _pipeStream;
-        private readonly IBot _bot;
+        private readonly BotConnector _botConnector;
 
         public Form1()
         {
@@ -36,22 +31,8 @@ namespace NPacMan.UI
                              .Subscribe(GameNotification.PreTick, BeforeTick)
                              .StartGame();
 
-            _pipeServer = new NamedPipeServerStream("pacmanbot", PipeDirection.InOut, 1);
-            _pipeServer.WaitForConnection();
-            _pipeStream = new StreamString(_pipeServer);
-
-            var board = new BotBoard
-            {
-                Portals = _game.Portals.Select(kv => new BotPortal { Entry = kv.Key, Exit = kv.Value }),
-                Height = _game.Height,
-                Width = _game.Width,
-                Walls = _game.Walls,
-            };
-            var json = JsonSerializer.Serialize(board);
-
-            _pipeStream.WriteString("initialise:" + json);
-
-            _bot = new GreedyBot(_game);
+            _botConnector = new BotConnector();
+            _botConnector.Initialise(_game);
 
             _graphicsBuffers = new GraphicsBuffers(this) { ShowFps = true };
 
@@ -65,56 +46,14 @@ namespace NPacMan.UI
             _renderLoop.Tick += _renderLoop_Tick;
         }
 
-        private object _lock = new object();
-
         private async void BeforeTick()
         {
             if (_game.Status == GameStatus.Alive)
             {
-                var botGame = new BotGame
+                var nextDirection = _botConnector.NextMove();
+                if (nextDirection is object)
                 {
-                    Coins = _game.Coins,
-                    Doors = _game.Doors,
-                    PowerPills = _game.PowerPills,
-                    Lives = _game.Lives,
-                    Score = _game.Score,
-                    PacMan = new Bots.BotPacMan { Location = _game.PacMan.Location, CurrentDirection = _game.PacMan.Direction },
-                    Ghosts = _game.Ghosts.Values.Select(g => new BotGhost { Edible = g.Edible, Location = g.Location, Name = g.Name }),
-                    Board = new BotBoard
-                    {
-                        Portals = _game.Portals.Select(kv => new BotPortal { Entry = kv.Key, Exit = kv.Value }),
-                        Height = _game.Height,
-                        Width = _game.Width,
-                        Walls = _game.Walls,
-                    }
-                };
-
-                var json = JsonSerializer.Serialize(botGame);
-
-                var nextDirection = string.Empty;
-                lock (_lock)
-                {
-                    _pipeStream.WriteString("play:" + json);
-
-                    nextDirection = _pipeStream.ReadString();
-                }
-
-                switch (nextDirection)
-                {
-                    case "left":
-                        await _game.ChangeDirection(Direction.Left);
-                        break;
-                    case "right":
-                        await _game.ChangeDirection(Direction.Right);
-                        break;
-                    case "up":
-                        await _game.ChangeDirection(Direction.Up);
-                        break;
-                    case "down":
-                        await _game.ChangeDirection(Direction.Down);
-                        break;
-                    default:
-                        break;
+                    await _game.ChangeDirection(nextDirection.Value);
                 }
             }
         }
