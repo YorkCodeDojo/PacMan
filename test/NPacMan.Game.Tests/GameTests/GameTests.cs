@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Xunit;
+using static NPacMan.Game.Tests.GameTests.Ensure;
 
 namespace NPacMan.Game.Tests.GameTests
 {

@@ -4,7 +4,6 @@ using Xunit;
 using System;
 using System.Threading.Tasks;
 using NPacMan.Game.Tests.GhostStrategiesForTests;
-using NPacMan.Game.Tests.Helpers;
 using System.Collections.Generic;
 
 namespace NPacMan.Game.Tests.GameTests
@@ -184,13 +183,5 @@ namespace NPacMan.Game.Tests.GameTests
 
             numberOfNotificationsTriggered.Should().Be(1);
         }
-    
-    
-    }
-
-    public static class GhostHelper
-    {
-        public static EnsureThatGhost WeExpectThat(Ghost ghost) => new EnsureThatGhost(ghost);
-        public static EnsureThatPacMan WeExpectThat(PacMan pacMan) => new EnsureThatPacMan(pacMan);
     }
 }

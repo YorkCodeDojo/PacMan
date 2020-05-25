@@ -14,19 +14,66 @@ namespace NPacMan.Game
             gameState.RecordLastTick(now);
         }
 
-        public static void ShowGhosts(GameState gameState)
+        public static void BeginDying(GameState gameState, GameNotifications gameNotifications)
         {
+            gameState.HideGhosts();
+            gameNotifications.Publish(GameNotification.Dying);
+        }
+
+        public static void BeginRespawning(GameNotifications gameNotifications)
+        {
+            gameNotifications.Publish(GameNotification.Respawning);
+        }
+
+        public static void CompleteRespawning(GameState gameState)
+        {
+            MoveGhostsHome(gameState);
+            MovePacManHome(gameState);
             gameState.ShowGhosts();
         }
 
-        public static void HideGhosts(GameState gameState)
+        public static void SetupGame(GameState gameState, DateTime now, GameNotifications gameNotifications)
         {
-            gameState.HideGhosts();
+            gameState.RecordLastTick(now);
+            MoveGhostsHome(gameState);
+            gameState.ShowGhosts();
+            gameNotifications.Publish(GameNotification.Beginning);
         }
 
-        private static IEnumerable<Ghost> GhostsCollidedWithPacMan(GameState gameState)
+        public static void CoinEaten(GameState gameState, CellLocation coinLocation, GameNotifications gameNotifications)
         {
-            return gameState.Ghosts.Values.Where(ghost => ghost.Location == gameState.PacMan.Location);
+            gameState.RemoveCoin(coinLocation);
+            gameState.IncreaseScore(10);
+            gameNotifications.Publish(GameNotification.EatCoin);
+        }
+
+        public static void PowerPillEaten(GameState gameState, CellLocation powerPillLocation, GameNotifications gameNotifications)
+        {
+            gameState.IncreaseScore(50);
+            gameNotifications.Publish(GameNotification.EatPowerPill);
+            MakeGhostsEdible(gameState);
+            gameState.RemovePowerPill(powerPillLocation);
+        }
+
+        public static void GhostEaten(GameState gameState, Ghost ghost, Game game)
+        {
+            SendGhostHome(gameState, ghost);
+            IncreaseScoreAfterEatingGhost(gameState, game);
+            MakeGhostNotEdible(gameState, ghost);
+        }
+
+        public static void EatenByGhost(GameState gameState)
+        {
+            gameState.DecreaseLives();
+        }
+
+        public static void ChangeDirection(IGameSettings gameSettings, GameState gameState, Direction direction)
+        {
+            var nextSpace = gameState.PacMan.Location + direction;
+            if (!gameSettings.Walls.Contains(nextSpace))
+            {
+                gameState.ChangeDirectionOfPacMan(direction);
+            }
         }
 
         public static void ScatterGhosts(GameState gameState)
@@ -39,31 +86,9 @@ namespace NPacMan.Game
             gameState.ApplyToGhosts(ghost => ghost.Chase());
         }
 
-        public static void MoveGhostsHome(GameState gameState)
-        {
-            gameState.ApplyToGhosts(ghost => ghost.SetToHome());
-        }
-
-        public static void MakeGhostsEdible(GameState gameState)
-        {
-            gameState.ApplyToGhosts(ghost => ghost.SetToEdible());
-        }
-
         public static void MakeGhostsNotEdible(GameState gameState)
         {
             gameState.ApplyToGhosts(ghost => ghost.SetToNotEdible());
-        }
-
-        public static void MakeGhostNotEdible(GameState gameState, Ghost ghostToUpdate)
-        {
-            gameState.ApplyToGhost(ghost => ghost.SetToNotEdible(), ghostToUpdate);
-        }
-
-        public static void MovePacManHome(GameState gameState) => gameState.MovePacManHome();
-
-        public static void SendGhostHome(GameState gameState, Ghost ghostToUpdate)
-        {
-            gameState.ApplyToGhost(ghost => ghost.SetToHome(), ghostToUpdate);
         }
 
         public async static Task MovePacMan(IGameSettings gameSettings, GameState gameState, BehaviorContext<GameState, Tick> context, GameStateMachine gameStateMachine)
@@ -108,30 +133,38 @@ namespace NPacMan.Game
             }
         }
 
-        internal static void IncreaseScoreAfterEatingGhost(GameState gameState, Game game)
+        private static IEnumerable<Ghost> GhostsCollidedWithPacMan(GameState gameState)
+        {
+            return gameState.Ghosts.Values.Where(ghost => ghost.Location == gameState.PacMan.Location);
+        }
+
+        private static void IncreaseScoreAfterEatingGhost(GameState gameState, Game game)
         {
             var numberOfInEdibleGhosts = game.Ghosts.Values.Count(g => !g.Edible);
             var increaseInScore = (int)Math.Pow(2, numberOfInEdibleGhosts) * 200;
             gameState.IncreaseScore(increaseInScore);
         }
 
-        public static void RemoveCoin(GameState gameState, CellLocation location)
+        private static void MakeGhostNotEdible(GameState gameState, Ghost ghostToUpdate)
         {
-            gameState.RemoveCoin(location);
+            gameState.ApplyToGhost(ghost => ghost.SetToNotEdible(), ghostToUpdate);
         }
 
-        public static void RemovePowerPill(GameState gameState, CellLocation location)
+        private static void MovePacManHome(GameState gameState) => gameState.MovePacManHome();
+
+        private static void SendGhostHome(GameState gameState, Ghost ghostToUpdate)
         {
-            gameState.RemovePowerPill(location);
+            gameState.ApplyToGhost(ghost => ghost.SetToHome(), ghostToUpdate);
         }
 
-        public static void ChangeDirection(IGameSettings gameSettings, GameState gameState, Direction direction)
+        private static void MoveGhostsHome(GameState gameState)
         {
-            var nextSpace = gameState.PacMan.Location + direction;
-            if (!gameSettings.Walls.Contains(nextSpace))
-            {
-                gameState.ChangeDirectionOfPacMan(direction);
-            }
+            gameState.ApplyToGhosts(ghost => ghost.SetToHome());
+        }
+
+        private static void MakeGhostsEdible(GameState gameState)
+        {
+            gameState.ApplyToGhosts(ghost => ghost.SetToEdible());
         }
     }
 }
