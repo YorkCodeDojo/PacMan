@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
+using NPacMan.SharedUi;
 
 namespace NPacMan.UI
 {
@@ -15,6 +16,9 @@ namespace NPacMan.UI
 
         private Bitmap? _gameBuffer;
         private Graphics? _gameGraphics;
+
+        private Bitmap? _backgroundBuffer;
+        private Graphics? _backgroundGraphics;
 
         private readonly Form _form;
 
@@ -29,7 +33,9 @@ namespace NPacMan.UI
         private int _fpsLast = 0;
 
         private readonly Font _fpsFont = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point, ((byte)(0)));
-        private readonly Brush _fpsBrush = new SolidBrush(Color.DarkRed); 
+        private readonly Brush _fpsBrush = new SolidBrush(Color.DarkRed);
+
+        private Bitmap Gfx;
 
         public GraphicsBuffers(Form forms)
         {
@@ -39,6 +45,9 @@ namespace NPacMan.UI
 
             _fpsStopWatch=new Stopwatch();
             _fpsStopWatch.Start();
+
+            Gfx = new Bitmap("gfx.png");
+
         }
 
         /// <summary>
@@ -58,7 +67,6 @@ namespace NPacMan.UI
 
                 _screenGraphics.SmoothingMode = SmoothingMode.None;
                 _screenGraphics.InterpolationMode = InterpolationMode.NearestNeighbor;
-
             }
         }
 
@@ -68,7 +76,7 @@ namespace NPacMan.UI
         /// <param name="width"></param>
         /// <param name="height"></param>
         /// <returns></returns>
-        public Graphics GetBitmapBuffer(int width, int height)
+        private Graphics GetBitmapBuffer(int width, int height)
         {
             // Create a new one if we haven't got one, or the size has changed
             if (_gameGraphics == null || _gameBuffer == null || _gameBuffer.Height != height || _gameBuffer.Width != width)
@@ -83,17 +91,45 @@ namespace NPacMan.UI
                 _gameGraphics.InterpolationMode = InterpolationMode.NearestNeighbor;
             }
 
-            // Clear it and reset origin
-            _gameGraphics.TranslateTransform(0, 0);
-            _gameGraphics.Clear(Color.Black);
-
             return _gameGraphics;
+        }
+
+        /// <summary>
+        /// Transfer background on to buffer
+        /// </summary>
+        private void BackBufferToGameBuffer()
+        {
+            _gameGraphics?.DrawImageUnscaled(_backgroundBuffer, 0, 0);
+        }
+
+        /// <summary>
+        /// Get a static background buffer that is used as the starting point of render
+        /// </summary>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <returns></returns>
+        private Graphics GetBitmapBackgroundBuffer(int width, int height)
+        {
+            // Create a new one if we haven't got one, or the size has changed
+            if (_backgroundGraphics == null || _backgroundBuffer == null || _backgroundBuffer.Height != height || _backgroundBuffer.Width != width)
+            {
+                _backgroundGraphics?.Dispose();
+                _backgroundBuffer?.Dispose();
+
+                _backgroundBuffer = new Bitmap(width, height);
+                _backgroundGraphics = Graphics.FromImage(_backgroundBuffer);
+
+                _backgroundGraphics.SmoothingMode = SmoothingMode.None;
+                _backgroundGraphics.InterpolationMode = InterpolationMode.NearestNeighbor;
+            }
+            
+            return _backgroundGraphics;
         }
 
         /// <summary>
         /// Transfer the back buffer to the screen (resizing automatically)
         /// </summary>
-        public void Render()
+        private void Render()
         {
             GetFormBuffer();
 
@@ -131,6 +167,55 @@ namespace NPacMan.UI
             _screenBuffer?.Render();
         }
 
+        /// <summary>
+        /// Render a sprite onto the specified buffer
+        /// </summary>
+        /// <param name="g"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="source"></param>
+        private void RenderSprite(Graphics g, decimal x, decimal y, SpriteSource source)
+        {
+            var size = PixelGrid * source.Size;
+            var pixelX = (int)((x + 0.5m - source.Size * 0.5m) * PixelGrid);
+            var pixelY = (int)((y + 0.5m - source.Size * 0.5m) * PixelGrid);
+            g.DrawImage(Gfx, new Rectangle(pixelX, pixelY, size, size), PixelGrid * source.XPos, PixelGrid * source.YPos,
+                size, size,
+                GraphicsUnit.Pixel);
+        }
+
+        /// <summary>
+        /// Update the screen from the board render/display
+        /// </summary>
+        /// <param name="display"></param>
+        public void RenderBackgroundUpdate(BoardRenderer boardRenderer)
+        {
+            // Update the static background with any changes
+            var gBack = GetBitmapBackgroundBuffer(boardRenderer.DisplayWidth * PixelGrid, 
+                boardRenderer.DisplayHeight * PixelGrid);
+            foreach (var sprite in boardRenderer.BackgroundToUpdate)
+            {
+                RenderSprite(gBack, sprite.XPos, sprite.YPos, sprite.Sprite);
+            }
+
+            // Draw the static background onto the foreground
+            BackBufferToGameBuffer();
+
+            // Draw any sprites onto the foreground
+            var gSprite = GetBitmapBuffer(boardRenderer.DisplayWidth * PixelGrid,
+                boardRenderer.DisplayHeight * PixelGrid);
+            foreach (var sprite in boardRenderer.SpritesToDisplay)
+            {
+                RenderSprite(gSprite, sprite.XPos, sprite.YPos, sprite.Sprite);
+            }
+
+            // Push out onto the screen
+            Render();
+        }
+
+        private const int PixelGrid = 8;
+
+
         public void Dispose()
         {
             _currentContext?.Dispose();
@@ -138,6 +223,8 @@ namespace NPacMan.UI
             _screenGraphics?.Dispose();
             _gameBuffer?.Dispose();
             _gameGraphics?.Dispose();
+            _backgroundBuffer?.Dispose();
+            _backgroundGraphics?.Dispose();
         }
     }
 }

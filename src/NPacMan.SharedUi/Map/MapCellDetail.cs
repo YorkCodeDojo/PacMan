@@ -1,9 +1,9 @@
-﻿namespace NPacMan.UI.Map
+﻿namespace NPacMan.SharedUi.Map
 {
     /// <summary>
     /// Holds the detail of one cell of the map
     /// </summary>
-    public class MapCellDetail
+    internal class MapCellDetail
     {
         public readonly int Y;
         public readonly int X;

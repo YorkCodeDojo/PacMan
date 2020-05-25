@@ -2,6 +2,7 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using NPacMan.SharedUi;
 
 namespace NPacMan.UI
 {
@@ -91,24 +92,8 @@ namespace NPacMan.UI
         {
             try
             {
-                var g = _graphicsBuffers.GetBitmapBuffer(_game.Width * Sprites.PixelGrid,
-                    (_game.Height + 5) * Sprites.PixelGrid);
-
-                _boardRenderer.RenderScore(g, _game);
-
-                g.TranslateTransform(0, 3 * Sprites.PixelGrid);
-                _boardRenderer.RenderWalls(g, _game);
-                _boardRenderer.RenderCoins(g, _game);
-                _boardRenderer.RenderPowerPills(g, _game);
-                _boardRenderer.RenderPacMan(g, _game);
-                _boardRenderer.RenderGhosts(g, _game);
-                g.ResetTransform();
-
-                g.TranslateTransform(0, (3 + _game.Height) * Sprites.PixelGrid);
-                _boardRenderer.RenderLives(g, _game);
-                g.ResetTransform();
-
-                _graphicsBuffers.Render();
+                _boardRenderer.RenderStart(_game);
+                _graphicsBuffers.RenderBackgroundUpdate(_boardRenderer);
             }
             catch (System.ObjectDisposedException)
             {

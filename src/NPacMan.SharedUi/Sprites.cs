@@ -1,42 +1,17 @@
 ﻿using System;
-using System.Drawing;
 using NPacMan.Game;
+using NPacMan.SharedUi.Map;
 
-namespace NPacMan.UI
+namespace NPacMan.SharedUi
 {
-    public class Sprites
+    internal class Sprites
     {
-        private Bitmap Gfx;
-
         public Sprites()
         {
-            Gfx = new Bitmap("gfx.png");
             Bonus = new SpriteSource[8];
             for (int i = 0; i < 8; i++)
                 Bonus[i] = new SpriteSource(i * 2, 10, 2);
         }
-        
-        /// <summary>
-        /// Render a sprite to the graphics context
-        /// Position is top corner of 8 pixel grid
-        /// Larger sprites (eg. PacMac, Ghosts) are offset so they are in the centre of the square
-        /// </summary>
-        /// <param name="g"></param>
-        /// <param name="x">Screen X (pixel)</param>
-        /// <param name="y">Screen Y (pixel)</param>
-        /// <param name="size">Size of sprite on screen (pixel)</param>
-        /// <param name="source">Sprite to show</param>
-        public void RenderSprite(Graphics g, int x, int y, SpriteSource source)
-        {
-            var size = PixelGrid * source.Size;
-            x = x + PixelGrid / 2 - size / 2;
-            y = y + PixelGrid / 2 - size / 2;
-            g.DrawImage(Gfx, new Rectangle(x, y, size, size), PixelGrid * source.XPos, PixelGrid * source.YPos,
-                size, size,
-                GraphicsUnit.Pixel);
-        }
-
-        public const int PixelGrid = 8;
 
         public SpriteSource[] Bonus;
 

@@ -1,9 +1,9 @@
-﻿namespace NPacMan.UI.Map
+﻿namespace NPacMan.SharedUi.Map
 {
     /// <summary>
     /// A pattern of 9 cells around a target cell that correspond to a particular map piece
     /// </summary>
-    public class CellPattern
+    internal class CellPattern
     {
         public readonly BoardPiece BoardPiece;
         private readonly string[] _pattern;
