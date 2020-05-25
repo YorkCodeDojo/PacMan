@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using NPacMan.Game.GhostStrategies;
+using NPacMan.Game.Properties;
 
 namespace NPacMan.Game
 {
@@ -12,6 +13,13 @@ namespace NPacMan.Game
             var fileContents = System.IO.File.ReadAllText(filename);
             return Load(fileContents);
         }
+
+        public static IGameSettings LoadFromResource()
+        {
+            var fileContents = Resources.Board.Replace("\r\n", Environment.NewLine);
+            return Load(fileContents);
+        }
+
         public static IGameSettings Load(string board)
         {
             var allRows = board.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
