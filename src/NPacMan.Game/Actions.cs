@@ -47,11 +47,11 @@ namespace NPacMan.Game
             gameNotifications.Publish(GameNotification.EatCoin);
         }
 
-        public static void PowerPillEaten(GameState gameState, CellLocation powerPillLocation, GameNotifications gameNotifications)
+        public static void PowerPillEaten(IGameSettings gameSettings, GameState gameState, CellLocation powerPillLocation, GameNotifications gameNotifications)
         {
             gameState.IncreaseScore(50);
             gameNotifications.Publish(GameNotification.EatPowerPill);
-            MakeGhostsEdible(gameState);
+            MakeGhostsEdible(gameSettings, gameState);
             gameState.RemovePowerPill(powerPillLocation);
         }
 
@@ -162,9 +162,9 @@ namespace NPacMan.Game
             gameState.ApplyToGhosts(ghost => ghost.SetToHome());
         }
 
-        private static void MakeGhostsEdible(GameState gameState)
+        private static void MakeGhostsEdible(IGameSettings gameSettings, GameState gameState)
         {
-            gameState.ApplyToGhosts(ghost => ghost.SetToEdible());
+            gameState.ApplyToGhosts(ghost => ghost.SetToEdible(gameSettings.DirectionPicker));
         }
     }
 }

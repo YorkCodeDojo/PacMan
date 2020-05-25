@@ -55,7 +55,7 @@ namespace NPacMan.Game
                 When(CoinCollision)
                     .Then(context => Actions.CoinEaten(context.Instance, context.Data.Location, gameNotifications)),
                 When(PowerPillCollision)
-                    .Then(context => Actions.PowerPillEaten(context.Instance, context.Data.Location, gameNotifications))
+                    .Then(context => Actions.PowerPillEaten(settings, context.Instance, context.Data.Location, gameNotifications))
                     .TransitionTo(Frightened),
                 When(GhostCollision)
                     .IfElse(x => x.Data.Ghost.Edible,

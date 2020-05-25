@@ -2,6 +2,7 @@
 
 namespace NPacMan.Game
 {
+
     public class Ghost
     {
         public string Name { get; }
@@ -65,12 +66,16 @@ namespace NPacMan.Game
 
         internal Ghost SetToHome() => WithNewLocation(Home);
 
-        internal Ghost SetToEdible() => WithNewEdibleAndDirection(true, Direction.Opposite());
+        internal Ghost SetToEdible(IDirectionPicker directionPicker)
+        {
+            var strategy = new RandomStrategy(directionPicker);
+            return WithNewEdibleAndDirectionAndStrategy(true, Direction.Opposite(), strategy);
+        }
 
-        internal Ghost SetToNotEdible() => WithNewEdibleAndDirection(false, Direction);
+        internal Ghost SetToNotEdible() => WithNewEdibleAndDirectionAndStrategy(false, Direction, CurrentStrategy);
 
-        private Ghost WithNewEdibleAndDirection(bool isEdible, Direction newDirection)
-            => new Ghost(Name, Home, Location, newDirection, ScatterTarget, Strategy, CurrentStrategy, isEdible);
+        private Ghost WithNewEdibleAndDirectionAndStrategy(bool isEdible, Direction newDirection, IGhostStrategy newCurrentStrategy)
+            => new Ghost(Name, Home, Location, newDirection, ScatterTarget, Strategy, newCurrentStrategy, isEdible);
 
         private Ghost WithNewCurrentStrategyAndDirection(IGhostStrategy newCurrentStrategy, Direction newDirection)
             => new Ghost(Name, Home, Location, newDirection, ScatterTarget, Strategy, newCurrentStrategy, Edible);

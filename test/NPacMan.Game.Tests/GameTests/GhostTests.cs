@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -33,7 +34,8 @@ namespace NPacMan.Game.Tests.GameTests
             await _gameClock.Tick();
             game.Ghosts["Ghost1"].Should().BeEquivalentTo(new
             {
-                Location = new {
+                Location = new
+                {
                     X = 1,
                     Y = 0
                 }
@@ -51,14 +53,15 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.PacMan = new PacMan((3, 3), Direction.Down);
 
             var game = new Game(_gameClock, _gameSettings);
-            game.StartGame(); 
+            game.StartGame();
             await _gameClock.Tick();
 
             using var _ = new AssertionScope();
             game.Ghosts.Values.First()
                 .Should().BeEquivalentTo(new
                 {
-                    Location = new {
+                    Location = new
+                    {
                         X = x,
                         Y = y
                     }
@@ -76,7 +79,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Ghosts.Add(new Ghost("Ghost1", homeLocation, Direction.Right, CellLocation.TopLeft, strategy));
 
             var game = new Game(_gameClock, _gameSettings);
-            game.StartGame(); 
+            game.StartGame();
             var now = DateTime.UtcNow;
 
             await _gameClock.Tick(now);
@@ -94,7 +97,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Ghosts.Add(new Ghost("Ghost1", homeLocation, Direction.Right, CellLocation.TopLeft, strategy));
 
             var game = new Game(_gameClock, _gameSettings);
-            game.StartGame(); 
+            game.StartGame();
             var now = DateTime.UtcNow;
 
             await _gameClock.Tick(now);
@@ -104,14 +107,15 @@ namespace NPacMan.Game.Tests.GameTests
                 throw new Exception($"Invalid Game State {game.Status:G} Should be Respawning");
 
             await _gameClock.Tick(now.AddSeconds(8));
-            
+
             if (game.Status != GameStatus.Alive)
                 throw new Exception($"Invalid Game State {game.Status:G} Should be Alive");
-            
+
             game.Ghosts.Values.First()
                 .Should().BeEquivalentTo(new
                 {
-                    Location = new {
+                    Location = new
+                    {
                         X = homeLocation.X,
                         Y = homeLocation.Y
                     }
@@ -138,7 +142,8 @@ namespace NPacMan.Game.Tests.GameTests
             game.Ghosts.Values.First()
                 .Should().BeEquivalentTo(new
                 {
-                    Location = new {
+                    Location = new
+                    {
                         X = scatterLocation.X,
                         Y = scatterLocation.Y
                     }
@@ -171,7 +176,8 @@ namespace NPacMan.Game.Tests.GameTests
             game.Ghosts.Values.First()
                 .Should().BeEquivalentTo(new
                 {
-                    Location = new {
+                    Location = new
+                    {
                         X = 31,
                         Y = scatterLocation.Y
                     }
@@ -213,7 +219,8 @@ namespace NPacMan.Game.Tests.GameTests
             ourGhost()
                 .Should().BeEquivalentTo(new
                 {
-                    Location = new {
+                    Location = new
+                    {
                         X = 29,
                         Y = 1
                     }
@@ -230,12 +237,13 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Ghosts.Add(new Ghost("Ghost2", _gameSettings.PacMan.Location.Right.Right, Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
             _gameSettings.Ghosts.Add(new Ghost("Ghost3", _gameSettings.PacMan.Location.Right.Right, Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
 
-             var game = new Game(_gameClock, _gameSettings);
-            game.StartGame(); 
+            var game = new Game(_gameClock, _gameSettings);
+            game.StartGame();
 
             await _gameClock.Tick();
 
-            game.Ghosts.Values.Should().AllBeEquivalentTo(new {
+            game.Ghosts.Values.Should().AllBeEquivalentTo(new
+            {
                 Edible = false
             });
         }
@@ -250,8 +258,8 @@ namespace NPacMan.Game.Tests.GameTests
 
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Right);
 
-             var game = new Game(_gameClock, _gameSettings);
-            game.StartGame(); 
+            var game = new Game(_gameClock, _gameSettings);
+            game.StartGame();
 
             await game.ChangeDirection(Direction.Right);
 
@@ -261,9 +269,10 @@ namespace NPacMan.Game.Tests.GameTests
             if (!game.Ghosts.Values.All(g => g.Edible))
                 throw new Exception("All ghosts are meant to be edible.");
 
-            await _gameClock.Tick(now.AddSeconds(7));                
+            await _gameClock.Tick(now.AddSeconds(7));
 
-            game.Ghosts.Values.Should().AllBeEquivalentTo(new {
+            game.Ghosts.Values.Should().AllBeEquivalentTo(new
+            {
                 Edible = false
             });
         }
@@ -278,8 +287,8 @@ namespace NPacMan.Game.Tests.GameTests
 
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Right);
 
-             var game = new Game(_gameClock, _gameSettings);
-            game.StartGame(); 
+            var game = new Game(_gameClock, _gameSettings);
+            game.StartGame();
 
             await game.ChangeDirection(Direction.Right);
 
@@ -289,12 +298,13 @@ namespace NPacMan.Game.Tests.GameTests
             if (!game.Ghosts.Values.All(g => g.Edible))
                 throw new Exception("All ghosts are meant to be edible.");
 
-            game.Ghosts.Values.Should().AllBeEquivalentTo(new {
+            game.Ghosts.Values.Should().AllBeEquivalentTo(new
+            {
                 Location = ghostStart.Right
             });
         }
 
-        
+
         [Fact]
         public async Task AllGhostsShouldShouldStayInSameLocationWhenTransitioningToNoneEdiable()
         {
@@ -305,8 +315,8 @@ namespace NPacMan.Game.Tests.GameTests
 
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Right);
 
-             var game = new Game(_gameClock, _gameSettings);
-            game.StartGame(); 
+            var game = new Game(_gameClock, _gameSettings);
+            game.StartGame();
 
             await game.ChangeDirection(Direction.Right);
 
@@ -316,15 +326,17 @@ namespace NPacMan.Game.Tests.GameTests
             if (!game.Ghosts.Values.All(g => g.Edible))
                 throw new Exception("All ghosts are meant to be edible.");
 
-            await _gameClock.Tick(now.AddSeconds(7));                
+            await _gameClock.Tick(now.AddSeconds(7));
 
             if (!game.Ghosts.Values.All(g => !g.Edible))
                 throw new Exception("All ghosts are meant to be nonedible.");
 
             using var _ = new AssertionScope();
 
-            foreach(var ghost in game.Ghosts.Values){
-                ghost.Should().NotBeEquivalentTo(new {
+            foreach (var ghost in game.Ghosts.Values)
+            {
+                ghost.Should().NotBeEquivalentTo(new
+                {
                     Location = ghostStart
                 });
             }
@@ -341,8 +353,8 @@ namespace NPacMan.Game.Tests.GameTests
 
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Left);
 
-             var game = new Game(_gameClock, _gameSettings);
-            game.StartGame(); 
+            var game = new Game(_gameClock, _gameSettings);
+            game.StartGame();
 
             await game.ChangeDirection(Direction.Left);
 
@@ -354,12 +366,14 @@ namespace NPacMan.Game.Tests.GameTests
 
             await _gameClock.Tick(now);
             WeExpectThat(game.PacMan).IsAt(_gameSettings.PacMan.Location.Left.Left);
-            
-            game.Ghosts["Ghost1"].Should().BeEquivalentTo(new {
+
+            game.Ghosts["Ghost1"].Should().BeEquivalentTo(new
+            {
                 Location = ghostStart1and3
             });
 
-            game.Ghosts["Ghost2"].Should().NotBeEquivalentTo(new {
+            game.Ghosts["Ghost2"].Should().NotBeEquivalentTo(new
+            {
                 Location = ghostStart2
             });
 
@@ -376,11 +390,11 @@ namespace NPacMan.Game.Tests.GameTests
             var ghostStart2 = _gameSettings.PacMan.Location.Below.Below.Below;
             _gameSettings.Ghosts.Add(new Ghost("Ghost1", ghostStart1, Direction.Left, CellLocation.TopLeft, new GhostGoesRightStrategy()));
             _gameSettings.Ghosts.Add(new Ghost("Ghost2", ghostStart2, Direction.Left, CellLocation.TopLeft, new GhostGoesRightStrategy()));
-       
+
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Left);
 
-             var game = new Game(_gameClock, _gameSettings);
-            game.StartGame(); 
+            var game = new Game(_gameClock, _gameSettings);
+            game.StartGame();
 
             await game.ChangeDirection(Direction.Left);
 
@@ -392,14 +406,16 @@ namespace NPacMan.Game.Tests.GameTests
 
             await _gameClock.Tick(now);
             WeExpectThat(game.PacMan).IsAt(_gameSettings.PacMan.Location.Left.Left);
-            
+
 
             using var _ = new AssertionScope();
-            game.Ghosts["Ghost1"].Should().BeEquivalentTo(new {
+            game.Ghosts["Ghost1"].Should().BeEquivalentTo(new
+            {
                 Edible = false
             });
 
-            game.Ghosts["Ghost2"].Should().BeEquivalentTo(new {
+            game.Ghosts["Ghost2"].Should().BeEquivalentTo(new
+            {
                 Edible = true
             });
 
@@ -410,28 +426,63 @@ namespace NPacMan.Game.Tests.GameTests
         {
             var ghostStart1 = _gameSettings.PacMan.Location.Below.Below;
             _gameSettings.Ghosts.Add(new Ghost("Ghost1", ghostStart1, Direction.Left, CellLocation.TopLeft, new GhostGoesRightStrategy()));
-           
+
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Left);
 
-             var game = new Game(_gameClock, _gameSettings);
-            game.StartGame(); 
+            var game = new Game(_gameClock, _gameSettings);
+            game.StartGame();
 
             await game.ChangeDirection(Direction.Left);
 
             await _gameClock.Tick();
-            
+
             await _gameClock.Tick();
             await _gameClock.Tick();
             await _gameClock.Tick();
             await _gameClock.Tick();
 
             using var _ = new AssertionScope();
-            game.Ghosts["Ghost1"].Should().BeEquivalentTo(new {
+            game.Ghosts["Ghost1"].Should().BeEquivalentTo(new
+            {
                 Location = ghostStart1.Right.Right.Right
             });
         }
 
-        
+        [Fact]
+        public async Task GhostMovesRandomlyWhileFrightened()
+        {
+            var testDirectionPicker = new TestDirectionPicker();
+            testDirectionPicker.DefaultDirection = Direction.Up;
+            var allDirections = new[] { Direction.Down, Direction.Up, Direction.Right };
+            testDirectionPicker.Returns(allDirections, Direction.Right);
+
+            _gameSettings.DirectionPicker = testDirectionPicker;
+            var ghostStart1 = _gameSettings.PacMan.Location.Below.Below;
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", ghostStart1, Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
+
+            _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Left);
+
+            var game = new Game(_gameClock, _gameSettings);
+            game.StartGame();
+
+            // PacMan Eat Pill
+            await game.ChangeDirection(Direction.Left);
+            await _gameClock.Tick();
+
+            await _gameClock.Tick();
+            await _gameClock.Tick();
+
+            await _gameClock.Tick();
+            await _gameClock.Tick();
+
+            using var _ = new AssertionScope();
+            game.Ghosts["Ghost1"].Should().BeEquivalentTo(new
+            {
+                Location = ghostStart1.Right.Right
+            });
+        }
+
+
         [Fact]
         public async Task GhostIsTeleportedWhenWalkingIntoAPortal()
         {
@@ -447,9 +498,34 @@ namespace NPacMan.Game.Tests.GameTests
 
             game.Ghosts.Values.First()
                 .Should()
-                .BeEquivalentTo(new {
+                .BeEquivalentTo(new
+                {
                     Location = portalExit.Right
                 });
+        }
+    }
+
+    public class TestDirectionPicker : IDirectionPicker
+    {
+        public Direction DefaultDirection { get; set; } = Direction.Right;
+        public Direction Pick(IEnumerable<Direction> directions)
+        {
+            var rKey = _returnValues.Keys.Where(x => x.Count() == directions.Count() && x.All(y => directions.Contains(y)))
+                                .FirstOrDefault();
+
+            if (rKey is null)
+            {
+                return DefaultDirection;
+            }
+
+            return _returnValues[rKey];
+        }
+
+        private Dictionary<IEnumerable<Direction>, Direction> _returnValues
+            = new Dictionary<IEnumerable<Direction>, Direction>();
+        public void Returns(IEnumerable<Direction> input, Direction output)
+        {
+            _returnValues.Add(input, output);
         }
     }
 }
