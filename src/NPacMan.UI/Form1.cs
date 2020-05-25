@@ -1,5 +1,6 @@
 ﻿using NPacMan.Game;
 using NPacMan.UI.Bots;
+using NPacMan.UI.Bots.SocketTransport;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -37,6 +38,18 @@ namespace NPacMan.UI
                 {
                     var pipename = args[1];
                     var transport = new NamedPipesTransport(pipename);
+
+                    _botConnector = new BotConnector(transport);
+                    _botConnector.Initialise(_game);
+
+                    _game.Subscribe(GameNotification.PreTick, RequestNextMoveFromBot);
+                }
+
+                if (args[0].Equals("--hostname"))
+                {
+                    var hostNameAndPortal = args[1];
+                    var parts = hostNameAndPortal.Split(':');
+                    var transport = new SocketsTransport(parts[0], int.Parse(parts[1]));
 
                     _botConnector = new BotConnector(transport);
                     _botConnector.Initialise(_game);

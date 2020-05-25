@@ -14,16 +14,6 @@ namespace NPacMan.UI.Bots
             _pipeStream = ConnectToClient();
         }
 
-        private StreamString ConnectToClient()
-        {
-            var pipeServer = new NamedPipeServerStream(_pipeName, PipeDirection.InOut, 1);
-            pipeServer.WaitForConnection();
-
-            var pipeStream = new StreamString(pipeServer);
-
-            return pipeStream;
-        }
-
         public string SendCommand(string payload)
         {
             try
@@ -48,6 +38,16 @@ namespace NPacMan.UI.Bots
             }
 
             return string.Empty;
+        }
+
+        private StreamString ConnectToClient()
+        {
+            var pipeServer = new NamedPipeServerStream(_pipeName, PipeDirection.InOut, 1);
+            pipeServer.WaitForConnection();
+
+            var pipeStream = new StreamString(pipeServer);
+
+            return pipeStream;
         }
     }
 }
