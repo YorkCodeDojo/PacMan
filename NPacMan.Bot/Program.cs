@@ -3,7 +3,6 @@ using System;
 using System.IO.Pipes;
 using System.Security.Principal;
 using System.Text.Json;
-using System.Threading;
 
 namespace NPacMan.Bot
 {
@@ -13,11 +12,30 @@ namespace NPacMan.Bot
         {
             if (args.Length == 0)
             {
-                Console.WriteLine("Please supply the ClientHandle.");
+                Console.WriteLine("Please supply the pipename.");
                 return;
             }
 
-            using var pipeClient = new NamedPipeClientStream(".", args[0], PipeDirection.InOut, PipeOptions.None, TokenImpersonationLevel.Impersonation);
+            var done = false;
+            while (!done)
+            {
+                try
+                {
+                    RunClient(args);
+                    done = true;
+                }
+                catch (DeadPipeException ex)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"Pipe errored - attempting to create new pipe - error was " + ex.Message);
+                    Console.ResetColor();
+                }
+            }
+        }
+
+        private static void RunClient(string[] args)
+        {
+            var pipeClient = new NamedPipeClientStream(".", args[0], PipeDirection.InOut, PipeOptions.None, TokenImpersonationLevel.Impersonation);
             Console.WriteLine("Connecting to server...\n");
             pipeClient.Connect();
 
@@ -37,7 +55,6 @@ namespace NPacMan.Bot
                 {
                     Console.WriteLine("Initialise");
                     var boardState = command[("initialise:".Length)..];
-                    Console.WriteLine(boardState.Substring(0,10));
                     var board = JsonSerializer.Deserialize<BotBoard>(boardState);
                     bot = new GreedyBot(board);
                 }
@@ -54,9 +71,6 @@ namespace NPacMan.Bot
             }
 
             pipeClient.Close();
-            // Give the client process some time to display results before exiting.
-            Thread.Sleep(4000);
-
         }
     }
 }
