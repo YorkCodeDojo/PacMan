@@ -19,6 +19,9 @@ namespace NPacMan.Game
         int InitialScatterTimeInSeconds { get; }
 
         int ChaseTimeInSeconds { get; }
+
+        int FrightenedTimeInSeconds { get; }
+        
         IDirectionPicker DirectionPicker { get; }
     }
 }

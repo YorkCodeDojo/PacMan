@@ -39,7 +39,7 @@ namespace NPacMan.Game
 
             WhenEnter(Frightened,
                        binder => binder
-                                .Then(context => context.Instance.ChangeStateIn(7)));
+                                .Then(context => context.Instance.ChangeStateIn(settings.FrightenedTimeInSeconds)));
 
             During(Frightened,
                 When(Tick, context => context.Data.Now >= context.Instance.TimeToChangeState)

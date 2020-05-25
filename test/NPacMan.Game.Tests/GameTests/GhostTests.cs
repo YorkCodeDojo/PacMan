@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -248,13 +247,18 @@ namespace NPacMan.Game.Tests.GameTests
             });
         }
 
+        public CellLocation FarAway(CellLocation location) => new CellLocation(location.X + 10, location.Y + 10);
 
-        [Fact]
-        public async Task AllGhostsShouldReturnToNonEdibleAfter7Seconds()
+        [Theory]
+        [InlineData(5)]
+        [InlineData(7)]
+        [InlineData(10)]
+        public async Task AllGhostsShouldReturnToNonEdibleAfterGivenAmountOfSeconds(int seconds)
         {
-            _gameSettings.Ghosts.Add(new Ghost("Ghost1", _gameSettings.PacMan.Location.Right.Right, Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
-            _gameSettings.Ghosts.Add(new Ghost("Ghost2", _gameSettings.PacMan.Location.Right.Right, Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
-            _gameSettings.Ghosts.Add(new Ghost("Ghost3", _gameSettings.PacMan.Location.Right.Right, Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
+            _gameSettings.FrightenedTimeInSeconds = seconds;
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", FarAway(_gameSettings.PacMan.Location), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost2", FarAway(_gameSettings.PacMan.Location), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost3", FarAway(_gameSettings.PacMan.Location), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
 
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Right);
 
@@ -269,7 +273,11 @@ namespace NPacMan.Game.Tests.GameTests
             if (!game.Ghosts.Values.All(g => g.Edible))
                 throw new Exception("All ghosts are meant to be edible.");
 
-            await _gameClock.Tick(now.AddSeconds(7));
+            await _gameClock.Tick(now.AddSeconds(seconds).AddMilliseconds(-100));
+            if (!game.Ghosts.Values.All(g => g.Edible))
+                throw new Exception("All ghosts are meant to be edible.");
+
+            await _gameClock.Tick(now.AddSeconds(seconds));
 
             game.Ghosts.Values.Should().AllBeEquivalentTo(new
             {
@@ -502,30 +510,6 @@ namespace NPacMan.Game.Tests.GameTests
                 {
                     Location = portalExit.Right
                 });
-        }
-    }
-
-    public class TestDirectionPicker : IDirectionPicker
-    {
-        public Direction DefaultDirection { get; set; } = Direction.Right;
-        public Direction Pick(IEnumerable<Direction> directions)
-        {
-            var rKey = _returnValues.Keys.Where(x => x.Count() == directions.Count() && x.All(y => directions.Contains(y)))
-                                .FirstOrDefault();
-
-            if (rKey is null)
-            {
-                return DefaultDirection;
-            }
-
-            return _returnValues[rKey];
-        }
-
-        private Dictionary<IEnumerable<Direction>, Direction> _returnValues
-            = new Dictionary<IEnumerable<Direction>, Direction>();
-        public void Returns(IEnumerable<Direction> input, Direction output)
-        {
-            _returnValues.Add(input, output);
         }
     }
 }

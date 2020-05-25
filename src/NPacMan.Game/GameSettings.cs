@@ -42,6 +42,8 @@ namespace NPacMan.Game
 
         public int ChaseTimeInSeconds { get; } = 7;
 
+        public int FrightenedTimeInSeconds { get; } = 7;
+
         public IDirectionPicker DirectionPicker {get;} = new RandomDirectionPicker();
     }
 }

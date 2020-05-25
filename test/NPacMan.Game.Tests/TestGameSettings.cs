@@ -50,6 +50,7 @@ namespace NPacMan.Game.Tests
         public int InitialLives { get; set; } = 3;
         public int InitialScatterTimeInSeconds { get; set; } = 7;
         public int ChaseTimeInSeconds { get; set; } = 7;
+        public int FrightenedTimeInSeconds { get; set; } = 7;
         public IDirectionPicker DirectionPicker { get; internal set; } = new TestDirectionPicker();
     }
 }
