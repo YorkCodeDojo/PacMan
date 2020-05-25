@@ -2,6 +2,7 @@
 {
     public enum GameNotification
     {
+        PreTick,
         EatCoin,
         EatFruit,
         Beginning,

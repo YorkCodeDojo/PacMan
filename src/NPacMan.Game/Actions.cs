@@ -8,6 +8,12 @@ namespace NPacMan.Game
 {
     internal static class Actions
     {
+        public static void Tick(GameState gameState, DateTime now, GameNotifications gameNotifications)
+        {
+            gameNotifications.Publish(GameNotification.PreTick);
+            gameState.RecordLastTick(now);
+        }
+
         public static void BeginDying(GameState gameState, GameNotifications gameNotifications)
         {
             gameState.HideGhosts();

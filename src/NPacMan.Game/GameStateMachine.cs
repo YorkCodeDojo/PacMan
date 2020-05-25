@@ -12,7 +12,7 @@ namespace NPacMan.Game
 
             DuringAny(
                 When(Tick)
-                    .Then(context => context.Instance.RecordLastTick(context.Data.Now)));
+                    .Then(context => Actions.Tick(context.Instance, context.Data.Now, gameNotifications)));
 
             Initially(
                 When(Tick)
