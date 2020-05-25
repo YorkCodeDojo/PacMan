@@ -550,5 +550,58 @@ namespace NPacMan.Game.Tests.GameTests
                     Location = portalExit.Right
                 });
         }
+
+        [Fact]
+        public async Task TheEdibleGhostReturnsToStrategyAfterBeingEaten()
+        {
+            var ghostStart1 = _gameSettings.PacMan.Location.Above.Above.Left;
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", ghostStart1, Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
+           
+            _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Above);
+
+            // . . .
+            // . G .
+            // . . *
+            // . . V
+
+            var game = new Game(_gameClock, _gameSettings);
+            game.StartGame();
+
+            await game.ChangeDirection(Direction.Up);
+
+            var now = DateTime.UtcNow;
+            await _gameClock.Tick(now);
+
+            // . . .
+            // . G .
+            // . . V
+
+            WeExpectThat(game.PacMan).IsAt(_gameSettings.PacMan.Location.Above);
+            WeExpectThat(game.Ghosts["Ghost1"]).IsAt(ghostStart1);
+
+            await _gameClock.Tick(now);
+
+            // . . .
+            // . . GV
+
+            // Perhaps . G V ????
+
+            WeExpectThat(game.PacMan).IsAt(_gameSettings.PacMan.Location.Above.Above);
+            WeExpectThat(game.Ghosts["Ghost1"]).IsAt(ghostStart1);
+
+            await _gameClock.Tick(now);
+
+            // . . V
+            // . G .
+            // . . .
+
+            WeExpectThat(game.PacMan).IsAt(_gameSettings.PacMan.Location.Above.Above.Above);
+
+            using var _ = new AssertionScope();
+            game.Ghosts["Ghost1"].Should().BeEquivalentTo(new
+            {
+                Location = ghostStart1
+            });
+        }
     }
 }

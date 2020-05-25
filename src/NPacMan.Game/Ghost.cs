@@ -72,7 +72,7 @@ namespace NPacMan.Game
             return WithNewEdibleAndDirectionAndStrategy(true, Direction.Opposite(), strategy);
         }
 
-        internal Ghost SetToNotEdible() => WithNewEdibleAndDirectionAndStrategy(false, Direction, CurrentStrategy);
+        internal Ghost SetToNotEdible() => WithNewEdibleAndDirectionAndStrategy(false, Direction, Strategy);
 
         private Ghost WithNewEdibleAndDirectionAndStrategy(bool isEdible, Direction newDirection, IGhostStrategy newCurrentStrategy)
             => new Ghost(Name, Home, Location, newDirection, ScatterTarget, Strategy, newCurrentStrategy, isEdible);
