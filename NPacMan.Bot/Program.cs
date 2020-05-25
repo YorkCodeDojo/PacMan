@@ -16,6 +16,8 @@ namespace NPacMan.Bot
                 return;
             }
 
+            ShowBanner();
+
             var done = false;
             while (!done)
             {
@@ -31,6 +33,19 @@ namespace NPacMan.Bot
                     Console.ResetColor();
                 }
             }
+        }
+
+        private static void ShowBanner()
+        {
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine(@"  _____           __  __               ____        _   
+ |  __ \         |  \/  |             |  _ \      | |  
+ | |__) |_ _  ___| \  / | __ _ _ __   | |_) | ___ | |_ 
+ |  ___/ _` |/ __| |\/| |/ _` | '_ \  |  _ < / _ \| __|
+ | |  | (_| | (__| |  | | (_| | | | | | |_) | (_) | |_ 
+ |_|   \__,_|\___|_|  |_|\__,_|_| |_| |____/ \___/ \__|
+");
+            Console.ResetColor();
         }
 
         private static void RunClient(string[] args)
