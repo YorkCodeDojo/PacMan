@@ -1,7 +1,8 @@
 ﻿using NPacMan.Game;
 using System;
-using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using NPacMan.SharedUi;
 
 namespace NPacMan.UI
 {
@@ -11,6 +12,41 @@ namespace NPacMan.UI
         private readonly BoardRenderer _boardRenderer = new BoardRenderer();
         private readonly GraphicsBuffers _graphicsBuffers;
         private readonly Game.Game _game;
+
+        [Flags]
+        private enum KeyStates
+        {
+            None = 0,
+            Down = 1,
+            Toggled = 2
+        }
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
+        private static extern short GetKeyState(int keyCode);
+
+        private static KeyStates GetKeyState(Keys key)
+        {
+            KeyStates state = KeyStates.None;
+
+            short retVal = GetKeyState((int)key);
+
+            //If the high-order bit is 1, the key is down
+            //otherwise, it is up.
+            if ((retVal & 0x8000) == 0x8000)
+                state |= KeyStates.Down;
+
+            //If the low-order bit is 1, the key is toggled.
+            if ((retVal & 1) == 1)
+                state |= KeyStates.Toggled;
+
+            return state;
+        }
+
+        public static bool IsKeyDown(Keys key)
+        {
+            return KeyStates.Down == (GetKeyState(key) & KeyStates.Down);
+        }
+
 
         public Form1()
         {
@@ -26,6 +62,7 @@ namespace NPacMan.UI
                              .Subscribe(GameNotification.EatGhost, soundSet.EatGhost)
                              .Subscribe(GameNotification.ExtraPac, soundSet.ExtraPac)
                              .Subscribe(GameNotification.Intermission, soundSet.Intermission)
+                             .Subscribe(GameNotification.PreTick, CheckForKeyPress)
                              .StartGame();
 
             _graphicsBuffers = new GraphicsBuffers(this) { ShowFps = true };
@@ -33,50 +70,30 @@ namespace NPacMan.UI
             this.StartPosition = FormStartPosition.CenterScreen;
             this.Text = "PacMan";
             this.WindowState = FormWindowState.Maximized;
-            this.KeyDown += Form1_KeyDown;
 
             _renderLoop.Interval = 16; //40fps
             _renderLoop.Enabled = true;
             _renderLoop.Tick += _renderLoop_Tick;
         }
 
-        private static readonly IReadOnlyDictionary<Keys, Direction> _keysMap
-            = new Dictionary<Keys, Direction>{
-                {Keys.Up, Direction.Up},
-                {Keys.Down, Direction.Down},
-                {Keys.Left, Direction.Left},
-                {Keys.Right, Direction.Right},
-            };
-        private async void Form1_KeyDown(object sender, KeyEventArgs e)
+        private async void CheckForKeyPress()
         {
-            if (_keysMap.TryGetValue(e.KeyCode, out var direction))
-            {
-                await _game.ChangeDirection(direction);
-            }
+            if (IsKeyDown(Keys.Left)) 
+                await _game.ChangeDirection(Direction.Left);
+            else if (IsKeyDown(Keys.Right))
+                await _game.ChangeDirection(Direction.Right);
+            else if (IsKeyDown(Keys.Up))
+                await _game.ChangeDirection(Direction.Up);
+            else if (IsKeyDown(Keys.Down))
+                await _game.ChangeDirection(Direction.Down);
         }
 
         private void _renderLoop_Tick(object? sender, EventArgs e)
         {
             try
             {
-                var g = _graphicsBuffers.GetBitmapBuffer(_game.Width * Sprites.PixelGrid,
-                    (_game.Height + 5) * Sprites.PixelGrid);
-
-                _boardRenderer.RenderScore(g, _game);
-
-                g.TranslateTransform(0, 3 * Sprites.PixelGrid);
-                _boardRenderer.RenderWalls(g, _game);
-                _boardRenderer.RenderCoins(g, _game);
-                _boardRenderer.RenderPowerPills(g, _game);
-                _boardRenderer.RenderPacMan(g, _game);
-                _boardRenderer.RenderGhosts(g, _game);
-                g.ResetTransform();
-
-                g.TranslateTransform(0, (3 + _game.Height) * Sprites.PixelGrid);
-                _boardRenderer.RenderLives(g, _game);
-                g.ResetTransform();
-
-                _graphicsBuffers.Render();
+                _boardRenderer.RenderStart(_game);
+                _graphicsBuffers.RenderBackgroundUpdate(_boardRenderer);
             }
             catch (System.ObjectDisposedException)
             {

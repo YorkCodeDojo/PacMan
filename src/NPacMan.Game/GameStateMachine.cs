@@ -1,4 +1,5 @@
 ﻿using Automatonymous;
+using System;
 
 namespace NPacMan.Game
 {
@@ -11,14 +12,11 @@ namespace NPacMan.Game
 
             DuringAny(
                 When(Tick)
-                    .Then(context => context.Instance.RecordLastTick(context.Data.Now)));
+                    .Then(context => Actions.Tick(context.Instance, context.Data.Now, gameNotifications)));
 
             Initially(
                 When(Tick)
-                    .Then(context => context.Instance.RecordLastTick(context.Data.Now))
-                    .Then(context => Actions.MoveGhostsHome(context.Instance))
-                    .Then(context => Actions.ShowGhosts(context.Instance))
-                    .Then(context => gameNotifications.Publish(GameNotification.Beginning))
+                    .Then(context => Actions.SetupGame(context.Instance, context.Data.Now, gameNotifications))
                     .TransitionTo(Scatter));
 
             WhenEnter(Scatter,
@@ -39,10 +37,6 @@ namespace NPacMan.Game
                 When(Tick, context => context.Data.Now >= context.Instance.TimeToChangeState)
                     .TransitionTo(Scatter));
 
-            WhenEnter(Frightened,
-                       binder => binder
-                                .Then(context => context.Instance.ChangeStateIn(7)));
-
             During(Frightened,
                 When(Tick, context => context.Data.Now >= context.Instance.TimeToChangeState)
                     .Then(context => Actions.MakeGhostsNotEdible(context.Instance))
@@ -55,28 +49,21 @@ namespace NPacMan.Game
                     .ThenAsync(async context => await Actions.MoveGhosts(game, context.Instance, context, this))
                     .ThenAsync(async context => await Actions.MovePacMan(settings, context.Instance, context, this)),
                 When(CoinCollision)
-                    .Then(context => Actions.RemoveCoin(context.Instance, context.Data.Location))
-                    .Then(context => context.Instance.IncreaseScore(10))
-                    .Then(context => gameNotifications.Publish(GameNotification.EatCoin)),
+                    .Then(context => Actions.CoinEaten(context.Instance, context.Data.Location, gameNotifications)),
                 When(PowerPillCollision)
-                    .Then(context => context.Instance.IncreaseScore(50))
-                    .Then(context => gameNotifications.Publish(GameNotification.EatPowerPill))
-                    .Then(context => Actions.MakeGhostsEdible(context.Instance))
-                    .Then(context => Actions.RemovePowerPill(context.Instance, context.Data.Location))
+                    .Then(context => context.Instance.ChangeStateIn(settings.FrightenedTimeInSeconds))
+                    .Then(context => Actions.PowerPillEaten(settings, context.Instance, context.Data.Location, gameNotifications))
                     .TransitionTo(Frightened),
                 When(GhostCollision)
                     .IfElse(x => x.Data.Ghost.Edible,
-                    binder => binder.Then(context => Actions.SendGhostHome(context.Instance, context.Data.Ghost))
-                                    .Then(context => Actions.IncreaseScoreAfterEatingGhost(context.Instance, game))
-                                    .Then(context => Actions.MakeGhostNotEdible(context.Instance, context.Data.Ghost)),
-                    binder => binder.Then(context => context.Instance.DecreaseLives())
+                    binder => binder.Then(context => Actions.GhostEaten(context.Instance, context.Data.Ghost, game)),
+                    binder => binder.Then(context => Actions.EatenByGhost(context.Instance))
                                     .TransitionTo(Dying))); 
 
             WhenEnter(Dying,
                        binder => binder
-                                .Then(context => Actions.HideGhosts(context.Instance))
-                                .Then(context => context.Instance.ChangeStateIn(4))
-                                .Then(context => gameNotifications.Publish(GameNotification.Dying)));
+                                .Then(context => Actions.BeginDying(context.Instance, gameNotifications))
+                                .Then(context => context.Instance.ChangeStateIn(4)));
 
             During(Dying,
                 When(Tick, context => context.Data.Now >= context.Instance.TimeToChangeState)
@@ -87,14 +74,11 @@ namespace NPacMan.Game
             WhenEnter(Respawning,
                        binder => binder
                                 .Then(context => context.Instance.ChangeStateIn(4))
-                                .Then(context => gameNotifications.Publish(GameNotification.Respawning)));
+                                .Then(context => Actions.BeginRespawning(gameNotifications)));
 
             During(Respawning,
                 When(Tick, context => context.Data.Now >= context.Instance.TimeToChangeState)
-                    .Then(context => context.Instance.ChangeStateIn(4))
-                    .Then(context => Actions.MoveGhostsHome(context.Instance))
-                    .Then(context => Actions.MovePacManHome(context.Instance))
-                    .Then(context => Actions.ShowGhosts(context.Instance))
+                    .Then(context => Actions.CompleteRespawning(context.Instance))
                     .TransitionTo(GhostChase));
 
             During(Dead, Ignore(Tick));

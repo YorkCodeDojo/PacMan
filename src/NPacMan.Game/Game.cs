@@ -1,7 +1,6 @@
 ﻿using Automatonymous;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Threading.Tasks;
 
 namespace NPacMan.Game
@@ -49,8 +48,7 @@ namespace NPacMan.Game
 
         public static Game Create()
         {
-            var filename = "board.txt";
-            var gameSettings = GameSettingsLoader.LoadFromFile(filename);
+            var gameSettings = GameSettingsLoader.LoadFromResource();
 
             return new Game(new GameClock(), gameSettings);
         }
@@ -83,7 +81,7 @@ namespace NPacMan.Game
         public PacMan PacMan => _gameState.PacMan;
 
         public IReadOnlyDictionary<string, Ghost> Ghosts
-            => _gameState.GhostsVisible ? _gameState.Ghosts : ImmutableDictionary<string, Ghost>.Empty;
+            => _gameState.GhostsVisible ? _gameState.Ghosts : new Dictionary<string, Ghost>();
 
         public GameStatus Status => _gameState.Status switch
         {

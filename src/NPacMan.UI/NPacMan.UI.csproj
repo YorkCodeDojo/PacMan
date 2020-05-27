@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\NPacMan.Game\NPacMan.Game.csproj" />
+    <ProjectReference Include="..\NPacMan.SharedUi\NPacMan.SharedUi.csproj" />
   </ItemGroup>
 
   <ItemGroup>
