@@ -1,8 +1,7 @@
-﻿using NPacMan.Game;
-using System;
-using System.Runtime.InteropServices;
+﻿using System;
 using System.Windows.Forms;
 using NPacMan.SharedUi;
+using NPacMan.UI.Bots;
 
 namespace NPacMan.UI
 {
@@ -12,13 +11,14 @@ namespace NPacMan.UI
         private readonly BoardRenderer _boardRenderer = new BoardRenderer();
         private readonly GraphicsBuffers _graphicsBuffers;
         private readonly Game.Game _game;
-        public Form1()
+        public Form1(string[] args)
         {
             InitializeComponent();
 
             _game = Game.Game.Create()
                              .AddKeyboard()
                              .AddSounds()
+                             .AddBots(args)
                              .StartGame();
 
             _graphicsBuffers = new GraphicsBuffers(this) { ShowFps = true };
