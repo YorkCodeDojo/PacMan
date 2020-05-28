@@ -31,6 +31,17 @@ namespace NPacMan.UI.Bots
 
                     game.Subscribe(GameNotification.PreTick, botConnector.RequestNextMoveFromBot);
                 }
+
+                if (args[0].Equals("--process"))
+                {
+                    var pathToExe = args[1];
+                    var transport = new StdInOutTransport(pathToExe);
+
+                    var botConnector = new BotConnector(transport, game);
+                    botConnector.Initialise();
+
+                    game.Subscribe(GameNotification.PreTick, botConnector.RequestNextMoveFromBot);
+                }
             }
 
             return game;

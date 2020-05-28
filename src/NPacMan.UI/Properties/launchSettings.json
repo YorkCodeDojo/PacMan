@@ -2,7 +2,7 @@
   "profiles": {
     "NPacMan.UI": {
       "commandName": "Project",
-      "commandLineArgs": "--hostname localhost:9001"
+      "commandLineArgs": "--process \"C:\\personal\\PacMan\\src\\NPacMan.StdInOutBot\\bin\\Debug\\netcoreapp3.1\\NPacMan.StdInOutBot.exe\""
     }
   }
 }

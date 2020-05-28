@@ -97,26 +97,18 @@ namespace NPacMan.SocketsBot
                         {
                             Console.WriteLine("Play");
                             var gameState = command[("play:".Length)..];
-                            try
-                            {
-                                var game = JsonSerializer.Deserialize<BotGame>(gameState);
-                                if (bot is null) bot = new GreedyBot(game.Board);
-                                var nextDirection = bot.SuggestNextDirection(game).ToString().ToLower();
-                                Console.WriteLine($"    Responding with {nextDirection}");
+                            var game = JsonSerializer.Deserialize<BotGame>(gameState);
+                            if (bot is null) bot = new GreedyBot(game.Board);
+                            var nextDirection = bot.SuggestNextDirection(game).ToString().ToLower();
+                            Console.WriteLine($"    Responding with {nextDirection}");
 
-                                var msg = Encoding.ASCII.GetBytes(nextDirection);
-                                handler.Send(msg);
-                            }
-                            catch (JsonException)
-                            {
-                                Console.WriteLine(gameState);
-                                throw;
-                            }
-
+                            var msg = Encoding.ASCII.GetBytes(nextDirection);
+                            handler.Send(msg);
                         }
                     }
                     handler.Shutdown(SocketShutdown.Both);
                     handler.Close();
+                    handler.Dispose();
                 }
 
             }
