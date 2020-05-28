@@ -21,8 +21,8 @@ namespace NPacMan.SocketsBot
             var currentLocation = _graph.GetNodeForLocation(_game.PacMan.Location);
 
             var shortestDistances = DistancesCalculator.CalculateDistances(_game, _graph, currentLocation);
-
-            var nearestCoin = FindNearestCoin(_game.Coins, shortestDistances);
+             
+            var nearestCoin = FindNearestCoinOrPowerPill(_game.Coins, _game.PowerPills, shortestDistances);
 
             Direction bestDirectionToNearestCoin;
             if (nearestCoin == CellLocation.TopLeft)
@@ -71,9 +71,9 @@ namespace NPacMan.SocketsBot
             return possibleDirections.First().Direction;
         }
 
-        private CellLocation FindNearestCoin(IReadOnlyCollection<CellLocation> coins, Distances shortestDistances)
+        private CellLocation FindNearestCoinOrPowerPill(IReadOnlyCollection<CellLocation> coins, IReadOnlyCollection<CellLocation> powerPills, Distances shortestDistances)
         {
-            var bestCoin = default(CellLocation);
+            var bestTarget = default(CellLocation);
             var shortestDistance = int.MaxValue;
 
             foreach (var coin in coins)
@@ -83,11 +83,22 @@ namespace NPacMan.SocketsBot
                 if (distanceToCoin < shortestDistance)
                 {
                     shortestDistance = distanceToCoin;
-                    bestCoin = coin;
+                    bestTarget = coin;
                 }
             }
 
-            return bestCoin;
+            foreach (var pill in powerPills)
+            {
+                var distanceToPill = shortestDistances.DistanceTo(pill);
+
+                if (distanceToPill < shortestDistance)
+                {
+                    shortestDistance = distanceToPill;
+                    bestTarget = pill;
+                }
+            }
+
+            return bestTarget;
         }
 
         private BotGhost? FindNearestGhost(BotGhost[] ghosts, Distances shortestDistances)

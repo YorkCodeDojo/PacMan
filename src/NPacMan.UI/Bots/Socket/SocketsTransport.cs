@@ -10,6 +10,7 @@ namespace NPacMan.UI.Bots.SocketTransport
         private readonly string _hostName;
         private readonly int _portNumber;
         private Socket? _socket;
+        private readonly object _lock = new object();
 
         public SocketsTransport(string hostName, int portNumber)
         {
@@ -31,17 +32,20 @@ namespace NPacMan.UI.Bots.SocketTransport
 
         public string SendCommand(string payload)
         {
-            if (_socket is null)
-                _socket = ConnectToSocket();
+            lock (_lock)
+            {
+                if (_socket is null)
+                    _socket = ConnectToSocket();
 
-            var msg = Encoding.ASCII.GetBytes(payload + "<EOF>");
-            _socket.Send(msg);
+                var msg = Encoding.ASCII.GetBytes(payload + "<EOF>");
+                _socket.Send(msg);
 
-            var bytes = new byte[1024];
-            var bytesRec = _socket.Receive(bytes);
-            var response = Encoding.ASCII.GetString(bytes, 0, bytesRec);
+                var bytes = new byte[1024];
+                var bytesRec = _socket.Receive(bytes);
+                var response = Encoding.ASCII.GetString(bytes, 0, bytesRec);
 
-            return response;
+                return response;
+            }
         }
 
         private Socket ConnectToSocket()

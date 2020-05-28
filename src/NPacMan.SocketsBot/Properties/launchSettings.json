@@ -2,7 +2,7 @@
   "profiles": {
     "NPacMan.Bot": {
       "commandName": "Project",
-      "commandLineArgs": "pacmanbot"
+      "commandLineArgs": "localhost 9001"
     }
   }
 }

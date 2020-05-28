@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "NPacMan.UI": {
+      "commandName": "Project",
+      "commandLineArgs": "--hostname localhost:9001"
+    }
+  }
+}
