@@ -56,6 +56,9 @@ namespace NPacMan.Game
         public IReadOnlyCollection<CellLocation> Coins
             => _gameState.RemainingCoins;
 
+        internal IReadOnlyCollection<CellLocation> StartingCoins
+            => _settings.Coins;
+
         public IReadOnlyCollection<CellLocation> PowerPills
             => _gameState.RemainingPowerPills;
 
@@ -85,6 +88,8 @@ namespace NPacMan.Game
 
         public IReadOnlyDictionary<string, Ghost> Ghosts
             => _gameState.GhostsVisible ? _gameState.Ghosts : new Dictionary<string, Ghost>();
+
+        
 
         public GameStatus Status => _gameState.Status switch
         {

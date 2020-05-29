@@ -609,8 +609,8 @@ namespace NPacMan.Game.Tests.GameTests
         {
             var ghostStart1 = _gameSettings.PacMan.Location.FarAway();
             _gameSettings.GhostHouse.Add(ghostStart1);
-            _gameSettings.Ghosts.Add(new Ghost("Ghost1", ghostStart1, Direction.Left, CellLocation.TopLeft, new GhostGoesRightStrategy()));
-            _gameSettings.Ghosts.Add(new Ghost("Ghost2", ghostStart1, Direction.Left, CellLocation.TopLeft, new GhostGoesRightStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", ghostStart1, Direction.Left, CellLocation.TopLeft, new GhostGoesRightStrategy(), int.MaxValue));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost2", ghostStart1, Direction.Left, CellLocation.TopLeft, new GhostGoesRightStrategy(), int.MaxValue));
            
             var game = new Game(_gameClock, _gameSettings);
             game.StartGame();
@@ -619,6 +619,47 @@ namespace NPacMan.Game.Tests.GameTests
             await _gameClock.Tick();
 
             game.Ghosts.Values.Should().AllBeEquivalentTo(new {
+                Location = ghostStart1
+            });
+        }
+
+        [Fact]
+        public async Task GhostsShouldLeaveGhostHouseWhenPillCountHasBeenReached()
+        {
+            // X
+            // -
+            // H G
+
+            var ghostStart1 = new CellLocation(1, 2);
+            _gameSettings.PacMan = new PacMan(ghostStart1.FarAway(), Direction.Left);
+            _gameSettings.GhostHouse.AddRange(new [] {ghostStart1, ghostStart1.Left});
+            _gameSettings.Doors.Add(ghostStart1.Left.Above);
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", ghostStart1, Direction.Left, CellLocation.TopLeft, new GhostGoesRightStrategy(), 1));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost2", ghostStart1, Direction.Left, CellLocation.TopLeft, new GhostGoesRightStrategy(), 10));
+           
+            _gameSettings.Coins.Add(_gameSettings.PacMan.Location.Left);
+
+            var game = new Game(_gameClock, _gameSettings);
+            game.StartGame();
+            await game.ChangeDirection(Direction.Left);
+
+            // PacMan Eats Coin
+            await _gameClock.Tick();
+
+            // Still in House, under door
+            await _gameClock.Tick();
+
+            // On ghost door
+            await _gameClock.Tick();
+
+            // Out of house
+            await _gameClock.Tick();
+
+            using var _  = new AssertionScope();
+            game.Ghosts["Ghost1"].Should().BeEquivalentTo(new {
+                Location = ghostStart1.Left.Above.Above
+            });
+             game.Ghosts["Ghost2"].Should().BeEquivalentTo(new {
                 Location = ghostStart1
             });
         }

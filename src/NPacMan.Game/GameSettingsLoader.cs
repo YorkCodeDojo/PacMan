@@ -45,7 +45,8 @@ namespace NPacMan.Game
                                                      GhostNames.Inky => new DirectToStrategy(new InterceptPacManLocation(GhostNames.Blinky)),
                                                      GhostNames.Pinky => new DirectToStrategy(new DirectToExpectedPacManLocation()),
                                                      _ => new DirectToStrategy(new DirectToPacManLocation())
-                                                 })).ToList();
+                                                 },
+                                                 data.PillsToLeave)).ToList();
 
             var coins = new List<CellLocation>();
             var powerPills = new List<CellLocation>();
@@ -124,6 +125,8 @@ namespace NPacMan.Game
             public Location ScatterTarget { get; set; } = null!;
 
             public Location StartingLocation { get; set; } = null!;
+
+            public int PillsToLeave { get; set; }
         }
 
         class Location
