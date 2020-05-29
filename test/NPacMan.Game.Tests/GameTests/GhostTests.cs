@@ -247,7 +247,6 @@ namespace NPacMan.Game.Tests.GameTests
             });
         }
 
-        public CellLocation FarAway(CellLocation location) => new CellLocation(location.X + 10, location.Y + 10);
 
         [Theory]
         [InlineData(5)]
@@ -256,9 +255,9 @@ namespace NPacMan.Game.Tests.GameTests
         public async Task AllGhostsShouldReturnToNonEdibleAfterGivenAmountOfSeconds(int seconds)
         {
             _gameSettings.FrightenedTimeInSeconds = seconds;
-            _gameSettings.Ghosts.Add(new Ghost("Ghost1", FarAway(_gameSettings.PacMan.Location), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
-            _gameSettings.Ghosts.Add(new Ghost("Ghost2", FarAway(_gameSettings.PacMan.Location), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
-            _gameSettings.Ghosts.Add(new Ghost("Ghost3", FarAway(_gameSettings.PacMan.Location), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", _gameSettings.PacMan.Location.FarAway(), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost2", _gameSettings.PacMan.Location.FarAway(), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost3", _gameSettings.PacMan.Location.FarAway(), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
 
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Right);
 
@@ -292,9 +291,9 @@ namespace NPacMan.Game.Tests.GameTests
         public async Task GhostShouldReturnToNonEdibleAfterGivenAmountSecondsWhenEatingSecondPowerPills(int seconds)
         {
             _gameSettings.FrightenedTimeInSeconds = seconds;
-            _gameSettings.Ghosts.Add(new Ghost("Ghost1", FarAway(_gameSettings.PacMan.Location), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
-            _gameSettings.Ghosts.Add(new Ghost("Ghost2", FarAway(_gameSettings.PacMan.Location), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
-            _gameSettings.Ghosts.Add(new Ghost("Ghost3", FarAway(_gameSettings.PacMan.Location), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", _gameSettings.PacMan.Location.FarAway(), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost2", _gameSettings.PacMan.Location.FarAway(), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost3", _gameSettings.PacMan.Location.FarAway(), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
 
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Right);
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Right.Right.Right);
