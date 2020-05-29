@@ -602,5 +602,25 @@ namespace NPacMan.Game.Tests.GameTests
                 Location = ghostStart1
             });
         }
+
+        
+        [Fact]
+        public async Task GhostsShouldStandStillInGhostHouse()
+        {
+            var ghostStart1 = _gameSettings.PacMan.Location.FarAway();
+            _gameSettings.GhostHouse.Add(ghostStart1);
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", ghostStart1, Direction.Left, CellLocation.TopLeft, new GhostGoesRightStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost2", ghostStart1, Direction.Left, CellLocation.TopLeft, new GhostGoesRightStrategy()));
+           
+            var game = new Game(_gameClock, _gameSettings);
+            game.StartGame();
+
+            await _gameClock.Tick();
+            await _gameClock.Tick();
+
+            game.Ghosts.Values.Should().AllBeEquivalentTo(new {
+                Location = ghostStart1
+            });
+        }
     }
 }

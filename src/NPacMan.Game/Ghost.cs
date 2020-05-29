@@ -1,4 +1,5 @@
-﻿using NPacMan.Game.GhostStrategies;
+﻿using System.Linq;
+using NPacMan.Game.GhostStrategies;
 
 namespace NPacMan.Game
 {
@@ -39,6 +40,7 @@ namespace NPacMan.Game
         {
             if (Edible && gameState.TickCounter % 2 == 1) return this;
 
+            if (game.GhostHouse.Contains(Location)) return this;
           
             var nextDirection = CurrentStrategy.GetNextDirection(this, game);
             if (nextDirection is Direction newDirection)

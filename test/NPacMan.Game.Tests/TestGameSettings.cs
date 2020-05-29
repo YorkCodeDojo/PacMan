@@ -35,6 +35,14 @@ namespace NPacMan.Game.Tests
         IReadOnlyDictionary<CellLocation, CellLocation> IGameSettings.Portals
             => this.Portals;
 
+
+        public List<CellLocation> GhostHouse { get; set; }
+            = new List<CellLocation>();
+            
+        IReadOnlyCollection<CellLocation> IGameSettings.GhostHouse
+            => this.GhostHouse;
+
+
         public int Width { get; set; }
 
         public int Height { get; set; }
@@ -52,5 +60,6 @@ namespace NPacMan.Game.Tests
         public int ChaseTimeInSeconds { get; set; } = 7;
         public int FrightenedTimeInSeconds { get; set; } = 7;
         public IDirectionPicker DirectionPicker { get; internal set; } = new TestDirectionPicker();
+
     }
 }

@@ -7,6 +7,7 @@ namespace NPacMan.Game
         PacMan PacMan { get; }
         IReadOnlyCollection<CellLocation> Walls { get; }
         IReadOnlyCollection<CellLocation> Doors { get; }
+        IReadOnlyCollection<CellLocation> GhostHouse { get; }
         IReadOnlyCollection<CellLocation> Coins { get; }
         IReadOnlyCollection<CellLocation> PowerPills { get; }
         IReadOnlyDictionary<CellLocation, CellLocation> Portals { get; }
