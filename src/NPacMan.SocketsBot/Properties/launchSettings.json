@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "NPacMan.Bot": {
+      "commandName": "Project",
+      "commandLineArgs": "localhost 9001"
+    }
+  }
+}
