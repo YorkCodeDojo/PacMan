@@ -47,7 +47,7 @@ namespace NPacMan.Game
                     .Then(context => Actions.ChangeDirection(game, context.Instance, context.Data.NewDirection)),
                 When(Tick)
                     .ThenAsync(async context => await Actions.MoveGhosts(game, context.Instance, context, this))
-                    .ThenAsync(async context => await Actions.MovePacMan(settings, context.Instance, context, this)),
+                    .ThenAsync(async context => await Actions.MovePacMan(game, context.Instance, context, this)),
                 When(CoinCollision)
                     .Then(context => Actions.CoinEaten(context.Instance, context.Data.Location, gameNotifications)),
                 When(PowerPillCollision)

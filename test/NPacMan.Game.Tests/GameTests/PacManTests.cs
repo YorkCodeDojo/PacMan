@@ -56,31 +56,49 @@ namespace NPacMan.Game.Tests.GameTests
         }
 
         [Theory]
-        [InlineData(Direction.Up, 0, -1)]
-        [InlineData(Direction.Down, 0, +1)]
-        [InlineData(Direction.Left, -1, 0)]
-        [InlineData(Direction.Right, +1, 0)]
-        public async Task PacManCannotMoveIntoWalls(Direction directionToFace, int createWallXOffset, int createWallYOffset)
+        [InlineData(Direction.Up)]
+        [InlineData(Direction.Down)]
+        [InlineData(Direction.Left)]
+        [InlineData(Direction.Right)]
+        public async Task PacManCannotMoveIntoWalls(Direction directionToFace)
         {
+            var location = _gameSettings.PacMan.Location;
+            _gameSettings.PacMan = new PacMan(location, directionToFace);
+            _gameSettings.Walls.Add(location + directionToFace);
+
             var game = new Game(_gameClock, _gameSettings);
             game.StartGame();
-            var x = game.PacMan.Location.X;
-            var y = game.PacMan.Location.Y;
-            var score = game.Score;
-
-            await game.ChangeDirection(directionToFace);
-
-            _gameSettings.Walls.Add((x + createWallXOffset, y + createWallYOffset));
 
             await _gameClock.Tick();
 
             game.PacMan.Should().BeEquivalentTo(new
             {
-                Location = new CellLocation(x, y),
+                Location = location,
                 Direction = directionToFace
             });
+        }
 
-            game.Score.Should().Be(score);
+        [Theory]
+        [InlineData(Direction.Up)]
+        [InlineData(Direction.Down)]
+        [InlineData(Direction.Left)]
+        [InlineData(Direction.Right)]
+        public async Task PacManCannotMoveIntoDoors(Direction directionToFace)
+        {
+            var location = _gameSettings.PacMan.Location;
+            _gameSettings.PacMan= new PacMan(location, directionToFace);
+            _gameSettings.Doors.Add(location + directionToFace);
+
+            var game = new Game(_gameClock, _gameSettings);
+            game.StartGame();
+            
+            await _gameClock.Tick();
+
+            game.PacMan.Should().BeEquivalentTo(new
+            {
+                Location = location,
+                Direction = directionToFace
+            });
         }
 
         [Fact]

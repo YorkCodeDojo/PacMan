@@ -91,16 +91,16 @@ namespace NPacMan.Game
             gameState.ApplyToGhosts(ghost => ghost.SetToNotEdible());
         }
 
-        public async static Task MovePacMan(IGameSettings gameSettings, GameState gameState, BehaviorContext<GameState, Tick> context, GameStateMachine gameStateMachine)
+        public async static Task MovePacMan(Game game, GameState gameState, BehaviorContext<GameState, Tick> context, GameStateMachine gameStateMachine)
         {
             var newPacManLocation = gameState.PacMan.Location + gameState.PacMan.Direction;
 
-            if (gameSettings.Portals.TryGetValue(newPacManLocation, out var otherEndOfThePortal))
+            if (game.Portals.TryGetValue(newPacManLocation, out var otherEndOfThePortal))
             {
                 newPacManLocation = otherEndOfThePortal + gameState.PacMan.Direction;
             }
 
-            if (!gameSettings.Walls.Contains(newPacManLocation))
+            if (!game.Walls.Contains(newPacManLocation))
             {
                 gameState.MovePacManTo(newPacManLocation);
             }
