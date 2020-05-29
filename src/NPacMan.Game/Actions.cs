@@ -67,10 +67,10 @@ namespace NPacMan.Game
             gameState.DecreaseLives();
         }
 
-        public static void ChangeDirection(IGameSettings gameSettings, GameState gameState, Direction direction)
+        public static void ChangeDirection(Game game, GameState gameState, Direction direction)
         {
             var nextSpace = gameState.PacMan.Location + direction;
-            if (!gameSettings.Walls.Contains(nextSpace))
+            if (!game.Walls.Contains(nextSpace))
             {
                 gameState.ChangeDirectionOfPacMan(direction);
             }

@@ -40,8 +40,8 @@ namespace NPacMan.Game.Tests.GameTests
         public async Task PacManWalksInFacingDirection(Direction directionToFace, int changeInX, int changeInY)
         {
             var game = new Game(_gameClock, _gameSettings);
-            game.StartGame(); 
-            
+            game.StartGame();
+
             var (x, y) = game.PacMan.Location;
 
             await game.ChangeDirection(directionToFace);
@@ -63,7 +63,7 @@ namespace NPacMan.Game.Tests.GameTests
         public async Task PacManCannotMoveIntoWalls(Direction directionToFace, int createWallXOffset, int createWallYOffset)
         {
             var game = new Game(_gameClock, _gameSettings);
-            game.StartGame(); 
+            game.StartGame();
             var x = game.PacMan.Location.X;
             var y = game.PacMan.Location.Y;
             var score = game.Score;
@@ -87,7 +87,7 @@ namespace NPacMan.Game.Tests.GameTests
         public async Task PacManIsTeleportedWhenYouWalkIntoAPortal()
         {
             var game = new Game(_gameClock, _gameSettings);
-            game.StartGame(); 
+            game.StartGame();
             var x = game.PacMan.Location.X;
             var y = game.PacMan.Location.Y;
             var score = game.Score;
@@ -120,7 +120,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.PacMan = new PacMan((x, y), Direction.Down);
 
             var game = new Game(_gameClock, _gameSettings);
-            game.StartGame(); 
+            game.StartGame();
             await _gameClock.Tick();
 
             game.PacMan
@@ -141,7 +141,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(1, 2), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
 
             var game = new Game(_gameClock, _gameSettings);
-            game.StartGame(); 
+            game.StartGame();
             var now = DateTime.UtcNow;
             await _gameClock.Tick(now);
 
@@ -167,7 +167,7 @@ namespace NPacMan.Game.Tests.GameTests
 
             var game = new Game(_gameClock, _gameSettings);
             game.Subscribe(GameNotification.Dying, () => numberOfNotificationsTriggered++);
-            game.StartGame(); 
+            game.StartGame();
             var now = DateTime.UtcNow;
             await _gameClock.Tick(now);
 
@@ -191,7 +191,7 @@ namespace NPacMan.Game.Tests.GameTests
 
             var game = new Game(_gameClock, _gameSettings);
             game.Subscribe(GameNotification.Respawning, () => numberOfNotificationsTriggered++);
-            game.StartGame(); 
+            game.StartGame();
             var now = DateTime.UtcNow;
             await _gameClock.Tick(now);
 
@@ -239,7 +239,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(1, 2), Direction.Right, CellLocation.TopLeft, new GhostGoesRightStrategy()));
 
             var game = new Game(_gameClock, _gameSettings);
-            game.StartGame(); 
+            game.StartGame();
             var now = DateTime.UtcNow;
             await _gameClock.Tick(now);
             await _gameClock.Tick(now);
@@ -272,15 +272,37 @@ namespace NPacMan.Game.Tests.GameTests
         [InlineData(Direction.Right)]
         public async Task PacManCantTurnToFaceWall(Direction direction)
         {
-            var game = new Game(_gameClock, _gameSettings);
-            game.StartGame(); 
-
-            var pacManLocation = game.PacMan.Location;
-
             var expectedDirection = direction.Opposite();
-            await game.ChangeDirection(expectedDirection);
-
+            var pacManLocation = new CellLocation(1, 1);
+            _gameSettings.PacMan = new PacMan(pacManLocation, expectedDirection);
             _gameSettings.Walls.Add(pacManLocation + direction);
+
+            var game = new Game(_gameClock, _gameSettings);
+            game.StartGame();
+
+            await game.ChangeDirection(direction);
+
+            game.PacMan.Should().BeEquivalentTo(new
+            {
+                Location = pacManLocation,
+                Direction = expectedDirection
+            });
+        }
+
+        [Theory]
+        [InlineData(Direction.Up)]
+        [InlineData(Direction.Down)]
+        [InlineData(Direction.Left)]
+        [InlineData(Direction.Right)]
+        public async Task PacManCantTurnToFaceDoor(Direction direction)
+        {
+            var expectedDirection = direction.Opposite();
+            var pacManLocation = new CellLocation(1, 1);
+            _gameSettings.PacMan = new PacMan(pacManLocation, expectedDirection);
+            _gameSettings.Doors.Add(pacManLocation + direction);
+            var game = new Game(_gameClock, _gameSettings);
+
+            game.StartGame();
 
             await game.ChangeDirection(direction);
 
@@ -318,13 +340,13 @@ namespace NPacMan.Game.Tests.GameTests
         public async Task ScoreShouldIncreaseExponentiallyAfterEatingEachGhost(int numberOfGhosts, int totalScore)
         {
             var ghostStart = _gameSettings.PacMan.Location.Left.Left.Left;
-            for(int g = 0;g<numberOfGhosts;g++)
-{            _gameSettings.Ghosts.Add(new Ghost($"Ghost{g}", ghostStart, Direction.Left, CellLocation.TopLeft, new GhostGoesRightStrategy()));}
-       
+            for (int g = 0; g < numberOfGhosts; g++)
+            { _gameSettings.Ghosts.Add(new Ghost($"Ghost{g}", ghostStart, Direction.Left, CellLocation.TopLeft, new GhostGoesRightStrategy())); }
+
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Left);
 
-             var game = new Game(_gameClock, _gameSettings);
-            game.StartGame(); 
+            var game = new Game(_gameClock, _gameSettings);
+            game.StartGame();
 
             await game.ChangeDirection(Direction.Left);
 
@@ -333,8 +355,8 @@ namespace NPacMan.Game.Tests.GameTests
             var scoreBeforeGhost = game.Score;
 
             WeExpectThat(game.PacMan).IsAt(_gameSettings.PacMan.Location.Left);
-            for(int g =0;g<numberOfGhosts;g++)
-            {            
+            for (int g = 0; g < numberOfGhosts; g++)
+            {
                 WeExpectThat(game.Ghosts[$"Ghost{g}"]).IsAt(ghostStart.Right);
             }
 
@@ -342,7 +364,7 @@ namespace NPacMan.Game.Tests.GameTests
 
             WeExpectThat(game.PacMan).IsAt(_gameSettings.PacMan.Location.Left.Left);
 
-            game.Score.Should().Be(scoreBeforeGhost+totalScore);
+            game.Score.Should().Be(scoreBeforeGhost + totalScore);
         }
     }
 }

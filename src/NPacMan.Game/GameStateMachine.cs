@@ -44,7 +44,7 @@ namespace NPacMan.Game
 
             During(Scatter, GhostChase, Frightened,
                 When (PlayersWishesToChangeDirection)
-                    .Then(context => Actions.ChangeDirection(settings, context.Instance, context.Data.NewDirection)),
+                    .Then(context => Actions.ChangeDirection(game, context.Instance, context.Data.NewDirection)),
                 When(Tick)
                     .ThenAsync(async context => await Actions.MoveGhosts(game, context.Instance, context, this))
                     .ThenAsync(async context => await Actions.MovePacMan(settings, context.Instance, context, this)),
