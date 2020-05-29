@@ -9,11 +9,11 @@
  X......XX....XX....XX......X
  XXXXXX.XXXXX XX XXXXX.XXXXXX
       X.XXXXX XX XXXXX.X     
-      X.XX   B      XX.X     
+      X.XX          XX.X     
       X.XX XXX--XXX XX.X     
- XXXXXX.XX X      X XX.XXXXXX
-T      .   X IC P X   .      T
- XXXXXX.XX X      X XX.XXXXXX
+ XXXXXX.XX XHHHHHHX XX.XXXXXX
+T      .   XHHHHHHX   .      T
+ XXXXXX.XX XHHHHHHX XX.XXXXXX
       X.XX XXXXXXXX XX.X     
       X.XX          XX.X     
       X.XX XXXXXXXX XX.X
