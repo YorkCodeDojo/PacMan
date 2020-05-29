@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NPacMan.Game.GhostStrategies;
 using NPacMan.Game.Properties;
+using System.Text.Json;
 
 namespace NPacMan.Game
 {
@@ -29,14 +30,28 @@ namespace NPacMan.Game
             var height = rows.Length;
             var width = 0;
 
-            var homeLocations = FindHomeLocations(instructions);
+            var ghostSetup = FindHomeLocations(instructions);
+
+            var ghosts = ghostSetup.Select(data => 
+
+                                        new Ghost(data.Name,
+                                                 new CellLocation(data.StartingLocation.X, data.StartingLocation.Y),
+                                                 Direction.Left,
+                                                 new CellLocation(data.ScatterTarget.X, data.ScatterTarget.Y),
+                                                 data.Name switch 
+                                                 {
+                                                     GhostNames.Blinky => new DirectToStrategy(new DirectToPacManLocation()),
+                                                     GhostNames.Clyde => new DirectToStrategy(new StaysCloseToPacManLocation(GhostNames.Clyde)),
+                                                     GhostNames.Inky => new DirectToStrategy(new InterceptPacManLocation(GhostNames.Blinky)),
+                                                     GhostNames.Pinky => new DirectToStrategy(new DirectToExpectedPacManLocation()),
+                                                     _ => new DirectToStrategy(new DirectToPacManLocation())
+                                                 })).ToList();
 
             var coins = new List<CellLocation>();
             var powerPills = new List<CellLocation>();
             var walls = new List<CellLocation>();
             var doors = new List<CellLocation>();
             var portalParts = new List<CellLocation>();
-            var ghosts = new List<Ghost>();
             PacMan? pacMan = null;
             for (int rowNumber = 0; rowNumber < height; rowNumber++)
             {
@@ -46,38 +61,6 @@ namespace NPacMan.Game
                     var location = new CellLocation(columnNumber - 1, rowNumber);
                     switch (row[columnNumber])
                     {
-                        case 'B':
-                            var homeB = homeLocations[GhostNames.Blinky];
-                            ghosts.Add(new Ghost(GhostNames.Blinky,
-                                                 location,
-                                                 Direction.Left,
-                                                 new CellLocation(homeB.X, homeB.Y),
-                                                 new DirectToStrategy(new DirectToPacManLocation())));
-                            break;
-                        case 'P':
-                            var homeP = homeLocations[GhostNames.Pinky];
-                            ghosts.Add(new Ghost(GhostNames.Pinky,
-                                                 location,
-                                                 Direction.Left,
-                                                 new CellLocation(homeP.X, homeP.Y),
-                                                 new DirectToStrategy(new DirectToExpectedPacManLocation())));
-                            break;
-                        case 'I':
-                            var homeI = homeLocations[GhostNames.Inky];
-                            ghosts.Add(new Ghost(GhostNames.Inky,
-                                                 location,
-                                                  Direction.Left,
-                                                 new CellLocation(homeI.X, homeI.Y),
-                                                 new DirectToStrategy(new InterceptPacManLocation(GhostNames.Blinky))));
-                            break;
-                        case 'C':
-                            var homeC = homeLocations[GhostNames.Clyde];
-                            ghosts.Add(new Ghost(GhostNames.Clyde,
-                                                 location,
-                                                Direction.Left,
-                                                 new CellLocation(homeC.X, homeC.Y),
-                                                 new DirectToStrategy(new StaysCloseToPacManLocation(GhostNames.Clyde))));
-                            break;
                         case '▲':
                             pacMan = new PacMan(location, Direction.Up);
                             break;
@@ -104,7 +87,7 @@ namespace NPacMan.Game
                             break;
                         case '*':
                             powerPills.Add(location);
-                            break;                            
+                            break;
                         default:
                             break;
                     }
@@ -129,26 +112,31 @@ namespace NPacMan.Game
             return new GameSettings(width - 2, height, walls, coins, powerPills, portals, pacMan, ghosts, doors);
         }
 
-        private static Dictionary<string, CellLocation> FindHomeLocations(string[] instructions)
+        class GhostSetup
         {
-            var result = new Dictionary<string, CellLocation>();
+
+            public string Name { get; set; } = null!;
+
+            public Location ScatterTarget { get; set; } = null!;
+
+            public Location StartingLocation { get; set; } = null!;
+        }
+
+        class Location
+        {
+
+            public int X { get; set; }
+            public int Y { get; set; }
+        }
+
+        private static List<GhostSetup> FindHomeLocations(string[] instructions)
+        {
+            var result = new List<GhostSetup>();
 
             foreach (var instruction in instructions)
             {
-                // Parses instructions in the form {Blinky=-10,-3}
-                var span = EatToken(instruction.AsSpan(), "{");
-                span = ConsumeToAndEatToken(span, "=", out var name);
-                span = ConsumeToAndEatToken(span, ",", out var xString);
-                span = ConsumeToAndEatToken(span, "}", out var yString);
-
-                if (!int.TryParse(xString, out var x))
-                    throw new Exception($"{xString.ToString()} could not be parsed as a numeric value for the ghosts home X location.");
-
-                if (!int.TryParse(yString, out var y))
-                    throw new Exception($"{yString.ToString()} could not be parsed as a numeric value for the ghosts home Y location.");
-
-                result.Add(name.ToString(), new CellLocation(x, y));
-
+                var setup = JsonSerializer.Deserialize<GhostSetup>(instruction, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+                result.Add(setup);
             }
 
             return result;
@@ -161,7 +149,7 @@ namespace NPacMan.Game
                 throw new Exception($"String {instruction.ToString()} does not contain the expected token {token}");
 
             value = instruction[..(indexOf)];
-            return instruction[(indexOf+1)..];
+            return instruction[(indexOf + 1)..];
         }
 
         private static ReadOnlySpan<char> EatToken(ReadOnlySpan<char> instruction, string token)

@@ -29,7 +29,7 @@ T      .   X IC P X   .      T
  X.XXXXXXXXXX.XX.XXXXXXXXXX.X
  X..........................X
  XXXXXXXXXXXXXXXXXXXXXXXXXXXX
-{Pinky=2,-2}
-{Blinky=28,-2}
-{Clyde=0,31}
-{Inky=30,31}
+{"type": "Ghost", "name":"Pinky", "startingLocation": {"x":16,"y":14}, "scatterTarget": {"x":2,"y":-2}, "pillsToLeave": 0 }
+{"type": "Ghost", "name":"Blinky", "startingLocation": {"x":13,"y":11}, "scatterTarget": {"x":28,"y":-2}, "pillsToLeave": 0 }
+{"type": "Ghost", "name":"Clyde", "startingLocation": {"x":14,"y":14}, "scatterTarget": {"x":0,"y":31}, "pillsToLeave": 30 }
+{"type": "Ghost", "name":"Inky", "startingLocation": {"x":13,"y":14}, "scatterTarget": {"x":30,"y":31}, "pillsToLeave": 90 }

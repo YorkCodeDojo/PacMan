@@ -90,13 +90,13 @@ T*▲*T
         public void ShouldHaveGhostsAtCorrectLocations()
         {
             var board = @" XXX 
- BIP 
- ▲XC
+     
+ ▲X 
  ....
-{Blinky=-10,-3}
-{Inky=1,3}
-{Pinky=2,3}
-{Clyde=20,33}";
+{""type"": ""Ghost"", ""name"": ""Pinky"", ""startingLocation"": {""x"":2,""y"":1}, ""scatterTarget"": {""x"":2, ""y"":3}, ""pillsToLeave"": 0 }
+{""type"": ""Ghost"", ""name"": ""Blinky"", ""startingLocation"": {""x"":0,""y"":1}, ""scatterTarget"": {""x"":-10, ""y"":-3}, ""pillsToLeave"": 0 }
+{""type"": ""Ghost"", ""name"": ""Clyde"", ""startingLocation"": {""x"":2,""y"":2}, ""scatterTarget"": {""x"":20, ""y"":33}, ""pillsToLeave"": 30 }
+{""type"": ""Ghost"", ""name"": ""Inky"", ""startingLocation"": {""x"":1,""y"":1}, ""scatterTarget"": {""x"":1, ""y"":3}, ""pillsToLeave"": 90 }";
 
             var loadedBoard = GameSettingsLoader.Load(board);
 
@@ -146,10 +146,10 @@ T*▲*T
  BIP 
  ▲XC 
  ....
-{Blinky=-10,-3}
-{Inky=1,3}
-{Pinky=2,3}
-{Clyde=20,33}";
+{""type"": ""Ghost"", ""name"": ""Pinky"", ""startingLocation"": {""x"":16,""y"":14}, ""scatterTarget"": {""x"":2, ""y"":3}, ""pillsToLeave"": 0 }
+{""type"": ""Ghost"", ""name"": ""Blinky"", ""startingLocation"": {""x"":13,""y"":11}, ""scatterTarget"": {""x"":-10, ""y"":-3}, ""pillsToLeave"": 0 }
+{""type"": ""Ghost"", ""name"": ""Clyde"", ""startingLocation"": {""x"":14,""y"":14}, ""scatterTarget"": {""x"":20, ""y"":33}, ""pillsToLeave"": 30 }
+{""type"": ""Ghost"", ""name"": ""Inky"", ""startingLocation"": {""x"":13,""y"":14}, ""scatterTarget"": {""x"":1, ""y"":3}, ""pillsToLeave"": 90 }";
 
             var loadedBoard = GameSettingsLoader.Load(board);
             loadedBoard.Ghosts.Should().BeEquivalentTo(
