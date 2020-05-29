@@ -36,7 +36,8 @@ namespace NPacMan.Game.Tests
  X.X 
  XX. 
 T*▲*T
- --- ";
+ ---
+ HHH ";
             var gameBoard = GameSettingsLoader.Load(board);
 
             gameBoard.Should().BeEquivalentTo(new
@@ -45,8 +46,9 @@ T*▲*T
                 Coins = new CellLocation[] { (1, 1), (2, 2) },
                 PowerPills = new CellLocation[] { (0, 3), (2, 3) },
                 Doors = new CellLocation[] { new CellLocation(0, 4), new CellLocation(1, 4), new CellLocation(2, 4) },
+                GhostHouse = new CellLocation[] { new CellLocation(0, 5),  new CellLocation(1, 5), new CellLocation(2, 5) },
                 Width = 3,
-                Height = 5,
+                Height = 6,
                 Portals = new Dictionary<CellLocation, CellLocation>
                 {
                     {(-1,3), (3,3) },{(3,3), (-1,3) }

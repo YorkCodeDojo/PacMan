@@ -13,7 +13,8 @@ namespace NPacMan.Game
             IReadOnlyDictionary<CellLocation, CellLocation> portals,
             PacMan pacMan,
             IReadOnlyCollection<Ghost> ghosts,
-            IReadOnlyCollection<CellLocation> doors)
+            IReadOnlyCollection<CellLocation> doors,
+            IReadOnlyCollection<CellLocation> ghostHouse)
         {
             Width = width;
             Height = height;
@@ -24,6 +25,7 @@ namespace NPacMan.Game
             Coins = coins;
             PowerPills = powerPills;
             Doors = doors;
+            GhostHouse = ghostHouse;
         }
 
         public PacMan PacMan { get; }
@@ -35,6 +37,7 @@ namespace NPacMan.Game
         public int Height { get; }
         public IReadOnlyCollection<Ghost> Ghosts { get; }
         public IReadOnlyCollection<CellLocation> Doors { get; }
+        public IReadOnlyCollection<CellLocation> GhostHouse { get; }
         public GameStatus InitialGameStatus { get; } = GameStatus.Initial;
         public int InitialLives { get; } = 3;
 

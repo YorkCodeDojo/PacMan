@@ -52,6 +52,7 @@ namespace NPacMan.Game
             var walls = new List<CellLocation>();
             var doors = new List<CellLocation>();
             var portalParts = new List<CellLocation>();
+            var ghostHouse = new List<CellLocation>();
             PacMan? pacMan = null;
             for (int rowNumber = 0; rowNumber < height; rowNumber++)
             {
@@ -88,6 +89,9 @@ namespace NPacMan.Game
                         case '*':
                             powerPills.Add(location);
                             break;
+                        case 'H':
+                            ghostHouse.Add(location);
+                            break;                            
                         default:
                             break;
                     }
@@ -109,7 +113,7 @@ namespace NPacMan.Game
             if (pacMan is null)
                 throw new Exception("Pacman seems to be missing from the board.");
 
-            return new GameSettings(width - 2, height, walls, coins, powerPills, portals, pacMan, ghosts, doors);
+            return new GameSettings(width - 2, height, walls, coins, powerPills, portals, pacMan, ghosts, doors, ghostHouse);
         }
 
         class GhostSetup
