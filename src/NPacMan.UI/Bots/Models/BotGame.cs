@@ -1,7 +1,6 @@
-﻿using NPacMan.Game;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace NPacMan.UI.Bots
+namespace NPacMan.UI.Bots.Models
 {
     public class BotGame
     {

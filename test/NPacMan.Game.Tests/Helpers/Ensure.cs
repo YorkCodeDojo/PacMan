@@ -1,6 +1,4 @@
-﻿using NPacMan.Game.Tests.Helpers;
-
-namespace NPacMan.Game.Tests.GameTests
+﻿namespace NPacMan.Game.Tests.Helpers
 {
     public static class Ensure
     {

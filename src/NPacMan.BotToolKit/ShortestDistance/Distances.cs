@@ -1,13 +1,15 @@
 ﻿using System.Linq;
+using NPacMan.BotSDK.Graph;
+using NPacMan.BotSDK.Models;
 
-namespace NPacMan.BotSDK
+namespace NPacMan.BotSDK.ShortestDistance
 {
     public class Distances
     {
         private readonly int[,] _shortestDistances;
-        private readonly Graph _graph;
+        private readonly Graph.Graph _graph;
 
-        internal Distances(int[,] shortestDistances, Graph graph)
+        internal Distances(int[,] shortestDistances, Graph.Graph graph)
         {
             _shortestDistances = shortestDistances;
             _graph = graph;

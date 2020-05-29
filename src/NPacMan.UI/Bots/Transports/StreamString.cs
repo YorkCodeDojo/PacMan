@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Text;
 
-namespace NPacMan.UI.Bots
+namespace NPacMan.UI.Bots.Transports
 {
     public class StreamString
     {

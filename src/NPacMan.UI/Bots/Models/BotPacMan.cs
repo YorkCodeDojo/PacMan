@@ -1,6 +1,6 @@
 ﻿using NPacMan.Game;
 
-namespace NPacMan.UI.Bots
+namespace NPacMan.UI.Bots.Models
 {
     public class BotPacMan
     {

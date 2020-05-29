@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace NPacMan.Bot
+namespace NPacMan.NamedPipesBot
 {
     [Serializable]
     internal class DeadPipeException : Exception

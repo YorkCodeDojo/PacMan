@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NPacMan.BotSDK
+namespace NPacMan.BotSDK.Models
 {
     public struct CellLocation
     {

@@ -1,4 +1,4 @@
-﻿namespace NPacMan.BotSDK
+﻿namespace NPacMan.BotSDK.Models
 {
     public class BotPacMan
     {

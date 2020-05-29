@@ -1,6 +1,6 @@
 ﻿using System.IO.Pipes;
 
-namespace NPacMan.UI.Bots
+namespace NPacMan.UI.Bots.Transports
 {
     internal class NamedPipesTransport : IBotTransport
     {

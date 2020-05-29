@@ -1,4 +1,6 @@
-﻿namespace NPacMan.BotSDK
+﻿using NPacMan.BotSDK.Models;
+
+namespace NPacMan.BotSDK.Graph
 {
     public class Graph
     {

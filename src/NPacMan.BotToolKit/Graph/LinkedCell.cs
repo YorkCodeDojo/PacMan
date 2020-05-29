@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using NPacMan.BotSDK.Models;
 
-namespace NPacMan.BotSDK
+namespace NPacMan.BotSDK.Graph
 {
     public class LinkedCell
     {

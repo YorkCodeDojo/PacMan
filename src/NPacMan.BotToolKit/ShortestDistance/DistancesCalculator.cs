@@ -1,10 +1,12 @@
 ﻿using System;
+using NPacMan.BotSDK.Graph;
+using NPacMan.BotSDK.Models;
 
-namespace NPacMan.BotSDK
+namespace NPacMan.BotSDK.ShortestDistance
 {
     public static class DistancesCalculator
     {
-        public static Distances CalculateDistances(BotGame game, Graph graph, LinkedCell currentLocation)
+        public static Distances CalculateDistances(BotGame game, Graph.Graph graph, LinkedCell currentLocation)
         {
             //1
             var width = game.Board.Width;

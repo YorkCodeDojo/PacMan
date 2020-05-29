@@ -1,4 +1,5 @@
 ﻿using System;
+using NPacMan.BotSDK.Models;
 
 namespace NPacMan.BotSDK
 {

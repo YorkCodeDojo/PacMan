@@ -2,7 +2,7 @@
 using System.IO;
 using System.Threading;
 
-namespace NPacMan.UI.Bots
+namespace NPacMan.UI.Bots.Transports
 {
     class StdInOutTransport : IBotTransport
     {

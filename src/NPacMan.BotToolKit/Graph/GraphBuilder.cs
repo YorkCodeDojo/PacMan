@@ -1,6 +1,7 @@
 ﻿using System.Linq;
+using NPacMan.BotSDK.Models;
 
-namespace NPacMan.BotSDK
+namespace NPacMan.BotSDK.Graph
 {
     public static class GraphBuilder
     {

@@ -1,8 +1,10 @@
-﻿using NPacMan.BotSDK;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using NPacMan.BotSDK.Graph;
+using NPacMan.BotSDK.Models;
+using NPacMan.BotSDK.ShortestDistance;
 
-namespace NPacMan.Bot
+namespace NPacMan.NamedPipesBot
 {
     internal class GreedyBot
     {

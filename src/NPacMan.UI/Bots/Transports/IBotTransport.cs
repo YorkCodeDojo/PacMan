@@ -1,4 +1,4 @@
-﻿namespace NPacMan.UI.Bots
+﻿namespace NPacMan.UI.Bots.Transports
 {
     internal interface IBotTransport
     {

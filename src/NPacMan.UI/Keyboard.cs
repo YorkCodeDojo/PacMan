@@ -5,17 +5,6 @@ using System.Windows.Forms;
 
 namespace NPacMan.UI
 {
-    internal static class KeyboardExtension
-    {
-        public static Game.Game AddKeyboard(this Game.Game game)
-        {
-            var keyboard = new Keyboard(game);
-            game.Subscribe(GameNotification.PreTick, keyboard.CheckForKeyPress);
-
-            return game;
-        }
-    }
-
     internal class Keyboard
     {
         private readonly Game.Game _game;

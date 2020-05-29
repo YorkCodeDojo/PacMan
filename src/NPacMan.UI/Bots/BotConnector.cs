@@ -1,6 +1,8 @@
 ﻿using NPacMan.Game;
 using System.Linq;
 using System.Text.Json;
+using NPacMan.UI.Bots.Models;
+using NPacMan.UI.Bots.Transports;
 
 namespace NPacMan.UI.Bots
 {
@@ -51,7 +53,7 @@ namespace NPacMan.UI.Bots
                 PowerPills = _game.PowerPills.Select(l => new BotLocation(l)),
                 Lives = _game.Lives,
                 Score = _game.Score,
-                PacMan = new Bots.BotPacMan { Location = new BotLocation(_game.PacMan.Location), CurrentDirection = _game.PacMan.Direction },
+                PacMan = new BotPacMan { Location = new BotLocation(_game.PacMan.Location), CurrentDirection = _game.PacMan.Direction },
                 Ghosts = _game.Ghosts.Values.Select(g => new BotGhost { Edible = g.Edible, Location = new BotLocation(g.Location), Name = g.Name }),
                 Board = new BotBoard
                 {

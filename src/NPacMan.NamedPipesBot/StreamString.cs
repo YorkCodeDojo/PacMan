@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text;
 
-namespace NPacMan.Bot
+namespace NPacMan.NamedPipesBot
 {
     public class StreamString
     {

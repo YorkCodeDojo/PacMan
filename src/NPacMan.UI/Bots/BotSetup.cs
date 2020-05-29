@@ -1,5 +1,5 @@
 ﻿using NPacMan.Game;
-using NPacMan.UI.Bots.SocketTransport;
+using NPacMan.UI.Bots.Transports;
 
 namespace NPacMan.UI.Bots
 {

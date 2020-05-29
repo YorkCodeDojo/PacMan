@@ -1,6 +1,7 @@
 ﻿using NPacMan.BotSDK;
 using System;
 using System.Text.Json;
+using NPacMan.BotSDK.Models;
 
 namespace NPacMan.StdInOutBot
 {

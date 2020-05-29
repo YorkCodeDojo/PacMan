@@ -3,14 +3,13 @@ using System.Linq;
 
 namespace NPacMan.Game.GhostStrategies
 {
-    public class DirectToStrategy : IGhostStrategy
+    public class RandomStrategy : IGhostStrategy
     {
-        private readonly IDirectToLocation _directToLocation;
-        public DirectToStrategy(IDirectToLocation directToLocation)
+        private IDirectionPicker _directionPicker;
+        public RandomStrategy(IDirectionPicker directionPicker)
         {
-            _directToLocation = directToLocation;
+            _directionPicker = directionPicker;
         }
-        
         public Direction? GetNextDirection(Ghost ghost, Game game)
         {
             var availableMoves = GetAvailableMovesForLocation(ghost.Location, game.Walls);
@@ -19,16 +18,10 @@ namespace NPacMan.Game.GhostStrategies
 
             if (availableMoves.Count() == 1)
                 return availableMoves.First();
-            
-            var target = _directToLocation.GetLocation(game);
 
-            return availableMoves
-                .OrderBy(possibleDirection => (ghost.Location + possibleDirection) - target)
-                .ThenBy(p => (int) p)
-                .First();
-
+            return _directionPicker.Pick(availableMoves);
         }
-
+        
         private List<Direction> GetAvailableMovesForLocation(CellLocation location, IReadOnlyCollection<CellLocation> walls)
         {
             var result = new List<Direction>(4);
@@ -47,6 +40,5 @@ namespace NPacMan.Game.GhostStrategies
 
             return result;                                             
         }
-
     }
 }

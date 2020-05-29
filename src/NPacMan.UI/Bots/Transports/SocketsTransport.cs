@@ -3,7 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
-namespace NPacMan.UI.Bots.SocketTransport
+namespace NPacMan.UI.Bots.Transports
 {
     internal class SocketsTransport : IBotTransport, IDisposable
     {
