@@ -152,11 +152,14 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public async Task PacManDoesNotCollectCoinAndScoreStaysTheSameWhenCollidesWithGhost()
         {
-            var x = _gameSettings.PacMan.Location.X + 1;
-            var y = _gameSettings.PacMan.Location.Y;
+            var ghostAndCoinLocation = _gameSettings.PacMan.Location + Direction.Right;
 
-            _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(x, y), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
-            _gameSettings.Coins.Add((x, y));
+            var ghost = GhostBuilder.New()
+                .WithLocation(ghostAndCoinLocation)
+                .Create();
+
+            _gameSettings.Ghosts.Add(ghost);
+            _gameSettings.Coins.Add(ghostAndCoinLocation);
 
             var game = new Game(_gameClock, _gameSettings);
             game.StartGame(); 
@@ -166,10 +169,7 @@ namespace NPacMan.Game.Tests.GameTests
             await _gameClock.Tick();
 
             using var _ = new AssertionScope();
-            game.Coins.Should().ContainEquivalentOf(new {
-                X = x,
-                Y = y
-            });
+            game.Coins.Should().ContainEquivalentOf(ghostAndCoinLocation);
             game.Score.Should().Be(score);
         }
 
