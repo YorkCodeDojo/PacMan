@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using FluentAssertions;
-using NPacMan.Game.Tests.GhostStrategiesForTests;
 using Xunit;
 using static NPacMan.Game.Tests.Helpers.Ensure;
 
@@ -86,12 +85,12 @@ namespace NPacMan.Game.Tests.GameTests
         public async Task PacManCannotMoveIntoDoors(Direction directionToFace)
         {
             var location = _gameSettings.PacMan.Location;
-            _gameSettings.PacMan= new PacMan(location, directionToFace);
+            _gameSettings.PacMan = new PacMan(location, directionToFace);
             _gameSettings.Doors.Add(location + directionToFace);
 
             var game = new Game(_gameClock, _gameSettings);
             game.StartGame();
-            
+
             await _gameClock.Tick();
 
             game.PacMan.Should().BeEquivalentTo(new
@@ -156,7 +155,7 @@ namespace NPacMan.Game.Tests.GameTests
         public async Task PacManShouldRespawnAfter4Seconds()
         {
             _gameSettings.PacMan = new PacMan((1, 1), Direction.Down);
-            _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(1, 2), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(GhostBuilder.New().WithLocation((1,2)).Create());
 
             var game = new Game(_gameClock, _gameSettings);
             game.StartGame();
@@ -179,7 +178,7 @@ namespace NPacMan.Game.Tests.GameTests
         public async Task WhenPacManDiesTheGameNotificationShouldFire()
         {
             _gameSettings.PacMan = new PacMan((1, 1), Direction.Down);
-            _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(1, 2), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(GhostBuilder.New().WithLocation((1, 2)).Create());
 
             var numberOfNotificationsTriggered = 0;
 
@@ -203,7 +202,7 @@ namespace NPacMan.Game.Tests.GameTests
         public async Task WhenPacManRespawnsTheGameNotificationShouldFire()
         {
             _gameSettings.PacMan = new PacMan((1, 1), Direction.Down);
-            _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(1, 2), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(GhostBuilder.New().WithLocation((1, 2)).Create());
 
             var numberOfNotificationsTriggered = 0;
 
@@ -232,7 +231,7 @@ namespace NPacMan.Game.Tests.GameTests
         public async Task PacManShouldBeAliveAfter4SecondsWhenInRespawning()
         {
             _gameSettings.PacMan = new PacMan((5, 2), Direction.Left);
-            _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(1, 2), Direction.Right, CellLocation.TopLeft, new GhostGoesRightStrategy()));
+            _gameSettings.Ghosts.Add(GhostBuilder.New().WithLocation((1, 2)).WithChaseStrategyRight().Create());
 
             var game = new Game(_gameClock, _gameSettings);
             game.StartGame();
@@ -254,7 +253,7 @@ namespace NPacMan.Game.Tests.GameTests
         public async Task PacManShouldBeBackAtHomeLocationAfter4SecondsWhenBecomingBackAlive()
         {
             _gameSettings.PacMan = new PacMan((5, 2), Direction.Left);
-            _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(1, 2), Direction.Right, CellLocation.TopLeft, new GhostGoesRightStrategy()));
+            _gameSettings.Ghosts.Add(GhostBuilder.New().WithLocation((1, 2)).WithChaseStrategyRight().Create());
 
             var game = new Game(_gameClock, _gameSettings);
             game.StartGame();
@@ -336,7 +335,7 @@ namespace NPacMan.Game.Tests.GameTests
         {
             _gameSettings.InitialLives = 1;
             _gameSettings.PacMan = new PacMan((5, 2), Direction.Left);
-            _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(1, 2), Direction.Right, CellLocation.TopLeft, new GhostGoesRightStrategy()));
+            _gameSettings.Ghosts.Add(GhostBuilder.New().WithLocation((1, 2)).WithChaseStrategyRight().Create());
 
             var game = new Game(_gameClock, _gameSettings);
             game.StartGame();
@@ -358,9 +357,11 @@ namespace NPacMan.Game.Tests.GameTests
         public async Task ScoreShouldIncreaseExponentiallyAfterEatingEachGhost(int numberOfGhosts, int totalScore)
         {
             var ghostStart = _gameSettings.PacMan.Location.Left.Left.Left;
-            for (int g = 0; g < numberOfGhosts; g++)
-            { _gameSettings.Ghosts.Add(new Ghost($"Ghost{g}", ghostStart, Direction.Left, CellLocation.TopLeft, new GhostGoesRightStrategy())); }
-
+            var ghosts = GhostBuilder.New().WithLocation(ghostStart).WithChaseStrategyRight()
+                .CreateMany(numberOfGhosts);
+            
+            _gameSettings.Ghosts.AddRange(ghosts);
+            
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Left);
 
             var game = new Game(_gameClock, _gameSettings);
@@ -375,7 +376,7 @@ namespace NPacMan.Game.Tests.GameTests
             WeExpectThat(game.PacMan).IsAt(_gameSettings.PacMan.Location.Left);
             for (int g = 0; g < numberOfGhosts; g++)
             {
-                WeExpectThat(game.Ghosts[$"Ghost{g}"]).IsAt(ghostStart.Right);
+                WeExpectThat(game.Ghosts.Values).IsAt(ghostStart.Right);
             }
 
             await _gameClock.Tick();
