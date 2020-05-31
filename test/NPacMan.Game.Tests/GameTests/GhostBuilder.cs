@@ -8,7 +8,7 @@ namespace NPacMan.Game.Tests.GameTests
     public class GhostBuilder
     {
         private int _numberOfCoinsRequiredToExitHouse = 0;
-        private IGhostStrategy _chaseStragtegy = new StandingStillGhostStrategy();
+        private IGhostStrategy _chaseStrategy = new StandingStillGhostStrategy();
         private CellLocation _scatterTarget = CellLocation.TopLeft;
         private Direction _direction = Direction.Left;
         private CellLocation _location = new CellLocation(0, 0);
@@ -34,7 +34,7 @@ namespace NPacMan.Game.Tests.GameTests
 
         public GhostBuilder WithChaseStrategy(IGhostStrategy ghostStrategy)
         {
-            _chaseStragtegy = ghostStrategy;
+            _chaseStrategy = ghostStrategy;
 
             return this;
         }
@@ -67,7 +67,7 @@ namespace NPacMan.Game.Tests.GameTests
         {
             var name = _names.Dequeue();
 
-            return new Ghost(name, _location, _direction, _scatterTarget, _chaseStragtegy,
+            return new Ghost(name, _location, _direction, _scatterTarget, _chaseStrategy,
                 _numberOfCoinsRequiredToExitHouse);
         }
 
