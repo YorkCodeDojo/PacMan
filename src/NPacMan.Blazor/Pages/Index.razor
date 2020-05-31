@@ -1,10 +1,11 @@
 ﻿@page "/"
 @using NPacMan.SharedUi
 @using NPacMan.Game
+@using NPacMan.Blazor.JsInterop
 
 @inject IJSRuntime jsRuntime
 
-<canvas tabindex="0" @ref="_canvas" style="height: 100%; width: 100%;" @onkeydown="KeyPressed"></canvas>
+<canvas tabindex="0" @ref="_canvas" style="height: 100%; width: 100%;"></canvas>
 <img @ref="_spriteMap" src="gfx.png" hidden />
 
 @code
@@ -18,18 +19,21 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
-        {
-            await Setup();
-        }
+        if (!firstRender)
+            return;
+
+        await Setup();
+
     }
 
     private async Task Setup()
     {
         // Create and start game
 
-        _game = Game.Create()
-            .StartGame();
+        _game = Game.Create();
+        InteropKeyPress.KeyDown += OnKeyDown;
+
+        _game = _game.StartGame();
 
         // Pass references of the canvas and spritemap to the javascript code
 
@@ -78,8 +82,8 @@
 
                 // Call javascript code to push out onto the screen
 
-                jsRuntime.InvokeVoidAsync("SpriteSet", 
-                    _boardRenderer.DisplayWidth * PixelGrid, _boardRenderer.DisplayHeight * PixelGrid, 
+                jsRuntime.InvokeVoidAsync("SpriteSet",
+                    _boardRenderer.DisplayWidth * PixelGrid, _boardRenderer.DisplayHeight * PixelGrid,
                     jsData.ToArray());
             }
         }
@@ -107,19 +111,19 @@
     }
 
 
-    private static readonly IReadOnlyDictionary<string, Direction> _keysMap
-        = new Dictionary<string, Direction>{
-            {"ArrowUp", Direction.Up},
-            {"ArrowDown", Direction.Down},
-            {"ArrowLeft", Direction.Left},
-            {"ArrowRight", Direction.Right},
+    private static readonly IReadOnlyDictionary<ConsoleKey, Direction> KeysMap
+        = new Dictionary<ConsoleKey, Direction>{
+            {ConsoleKey.UpArrow, Direction.Up},
+            {ConsoleKey.DownArrow, Direction.Down},
+            {ConsoleKey.LeftArrow, Direction.Left},
+            {ConsoleKey.RightArrow, Direction.Right},
         };
 
     // Keyboard event
 
-    private async void KeyPressed(KeyboardEventArgs e)
+    private async void OnKeyDown(object sender, ConsoleKey e)
     {
-        if (_game !=null && _keysMap.TryGetValue(e.Key, out var direction))
+        if (_game !=null && KeysMap.TryGetValue(e, out var direction))
         {
             await _game.ChangeDirection(direction);
         }
