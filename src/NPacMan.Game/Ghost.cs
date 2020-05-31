@@ -74,6 +74,9 @@ namespace NPacMan.Game
                 {
                     newGhostLocation = otherEndOfThePortal + newDirection;
                 }
+
+                PacManEventSource.Log.GhostMoved(Name, gameState.TickCounter, Location.X, Location.Y, newGhostLocation.X, newGhostLocation.Y);
+
                 return WithNewLocationAndDirection(newGhostLocation, newDirection);
             }
             else

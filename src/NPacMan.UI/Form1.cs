@@ -17,7 +17,7 @@ namespace NPacMan.UI
 
             _game = Game.Game.Create()
                              .AddKeyboard()
-                             .AddSounds()
+                            // .AddSounds()
                              .AddBots(args)
                              .StartGame();
 
