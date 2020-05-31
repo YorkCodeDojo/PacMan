@@ -10,29 +10,37 @@ namespace NPacMan.Game.Tests.GameTests
 {
     public class GhostStrategyTests
     {
+        private readonly GhostBuilder _ghostBuilder;
+
+        public GhostStrategyTests()
+        {
+            _ghostBuilder = GhostBuilder.New()
+                    .WithChaseStrategy(new DirectToStrategy(new DirectToPacManLocation()));
+        }
 
         [Theory]
-        [InlineData(0,5,4,5)]
-        [InlineData(5,0,5,4)]
-        [InlineData(5,10,5,6)]
+        [InlineData(0, 5, 4, 5)]
+        [InlineData(5, 0, 5, 4)]
+        [InlineData(5, 10, 5, 6)]
         public async Task ShouldMoveTowardsPacMan(int pacManX, int pacManY, int expectedGhostPositionX, int expectedGhostPositionY)
         {
             //pacManX: 10, pacManY: 5, expectedGhostPositionX: 6, expectedGhostPositionY: 5) [FAIL
-            var name = "Bob";
+            var ghost = _ghostBuilder.WithLocation((5, 5)).Create();
             var board = new TestGameSettings()
             {
-                Ghosts = { new Ghost(name, new CellLocation(5, 5), Direction.Left, CellLocation.TopLeft, new DirectToStrategy(new DirectToPacManLocation())) },
+                Ghosts = { ghost },
                 PacMan = new PacMan((pacManX, pacManY), Direction.Left)
             };
 
             var gameClock = new TestGameClock();
             var game = new Game(gameClock, board);
-            game.StartGame(); 
+            game.StartGame();
             await gameClock.Tick();
 
-            game.Ghosts[name].Should().BeEquivalentTo(new
+            game.Ghosts[ghost.Name].Should().BeEquivalentTo(new
             {
-                Location = new {
+                Location = new
+                {
                     X = expectedGhostPositionX,
                     Y = expectedGhostPositionY
                 }
@@ -42,31 +50,33 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public async Task ShouldNotWalkInToWall()
         {
-            var name = "Bob";
+            var ghost = _ghostBuilder.WithLocation((5, 5)).Create();
             var board = new TestGameSettings()
             {
-                Ghosts = { new Ghost(name, new CellLocation(5, 5), Direction.Left, CellLocation.TopLeft, new DirectToStrategy(new DirectToPacManLocation())) },
+                Ghosts = { ghost },
                 PacMan = new PacMan((3, 5), Direction.Left),
-                Walls = {(4,5)}
+                Walls = { (4, 5) }
             };
 
             var gameClock = new TestGameClock();
             var game = new Game(gameClock, board);
-            game.StartGame(); 
+            game.StartGame();
             await gameClock.Tick();
 
             using var _ = new AssertionScope();
-            game.Ghosts[name].Should().NotBeEquivalentTo(new 
+            game.Ghosts[ghost.Name].Should().NotBeEquivalentTo(new
             {
-                Location = new {
+                Location = new
+                {
                     X = 4,
                     Y = 5
                 }
             });
 
-            game.Ghosts[name].Should().NotBeEquivalentTo(new
+            game.Ghosts[ghost.Name].Should().NotBeEquivalentTo(new
             {
-                Location = new {
+                Location = new
+                {
                     X = 5,
                     Y = 5
                 }
@@ -77,31 +87,33 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public async Task ShouldNotWalkInToWall2()
         {
-            var name = "Bob";
+            var ghost = _ghostBuilder.WithLocation((5, 5)).Create();
             var board = new TestGameSettings()
             {
-                Ghosts = { new Ghost(name, new CellLocation(5, 5), Direction.Left, CellLocation.TopLeft, new DirectToStrategy(new DirectToPacManLocation())) },
+                Ghosts = { ghost },
                 PacMan = new PacMan((5, 3), Direction.Left),
                 Walls = { (5, 4) }
             };
 
             var gameClock = new TestGameClock();
             var game = new Game(gameClock, board);
-            game.StartGame(); 
+            game.StartGame();
             await gameClock.Tick();
 
             using var _ = new AssertionScope();
-            game.Ghosts[name].Should().NotBeEquivalentTo(new
+            game.Ghosts[ghost.Name].Should().NotBeEquivalentTo(new
             {
-                Location = new {
+                Location = new
+                {
                     X = 5,
                     Y = 4
                 }
             });
 
-            game.Ghosts[name].Should().NotBeEquivalentTo(new
+            game.Ghosts[ghost.Name].Should().NotBeEquivalentTo(new
             {
-                Location = new {
+                Location = new
+                {
                     X = 5,
                     Y = 5
                 }
@@ -115,10 +127,11 @@ namespace NPacMan.Game.Tests.GameTests
             // X ^ ▶ ▶
             // X S X X
 
-            var name = "Bob";
+            var ghost = _ghostBuilder.WithLocation((1, 2))
+                .WithDirection(Direction.Up).Create();
             var board = new TestGameSettings()
             {
-                Ghosts = { new Ghost(name, new CellLocation(1, 2), Direction.Up, CellLocation.TopLeft, new DirectToStrategy(new DirectToPacManLocation())) },
+                Ghosts = { ghost },
                 PacMan = new PacMan((4, 1), Direction.Right),
                 Walls = { (0, 0), (1, 0), (2, 0), (3, 0),
                     (0,1), (0,2), (2,2), (3,2)
@@ -127,15 +140,16 @@ namespace NPacMan.Game.Tests.GameTests
 
             var gameClock = new TestGameClock();
             var game = new Game(gameClock, board);
-            game.StartGame(); 
+            game.StartGame();
             await gameClock.Tick();
             await gameClock.Tick();
             await gameClock.Tick();
 
             using var _ = new AssertionScope();
-            game.Ghosts[name].Should().BeEquivalentTo(new
+            game.Ghosts[ghost.Name].Should().BeEquivalentTo(new
             {
-                Location = new {
+                Location = new
+                {
                     X = 3,
                     Y = 1
                 },
@@ -150,10 +164,11 @@ namespace NPacMan.Game.Tests.GameTests
             //   ^ ▶ ▶ C
             // X S X X
 
-             var name = "Bob";
+            var ghost = _ghostBuilder.WithLocation((1, 2))
+                .WithDirection(Direction.Up).Create();
             var board = new TestGameSettings()
             {
-                Ghosts = { new Ghost(name, new CellLocation(1, 2), Direction.Up, CellLocation.TopLeft, new DirectToStrategy(new DirectToPacManLocation())) },
+                Ghosts = { ghost },
                 PacMan = new PacMan((4, 1), Direction.Right),
                 Walls = { (0, 0), (2, 0), (3, 0),
                    (0,2), (2,2), (3,2)
@@ -162,15 +177,16 @@ namespace NPacMan.Game.Tests.GameTests
 
             var gameClock = new TestGameClock();
             var game = new Game(gameClock, board);
-            game.StartGame(); 
+            game.StartGame();
             await gameClock.Tick();
             await gameClock.Tick();
             await gameClock.Tick();
 
             using var _ = new AssertionScope();
-            game.Ghosts[name].Should().BeEquivalentTo(new
+            game.Ghosts[ghost.Name].Should().BeEquivalentTo(new
             {
-                Location = new {
+                Location = new
+                {
                     X = 3,
                     Y = 1
                 },
@@ -203,22 +219,24 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public void ShouldBeAbleInterceptPacMan()
         {
-// ghost = 1,2
-// pacman (+2) will be at= 6,1
-// difference 5,-1
-// target vector = (difference * 2) = 10, -2
-// ghost + vector = 11, 0
+            // ghost = 1,2
+            // pacman (+2) will be at= 6,1
+            // difference 5,-1
+            // target vector = (difference * 2) = 10, -2
+            // ghost + vector = 11, 0
 
+            var ghost = _ghostBuilder.WithLocation((1, 2))
+                .WithChaseStrategy(new NullGhostStrategy()).Create();
             var board = new TestGameSettings()
             {
                 PacMan = new PacMan((4, 1), Direction.Right),
-                Ghosts = { new Ghost("ghost-1", new CellLocation(1, 2), Direction.Up, CellLocation.TopLeft, new NullGhostStrategy()) },                
+                Ghosts = { ghost },
                 Walls = { }
             };
             var gameClock = new TestGameClock();
             var game = new Game(gameClock, board);
             game.StartGame();
-            var inkyTargetCell = new InterceptPacManLocation("ghost-1");
+            var inkyTargetCell = new InterceptPacManLocation(ghost.Name);
             var targetLocation = inkyTargetCell.GetLocation(game);
 
             targetLocation.Should().BeEquivalentTo(new
@@ -231,16 +249,18 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public void StayCloseToPacManMovesTowardsHimWhileOutsideOf8Cells()
         {
+            var ghost = _ghostBuilder.WithLocation((1, 2))
+                .WithChaseStrategy(new NullGhostStrategy()).Create();
             var board = new TestGameSettings()
             {
                 PacMan = new PacMan((14, 1), Direction.Right),
                 Walls = { },
-                Ghosts = { new Ghost("ghost-1", new CellLocation(1, 2), Direction.Up, CellLocation.TopLeft, new NullGhostStrategy()) },                
+                Ghosts = { ghost },
             };
             var gameClock = new TestGameClock();
             var game = new Game(gameClock, board);
             game.StartGame();
-            var staysCloseToPacManLocation = new StaysCloseToPacManLocation("ghost-1");
+            var staysCloseToPacManLocation = new StaysCloseToPacManLocation(ghost.Name);
             var targetLocation = staysCloseToPacManLocation.GetLocation(game);
 
             targetLocation.Should().BeEquivalentTo(new
@@ -249,20 +269,24 @@ namespace NPacMan.Game.Tests.GameTests
                 Y = 1
             });
         }
-        
+
         [Fact]
         public void StayCloseToPacManScattersWhileInsideOf8Cells()
         {
+            var ghost = _ghostBuilder.WithLocation((1, 2))
+                .WithChaseStrategy(new NullGhostStrategy())
+                .WithScatterTarget((11, 12))
+                .Create();
             var board = new TestGameSettings()
             {
                 PacMan = new PacMan((4, 1), Direction.Right),
                 Walls = { },
-                Ghosts = { new Ghost("ghost-1", new CellLocation(1, 2), Direction.Up, new CellLocation(11, 12), new NullGhostStrategy()) },                
+                Ghosts = { ghost },
             };
             var gameClock = new TestGameClock();
             var game = new Game(gameClock, board);
             game.StartGame();
-            var staysCloseToPacManLocation = new StaysCloseToPacManLocation("ghost-1");
+            var staysCloseToPacManLocation = new StaysCloseToPacManLocation(ghost.Name);
             var targetLocation = staysCloseToPacManLocation.GetLocation(game);
 
             targetLocation.Should().BeEquivalentTo(new
