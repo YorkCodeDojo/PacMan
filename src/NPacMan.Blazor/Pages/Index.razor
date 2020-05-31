@@ -32,6 +32,8 @@
 
         _game = Game.Create();
         InteropKeyPress.KeyDown += OnKeyDown;
+        InteropTouch.TouchStart += TouchStart;
+        InteropTouch.TouchEnd += TouchEnd;
 
         _game = _game.StartGame();
 
@@ -53,6 +55,8 @@
             }
         }
     }
+
+
 
     private void Tick()
     {
@@ -99,8 +103,8 @@
 
     private int[] Sprite(bool onBuffer, decimal x, decimal y, SpriteSource source)
     {
-        x = x + (1 - source.Size) *0.5m;
-        y = y + (1 - source.Size) *0.5m;
+        x = x + (1 - source.Size) * 0.5m;
+        y = y + (1 - source.Size) * 0.5m;
         var size = PixelGrid * source.Size;
         return new[]
         {
@@ -117,15 +121,57 @@
             {ConsoleKey.DownArrow, Direction.Down},
             {ConsoleKey.LeftArrow, Direction.Left},
             {ConsoleKey.RightArrow, Direction.Right},
-        };
+                            };
 
     // Keyboard event
 
     private async void OnKeyDown(object sender, ConsoleKey e)
     {
-        if (_game !=null && KeysMap.TryGetValue(e, out var direction))
+        if (_game != null && KeysMap.TryGetValue(e, out var direction))
         {
             await _game.ChangeDirection(direction);
         }
     }
+
+    private int startTouchX = 0;
+    private int startTouchY = 0;
+    private void TouchStart(object sender, TouchEvent e)
+    {
+        startTouchX = e.Touches.FirstOrDefault()?.ClientX ?? 0;
+        startTouchY = e.Touches.FirstOrDefault()?.ClientY ?? 0;
+    }
+
+    private async void TouchEnd(object sender, TouchEvent e)
+    {
+        var endTouchX = e.ChangedTouches.FirstOrDefault()?.ClientX ?? 0;
+        var endTouchY = e.ChangedTouches.FirstOrDefault()?.ClientY ?? 0;
+
+
+        var xDiff = endTouchX - startTouchX;
+        var yDiff = endTouchY - startTouchY;
+
+        if (Math.Abs(xDiff) > Math.Abs(yDiff))
+        {
+            if (xDiff < 0)
+            {
+                await _game!.ChangeDirection(Direction.Left);
+            }
+            else
+            {
+                await _game!.ChangeDirection(Direction.Right);
+            }
+        }
+        else
+        {
+            if (yDiff < 0)
+            {
+                await _game!.ChangeDirection(Direction.Up);
+            }
+            else
+            {
+                await _game!.ChangeDirection(Direction.Down);
+            }
+        }
+    }
+
 }
