@@ -5,6 +5,7 @@ using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using GreenPipes;
 using NPacMan.Game.GhostStrategies;
 using NPacMan.Game.Tests.Helpers;
 using Xunit;
@@ -454,7 +455,10 @@ namespace NPacMan.Game.Tests.GameTests
             await _gameClock.Tick(now);
 
             WeExpectThat(game.PacMan).IsAt(_gameSettings.PacMan.Location.Left);
-            WeExpectThat(game.Ghosts["Ghost1"]).IsAt(ghostStart1and3.Right);
+            foreach (var g in haunt1)
+            {
+                WeExpectThat(game.Ghosts[g.Name]).IsAt(ghostStart1and3.Right);
+            }
 
             await _gameClock.Tick(now);
             WeExpectThat(game.PacMan).IsAt(_gameSettings.PacMan.Location.Left.Left);
