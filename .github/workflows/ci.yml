@@ -13,6 +13,8 @@ jobs:
       - run: dotnet test --no-build --configuration Release
       - run: dotnet publish --no-build --configuration Release --output staging/Blazor ./src/NPacMan.Blazor/
       
+      - run: git config user.name "ci@yorkdevelopers.org"
+      - run: git config user.email "ci@yorkdevelopers.org"
       - run: git add staging/Blazor/wwwroot
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
       - run: git commit -m "Initial staging/Blazor/wwwroot subtree commit"
