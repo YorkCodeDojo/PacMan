@@ -21,6 +21,7 @@ jobs:
 
   deploy_blazor:
     name: Deploy Blazor
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Download blazor site
