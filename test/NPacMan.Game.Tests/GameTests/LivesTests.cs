@@ -2,7 +2,7 @@
 using FluentAssertions;
 using NPacMan.Game.Tests.GhostStrategiesForTests;
 using Xunit;
-using static NPacMan.Game.Tests.GameTests.Ensure;
+using static NPacMan.Game.Tests.Helpers.Ensure;
 
 namespace NPacMan.Game.Tests.GameTests
 {

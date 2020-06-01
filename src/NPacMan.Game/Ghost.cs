@@ -1,4 +1,5 @@
-﻿using NPacMan.Game.GhostStrategies;
+﻿using System.Linq;
+using NPacMan.Game.GhostStrategies;
 
 namespace NPacMan.Game
 {
@@ -13,32 +14,58 @@ namespace NPacMan.Game
         public Direction Direction { get; }
 
         public CellLocation Home { get; }
-        private IGhostStrategy Strategy { get; }
+        private IGhostStrategy ChaseStrategy { get; }
         private IGhostStrategy CurrentStrategy { get; }
 
         public bool Edible { get; }
+        public int NumberOfCoinsRequiredToExitHouse { get; }
 
-        public Ghost(string name, CellLocation location, Direction direction, CellLocation scatterTarget, IGhostStrategy strategy)
-        : this(name, location, location, direction, scatterTarget, strategy, strategy, false)
+        public Ghost(string name, CellLocation location, Direction direction, CellLocation scatterTarget, IGhostStrategy chaseStrategy, int numberOfCoinsRequiredToExitHouse = 0)
+        : this(name, location, location, direction, scatterTarget, chaseStrategy, chaseStrategy, false, numberOfCoinsRequiredToExitHouse)
         {
         }
 
-        private Ghost(string name, CellLocation homeLocation, CellLocation currentLocation, Direction direction, CellLocation scatterTarget, IGhostStrategy strategy, IGhostStrategy currentStrategy, bool edible)
+        private Ghost(string name, CellLocation homeLocation, CellLocation currentLocation, Direction direction, CellLocation scatterTarget, IGhostStrategy chaseStrategy, IGhostStrategy currentStrategy, bool edible, int numberOfCoinsRequiredToExitHouse)
         {
             Name = name;
             Home = homeLocation;
             Location = currentLocation;
             Direction = direction;
-            Strategy = strategy;
+            ChaseStrategy = chaseStrategy;
             CurrentStrategy = currentStrategy;
             ScatterTarget = scatterTarget;
             Edible = edible;
+            NumberOfCoinsRequiredToExitHouse = numberOfCoinsRequiredToExitHouse;
         }
 
         internal Ghost Move(Game game, IReadOnlyGameState gameState)
         {
             if (Edible && gameState.TickCounter % 2 == 1) return this;
 
+            if (game.GhostHouse.Contains(Location) || game.Doors.Contains(Location))
+            {
+                if (game.StartingCoins.Count - game.Coins.Count >= NumberOfCoinsRequiredToExitHouse)
+                {
+                    var outDirection = Direction.Up;
+                    var target = game.Doors.First().Above;
+                    if(target.X < Location.X)
+                    {
+                        outDirection = Direction.Left;
+                    }
+                    else if(target.X > Location.X)
+                    {
+                        outDirection = Direction.Right;
+                    }
+                    var newGhostLocation = Location + outDirection;
+                    
+                    return WithNewLocationAndDirection(newGhostLocation, outDirection);
+                }
+                else
+                {
+                    return this;
+                }
+            }
+          
             var nextDirection = CurrentStrategy.GetNextDirection(this, game);
             if (nextDirection is Direction newDirection)
             {
@@ -55,7 +82,7 @@ namespace NPacMan.Game
 
         internal Ghost Chase()
         {
-            return WithNewCurrentStrategyAndDirection(Strategy, Direction.Opposite());
+            return WithNewCurrentStrategyAndDirection(ChaseStrategy, Direction.Opposite());
         }
 
         internal Ghost Scatter()
@@ -72,19 +99,19 @@ namespace NPacMan.Game
             return WithNewEdibleAndDirectionAndStrategy(true, Direction.Opposite(), strategy);
         }
 
-        internal Ghost SetToNotEdible() => WithNewEdibleAndDirectionAndStrategy(false, Direction, Strategy);
+        internal Ghost SetToNotEdible() => WithNewEdibleAndDirectionAndStrategy(false, Direction, ChaseStrategy);
 
         private Ghost WithNewEdibleAndDirectionAndStrategy(bool isEdible, Direction newDirection, IGhostStrategy newCurrentStrategy)
-            => new Ghost(Name, Home, Location, newDirection, ScatterTarget, Strategy, newCurrentStrategy, isEdible);
+            => new Ghost(Name, Home, Location, newDirection, ScatterTarget, ChaseStrategy, newCurrentStrategy, isEdible, NumberOfCoinsRequiredToExitHouse);
 
         private Ghost WithNewCurrentStrategyAndDirection(IGhostStrategy newCurrentStrategy, Direction newDirection)
-            => new Ghost(Name, Home, Location, newDirection, ScatterTarget, Strategy, newCurrentStrategy, Edible);
+            => new Ghost(Name, Home, Location, newDirection, ScatterTarget, ChaseStrategy, newCurrentStrategy, Edible, NumberOfCoinsRequiredToExitHouse);
 
         private Ghost WithNewLocation(CellLocation newLocation)
-            => new Ghost(Name, Home, newLocation, Direction, ScatterTarget, Strategy, CurrentStrategy, Edible);
+            => new Ghost(Name, Home, newLocation, Direction, ScatterTarget, ChaseStrategy, CurrentStrategy, Edible, NumberOfCoinsRequiredToExitHouse);
 
         private Ghost WithNewLocationAndDirection(CellLocation newLocation, Direction newDirection)
-            => new Ghost(Name, Home, newLocation, newDirection, ScatterTarget, Strategy, CurrentStrategy, Edible);
+            => new Ghost(Name, Home, newLocation, newDirection, ScatterTarget, ChaseStrategy, CurrentStrategy, Edible, NumberOfCoinsRequiredToExitHouse);
 
     }
 }

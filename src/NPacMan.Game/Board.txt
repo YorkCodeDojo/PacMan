@@ -9,11 +9,11 @@
  X......XX....XX....XX......X
  XXXXXX.XXXXX XX XXXXX.XXXXXX
       X.XXXXX XX XXXXX.X     
-      X.XX   B      XX.X     
+      X.XX          XX.X     
       X.XX XXX--XXX XX.X     
- XXXXXX.XX X      X XX.XXXXXX
-T      .   X IC P X   .      T
- XXXXXX.XX X      X XX.XXXXXX
+ XXXXXX.XX XHHHHHHX XX.XXXXXX
+T      .   XHHHHHHX   .      T
+ XXXXXX.XX XHHHHHHX XX.XXXXXX
       X.XX XXXXXXXX XX.X     
       X.XX          XX.X     
       X.XX XXXXXXXX XX.X
@@ -29,7 +29,7 @@ T      .   X IC P X   .      T
  X.XXXXXXXXXX.XX.XXXXXXXXXX.X
  X..........................X
  XXXXXXXXXXXXXXXXXXXXXXXXXXXX
-{Pinky=2,-2}
-{Blinky=28,-2}
-{Clyde=0,31}
-{Inky=30,31}
+{"type": "Ghost", "name":"Pinky", "startingLocation": {"x":16,"y":14}, "scatterTarget": {"x":2,"y":-2}, "pillsToLeave": 0 }
+{"type": "Ghost", "name":"Blinky", "startingLocation": {"x":13,"y":11}, "scatterTarget": {"x":28,"y":-2}, "pillsToLeave": 0 }
+{"type": "Ghost", "name":"Clyde", "startingLocation": {"x":14,"y":14}, "scatterTarget": {"x":0,"y":31}, "pillsToLeave": 30 }
+{"type": "Ghost", "name":"Inky", "startingLocation": {"x":13,"y":14}, "scatterTarget": {"x":30,"y":31}, "pillsToLeave": 90 }

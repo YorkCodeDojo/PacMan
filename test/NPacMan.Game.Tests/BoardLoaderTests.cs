@@ -36,7 +36,8 @@ namespace NPacMan.Game.Tests
  X.X 
  XX. 
 T*▲*T
- --- ";
+ ---
+ HHH ";
             var gameBoard = GameSettingsLoader.Load(board);
 
             gameBoard.Should().BeEquivalentTo(new
@@ -45,8 +46,9 @@ T*▲*T
                 Coins = new CellLocation[] { (1, 1), (2, 2) },
                 PowerPills = new CellLocation[] { (0, 3), (2, 3) },
                 Doors = new CellLocation[] { new CellLocation(0, 4), new CellLocation(1, 4), new CellLocation(2, 4) },
+                GhostHouse = new CellLocation[] { new CellLocation(0, 5),  new CellLocation(1, 5), new CellLocation(2, 5) },
                 Width = 3,
-                Height = 5,
+                Height = 6,
                 Portals = new Dictionary<CellLocation, CellLocation>
                 {
                     {(-1,3), (3,3) },{(3,3), (-1,3) }
@@ -90,13 +92,13 @@ T*▲*T
         public void ShouldHaveGhostsAtCorrectLocations()
         {
             var board = @" XXX 
- BIP 
- ▲XC
+     
+ ▲X 
  ....
-{Blinky=-10,-3}
-{Inky=1,3}
-{Pinky=2,3}
-{Clyde=20,33}";
+{""type"": ""Ghost"", ""name"": ""Pinky"", ""startingLocation"": {""x"":2,""y"":1}, ""scatterTarget"": {""x"":2, ""y"":3}, ""pillsToLeave"": 0 }
+{""type"": ""Ghost"", ""name"": ""Blinky"", ""startingLocation"": {""x"":0,""y"":1}, ""scatterTarget"": {""x"":-10, ""y"":-3}, ""pillsToLeave"": 0 }
+{""type"": ""Ghost"", ""name"": ""Clyde"", ""startingLocation"": {""x"":2,""y"":2}, ""scatterTarget"": {""x"":20, ""y"":33}, ""pillsToLeave"": 30 }
+{""type"": ""Ghost"", ""name"": ""Inky"", ""startingLocation"": {""x"":1,""y"":1}, ""scatterTarget"": {""x"":1, ""y"":3}, ""pillsToLeave"": 90 }";
 
             var loadedBoard = GameSettingsLoader.Load(board);
 
@@ -146,10 +148,10 @@ T*▲*T
  BIP 
  ▲XC 
  ....
-{Blinky=-10,-3}
-{Inky=1,3}
-{Pinky=2,3}
-{Clyde=20,33}";
+{""type"": ""Ghost"", ""name"": ""Pinky"", ""startingLocation"": {""x"":16,""y"":14}, ""scatterTarget"": {""x"":2, ""y"":3}, ""pillsToLeave"": 0 }
+{""type"": ""Ghost"", ""name"": ""Blinky"", ""startingLocation"": {""x"":13,""y"":11}, ""scatterTarget"": {""x"":-10, ""y"":-3}, ""pillsToLeave"": 0 }
+{""type"": ""Ghost"", ""name"": ""Clyde"", ""startingLocation"": {""x"":14,""y"":14}, ""scatterTarget"": {""x"":20, ""y"":33}, ""pillsToLeave"": 30 }
+{""type"": ""Ghost"", ""name"": ""Inky"", ""startingLocation"": {""x"":13,""y"":14}, ""scatterTarget"": {""x"":1, ""y"":3}, ""pillsToLeave"": 90 }";
 
             var loadedBoard = GameSettingsLoader.Load(board);
             loadedBoard.Ghosts.Should().BeEquivalentTo(

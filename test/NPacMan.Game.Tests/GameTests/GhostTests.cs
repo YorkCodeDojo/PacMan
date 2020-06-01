@@ -7,7 +7,7 @@ using NPacMan.Game.GhostStrategies;
 using NPacMan.Game.Tests.GhostStrategiesForTests;
 using NPacMan.Game.Tests.Helpers;
 using Xunit;
-using static NPacMan.Game.Tests.GameTests.Ensure;
+using static NPacMan.Game.Tests.Helpers.Ensure;
 
 namespace NPacMan.Game.Tests.GameTests
 {
@@ -247,7 +247,6 @@ namespace NPacMan.Game.Tests.GameTests
             });
         }
 
-        public CellLocation FarAway(CellLocation location) => new CellLocation(location.X + 10, location.Y + 10);
 
         [Theory]
         [InlineData(5)]
@@ -256,9 +255,9 @@ namespace NPacMan.Game.Tests.GameTests
         public async Task AllGhostsShouldReturnToNonEdibleAfterGivenAmountOfSeconds(int seconds)
         {
             _gameSettings.FrightenedTimeInSeconds = seconds;
-            _gameSettings.Ghosts.Add(new Ghost("Ghost1", FarAway(_gameSettings.PacMan.Location), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
-            _gameSettings.Ghosts.Add(new Ghost("Ghost2", FarAway(_gameSettings.PacMan.Location), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
-            _gameSettings.Ghosts.Add(new Ghost("Ghost3", FarAway(_gameSettings.PacMan.Location), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", _gameSettings.PacMan.Location.FarAway(), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost2", _gameSettings.PacMan.Location.FarAway(), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost3", _gameSettings.PacMan.Location.FarAway(), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
 
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Right);
 
@@ -292,9 +291,9 @@ namespace NPacMan.Game.Tests.GameTests
         public async Task GhostShouldReturnToNonEdibleAfterGivenAmountSecondsWhenEatingSecondPowerPills(int seconds)
         {
             _gameSettings.FrightenedTimeInSeconds = seconds;
-            _gameSettings.Ghosts.Add(new Ghost("Ghost1", FarAway(_gameSettings.PacMan.Location), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
-            _gameSettings.Ghosts.Add(new Ghost("Ghost2", FarAway(_gameSettings.PacMan.Location), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
-            _gameSettings.Ghosts.Add(new Ghost("Ghost3", FarAway(_gameSettings.PacMan.Location), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", _gameSettings.PacMan.Location.FarAway(), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost2", _gameSettings.PacMan.Location.FarAway(), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost3", _gameSettings.PacMan.Location.FarAway(), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
 
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Right);
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Right.Right.Right);
@@ -600,6 +599,67 @@ namespace NPacMan.Game.Tests.GameTests
             using var _ = new AssertionScope();
             game.Ghosts["Ghost1"].Should().BeEquivalentTo(new
             {
+                Location = ghostStart1
+            });
+        }
+
+        
+        [Fact]
+        public async Task GhostsShouldStandStillInGhostHouse()
+        {
+            var ghostStart1 = _gameSettings.PacMan.Location.FarAway();
+            _gameSettings.GhostHouse.Add(ghostStart1);
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", ghostStart1, Direction.Left, CellLocation.TopLeft, new GhostGoesRightStrategy(), int.MaxValue));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost2", ghostStart1, Direction.Left, CellLocation.TopLeft, new GhostGoesRightStrategy(), int.MaxValue));
+           
+            var game = new Game(_gameClock, _gameSettings);
+            game.StartGame();
+
+            await _gameClock.Tick();
+            await _gameClock.Tick();
+
+            game.Ghosts.Values.Should().AllBeEquivalentTo(new {
+                Location = ghostStart1
+            });
+        }
+
+        [Fact]
+        public async Task GhostsShouldLeaveGhostHouseWhenPillCountHasBeenReached()
+        {
+            // X
+            // -
+            // H G
+
+            var ghostStart1 = new CellLocation(1, 2);
+            _gameSettings.PacMan = new PacMan(ghostStart1.FarAway(), Direction.Left);
+            _gameSettings.GhostHouse.AddRange(new [] {ghostStart1, ghostStart1.Left});
+            _gameSettings.Doors.Add(ghostStart1.Left.Above);
+            _gameSettings.Ghosts.Add(new Ghost("Ghost1", ghostStart1, Direction.Left, CellLocation.TopLeft, new GhostGoesRightStrategy(), 1));
+            _gameSettings.Ghosts.Add(new Ghost("Ghost2", ghostStart1, Direction.Left, CellLocation.TopLeft, new GhostGoesRightStrategy(), 10));
+           
+            _gameSettings.Coins.Add(_gameSettings.PacMan.Location.Left);
+
+            var game = new Game(_gameClock, _gameSettings);
+            game.StartGame();
+            await game.ChangeDirection(Direction.Left);
+
+            // PacMan Eats Coin
+            await _gameClock.Tick();
+
+            // Still in House, under door
+            await _gameClock.Tick();
+
+            // On ghost door
+            await _gameClock.Tick();
+
+            // Out of house
+            await _gameClock.Tick();
+
+            using var _  = new AssertionScope();
+            game.Ghosts["Ghost1"].Should().BeEquivalentTo(new {
+                Location = ghostStart1.Left.Above.Above
+            });
+             game.Ghosts["Ghost2"].Should().BeEquivalentTo(new {
                 Location = ghostStart1
             });
         }
