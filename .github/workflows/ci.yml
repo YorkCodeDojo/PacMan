@@ -12,10 +12,10 @@ jobs:
       - run: dotnet build --no-restore --configuration Release
       - run: dotnet test --no-build --configuration Release
       - run: dotnet publish --no-build --configuration Release --output staging/Blazor ./src/NPacMan.Blazor/
-      - name: Deploy 🚀
+      
+      - run: git add staging/Blazor/wwwroot
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
-        uses: JamesIves/github-pages-deploy-action@releases/v3
-        with:
-          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-          BRANCH: gh-pages # The branch the action should deploy to.
-          FOLDER: staging/Blazor/wwwroot # The folder the action should deploy.
+      - run: git commit -m "Initial staging/Blazor/wwwroot subtree commit"
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+      - run: git subtree push --prefix staging/Blazor/wwwroot origin gh-pages
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
