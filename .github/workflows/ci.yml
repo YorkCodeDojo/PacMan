@@ -11,3 +11,11 @@ jobs:
       - run: dotnet restore
       - run: dotnet build --no-restore --configuration Release
       - run: dotnet test --no-build --configuration Release
+      - run: dotnet publish --no-build --configuration Release --output staging/Blazor ./src/NPacMan.Blazor/
+      - name: Deploy 🚀
+        if: ${{ github.event_name == 'push' && github.ref == 'master' }}
+        uses: JamesIves/github-pages-deploy-action@releases/v3
+        with:
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          BRANCH: gh-pages # The branch the action should deploy to.
+          FOLDER: staging/Blazor/wwwroot # The folder the action should deploy.
