@@ -5,6 +5,7 @@ using System;
 using System.Threading.Tasks;
 using NPacMan.Game.Tests.GhostStrategiesForTests;
 using System.Collections.Generic;
+using NPacMan.Game.Tests.Helpers;
 
 namespace NPacMan.Game.Tests.GameTests
 {
@@ -25,7 +26,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Below);
             var game = new Game(_gameClock, _gameSettings);
 
-            game.StartGame(); 
+            game.StartGame();
             await game.ChangeDirection(Direction.Down);
             await _gameClock.Tick();
 
@@ -38,7 +39,7 @@ namespace NPacMan.Game.Tests.GameTests
             var game = new Game(_gameClock, _gameSettings);
             _gameSettings.PowerPills.Add(game.PacMan.Location.Below);
 
-            game.StartGame(); 
+            game.StartGame();
             await game.ChangeDirection(Direction.Down);
             await _gameClock.Tick();
 
@@ -93,24 +94,24 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public async Task PacManDoesNotEatPowerPillAndScoreStaysTheSameWhenCollidesWithGhost()
         {
-            var x = _gameSettings.PacMan.Location.X + 1;
-            var y = _gameSettings.PacMan.Location.Y;
+            var pillAndGhostLocation = _gameSettings.PacMan.Location + Direction.Right;
 
-            _gameSettings.Ghosts.Add(new Ghost("Ghost1", _gameSettings.PacMan.Location.Right, Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
-            _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Right);
+            var ghost = GhostBuilder.New()
+                .WithLocation(pillAndGhostLocation)
+                .Create();
+
+            _gameSettings.Ghosts.Add(ghost);
+            _gameSettings.PowerPills.Add(pillAndGhostLocation);
 
             var game = new Game(_gameClock, _gameSettings);
-            game.StartGame(); 
+            game.StartGame();
             var score = game.Score;
 
             await game.ChangeDirection(Direction.Right);
             await _gameClock.Tick();
 
             using var _ = new AssertionScope();
-            game.PowerPills.Should().ContainEquivalentOf(new {
-                X = x,
-                Y = y
-            });
+            game.PowerPills.Should().ContainEquivalentOf(pillAndGhostLocation);
             game.Score.Should().Be(score);
         }
 
@@ -118,19 +119,21 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public async Task AllGhostsShouldChangetoEdibleWhenPacManEatsPowerPill()
         {
-            _gameSettings.Ghosts.Add(new Ghost("Ghost1", _gameSettings.PacMan.Location.Right.Right, Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
-            _gameSettings.Ghosts.Add(new Ghost("Ghost2", _gameSettings.PacMan.Location.Right.Right, Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
-            _gameSettings.Ghosts.Add(new Ghost("Ghost3", _gameSettings.PacMan.Location.Right.Right, Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
+            var ghosts = GhostBuilder.New()
+                .WithLocation(_gameSettings.PacMan.Location.FarAway())
+                .CreateMany(3);
+            _gameSettings.Ghosts.AddRange(ghosts);
 
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Right);
 
-             var game = new Game(_gameClock, _gameSettings);
-            game.StartGame(); 
+            var game = new Game(_gameClock, _gameSettings);
+            game.StartGame();
 
             await game.ChangeDirection(Direction.Right);
             await _gameClock.Tick();
 
-            game.Ghosts.Values.Should().AllBeEquivalentTo(new {
+            game.Ghosts.Values.Should().AllBeEquivalentTo(new
+            {
                 Edible = true
             });
         }
@@ -138,32 +141,50 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public async Task AllGhostsShouldChangeDirectionWhenPacManEatsPowerPill()
         {
-            _gameSettings.Ghosts.Add(new Ghost("Ghost1", _gameSettings.PacMan.Location.Right.Right, Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
-            _gameSettings.Ghosts.Add(new Ghost("Ghost2", _gameSettings.PacMan.Location.Right.Right, Direction.Right, CellLocation.TopLeft, new StandingStillGhostStrategy()));
-            _gameSettings.Ghosts.Add(new Ghost("Ghost3", _gameSettings.PacMan.Location.Right.Right, Direction.Down, CellLocation.TopLeft, new StandingStillGhostStrategy()));
-            _gameSettings.Ghosts.Add(new Ghost("Ghost4", _gameSettings.PacMan.Location.Right.Right, Direction.Up, CellLocation.TopLeft, new StandingStillGhostStrategy()));
+            var ghost1 = GhostBuilder.New()
+                .WithLocation(_gameSettings.PacMan.Location.FarAway())
+                .WithDirection(Direction.Up)
+                .Create();
+            var ghost2 = GhostBuilder.New()
+                .WithLocation(_gameSettings.PacMan.Location.FarAway())
+                .WithDirection(Direction.Down)
+                .Create();
+            var ghost3 = GhostBuilder.New()
+                .WithLocation(_gameSettings.PacMan.Location.FarAway())
+                .WithDirection(Direction.Left)
+                .Create();
+            var ghost4 = GhostBuilder.New()
+                .WithLocation(_gameSettings.PacMan.Location.FarAway())
+                .WithDirection(Direction.Right)
+                .Create();
+            _gameSettings.Ghosts.AddRange(new[] { ghost1, ghost2, ghost3, ghost4 });
 
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Right);
 
-             var game = new Game(_gameClock, _gameSettings);
-            game.StartGame(); 
+            var game = new Game(_gameClock, _gameSettings);
+            game.StartGame();
 
             await game.ChangeDirection(Direction.Right);
             await _gameClock.Tick();
 
-            game.Ghosts.Should().BeEquivalentTo(new Dictionary<string, object> {
-                ["Ghost1"] = new {
-                    Direction = Direction.Left.Opposite()
+            game.Ghosts.Should().BeEquivalentTo(new Dictionary<string, object>
+            {
+                [ghost1.Name] = new
+                {
+                    Direction = ghost1.Direction.Opposite()
                 },
-                ["Ghost2"] = new {
-                    Direction = Direction.Right.Opposite()
+                [ghost2.Name] = new
+                {
+                    Direction = ghost2.Direction.Opposite()
                 },
-                ["Ghost3"] = new {
-                    Direction = Direction.Down.Opposite()
+                [ghost3.Name] = new
+                {
+                    Direction = ghost3.Direction.Opposite()
                 },
-                ["Ghost4"] = new {
-                    Direction = Direction.Up.Opposite()
-                }
+                [ghost4.Name] = new
+                {
+                    Direction = ghost4.Direction.Opposite()
+                },
             });
         }
 
@@ -175,7 +196,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Below);
             var game = new Game(_gameClock, _gameSettings);
             game.Subscribe(GameNotification.EatPowerPill, () => numberOfNotificationsTriggered++);
-            game.StartGame(); 
+            game.StartGame();
 
             await game.ChangeDirection(Direction.Down);
 

@@ -1,8 +1,6 @@
 ﻿using System.Threading.Tasks;
 using FluentAssertions;
-using NPacMan.Game.Tests.GhostStrategiesForTests;
 using Xunit;
-using static NPacMan.Game.Tests.Helpers.Ensure;
 
 namespace NPacMan.Game.Tests.GameTests
 {
@@ -20,10 +18,8 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public async Task LivesStayTheSameWhenNotCollidingWithAGhost()
         {
-            var x = _gameSettings.PacMan.Location.X + 1;
-            var y = _gameSettings.PacMan.Location.Y;
-
-            _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(x, y), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
+            var ghost = GhostBuilder.New().WithLocation(_gameSettings.PacMan.Location.Right).Create();
+            _gameSettings.Ghosts.Add(ghost);
 
             var game = new Game(_gameClock, _gameSettings);
             game.StartGame(); 
@@ -38,10 +34,9 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public async Task LivesDecreaseByOneWhenCollidesWithGhost()
         {
-            var x = _gameSettings.PacMan.Location.X + 1;
-            var y = _gameSettings.PacMan.Location.Y;
+            var ghost = GhostBuilder.New().WithLocation(_gameSettings.PacMan.Location.Right).Create();
 
-            _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(x, y), Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
+            _gameSettings.Ghosts.Add(ghost);
 
             var game = new Game(_gameClock, _gameSettings);
             game.StartGame(); 
@@ -61,8 +56,11 @@ namespace NPacMan.Game.Tests.GameTests
             // G . . . P
             // . G . P .
             // . . PG . .
-            var ghostLocation = new CellLocation(_gameSettings.PacMan.Location.X - 4, _gameSettings.PacMan.Location.Y);
-            _gameSettings.Ghosts.Add(new Ghost("Ghost1", ghostLocation, Direction.Left, CellLocation.TopLeft, new GhostGoesRightStrategy()));
+            var ghost = GhostBuilder.New()
+                .WithLocation(_gameSettings.PacMan.Location.Left.Left.Left.Left)
+                .WithChaseStrategyRight().Create();
+
+            _gameSettings.Ghosts.Add(ghost);
 
             var game = new Game(_gameClock, _gameSettings);
             game.StartGame(); 
@@ -78,11 +76,11 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public async Task LivesDecreaseWhenCollidesWithGhostWhenPacManIsFacingAWall()
         {
-            var x = _gameSettings.PacMan.Location.X;
-            var y = _gameSettings.PacMan.Location.Y;
-
-            _gameSettings.Walls.Add((x, y - 1));
-            _gameSettings.Ghosts.Add(new Ghost("Ghost1", new CellLocation(x - 1, y), Direction.Right, CellLocation.TopLeft, new GhostGoesRightStrategy()));
+            _gameSettings.Walls.Add(_gameSettings.PacMan.Location.Above);
+            var ghost = GhostBuilder.New()
+                .WithLocation(_gameSettings.PacMan.Location.Left)
+                .WithChaseStrategyRight().Create();
+            _gameSettings.Ghosts.Add(ghost);
 
             var game = new Game(_gameClock, _gameSettings);
             game.StartGame(); 
@@ -103,7 +101,10 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.InitialGameStatus = GameStatus.Dying;
             _gameSettings.InitialLives = expectedLife;
 
-            _gameSettings.Ghosts.Add(new Ghost("Ghost1", location, Direction.Left, CellLocation.TopLeft, new StandingStillGhostStrategy()));
+            var ghost = GhostBuilder.New()
+                .WithLocation(location)
+                .Create();
+            _gameSettings.Ghosts.Add(ghost);
             _gameSettings.PacMan = new PacMan(location, Direction.Down);
 
             var game = new Game(_gameClock, _gameSettings);

@@ -11,3 +11,36 @@ jobs:
       - run: dotnet restore
       - run: dotnet build --no-restore --configuration Release
       - run: dotnet test --no-build --configuration Release
+      - run: dotnet publish --no-build --configuration Release --output staging/Blazor ./src/NPacMan.Blazor/
+      
+      - name: Upload blazor site
+        uses: actions/upload-artifact@v1
+        with:
+          name: blazor
+          path: staging/Blazor
+
+  deploy_blazor:
+    name: Deploy Blazor
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        ref: 'refs/heads/gh-pages'
+        path: 'blazor/wwwroot'
+    - name: Download blazor site
+      uses: actions/download-artifact@v1
+      with:
+        name: blazor
+        path: ./
+    - run: cd blazor
+    - run: pwd
+    - run: ls
+    - run: cd wwwroot
+    - run: ls
+    - run: pwd
+    - run: git config user.name "ci@yorkdevelopers.org"
+    - run: git config user.email "ci@yorkdevelopers.org"
+    - run: git add .
+    - run: git commit -m "Updating site"
+    - run: git push
