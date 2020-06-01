@@ -13,7 +13,7 @@ jobs:
       - run: dotnet test --no-build --configuration Release
       - run: dotnet publish --no-build --configuration Release --output staging/Blazor ./src/NPacMan.Blazor/
       - name: Deploy 🚀
-        if: ${{ github.event_name == 'push' && github.ref == 'ref/head/master' }}
+        if: ${{ github.event_name == 'push' && github.ref == 'ref/heads/master' }}
         uses: JamesIves/github-pages-deploy-action@releases/v3
         with:
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
