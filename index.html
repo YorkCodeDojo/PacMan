@@ -1,0 +1,116 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>NPacMan.Blazor</title>
+    <base href="/" />
+    <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
+    <link href="css/app.css" rel="stylesheet" />
+</head>
+
+<body>
+
+    <script>
+        var screenCanvas;
+        var screenContext;
+        var spriteMap;
+        var gameCanvas = 0;
+        var gameContext;
+        var backCanvas;
+        var backContext;
+
+        function SetupCanvas(cv, sp) {
+
+            // Reference the canvas
+
+            screenCanvas = cv;
+
+            // Reference the sprite map
+
+            spriteMap = sp;
+        }
+
+        function DrawSprite(ctx, fx, fy, fs, tx, ty) {
+            ctx.drawImage(spriteMap, fx, fy, fs, fs, tx, ty, fs, fs);
+        }
+
+        function SpriteSet(width, height, spriteData) {
+            try {
+                if (gameCanvas == 0) {
+
+                    // Setup back/fore canvas if we haven't got them
+                    screenCanvas.width = width;
+                    screenCanvas.height = height;
+                    screenContext = screenCanvas.getContext("2d", { alpha: false });
+                    screenContext.imageSmoothingEnabled = false;
+                    gameCanvas = document.createElement('canvas');
+                    gameCanvas.width = width;
+                    gameCanvas.height = height;
+                    gameContext = gameCanvas.getContext('2d', { alpha: false });
+                    gameContext.imageSmoothingEnabled = false;
+                    backCanvas = document.createElement('canvas');
+                    backCanvas.width = width;
+                    backCanvas.height = height;
+                    backContext = backCanvas.getContext('2d', { alpha: false });
+                    backContext.imageSmoothingEnabled = false;
+                }
+
+                // Sprites are passed in a large array of sets of six integers
+                // OnBuffer, SpriteX, SpriteY, Size, ScreenX, ScreenY
+
+                // Update the back canvas with changes first
+
+                for (var i = 0; i < spriteData.length; i += 6) {
+                    if (spriteData[i] == 1) {
+                        DrawSprite(backContext, spriteData[i + 1], spriteData[i + 2], spriteData[i + 3], spriteData[i + 4], spriteData[i + 5]);
+                    }
+                }
+
+                // Copy back canvas onto fore canvas
+
+                gameContext.drawImage(backCanvas, 0, 0);
+
+                // Add the sprites onto the fore canvas
+
+                for (var i = 0; i < spriteData.length; i += 6) {
+                    if (spriteData[i] == 0) {
+                        DrawSprite(gameContext, spriteData[i + 1], spriteData[i + 2], spriteData[i + 3], spriteData[i + 4], spriteData[i + 5]);
+                    }
+                }
+
+                // Transfer to the screen
+
+                screenContext.drawImage(gameCanvas, 0, 0);
+
+                // Scale canvas is not stretch to screen
+
+                var scale = Math.min(window.innerWidth / width, window.innerHeight / height);
+                var h = Math.floor(height * scale);
+                var w = Math.floor(width * scale);
+                if (screenCanvas.style.height != h) {
+                    screenCanvas.style.height = Math.floor(height * scale) + "px";
+                    screenCanvas.style.width = Math.floor(width * scale) + "px";
+                }
+            }
+            catch (e) {
+            }
+        }
+
+
+    </script>
+
+    <app>Loading...</app>
+
+    <div id="blazor-error-ui">
+        An unhandled error has occurred.
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
+    <script src="JsInteropTouch.js"></script>
+    <script src="JsInteropKeyPress.js"></script>
+    <script src="_framework/blazor.webassembly.js"></script>
+</body>
+
+</html>
