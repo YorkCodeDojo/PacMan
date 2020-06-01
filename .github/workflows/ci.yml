@@ -6,6 +6,8 @@ jobs:
     name: Build and Test
     runs-on: windows-latest
     steps:
+      - run: echo {{ github.ref }}
+      - run: echo {{ github.event_name }}
       - uses: actions/checkout@master
 
       - run: dotnet restore
