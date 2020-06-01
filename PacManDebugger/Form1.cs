@@ -8,9 +8,6 @@ namespace PacManDebugger
 {
     public partial class Form1 : Form
     {
-
-        private readonly Button cmdStart;
-        private readonly Button cmdDisplay;
         private readonly HScrollBar tickSelector;
         private readonly History _history = new History();
         private readonly Label lblTick;
@@ -18,27 +15,7 @@ namespace PacManDebugger
 
         public Form1()
         {
-            cmdStart = new Button
-            {
-                AutoSize = true,
-                Location = new System.Drawing.Point(74, 30),
-                Name = "cmdStart",
-                Size = new System.Drawing.Size(41, 25),
-                TabIndex = 0,
-                Text = "Start"
-            };
-            cmdStart.Click += cmdStart_Click;
-
-            cmdDisplay = new Button
-            {
-                AutoSize = true,
-                Location = new System.Drawing.Point(185, 30),
-                Name = "cmdCount",
-                Size = new System.Drawing.Size(38, 25),
-                TabIndex = 1,
-                Text = "Display"
-            };
-            cmdDisplay.Click += cmdDisplay_Click;
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
 
             tickSelector = new HScrollBar
             {
@@ -58,10 +35,59 @@ namespace PacManDebugger
             };
             this.Controls.Add(lblTick);
 
+            var toolStrip1 = new System.Windows.Forms.ToolStrip
+            {
+                Location = new System.Drawing.Point(0, 0),
+                Name = "toolStrip1",
+                Size = new System.Drawing.Size(800, 25),
+                TabIndex = 0,
+                Text = "toolStrip1"
+            };
+
+            var toolStripButtonStart = new System.Windows.Forms.ToolStripButton
+            {
+                //    toolStripButton1.Image = (Image)resources.GetObject("pacman")!;
+                ImageTransparentColor = System.Drawing.Color.Magenta,
+                Name = "toolStripButtonStart",
+                Size = new System.Drawing.Size(96, 22),
+                Text = "Start Capture",
+                DisplayStyle = ToolStripItemDisplayStyle.Text
+            };
+            toolStripButtonStart.Click += ToolStripButtonStart_Click;
+            toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { toolStripButtonStart });
+            this.Controls.Add(toolStrip1);
+
             ClientSize = new System.Drawing.Size(697, 800);
-            Controls.Add(cmdDisplay);
-            Controls.Add(cmdStart);
             Controls.Add(tickSelector);
+
+            this.Text = "PacMan Debugger";
+            this.BackColor = Color.White;
+            this.Icon = (Icon)resources.GetObject("pacman")!;
+
+        }
+
+        private void ToolStripButtonStart_Click(object? sender, EventArgs e)
+        {
+            Task.Run(() =>
+            {
+                var session = new TraceEventSession("TestEvents");
+
+                session.EnableProvider("PacManEventSource", Microsoft.Diagnostics.Tracing.TraceEventLevel.Always);
+
+                session.Source.Dynamic.AddCallbackForProviderEvent("PacManEventSource", "GhostMoved", traceEvent =>
+                {
+                    var ghostName = (string)traceEvent.PayloadByName("ghostName");
+                    var tickCounter = (int)traceEvent.PayloadByName("tickCounter");
+                    var fromLocationX = (int)traceEvent.PayloadByName("fromLocationX");
+                    var fromLocationY = (int)traceEvent.PayloadByName("fromLocationY");
+                    var toLocationX = (int)traceEvent.PayloadByName("toLocationX");
+                    var toLocationY = (int)traceEvent.PayloadByName("toLocationY");
+
+                    _history.AddHistoricEvent(ghostName, tickCounter, new Location(fromLocationX, fromLocationY), new Location(toLocationX, toLocationY));
+                });
+
+                session.Source.Process();
+            });
         }
 
         private void TickSelector_ValueChanged(object? sender, EventArgs e)
@@ -73,30 +99,6 @@ namespace PacManDebugger
             DisplayGhostsAtTime(tickCount);
         }
 
-        private void cmdStart_Click(object? sender, EventArgs e)
-        {
-            Task.Run(() =>
-           {
-               var session = new TraceEventSession("TestEvents");
-
-               session.EnableProvider("PacManEventSource", Microsoft.Diagnostics.Tracing.TraceEventLevel.Always);
-
-               session.Source.Dynamic.AddCallbackForProviderEvent("PacManEventSource", "GhostMoved", traceEvent =>
-               {
-                   var ghostName = (string)traceEvent.PayloadByName("ghostName");
-                   var tickCounter = (int)traceEvent.PayloadByName("tickCounter");
-                   var fromLocationX = (int)traceEvent.PayloadByName("fromLocationX");
-                   var fromLocationY = (int)traceEvent.PayloadByName("fromLocationY");
-                   var toLocationX = (int)traceEvent.PayloadByName("toLocationX");
-                   var toLocationY = (int)traceEvent.PayloadByName("toLocationY");
-
-                   _history.AddHistoricEvent(ghostName, tickCounter, new Location(fromLocationX, fromLocationY), new Location(toLocationX, toLocationY));
-               });
-
-               session.Source.Process();
-           });
-        }
-
         private void cmdDisplay_Click(object? sender, EventArgs e)
         {
             var tickCount = tickSelector.Value;
@@ -106,12 +108,17 @@ namespace PacManDebugger
 
         private void DisplayGhostsAtTime(int tickCount)
         {
-            var ghosts = _history.GhostNames();
-
-            var g = this.CreateGraphics();
-            g.TranslateTransform(50, 100);
             const int rowHeight = 10;
             const int columnWidth = 10;
+
+            var ghosts = _history.GhostNames();
+
+            var currentContext = BufferedGraphicsManager.Current;
+            var grid = new Rectangle(50,100, columnWidth * 50, 50 * rowHeight);
+            using var myBuffer = currentContext.Allocate(this.CreateGraphics(), grid);
+            var g = myBuffer.Graphics;
+
+            g.TranslateTransform(50, 100);
 
             DrawGrid(g, rowHeight, columnWidth);
 
@@ -135,10 +142,14 @@ namespace PacManDebugger
                 var y = eventDetails.FinalLocation.Y * rowHeight;
                 g.FillEllipse(Brushes.Red, x, y, columnWidth, rowHeight);
             }
+
+            myBuffer.Render();
         }
 
         private static void DrawGrid(Graphics g, int rowHeight, int columnWidth)
         {
+            g.FillRectangle(Brushes.Black, 0, 0, columnWidth * 50, 50 * rowHeight);
+
             for (int rowNumber = 0; rowNumber <= 50; rowNumber++)
             {
                 g.DrawLine(Pens.Blue, 0, rowNumber * rowHeight, columnWidth * 50, rowNumber * rowHeight);
