@@ -24,13 +24,17 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Download blazor site
-        uses: actions/download-artifact@v1
-        with:
-          name: blazor
-      - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@releases/v3
-        with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH: gh-pages # The branch the action should deploy to.
-          FOLDER: blazor/wwwroot # The folder the action should deploy.
+    - uses: actions/checkout@v2
+      with:
+        ref: 'refs/heads/gh-pages'
+        path: 'blazor/wwwroot'
+    - name: Download blazor site
+      uses: actions/download-artifact@v1
+      with:
+        name: blazor
+    - run: cd blazor/wwwroot
+    - run: git config user.name "ci@yorkdevelopers.org"
+    - run: git config user.email "ci@yorkdevelopers.org"
+    - run: git add .
+    - run: git commit -m "Updating site"
+    - run: git push
