@@ -32,7 +32,9 @@ jobs:
       uses: actions/download-artifact@v1
       with:
         name: blazor
+        path: ./
     - run: cd blazor
+    - run: pwd
     - run: ls
     - run: cd wwwroot
     - run: ls
