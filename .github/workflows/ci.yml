@@ -32,7 +32,11 @@ jobs:
       uses: actions/download-artifact@v1
       with:
         name: blazor
-    - run: cd blazor/wwwroot
+    - run: cd blazor
+    - run: ls
+    - run: cd wwwroot
+    - run: ls
+    - run: pwd
     - run: git config user.name "ci@yorkdevelopers.org"
     - run: git config user.email "ci@yorkdevelopers.org"
     - run: git add .
