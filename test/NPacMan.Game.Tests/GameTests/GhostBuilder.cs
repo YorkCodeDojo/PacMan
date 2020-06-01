@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using NPacMan.Game.GhostStrategies;
 using NPacMan.Game.Tests.GhostStrategiesForTests;
 
@@ -12,8 +13,6 @@ namespace NPacMan.Game.Tests.GameTests
         private CellLocation _scatterTarget = CellLocation.TopLeft;
         private Direction _direction = Direction.Left;
         private CellLocation _location = new CellLocation(0, 0);
-        private static readonly Queue<string> _names = new Queue<string>(
-            Enumerable.Range(0, 1000).Select(i => $"Ghost{i}"));
 
         private GhostBuilder()
         {
@@ -62,10 +61,11 @@ namespace NPacMan.Game.Tests.GameTests
             return this;
         }
 
-
+        private static int ghostNumber = 0;
         public Ghost Create()
         {
-            var name = _names.Dequeue();
+            var next = Interlocked.Increment(ref ghostNumber);
+            var name = $"Ghost{next}";
 
             return new Ghost(name, _location, _direction, _scatterTarget, _chaseStrategy,
                 _numberOfCoinsRequiredToExitHouse);
