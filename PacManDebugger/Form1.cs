@@ -10,7 +10,9 @@ namespace PacManDebugger
         private readonly History _history = new History();
         private readonly Board _board = new Board();
         private readonly HScrollBar tickSelector;
-        private readonly Label lblTick;
+        private readonly GroupBox gbTime;
+        private readonly Label lblStart;
+        private readonly Label lblEnd;
         private readonly EventConsumer _eventConsumer;
         private int _y = 100;
 
@@ -18,25 +20,55 @@ namespace PacManDebugger
         {
             _eventConsumer = new EventConsumer(_history, _board);
 
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+            lblStart = new Label
+            {
+                AutoSize = true,
+                Location = new Point(15, 76),
+                Name = "lblStart",
+                Size = new Size(19, 21),
+                TabIndex = 2,
+                Text = "0"
+            };
+
+            lblEnd = new Label
+            {
+                Anchor = AnchorStyles.Top | AnchorStyles.Right,
+                AutoSize = true,
+                Location = new Point(1072, 73),
+                Name = "lblEnd",
+                Size = new Size(46, 21),
+                TabIndex = 2,
+                Text = "1000"
+            };
 
             tickSelector = new HScrollBar
             {
-                Location = new System.Drawing.Point(10, 60),
-                Width = 400,
+                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right,
+                Location = new Point(15, 33),
+                Name = "tickSelector",
+                Size = new Size(1098, 32),
+                TabIndex = 1,
                 Minimum = 0,
                 Maximum = 1000,
                 Value = 10,
             };
             tickSelector.ValueChanged += TickSelector_ValueChanged;
 
-            lblTick = new Label
+            var resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+
+            gbTime = new GroupBox
             {
-                Location = new System.Drawing.Point(tickSelector.Left + tickSelector.Width + 20, tickSelector.Top),
-                AutoSize = true,
-                Text = "Tick: "
+                Anchor = (AnchorStyles.Top | AnchorStyles.Left) | AnchorStyles.Right,
+                Location = new Point(12, 37),
+                Name = "groupBox1",
+                Size = new Size(1132, 113),
+                TabIndex = 3,
+                TabStop = false,
+                Text = "Displaying Tick Number:"
             };
-            this.Controls.Add(lblTick);
+            gbTime.Controls.Add(tickSelector);
+            gbTime.Controls.Add(lblStart);
+            gbTime.Controls.Add(lblEnd);
 
             var toolStrip1 = new System.Windows.Forms.ToolStrip
             {
@@ -84,10 +116,12 @@ namespace PacManDebugger
             toolStrip1.Items.AddRange(new ToolStripItem[] { toolStripButtonStart, toolStripButtonStop, toolStripButtonClear });
             this.Controls.Add(toolStrip1);
 
-            ClientSize = new System.Drawing.Size(697, 800);
-            Controls.Add(tickSelector);
+            Location = new Point(100, 100);
+            ClientSize = new Size(1156, 1000);
 
-            this.Text = "PacMan Debugger";
+            this.Controls.Add(gbTime);
+            Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            this.Text = "PacMan Debugger - Not Started";
             this.BackColor = Color.White;
             this.Icon = (Icon)resources.GetObject("pacman")!;
 
@@ -96,11 +130,13 @@ namespace PacManDebugger
         private void ToolStripButtonStart_Click(object? sender, EventArgs e)
         {
             _eventConsumer.Start();
+            this.Text = "PacMan Debugger - Capturing";
         }
 
         private void ToolStripButtonStop_Click(object? sender, EventArgs e)
         {
             _eventConsumer.Stop();
+            this.Text = "PacMan Debugger - Stopped";
         }
 
         private void ToolStripButtonClear_Click(object? sender, EventArgs e)
@@ -113,7 +149,7 @@ namespace PacManDebugger
         {
             var tickCount = tickSelector.Value;
 
-            lblTick.Text = $"Tick: {tickCount}";
+            gbTime.Text = $"Displaying Tick Number: {tickCount}";
 
             DisplayGhostsAtTime(tickCount);
         }
@@ -130,55 +166,66 @@ namespace PacManDebugger
             const int rowHeight = 15;
             const int columnWidth = 15;
 
-            var ghosts = _history.GhostNames();
+            const int rowsToDisplay = 50;
+            const int columnsToDisplay = 50;
+
+            var gridLeft = gbTime.Left;
+            var gridTop = gbTime.Top + gbTime.Height + 30; ;
+
+            var xOffset = (columnsToDisplay - _board.Width) / 2;
+            var yOffset = (rowsToDisplay - _board.Height) / 2;
 
             var currentContext = BufferedGraphicsManager.Current;
-            var grid = new Rectangle(50, 100, columnWidth * 50, 50 * rowHeight);
+            var grid = new Rectangle(gridLeft, gridTop, columnWidth * columnsToDisplay, rowsToDisplay * rowHeight);
             using var myBuffer = currentContext.Allocate(this.CreateGraphics(), grid);
             var g = myBuffer.Graphics;
 
-            g.TranslateTransform(50, 100);
+            g.TranslateTransform(gridLeft, gridTop);
 
-            DrawGrid(g, rowHeight, columnWidth);
+            DrawGrid(g, rowHeight, columnWidth, xOffset, yOffset, columnsToDisplay, rowsToDisplay);
 
+            var ghosts = _history.GhostNames();
             foreach (var ghostName in ghosts)
             {
-                var lbl = FindLabelForGhost(ghostName);
-                if (lbl is null)
-                {
-                    lbl = new Label();
-                    lbl.Location = new System.Drawing.Point(1000, _y);
-                    lbl.AutoSize = true;
-                    lbl.Tag = ghostName;
-                    _y += (int)(lbl.Height * 1.5);
-                    this.Controls.Add(lbl);
-                }
-
-                var eventDetails = _history.GetHistoricEventForTickCount(ghostName, tickCount);
-                lbl.Text = $"{ghostName} went from {eventDetails.OriginalLocation} to {eventDetails.FinalLocation}";
-
-                var x = (2 + eventDetails.FinalLocation.X) * columnWidth;
-                var y = (2 + eventDetails.FinalLocation.Y) * rowHeight;
-                g.FillEllipse(Brushes.Red, x, y, columnWidth, rowHeight);
+                DisplayGhost(tickCount, rowHeight, columnWidth, g, ghostName, xOffset, yOffset);
             }
 
             myBuffer.Render();
         }
 
-        private void DrawGrid(Graphics g, int rowHeight, int columnWidth)
+        private void DisplayGhost(int tickCount, int rowHeight, int columnWidth, Graphics g, string ghostName, int xOffset, int yOffset)
         {
-            g.FillRectangle(new SolidBrush(this.BackColor), 0, 0, columnWidth * 50, _board.Height * 50);
-
-            g.FillRectangle(Brushes.Black, 0, 0, columnWidth * (_board.Width + 4), (_board.Height + 4) * rowHeight);
-
-            for (int rowNumber = 0; rowNumber <= _board.Height + 4; rowNumber++)
+            var lbl = FindLabelForGhost(ghostName);
+            if (lbl is null)
             {
-                g.DrawLine(Pens.DimGray, 0, rowNumber * rowHeight, columnWidth * (_board.Width + 4), rowNumber * rowHeight);
+                lbl = new Label();
+                lbl.Location = new System.Drawing.Point(1000, _y);
+                lbl.AutoSize = true;
+                lbl.Tag = ghostName;
+                _y += (int)(lbl.Height * 1.5);
+                this.Controls.Add(lbl);
             }
 
-            for (int columnNumber = 0; columnNumber <= _board.Width + 4; columnNumber++)
+            var eventDetails = _history.GetHistoricEventForTickCount(ghostName, tickCount);
+            lbl.Text = $"{ghostName} went from {eventDetails.OriginalLocation} to {eventDetails.FinalLocation}";
+
+            var x = (xOffset + eventDetails.FinalLocation.X) * columnWidth;
+            var y = (yOffset + eventDetails.FinalLocation.Y) * rowHeight;
+            g.FillEllipse(Brushes.Red, x, y, columnWidth, rowHeight);
+        }
+
+        private void DrawGrid(Graphics g, int rowHeight, int columnWidth, int xOffset, int yOffset, int columnsToDisplay, int rowsToDisplay)
+        {
+            g.FillRectangle(Brushes.Black, 0, 0, columnWidth * columnsToDisplay, rowHeight * rowsToDisplay);
+
+            for (int rowNumber = 0; rowNumber <= rowsToDisplay; rowNumber++)
             {
-                g.DrawLine(Pens.DimGray, columnNumber * columnWidth, 0, columnNumber * columnWidth, (_board.Height + 4) * rowHeight);
+                g.DrawLine(Pens.DimGray, 0, rowNumber * rowHeight, columnWidth * columnsToDisplay, rowNumber * rowHeight);
+            }
+
+            for (int columnNumber = 0; columnNumber <= columnsToDisplay; columnNumber++)
+            {
+                g.DrawLine(Pens.DimGray, columnNumber * columnWidth, 0, columnNumber * columnWidth, rowsToDisplay * rowHeight);
             }
 
             for (int rowNumber = 0; rowNumber <= _board.Height; rowNumber++)
@@ -187,7 +234,7 @@ namespace PacManDebugger
                 {
                     if (_board.Walls.Any(w => w.X == columnNumber && w.Y == rowNumber))
                     {
-                        g.FillRectangle(Brushes.LightBlue, ((2 + columnNumber) * columnWidth) + 1, ((2 + rowNumber) * rowHeight) + 1, columnWidth - 2, rowHeight - 2);
+                        g.FillRectangle(Brushes.LightBlue, ((xOffset + columnNumber) * columnWidth) + 1, ((yOffset + rowNumber) * rowHeight) + 1, columnWidth - 2, rowHeight - 2);
                     }
                 }
             }
