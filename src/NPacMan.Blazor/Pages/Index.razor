@@ -35,8 +35,6 @@
         InteropTouch.TouchStart += TouchStart;
         InteropTouch.TouchEnd += TouchEnd;
 
-        _game = _game.StartGame();
-
         // Pass references of the canvas and spritemap to the javascript code
 
         await jsRuntime.InvokeVoidAsync("SetupCanvas", _canvas,
@@ -51,6 +49,10 @@
         await RegisterSound(Sounds.Intermission, Resources.pacman_intermission);
 
         _boardRenderer = new BoardRenderer();
+
+        // Don't start game until everything ready
+
+        _game = _game.StartGame();
 
         // Timer loop
 
