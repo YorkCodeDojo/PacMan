@@ -38,5 +38,10 @@ namespace PacManDebugger
                 throw new Exception("Unknown ghost name - " + ghostName);
             }
         }
+
+        internal void Clear()
+        {
+            _ghostHistory.Clear();
+        }
     }
 }

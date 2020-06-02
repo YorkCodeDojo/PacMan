@@ -1,25 +1,28 @@
-﻿using Microsoft.Diagnostics.Tracing.Session;
-using System;
+﻿using System;
 using System.Drawing;
-using System.Threading.Tasks;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace PacManDebugger
 {
     public partial class Form1 : Form
     {
-        private readonly HScrollBar tickSelector;
         private readonly History _history = new History();
+        private readonly Board _board = new Board();
+        private readonly HScrollBar tickSelector;
         private readonly Label lblTick;
+        private readonly EventConsumer _eventConsumer;
         private int _y = 100;
 
         public Form1()
         {
+            _eventConsumer = new EventConsumer(_history, _board);
+
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
 
             tickSelector = new HScrollBar
             {
-                Location = new System.Drawing.Point(10, 700),
+                Location = new System.Drawing.Point(10, 60),
                 Width = 400,
                 Minimum = 0,
                 Maximum = 1000,
@@ -44,7 +47,7 @@ namespace PacManDebugger
                 Text = "toolStrip1"
             };
 
-            var toolStripButtonStart = new System.Windows.Forms.ToolStripButton
+            var toolStripButtonStart = new ToolStripButton
             {
                 //    toolStripButton1.Image = (Image)resources.GetObject("pacman")!;
                 ImageTransparentColor = System.Drawing.Color.Magenta,
@@ -54,7 +57,31 @@ namespace PacManDebugger
                 DisplayStyle = ToolStripItemDisplayStyle.Text
             };
             toolStripButtonStart.Click += ToolStripButtonStart_Click;
-            toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { toolStripButtonStart });
+
+            var toolStripButtonStop = new ToolStripButton
+            {
+                //    toolStripButton1.Image = (Image)resources.GetObject("pacman")!;
+                ImageTransparentColor = System.Drawing.Color.Magenta,
+                Name = "toolStripButtonStop",
+                Size = new System.Drawing.Size(96, 22),
+                Text = "Stop Capture",
+                DisplayStyle = ToolStripItemDisplayStyle.Text
+            };
+            toolStripButtonStop.Click += ToolStripButtonStop_Click;
+
+            var toolStripButtonClear = new ToolStripButton
+            {
+                //    toolStripButton1.Image = (Image)resources.GetObject("pacman")!;
+                ImageTransparentColor = System.Drawing.Color.Magenta,
+                Name = "toolStripButtonClear",
+                Size = new System.Drawing.Size(96, 22),
+                Text = "Clear Capture",
+                DisplayStyle = ToolStripItemDisplayStyle.Text
+            };
+            toolStripButtonClear.Click += ToolStripButtonClear_Click;
+
+
+            toolStrip1.Items.AddRange(new ToolStripItem[] { toolStripButtonStart, toolStripButtonStop, toolStripButtonClear });
             this.Controls.Add(toolStrip1);
 
             ClientSize = new System.Drawing.Size(697, 800);
@@ -68,9 +95,18 @@ namespace PacManDebugger
 
         private void ToolStripButtonStart_Click(object? sender, EventArgs e)
         {
-            var board = new Board();
-            var eventConsumer = new EventConsumer(_history, board);
-            eventConsumer.Start();
+            _eventConsumer.Start();
+        }
+
+        private void ToolStripButtonStop_Click(object? sender, EventArgs e)
+        {
+            _eventConsumer.Stop();
+        }
+
+        private void ToolStripButtonClear_Click(object? sender, EventArgs e)
+        {
+            _board.Clear();
+            _history.Clear();
         }
 
         private void TickSelector_ValueChanged(object? sender, EventArgs e)
@@ -91,13 +127,13 @@ namespace PacManDebugger
 
         private void DisplayGhostsAtTime(int tickCount)
         {
-            const int rowHeight = 10;
-            const int columnWidth = 10;
+            const int rowHeight = 15;
+            const int columnWidth = 15;
 
             var ghosts = _history.GhostNames();
 
             var currentContext = BufferedGraphicsManager.Current;
-            var grid = new Rectangle(50,100, columnWidth * 50, 50 * rowHeight);
+            var grid = new Rectangle(50, 100, columnWidth * 50, 50 * rowHeight);
             using var myBuffer = currentContext.Allocate(this.CreateGraphics(), grid);
             var g = myBuffer.Graphics;
 
@@ -121,26 +157,39 @@ namespace PacManDebugger
                 var eventDetails = _history.GetHistoricEventForTickCount(ghostName, tickCount);
                 lbl.Text = $"{ghostName} went from {eventDetails.OriginalLocation} to {eventDetails.FinalLocation}";
 
-                var x = eventDetails.FinalLocation.X * columnWidth;
-                var y = eventDetails.FinalLocation.Y * rowHeight;
+                var x = (2 + eventDetails.FinalLocation.X) * columnWidth;
+                var y = (2 + eventDetails.FinalLocation.Y) * rowHeight;
                 g.FillEllipse(Brushes.Red, x, y, columnWidth, rowHeight);
             }
 
             myBuffer.Render();
         }
 
-        private static void DrawGrid(Graphics g, int rowHeight, int columnWidth)
+        private void DrawGrid(Graphics g, int rowHeight, int columnWidth)
         {
-            g.FillRectangle(Brushes.Black, 0, 0, columnWidth * 50, 50 * rowHeight);
+            g.FillRectangle(new SolidBrush(this.BackColor), 0, 0, columnWidth * 50, _board.Height * 50);
 
-            for (int rowNumber = 0; rowNumber <= 50; rowNumber++)
+            g.FillRectangle(Brushes.Black, 0, 0, columnWidth * (_board.Width + 4), (_board.Height + 4) * rowHeight);
+
+            for (int rowNumber = 0; rowNumber <= _board.Height + 4; rowNumber++)
             {
-                g.DrawLine(Pens.Blue, 0, rowNumber * rowHeight, columnWidth * 50, rowNumber * rowHeight);
+                g.DrawLine(Pens.DimGray, 0, rowNumber * rowHeight, columnWidth * (_board.Width + 4), rowNumber * rowHeight);
             }
 
-            for (int columnNumber = 0; columnNumber <= 50; columnNumber++)
+            for (int columnNumber = 0; columnNumber <= _board.Width + 4; columnNumber++)
             {
-                g.DrawLine(Pens.Blue, columnNumber * columnWidth, 0, columnNumber * columnWidth, 50 * rowHeight);
+                g.DrawLine(Pens.DimGray, columnNumber * columnWidth, 0, columnNumber * columnWidth, (_board.Height + 4) * rowHeight);
+            }
+
+            for (int rowNumber = 0; rowNumber <= _board.Height; rowNumber++)
+            {
+                for (int columnNumber = 0; columnNumber <= _board.Width; columnNumber++)
+                {
+                    if (_board.Walls.Any(w => w.X == columnNumber && w.Y == rowNumber))
+                    {
+                        g.FillRectangle(Brushes.LightBlue, ((2 + columnNumber) * columnWidth) + 1, ((2 + rowNumber) * rowHeight) + 1, columnWidth - 2, rowHeight - 2);
+                    }
+                }
             }
         }
 
