@@ -8,7 +8,7 @@ namespace PacManDebugger
     {
         private Dictionary<string, HistoricEvent[]> _ghostHistory = new Dictionary<string, HistoricEvent[]>();
 
-        public void AddHistoricEvent(string ghostName, int tickCounter, Location originalLocation, Location finalLocation)
+        public void AddHistoricEvent(string ghostName, int tickCounter, CellLocation originalLocation, CellLocation finalLocation)
         {
             if (!_ghostHistory.TryGetValue(ghostName, out var historicEvents))
             {

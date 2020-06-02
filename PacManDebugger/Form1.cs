@@ -68,26 +68,9 @@ namespace PacManDebugger
 
         private void ToolStripButtonStart_Click(object? sender, EventArgs e)
         {
-            Task.Run(() =>
-            {
-                var session = new TraceEventSession("TestEvents");
-
-                session.EnableProvider("PacManEventSource", Microsoft.Diagnostics.Tracing.TraceEventLevel.Always);
-
-                session.Source.Dynamic.AddCallbackForProviderEvent("PacManEventSource", "GhostMoved", traceEvent =>
-                {
-                    var ghostName = (string)traceEvent.PayloadByName("ghostName");
-                    var tickCounter = (int)traceEvent.PayloadByName("tickCounter");
-                    var fromLocationX = (int)traceEvent.PayloadByName("fromLocationX");
-                    var fromLocationY = (int)traceEvent.PayloadByName("fromLocationY");
-                    var toLocationX = (int)traceEvent.PayloadByName("toLocationX");
-                    var toLocationY = (int)traceEvent.PayloadByName("toLocationY");
-
-                    _history.AddHistoricEvent(ghostName, tickCounter, new Location(fromLocationX, fromLocationY), new Location(toLocationX, toLocationY));
-                });
-
-                session.Source.Process();
-            });
+            var board = new Board();
+            var eventConsumer = new EventConsumer(_history, board);
+            eventConsumer.Start();
         }
 
         private void TickSelector_ValueChanged(object? sender, EventArgs e)

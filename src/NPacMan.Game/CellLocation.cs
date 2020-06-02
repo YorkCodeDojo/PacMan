@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.Json.Serialization;
 
 namespace NPacMan.Game
 {
@@ -20,17 +21,22 @@ namespace NPacMan.Game
 
         public override string ToString() => $"{X},{Y}";
 
+        [JsonIgnore] 
         public static CellLocation TopLeft => new CellLocation(0, 0);
 
         public CellLocation WithNewX(int newX) => new CellLocation(newX, Y);
         public CellLocation WithNewY(int newY) => new CellLocation(X, newY);
 
+        [JsonIgnore]
         public CellLocation Above => new CellLocation(X, Y - 1);
 
+        [JsonIgnore] 
         public CellLocation Below => new CellLocation(X, Y + 1);
 
+        [JsonIgnore] 
         public CellLocation Left => new CellLocation(X - 1, Y);
 
+        [JsonIgnore] 
         public CellLocation Right => new CellLocation(X + 1, Y);
 
         public static implicit operator (int X, int Y)(CellLocation cellLocation)

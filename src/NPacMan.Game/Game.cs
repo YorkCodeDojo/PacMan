@@ -37,6 +37,12 @@ namespace NPacMan.Game
 
         public Game StartGame()
         {
+            if (PacManEventSource.Log.IsEnabled())
+            {
+                var wallsJson = System.Text.Json.JsonSerializer.Serialize(_walls);
+                PacManEventSource.Log.GameStarted(_settings.Width, _settings.Height, wallsJson);
+            }
+
             _gameClock.Subscribe(Tick);
 
             return this;

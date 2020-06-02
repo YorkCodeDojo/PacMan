@@ -2,11 +2,11 @@
 {
     public readonly struct HistoricEvent
     {
-        public Location OriginalLocation { get; }
-        public Location FinalLocation { get; }
+        public CellLocation OriginalLocation { get; }
+        public CellLocation FinalLocation { get; }
         public bool WasMoveEvent { get; }
 
-        public HistoricEvent(Location originalLocation, Location finalLocation,  bool wasMoveEvent)
+        public HistoricEvent(CellLocation originalLocation, CellLocation finalLocation,  bool wasMoveEvent)
         {
             OriginalLocation = originalLocation;
             FinalLocation = finalLocation;
