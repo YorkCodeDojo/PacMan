@@ -29,7 +29,8 @@
 
             // Reference the sprite map
 
-            spriteMap = sp;
+            spriteMap = document.createElement('img');
+            spriteMap.src = "data:image/png;base64," + sp;
         }
 
         function DrawSprite(ctx, fx, fy, fs, tx, ty) {

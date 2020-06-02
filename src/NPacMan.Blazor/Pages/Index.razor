@@ -2,18 +2,17 @@
 @using NPacMan.SharedUi
 @using NPacMan.Game
 @using NPacMan.Blazor.JsInterop
+@using NPacMan.SharedUi.Properties
 
 @inject IJSRuntime jsRuntime
 
 <canvas tabindex="0" @ref="_canvas" style="height: 100%; width: 100%;"></canvas>
-<img @ref="_spriteMap" src="gfx.png" hidden />
 
 @code
 {
     private NPacMan.Game.Game? _game;
 
     private ElementReference _canvas;
-    private ElementReference _spriteMap;
 
     private BoardRenderer? _boardRenderer;
 
@@ -39,7 +38,9 @@
 
         // Pass references of the canvas and spritemap to the javascript code
 
-        await jsRuntime.InvokeVoidAsync("SetupCanvas", _canvas, _spriteMap);
+        await jsRuntime.InvokeVoidAsync("SetupCanvas", _canvas,
+            Convert.ToBase64String(Resources.gfx));
+
         _boardRenderer = new BoardRenderer();
 
         // Timer loop
