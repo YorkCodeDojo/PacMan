@@ -14,6 +14,7 @@ namespace PacManDebugger
         private readonly Label lblStart;
         private readonly Label lblEnd;
         private readonly EventConsumer _eventConsumer;
+        private PacManDetails? pacManDetails;
         private int _y = 100;
 
         public Form1()
@@ -125,6 +126,7 @@ namespace PacManDebugger
             this.BackColor = Color.White;
             this.Icon = (Icon)resources.GetObject("pacman")!;
 
+            _y = gbTime.Top + gbTime.Height + 30;
         }
 
         private void ToolStripButtonStart_Click(object? sender, EventArgs e)
@@ -170,13 +172,15 @@ namespace PacManDebugger
             const int columnsToDisplay = 50;
 
             var gridLeft = gbTime.Left;
-            var gridTop = gbTime.Top + gbTime.Height + 30; ;
+            var gridTop = gbTime.Top + gbTime.Height + 30;
+            var gridWidth = columnWidth * columnsToDisplay;
+            var gridRight = gridLeft + gridWidth;
 
             var xOffset = (columnsToDisplay - _board.Width) / 2;
             var yOffset = (rowsToDisplay - _board.Height) / 2;
 
             var currentContext = BufferedGraphicsManager.Current;
-            var grid = new Rectangle(gridLeft, gridTop, columnWidth * columnsToDisplay, rowsToDisplay * rowHeight);
+            var grid = new Rectangle(gridLeft, gridTop, gridWidth, rowsToDisplay * rowHeight);
             using var myBuffer = currentContext.Allocate(this.CreateGraphics(), grid);
             var g = myBuffer.Graphics;
 
@@ -184,34 +188,65 @@ namespace PacManDebugger
 
             DrawGrid(g, rowHeight, columnWidth, xOffset, yOffset, columnsToDisplay, rowsToDisplay);
 
+            DisplayPacMan(gridRight);
+
             var ghosts = _history.GhostNames();
             foreach (var ghostName in ghosts)
             {
-                DisplayGhost(tickCount, rowHeight, columnWidth, g, ghostName, xOffset, yOffset);
+                DisplayGhost(tickCount, rowHeight, columnWidth, g, ghostName, xOffset, yOffset, gridRight);
             }
 
             myBuffer.Render();
         }
 
-        private void DisplayGhost(int tickCount, int rowHeight, int columnWidth, Graphics g, string ghostName, int xOffset, int yOffset)
+        private void DisplayPacMan(int gridRight)
         {
-            var lbl = FindLabelForGhost(ghostName);
-            if (lbl is null)
+            if (pacManDetails is null)
             {
-                lbl = new Label();
-                lbl.Location = new System.Drawing.Point(1000, _y);
-                lbl.AutoSize = true;
-                lbl.Tag = ghostName;
-                _y += (int)(lbl.Height * 1.5);
-                this.Controls.Add(lbl);
+                pacManDetails = new PacManDetails()
+                {
+                    BorderStyle = BorderStyle.FixedSingle,
+                    Location = new Point(gridRight + 30, _y),
+                    Size = new Size(583, 116),
+                };
+                Controls.Add(pacManDetails);
+
+                _y += (int)(pacManDetails.Height * 1.2);
+            }
+        }
+
+        private void DisplayGhost(int tickCount, int rowHeight, int columnWidth, Graphics g, string ghostName, int xOffset, int yOffset, int gridRight)
+        {
+            var ghostColour = ghostName switch
+            {
+                GhostNames.Blinky => new SolidBrush(Color.FromArgb(245, 41, 0)),
+                GhostNames.Clyde => new SolidBrush(Color.FromArgb(255, 160, 6)),
+                GhostNames.Inky => new SolidBrush(Color.FromArgb(6, 219, 223)),
+                GhostNames.Pinky => new SolidBrush(Color.FromArgb(255, 176, 180)),
+                _ => Brushes.White,
+            };
+
+            var ghostDetails = FindControlForGhost(ghostName);
+            if (ghostDetails is null)
+            {
+                ghostDetails = new GhostDetails(ghostName)
+                {
+                    BorderStyle = BorderStyle.FixedSingle,
+                    Location = new Point(gridRight + 30, _y),
+                    Size = new Size(583, 116),
+                };
+                Controls.Add(ghostDetails);
+
+                _y += (int)(ghostDetails.Height * 1.2);
             }
 
             var eventDetails = _history.GetHistoricEventForTickCount(ghostName, tickCount);
-            lbl.Text = $"{ghostName} went from {eventDetails.OriginalLocation} to {eventDetails.FinalLocation}";
+            ghostDetails.ShowDetails(eventDetails);
 
             var x = (xOffset + eventDetails.FinalLocation.X) * columnWidth;
             var y = (yOffset + eventDetails.FinalLocation.Y) * rowHeight;
-            g.FillEllipse(Brushes.Red, x, y, columnWidth, rowHeight);
+            g.FillEllipse(ghostColour, x, y, columnWidth, rowHeight);
+
         }
 
         private void DrawGrid(Graphics g, int rowHeight, int columnWidth, int xOffset, int yOffset, int columnsToDisplay, int rowsToDisplay)
@@ -240,12 +275,12 @@ namespace PacManDebugger
             }
         }
 
-        private Label? FindLabelForGhost(string ghostName)
+        private GhostDetails? FindControlForGhost(string ghostName)
         {
             foreach (var ctl in this.Controls)
             {
-                if (ctl is Label lbl && (lbl.Tag is string) && lbl.Tag.Equals(ghostName))
-                    return lbl;
+                if (ctl is GhostDetails gd && gd.GhostName.Equals(ghostName))
+                    return gd;
             }
 
             return null;
