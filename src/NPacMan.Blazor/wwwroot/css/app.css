@@ -2,6 +2,9 @@
 
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    overscroll-behavior: contain;
+    user-select: none;
+    background-color: #000;
 }
 
 a, .btn-link {

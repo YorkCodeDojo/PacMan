@@ -33,19 +33,19 @@ namespace NPacMan.Blazor.JsInterop
         public class Touch
         {
             [JsonPropertyName("identifier")]
-            public int Identifier { get; set; }
+            public double Identifier { get; set; }
             [JsonPropertyName("screenX")]
-            public int ScreenX { get; set; }
+            public double ScreenX { get; set; }
             [JsonPropertyName("screenY")]
-            public int ScreenY { get; set; }
+            public double ScreenY { get; set; }
             [JsonPropertyName("clientX")]
-            public int ClientX { get; set; }
+            public double ClientX { get; set; }
             [JsonPropertyName("clientY")]
-            public int ClientY { get; set; }
+            public double ClientY { get; set; }
             [JsonPropertyName("pageX")]
-            public int PageX { get; set; }
+            public double PageX { get; set; }
             [JsonPropertyName("pageY")]
-            public int PageY { get; set; }
+            public double PageY { get; set; }
         }
     }
     /// <summary>

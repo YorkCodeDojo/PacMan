@@ -133,8 +133,8 @@
         }
     }
 
-    private int startTouchX = 0;
-    private int startTouchY = 0;
+    private double startTouchX = 0;
+    private double startTouchY = 0;
     private void TouchStart(object sender, TouchEvent e)
     {
         startTouchX = e.Touches.FirstOrDefault()?.ClientX ?? 0;
@@ -145,7 +145,6 @@
     {
         var endTouchX = e.ChangedTouches.FirstOrDefault()?.ClientX ?? 0;
         var endTouchY = e.ChangedTouches.FirstOrDefault()?.ClientY ?? 0;
-
 
         var xDiff = endTouchX - startTouchX;
         var yDiff = endTouchY - startTouchY;
