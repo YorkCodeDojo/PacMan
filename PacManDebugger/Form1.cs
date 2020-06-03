@@ -156,13 +156,6 @@ namespace PacManDebugger
             DisplayGhostsAtTime(tickCount);
         }
 
-        private void cmdDisplay_Click(object? sender, EventArgs e)
-        {
-            var tickCount = tickSelector.Value;
-
-            DisplayGhostsAtTime(tickCount);
-        }
-
         private void DisplayGhostsAtTime(int tickCount)
         {
             const int rowHeight = 15;
@@ -209,10 +202,18 @@ namespace PacManDebugger
                     Location = new Point(gridRight + 30, _y),
                     Size = new Size(583, 116),
                 };
+                pacManDetails.DisplayPacmanChanged += DisplayActorsChanged;
                 Controls.Add(pacManDetails);
 
                 _y += (int)(pacManDetails.Height * 1.2);
             }
+        }
+
+        private void DisplayActorsChanged(object? sender, EventArgs e)
+        {
+            var tickCount = tickSelector.Value;
+
+            DisplayGhostsAtTime(tickCount);
         }
 
         private void DisplayGhost(int tickCount, int rowHeight, int columnWidth, Graphics g, string ghostName, int xOffset, int yOffset, int gridRight)
@@ -235,17 +236,21 @@ namespace PacManDebugger
                     Location = new Point(gridRight + 30, _y),
                     Size = new Size(583, 116),
                 };
+                ghostDetails.DisplayGhostChanged += DisplayActorsChanged;
                 Controls.Add(ghostDetails);
 
                 _y += (int)(ghostDetails.Height * 1.2);
             }
 
-            var eventDetails = _history.GetHistoricEventForTickCount(ghostName, tickCount);
-            ghostDetails.ShowDetails(eventDetails);
+            if (ghostDetails.DisplayOnMap)
+            {
+                var eventDetails = _history.GetHistoricEventForTickCount(ghostName, tickCount);
+                ghostDetails.ShowDetails(eventDetails);
 
-            var x = (xOffset + eventDetails.FinalLocation.X) * columnWidth;
-            var y = (yOffset + eventDetails.FinalLocation.Y) * rowHeight;
-            g.FillEllipse(ghostColour, x, y, columnWidth, rowHeight);
+                var x = (xOffset + eventDetails.FinalLocation.X) * columnWidth;
+                var y = (yOffset + eventDetails.FinalLocation.Y) * rowHeight;
+                g.FillEllipse(ghostColour, x, y, columnWidth, rowHeight);
+            }
 
         }
 

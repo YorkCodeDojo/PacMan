@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace PacManDebugger
@@ -8,6 +9,10 @@ namespace PacManDebugger
         private readonly Label lblPreviousLocation;
         private readonly Label lblCurrentLocation;
         private readonly CheckBox cbDisplayPacman;
+
+        public event EventHandler? DisplayPacmanChanged;
+
+        public bool DisplayOnMap => cbDisplayPacman.Checked;
 
         public PacManDetails()
         {
@@ -20,7 +25,8 @@ namespace PacManDebugger
                 Name = "pbPacMan",
                 Size = new Size(82, 115),
                 TabIndex = 4,
-                TabStop = false
+                TabStop = false,
+                SizeMode = PictureBoxSizeMode.StretchImage,
             };
             Controls.Add(pbPacMan);
 
@@ -44,9 +50,16 @@ namespace PacManDebugger
             {
                 Text = "Display PacMan",
                 AutoSize = true,
-                Location = new Point(95, 60)
+                Location = new Point(95, 60),
+                Checked = true,
             };
+            cbDisplayPacman.CheckedChanged += CbDisplayPacman_CheckedChanged;
             Controls.Add(cbDisplayPacman);
+        }
+
+        private void CbDisplayPacman_CheckedChanged(object? sender, EventArgs e)
+        {
+            DisplayPacmanChanged?.Invoke(this, EventArgs.Empty);
         }
 
         internal void ShowDetails(HistoricEvent eventDetails)

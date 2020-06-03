@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace PacManDebugger
@@ -11,7 +12,11 @@ namespace PacManDebugger
         private readonly Label lblEdible;
         private readonly CheckBox cbDisplayGhost;
 
+        public event EventHandler? DisplayGhostChanged;
+
         public string GhostName { get; }
+
+        public bool DisplayOnMap => cbDisplayGhost.Checked;
 
         public GhostDetails(string ghostName)
         {
@@ -35,7 +40,8 @@ namespace PacManDebugger
                 Name = "pbGhost",
                 Size = new Size(82, 115),
                 TabIndex = 4,
-                TabStop = false
+                TabStop = false,
+                SizeMode = PictureBoxSizeMode.StretchImage,
             };
             Controls.Add(pbGhost);
 
@@ -59,7 +65,7 @@ namespace PacManDebugger
             {
                 Text = "Strategy",
                 AutoSize = true,
-                Location = new Point(230, 20)
+                Location = new Point(260, 20)
             };
             Controls.Add(lblStrategy);
 
@@ -67,7 +73,7 @@ namespace PacManDebugger
             {
                 Text = "Edible",
                 AutoSize = true,
-                Location = new Point(230, 40)
+                Location = new Point(260, 40)
             };
             Controls.Add(lblEdible);
 
@@ -75,9 +81,16 @@ namespace PacManDebugger
             {
                 Text = "Display Ghost",
                 AutoSize = true,
-                Location = new Point(95, 60)
+                Location = new Point(95, 60),
+                Checked = true,
             };
+            cbDisplayGhost.CheckedChanged += CbDisplayGhost_CheckedChanged;
             Controls.Add(cbDisplayGhost);
+        }
+
+        private void CbDisplayGhost_CheckedChanged(object? sender, EventArgs e)
+        {
+            DisplayGhostChanged?.Invoke(this, EventArgs.Empty);
         }
 
         internal void ShowDetails(HistoricEvent eventDetails)
