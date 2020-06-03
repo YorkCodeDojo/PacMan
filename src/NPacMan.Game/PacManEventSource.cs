@@ -15,5 +15,20 @@ namespace NPacMan.Game
         {
             WriteEvent(2, ghostName, tickCounter, fromLocationX, fromLocationY, toLocationX, toLocationY);
         }
+
+        internal void GhostStuckInHouse(string ghostName, int tickCounter, int fromLocationX, int fromLocationY, int numberOfCoinsRequiredToExitHouse)
+        {
+            WriteEvent(3, ghostName, tickCounter, fromLocationX, fromLocationY, numberOfCoinsRequiredToExitHouse);
+        }
+
+        internal void GhostChangedState(string ghostName, int tickCounter, int locationX, int locationY, string strategy, bool edible)
+        {
+            WriteEvent(4, ghostName, tickCounter, locationX, locationY, strategy, edible);
+        }
+
+        internal void PacManMoved(int tickCounter, int fromLocationX, int fromLocationY, int toLocationX, int toLocationY)
+        {
+            WriteEvent(5, tickCounter, fromLocationX, fromLocationY, toLocationX, toLocationY);
+        }
     }
 }

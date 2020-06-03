@@ -30,7 +30,7 @@ namespace NPacMan.Game
 
         public string Status { get; set; } = null!;
 
-        public DateTime? TimeToChangeState { get;private set; }
+        public DateTime? TimeToChangeState { get; private set; }
 
         public int Lives { get; private set; }
 
@@ -49,7 +49,7 @@ namespace NPacMan.Game
         public IReadOnlyCollection<CellLocation> RemainingPowerPills { get; private set; }
 
         public IReadOnlyDictionary<string, Ghost> Ghosts { get; private set; }
-        
+
         public PacMan PacMan { get; private set; }
 
         internal void RemoveCoin(CellLocation location)
@@ -68,6 +68,8 @@ namespace NPacMan.Game
 
         internal void MovePacManTo(CellLocation newPacManLocation)
         {
+            PacManEventSource.Log.PacManMoved(TickCounter, PacMan.Location.X, PacMan.Location.Y, newPacManLocation.X, newPacManLocation.Y);
+
             PacMan = PacMan.WithNewLocation(newPacManLocation);
         }
 
@@ -128,6 +130,8 @@ namespace NPacMan.Game
 
         internal void MovePacManHome()
         {
+            PacManEventSource.Log.PacManMoved(TickCounter, PacMan.Location.X, PacMan.Location.Y, PacMan.Home.X, PacMan.Home.Y);
+
             PacMan = PacMan.SetToHome();
         }
 

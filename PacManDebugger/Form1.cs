@@ -181,7 +181,7 @@ namespace PacManDebugger
 
             DrawGrid(g, rowHeight, columnWidth, xOffset, yOffset, columnsToDisplay, rowsToDisplay);
 
-            DisplayPacMan(gridRight);
+            DisplayPacMan(tickCount, rowHeight, columnWidth, g, xOffset, yOffset, gridRight);
 
             var ghosts = _history.GhostNames();
             foreach (var ghostName in ghosts)
@@ -192,7 +192,7 @@ namespace PacManDebugger
             myBuffer.Render();
         }
 
-        private void DisplayPacMan(int gridRight)
+        private void DisplayPacMan(int tickCount, int rowHeight, int columnWidth, Graphics g,int xOffset, int yOffset, int gridRight)
         {
             if (pacManDetails is null)
             {
@@ -207,6 +207,14 @@ namespace PacManDebugger
 
                 _y += (int)(pacManDetails.Height * 1.2);
             }
+
+            var eventDetails = _history.GetHistoricPacManEventForTickCount(tickCount);
+            pacManDetails.ShowDetails(eventDetails);
+
+            var x = (xOffset + eventDetails.FinalLocation.X) * columnWidth;
+            var y = (yOffset + eventDetails.FinalLocation.Y) * rowHeight;
+            g.FillEllipse(Brushes.Yellow, x, y, columnWidth, rowHeight);
+
         }
 
         private void DisplayActorsChanged(object? sender, EventArgs e)

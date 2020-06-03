@@ -48,34 +48,39 @@ namespace NPacMan.Game
                 {
                     var outDirection = Direction.Up;
                     var target = game.Doors.First().Above;
-                    if(target.X < Location.X)
+                    if (target.X < Location.X)
                     {
                         outDirection = Direction.Left;
                     }
-                    else if(target.X > Location.X)
+                    else if (target.X > Location.X)
                     {
                         outDirection = Direction.Right;
                     }
                     var newGhostLocation = Location + outDirection;
-                    
+
+                    PacManEventSource.Log.GhostMoved(Name, gameState.TickCounter, Location.X, Location.Y, newGhostLocation.X, newGhostLocation.Y);
+
                     return WithNewLocationAndDirection(newGhostLocation, outDirection);
                 }
                 else
                 {
+                    PacManEventSource.Log.GhostStuckInHouse(Name, gameState.TickCounter, Location.X, Location.Y, NumberOfCoinsRequiredToExitHouse);
+
                     return this;
                 }
             }
-          
+
             var nextDirection = CurrentStrategy.GetNextDirection(this, game);
             if (nextDirection is Direction newDirection)
             {
                 var newGhostLocation = Location + newDirection;
+                PacManEventSource.Log.GhostMoved(Name, gameState.TickCounter, Location.X, Location.Y, newGhostLocation.X, newGhostLocation.Y);
+
                 if (game.Portals.TryGetValue(newGhostLocation, out var otherEndOfThePortal))
                 {
                     newGhostLocation = otherEndOfThePortal + newDirection;
+                    PacManEventSource.Log.GhostMoved(Name, gameState.TickCounter, Location.X, Location.Y, newGhostLocation.X, newGhostLocation.Y);
                 }
-
-                PacManEventSource.Log.GhostMoved(Name, gameState.TickCounter, Location.X, Location.Y, newGhostLocation.X, newGhostLocation.Y);
 
                 return WithNewLocationAndDirection(newGhostLocation, newDirection);
             }
@@ -83,26 +88,42 @@ namespace NPacMan.Game
                 return this;
         }
 
-        internal Ghost Chase()
+        internal Ghost Chase(IReadOnlyGameState gameState)
         {
+            PacManEventSource.Log.GhostChangedState(Name, gameState.TickCounter, Location.X, Location.Y, "Chase", Edible);
+
             return WithNewCurrentStrategyAndDirection(ChaseStrategy, Direction.Opposite());
         }
 
-        internal Ghost Scatter()
+        internal Ghost Scatter(IReadOnlyGameState gameState)
         {
+            PacManEventSource.Log.GhostChangedState(Name, gameState.TickCounter, Location.X, Location.Y, "Scatter", Edible);
+
             var strategy = new DirectToStrategy(new DirectToGhostScatterTarget(this));
             return WithNewCurrentStrategyAndDirection(strategy, Direction.Opposite());
         }
 
-        internal Ghost SetToHome() => WithNewLocation(Home);
-
-        internal Ghost SetToEdible(IDirectionPicker directionPicker)
+        internal Ghost SetToHome(IReadOnlyGameState gameState)
         {
+            PacManEventSource.Log.GhostMoved(Name, gameState.TickCounter, Location.X, Location.Y, Home.X, Home.Y);
+
+            return WithNewLocation(Home);
+        }
+
+        internal Ghost SetToEdible(IReadOnlyGameState gameState, IDirectionPicker directionPicker)
+        {
+            PacManEventSource.Log.GhostChangedState(Name, gameState.TickCounter, Location.X, Location.Y, "Random", edible: true);
+
             var strategy = new RandomStrategy(directionPicker);
             return WithNewEdibleAndDirectionAndStrategy(true, Direction.Opposite(), strategy);
         }
 
-        internal Ghost SetToNotEdible() => WithNewEdibleAndDirectionAndStrategy(false, Direction, ChaseStrategy);
+        internal Ghost SetToNotEdible(IReadOnlyGameState gameState)
+        {
+            PacManEventSource.Log.GhostChangedState(Name, gameState.TickCounter, Location.X, Location.Y, "Chase", edible: false);
+
+            return WithNewEdibleAndDirectionAndStrategy(false, Direction, ChaseStrategy);
+        }
 
         private Ghost WithNewEdibleAndDirectionAndStrategy(bool isEdible, Direction newDirection, IGhostStrategy newCurrentStrategy)
             => new Ghost(Name, Home, Location, newDirection, ScatterTarget, ChaseStrategy, newCurrentStrategy, isEdible, NumberOfCoinsRequiredToExitHouse);

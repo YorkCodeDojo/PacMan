@@ -78,17 +78,17 @@ namespace NPacMan.Game
 
         public static void ScatterGhosts(GameState gameState)
         {
-            gameState.ApplyToGhosts(ghost => ghost.Scatter());
+            gameState.ApplyToGhosts(ghost => ghost.Scatter(gameState));
         }
 
         public static void GhostToChase(GameState gameState)
         {
-            gameState.ApplyToGhosts(ghost => ghost.Chase());
+            gameState.ApplyToGhosts(ghost => ghost.Chase(gameState));
         }
 
         public static void MakeGhostsNotEdible(GameState gameState)
         {
-            gameState.ApplyToGhosts(ghost => ghost.SetToNotEdible());
+            gameState.ApplyToGhosts(ghost => ghost.SetToNotEdible(gameState));
         }
 
         public async static Task MovePacMan(Game game, GameState gameState, BehaviorContext<GameState, Tick> context, GameStateMachine gameStateMachine)
@@ -147,24 +147,24 @@ namespace NPacMan.Game
 
         private static void MakeGhostNotEdible(GameState gameState, Ghost ghostToUpdate)
         {
-            gameState.ApplyToGhost(ghost => ghost.SetToNotEdible(), ghostToUpdate);
+            gameState.ApplyToGhost(ghost => ghost.SetToNotEdible(gameState), ghostToUpdate);
         }
 
         private static void MovePacManHome(GameState gameState) => gameState.MovePacManHome();
 
         private static void SendGhostHome(GameState gameState, Ghost ghostToUpdate)
         {
-            gameState.ApplyToGhost(ghost => ghost.SetToHome(), ghostToUpdate);
+            gameState.ApplyToGhost(ghost => ghost.SetToHome(gameState), ghostToUpdate);
         }
 
         private static void MoveGhostsHome(GameState gameState)
         {
-            gameState.ApplyToGhosts(ghost => ghost.SetToHome());
+            gameState.ApplyToGhosts(ghost => ghost.SetToHome(gameState));
         }
 
         private static void MakeGhostsEdible(IGameSettings gameSettings, GameState gameState)
         {
-            gameState.ApplyToGhosts(ghost => ghost.SetToEdible(gameSettings.DirectionPicker));
+            gameState.ApplyToGhosts(ghost => ghost.SetToEdible(gameState, gameSettings.DirectionPicker));
         }
     }
 }

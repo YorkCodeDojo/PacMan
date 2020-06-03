@@ -8,6 +8,8 @@ namespace PacManDebugger
     {
         private Dictionary<string, HistoricEvent[]> _ghostHistory = new Dictionary<string, HistoricEvent[]>();
 
+        private HistoricEvent[] _pacmanHistory = new HistoricEvent[1000];
+
         public void AddHistoricEvent(string ghostName, int tickCounter, CellLocation originalLocation, CellLocation finalLocation)
         {
             if (!_ghostHistory.TryGetValue(ghostName, out var historicEvents))
@@ -42,6 +44,18 @@ namespace PacManDebugger
         internal void Clear()
         {
             _ghostHistory.Clear();
+            _pacmanHistory = new HistoricEvent[1000];
+        }
+
+        internal void AddHistoricPacManEvent(int tickCounter, CellLocation originalLocation, CellLocation finalLocation)
+        {
+            var historicEvent = new HistoricEvent(originalLocation, finalLocation, wasMoveEvent: true);
+            _pacmanHistory[tickCounter] = historicEvent;
+        }
+
+        internal HistoricEvent GetHistoricPacManEventForTickCount(int tickCount)
+        {
+            return _pacmanHistory[tickCount];
         }
     }
 }
