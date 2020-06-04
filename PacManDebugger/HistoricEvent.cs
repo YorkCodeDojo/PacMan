@@ -1,4 +1,6 @@
-﻿namespace PacManDebugger
+﻿using System;
+
+namespace PacManDebugger
 {
     public readonly struct HistoricEvent
     {
@@ -12,7 +14,10 @@
             FinalLocation = finalLocation;
             WasMoveEvent = wasMoveEvent;
         }
+
+        internal HistoricEvent WithFinalLocation(CellLocation finalLocation)
+        {
+            return new HistoricEvent(OriginalLocation, finalLocation, WasMoveEvent);
+        }
     }
-
-
 }

@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.Tracing;
+﻿using System;
+using System.Diagnostics.Tracing;
 
 namespace NPacMan.Game
 {
@@ -29,6 +30,11 @@ namespace NPacMan.Game
         internal void PacManMoved(int tickCounter, int fromLocationX, int fromLocationY, int toLocationX, int toLocationY)
         {
             WriteEvent(5, tickCounter, fromLocationX, fromLocationY, toLocationX, toLocationY);
+        }
+
+        internal void PacManStateChanged(int tickCounter, int lives, int score, int locationX, int locationY, string direction)
+        {
+            WriteEvent(6, tickCounter, lives, score, locationX, locationY, direction);
         }
     }
 }

@@ -58,6 +58,19 @@ namespace PacManDebugger
 
                     _history.AddHistoricPacManEvent(tickCounter, new CellLocation(fromLocationX, fromLocationY), new CellLocation(toLocationX, toLocationY));
                 });
+
+                _session.Source.Dynamic.AddCallbackForProviderEvent("PacManEventSource", "PacManStateChanged", traceEvent =>
+                {
+                    var tickCounter = (int)traceEvent.PayloadByName("tickCounter");
+                    var lives = (int)traceEvent.PayloadByName("lives");
+                    var score = (int)traceEvent.PayloadByName("score");
+                    var locationX = (int)traceEvent.PayloadByName("locationX");
+                    var locationY = (int)traceEvent.PayloadByName("locationY");
+                    var direction = (string)traceEvent.PayloadByName("direction");
+
+                    _history.AddHistoricPacManEvent(tickCounter, new CellLocation(locationX, locationY), new CellLocation(locationX, locationY));
+                });
+
                 _session.Source.Process();
             });
         }

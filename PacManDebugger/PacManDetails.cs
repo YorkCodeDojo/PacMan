@@ -9,6 +9,9 @@ namespace PacManDebugger
         private readonly Label lblPreviousLocation;
         private readonly Label lblCurrentLocation;
         private readonly CheckBox cbDisplayPacman;
+        private Label lblLives;
+        private readonly Label lblDirection;
+        private readonly Label lblScore;
 
         public event EventHandler? DisplayPacmanChanged;
 
@@ -53,6 +56,32 @@ namespace PacManDebugger
                 Location = new Point(95, 60),
                 Checked = true,
             };
+
+            lblLives = new Label
+            {
+                Text = "Lives",
+                AutoSize = true,
+                Location = new Point(260, 20)
+            };
+            Controls.Add(lblLives);
+
+            lblScore = new Label
+            {
+                Text = "Score",
+                AutoSize = true,
+                Location = new Point(260, 40)
+            };
+            Controls.Add(lblScore);
+
+            lblDirection = new Label
+            {
+                Text = "Direction",
+                AutoSize = true,
+                Location = new Point(260, 60)
+            };
+            Controls.Add(lblDirection);
+
+
             cbDisplayPacman.CheckedChanged += CbDisplayPacman_CheckedChanged;
             Controls.Add(cbDisplayPacman);
         }
@@ -62,10 +91,13 @@ namespace PacManDebugger
             DisplayPacmanChanged?.Invoke(this, EventArgs.Empty);
         }
 
-        internal void ShowDetails(HistoricEvent eventDetails)
+        internal void ShowDetails(HistoricPacManEvent eventDetails)
         {
             lblPreviousLocation.Text = $"Previous Location : { eventDetails.OriginalLocation}";
             lblCurrentLocation.Text = $"Current Location : { eventDetails.FinalLocation}";
+            lblScore.Text = $"Lives : { eventDetails.Lives}";
+            lblLives.Text = $"Score : { eventDetails.Score}";
+            lblDirection.Text = $"Facing : { eventDetails.Direction}";
         }
     }
 }

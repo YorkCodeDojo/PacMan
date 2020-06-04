@@ -8,7 +8,7 @@ namespace PacManDebugger
     {
         private Dictionary<string, HistoricEvent[]> _ghostHistory = new Dictionary<string, HistoricEvent[]>();
 
-        private HistoricEvent[] _pacmanHistory = new HistoricEvent[1000];
+        private HistoricPacManEvent[] _pacmanHistory = new HistoricPacManEvent[1000];
 
         public void AddHistoricEvent(string ghostName, int tickCounter, CellLocation originalLocation, CellLocation finalLocation)
         {
@@ -44,16 +44,24 @@ namespace PacManDebugger
         internal void Clear()
         {
             _ghostHistory.Clear();
-            _pacmanHistory = new HistoricEvent[1000];
+            _pacmanHistory = new HistoricPacManEvent[1000];
         }
 
         internal void AddHistoricPacManEvent(int tickCounter, CellLocation originalLocation, CellLocation finalLocation)
         {
-            var historicEvent = new HistoricEvent(originalLocation, finalLocation, wasMoveEvent: true);
-            _pacmanHistory[tickCounter] = historicEvent;
+            if (_pacmanHistory[tickCounter].WasMoveEvent)
+            {
+                // Already had a record for this tick,  need to merge
+                _pacmanHistory[tickCounter] = _pacmanHistory[tickCounter].WithFinalLocation(finalLocation);
+            }
+            else
+            {
+                var historicEvent = new HistoricPacManEvent(originalLocation, finalLocation, wasMoveEvent: true, 0, 0, string.Empty);
+                _pacmanHistory[tickCounter] = historicEvent;
+            }
         }
 
-        internal HistoricEvent GetHistoricPacManEventForTickCount(int tickCount)
+        internal HistoricPacManEvent GetHistoricPacManEventForTickCount(int tickCount)
         {
             return _pacmanHistory[tickCount];
         }

@@ -211,9 +211,12 @@ namespace PacManDebugger
             var eventDetails = _history.GetHistoricPacManEventForTickCount(tickCount);
             pacManDetails.ShowDetails(eventDetails);
 
-            var x = (xOffset + eventDetails.FinalLocation.X) * columnWidth;
-            var y = (yOffset + eventDetails.FinalLocation.Y) * rowHeight;
-            g.FillEllipse(Brushes.Yellow, x, y, columnWidth, rowHeight);
+            if (pacManDetails.DisplayOnMap)
+            {
+                var x = (xOffset + eventDetails.FinalLocation.X) * columnWidth;
+                var y = (yOffset + eventDetails.FinalLocation.Y) * rowHeight;
+                g.FillEllipse(Brushes.Yellow, x, y, columnWidth, rowHeight);
+            }
 
         }
 
