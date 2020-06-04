@@ -208,13 +208,14 @@ namespace PacManDebugger
                 _y += (int)(pacManDetails.Height * 1.2);
             }
 
-            var eventDetails = _history.GetHistoricPacManEventForTickCount(tickCount);
-            pacManDetails.ShowDetails(eventDetails);
+            var locationDetails = _history.GetHistoricPacManMovementEventForTickCount(tickCount);
+            var stateDetails = _history.GetHistoricPacManStateChangeEventForTickCount(tickCount);
+            pacManDetails.ShowDetails(locationDetails, stateDetails);
 
             if (pacManDetails.DisplayOnMap)
             {
-                var x = (xOffset + eventDetails.FinalLocation.X) * columnWidth;
-                var y = (yOffset + eventDetails.FinalLocation.Y) * rowHeight;
+                var x = (xOffset + locationDetails.FinalLocation.X) * columnWidth;
+                var y = (yOffset + locationDetails.FinalLocation.Y) * rowHeight;
                 g.FillEllipse(Brushes.Yellow, x, y, columnWidth, rowHeight);
             }
 

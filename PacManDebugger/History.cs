@@ -8,7 +8,8 @@ namespace PacManDebugger
     {
         private Dictionary<string, HistoricEvent[]> _ghostHistory = new Dictionary<string, HistoricEvent[]>();
 
-        private HistoricPacManEvent[] _pacmanHistory = new HistoricPacManEvent[1000];
+        private HistoricPacManMovementEvent[] _pacmanMovements = new HistoricPacManMovementEvent[1000];
+        private HistoricPacManStateChangeEvent[] _pacmanStateChanges = new HistoricPacManStateChangeEvent[1000];
 
         public void AddHistoricEvent(string ghostName, int tickCounter, CellLocation originalLocation, CellLocation finalLocation)
         {
@@ -44,26 +45,39 @@ namespace PacManDebugger
         internal void Clear()
         {
             _ghostHistory.Clear();
-            _pacmanHistory = new HistoricPacManEvent[1000];
+            _pacmanMovements = new HistoricPacManMovementEvent[1000];
         }
 
         internal void AddHistoricPacManEvent(int tickCounter, CellLocation originalLocation, CellLocation finalLocation)
         {
-            if (_pacmanHistory[tickCounter].WasMoveEvent)
-            {
-                // Already had a record for this tick,  need to merge
-                _pacmanHistory[tickCounter] = _pacmanHistory[tickCounter].WithFinalLocation(finalLocation);
-            }
-            else
-            {
-                var historicEvent = new HistoricPacManEvent(originalLocation, finalLocation, wasMoveEvent: true, 0, 0, string.Empty);
-                _pacmanHistory[tickCounter] = historicEvent;
-            }
+            var historicEvent = new HistoricPacManMovementEvent(originalLocation, finalLocation);
+            _pacmanMovements[tickCounter] = historicEvent;
         }
 
-        internal HistoricPacManEvent GetHistoricPacManEventForTickCount(int tickCount)
+        internal void AddHistoricPacManStateChangedEvent(int tickCounter, int lives, int score, string direction)
         {
-            return _pacmanHistory[tickCount];
+            var historicEvent = new HistoricPacManStateChangeEvent(lives, score, direction);
+            _pacmanStateChanges[tickCounter] = historicEvent;
+        }
+
+        internal HistoricPacManMovementEvent GetHistoricPacManMovementEventForTickCount(int tickCount)
+        {
+            while (!_pacmanMovements[tickCount].EventSet && tickCount > 0)
+            {
+                tickCount--;
+            }
+
+            return _pacmanMovements[tickCount];
+        }
+
+        internal HistoricPacManStateChangeEvent GetHistoricPacManStateChangeEventForTickCount(int tickCount)
+        {
+            while (!_pacmanStateChanges[tickCount].EventSet && tickCount > 0)
+            {
+                tickCount--;
+            }
+
+            return _pacmanStateChanges[tickCount];
         }
     }
 }

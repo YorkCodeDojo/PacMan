@@ -91,13 +91,13 @@ namespace PacManDebugger
             DisplayPacmanChanged?.Invoke(this, EventArgs.Empty);
         }
 
-        internal void ShowDetails(HistoricPacManEvent eventDetails)
+        internal void ShowDetails(HistoricPacManMovementEvent eventDetails, HistoricPacManStateChangeEvent stateDetails)
         {
             lblPreviousLocation.Text = $"Previous Location : { eventDetails.OriginalLocation}";
             lblCurrentLocation.Text = $"Current Location : { eventDetails.FinalLocation}";
-            lblScore.Text = $"Lives : { eventDetails.Lives}";
-            lblLives.Text = $"Score : { eventDetails.Score}";
-            lblDirection.Text = $"Facing : { eventDetails.Direction}";
+            lblScore.Text = $"Lives : { stateDetails.Lives}";
+            lblLives.Text = $"Score : { stateDetails.Score}";
+            lblDirection.Text = $"Facing : { stateDetails.Direction}";
         }
     }
 }

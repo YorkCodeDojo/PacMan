@@ -41,8 +41,8 @@ namespace NPacMan.Game
             {
                 var wallsJson = System.Text.Json.JsonSerializer.Serialize(_walls);
                 PacManEventSource.Log.GameStarted(_settings.Width, _settings.Height, wallsJson);
-
-                PacManEventSource.Log.PacManStateChanged(_gameState.TickCounter, _gameState.Lives, _gameState.Score, PacMan.Location.X, PacMan.Location.Y, PacMan.Direction.ToText());
+                PacManEventSource.Log.PacManMoved(_gameState.TickCounter, PacMan.Location.X, PacMan.Location.Y, PacMan.Location.X, PacMan.Location.Y);
+                PacManEventSource.Log.PacManStateChanged(_gameState.TickCounter, _gameState.Lives, _gameState.Score, PacMan.Direction.ToText());
             }
 
             _gameClock.Subscribe(Tick);

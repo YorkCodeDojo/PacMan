@@ -32,9 +32,9 @@ namespace NPacMan.Game
             WriteEvent(5, tickCounter, fromLocationX, fromLocationY, toLocationX, toLocationY);
         }
 
-        internal void PacManStateChanged(int tickCounter, int lives, int score, int locationX, int locationY, string direction)
+        internal void PacManStateChanged(int tickCounter, int lives, int score, string direction)
         {
-            WriteEvent(6, tickCounter, lives, score, locationX, locationY, direction);
+            WriteEvent(6, tickCounter, lives, score, direction);
         }
     }
 }

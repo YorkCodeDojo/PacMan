@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using System.Windows.Forms;
 using NPacMan.SharedUi;
 
@@ -47,6 +48,7 @@ namespace NPacMan.UI
             _fpsStopWatch.Start();
 
             Gfx = new Bitmap("gfx.png");
+            Gfx= Gfx.Clone(new Rectangle(0, 0, Gfx.Width, Gfx.Height), PixelFormat.Format32bppPArgb);
 
         }
 

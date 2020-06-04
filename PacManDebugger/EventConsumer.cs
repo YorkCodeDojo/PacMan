@@ -64,11 +64,12 @@ namespace PacManDebugger
                     var tickCounter = (int)traceEvent.PayloadByName("tickCounter");
                     var lives = (int)traceEvent.PayloadByName("lives");
                     var score = (int)traceEvent.PayloadByName("score");
-                    var locationX = (int)traceEvent.PayloadByName("locationX");
-                    var locationY = (int)traceEvent.PayloadByName("locationY");
                     var direction = (string)traceEvent.PayloadByName("direction");
 
-                    _history.AddHistoricPacManEvent(tickCounter, new CellLocation(locationX, locationY), new CellLocation(locationX, locationY));
+                    _history.AddHistoricPacManStateChangedEvent(tickCounter, 
+                                                                lives,
+                                                                score,
+                                                                direction);
                 });
 
                 _session.Source.Process();

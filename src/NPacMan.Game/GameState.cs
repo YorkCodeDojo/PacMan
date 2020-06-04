@@ -76,13 +76,13 @@ namespace NPacMan.Game
         internal void IncreaseScore(int amount)
         {
             Score += amount;
-            PacManEventSource.Log.PacManStateChanged(TickCounter, Lives, Score, PacMan.Location.X, PacMan.Location.Y, PacMan.Direction.ToText());
+            PacManEventSource.Log.PacManStateChanged(TickCounter, Lives, Score, PacMan.Direction.ToText());
         }
 
         internal void DecreaseLives()
         {
             Lives--;
-            PacManEventSource.Log.PacManStateChanged(TickCounter, Lives, Score, PacMan.Location.X, PacMan.Location.Y, PacMan.Direction.ToText());
+            PacManEventSource.Log.PacManStateChanged(TickCounter, Lives, Score,PacMan.Direction.ToText());
         }
 
         internal void ShowGhosts()
@@ -143,7 +143,7 @@ namespace NPacMan.Game
             {
                 PacMan = PacMan.WithNewDirection(direction);
 
-                PacManEventSource.Log.PacManStateChanged(TickCounter, Lives, Score, PacMan.Location.X, PacMan.Location.Y, PacMan.Direction.ToText());
+                PacManEventSource.Log.PacManStateChanged(TickCounter, Lives, Score, PacMan.Direction.ToText());
             }
         }
     }
