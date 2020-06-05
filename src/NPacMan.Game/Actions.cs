@@ -66,6 +66,13 @@ namespace NPacMan.Game
             MakeGhostNotEdible(gameState, ghost);
         }
 
+        internal static void FruitEaten(Game game, IGameSettings settings, GameState gameState, CellLocation location, GameNotifications gameNotifications)
+        {
+            gameState.IncreaseScore(100);
+            gameState.HideFruit();
+            gameNotifications.Publish(GameNotification.EatFruit);
+        }
+
         public static void EatenByGhost(GameState gameState)
         {
             gameState.DecreaseLives();
@@ -95,7 +102,7 @@ namespace NPacMan.Game
             gameState.ApplyToGhosts(ghost => ghost.SetToNotEdible());
         }
 
-        public async static Task MovePacMan(Game game, GameState gameState, BehaviorContext<GameState, Tick> context, GameStateMachine gameStateMachine)
+        public async static Task MovePacMan(Game game, GameState gameState, BehaviorContext<GameState, Tick> context, GameStateMachine gameStateMachine, IGameSettings settings)
         {
             var newPacManLocation = gameState.PacMan.Location + gameState.PacMan.Direction;
 
@@ -123,6 +130,11 @@ namespace NPacMan.Game
             if (gameState.RemainingPowerPills.Contains(newPacManLocation))
             {
                 await context.Raise(gameStateMachine.PowerPillCollision, new PowerPillCollision(newPacManLocation));
+            }
+
+            if (settings.Fruit == newPacManLocation && gameState.FruitVisible )
+            {
+                await context.Raise(gameStateMachine.FruitCollision, new FruitCollision(newPacManLocation));
             }
         }
 

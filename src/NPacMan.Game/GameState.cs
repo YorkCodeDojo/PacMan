@@ -52,6 +52,7 @@ namespace NPacMan.Game
         public IReadOnlyDictionary<string, Ghost> Ghosts { get; private set; }
         
         public PacMan PacMan { get; private set; }
+
         public bool FruitVisible => LastTick <= _fruitVisibleUntil;
 
         internal void RemoveCoin(CellLocation location)
@@ -66,6 +67,11 @@ namespace NPacMan.Game
             // Note - this is not the same as gameState.RemainingPowerPills = gameState.RemainingPowerPills.Remove(location)
             // We have to allow for the UI to be iterating over the list whilst we are removing elements from it.
             RemainingPowerPills = RemainingPowerPills.Where(p => p != location).ToList();
+        }
+
+        internal void HideFruit()
+        {
+            _fruitVisibleUntil = null;
         }
 
         internal void MovePacManTo(CellLocation newPacManLocation)

@@ -10,11 +10,14 @@ namespace NPacMan.Game.Tests.GameTests
 {
     public class FruitTests
     {
+        private readonly DateTime _now;
         private readonly TestGameSettings _gameSettings;
         private readonly TestGameClock _gameClock;
 
         public FruitTests()
         {
+            _now = DateTime.UtcNow;
+
             _gameSettings = new TestGameSettings();
             _gameClock = new TestGameClock();
         }
@@ -61,10 +64,16 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public async Task FruitShouldDisappearAfterAConfiguredAmountOfTime()
         {
-            var now = DateTime.UtcNow;
             var fruitLocation = _gameSettings.PacMan.Location.FarAway();
+            var game = await PlayGameUntilFruitAppears(fruitLocation);
+
+            await _gameClock.Tick(_now.AddSeconds(_gameSettings.FruitVisibleForSeconds).AddSeconds(1));
+
+            game.Fruits.Should().BeEmpty();
+        }
+
+        private async Task<Game> PlayGameUntilFruitAppears(CellLocation fruitLocation){
             _gameSettings.Fruit = fruitLocation;
-            _gameSettings.FruitVisibleForSeconds = 5;
             _gameSettings.FruitAppearsAfterCoinsEaten.Add(2);
 
             _gameSettings.Coins.Add(_gameSettings.PacMan.Location.Left);
@@ -73,18 +82,47 @@ namespace NPacMan.Game.Tests.GameTests
             var game = new Game(_gameClock, _gameSettings);
             game.StartGame();
             await game.ChangeDirection(Direction.Left);
-            await _gameClock.Tick(now);
-            await _gameClock.Tick(now);
+            await _gameClock.Tick(_now);
+            await _gameClock.Tick(_now);
 
             if (!game.Fruits.Any())
             {
                 throw new Exception("Fruit should be visible");
             }
 
-            await _gameClock.Tick(now.AddSeconds(_gameSettings.FruitVisibleForSeconds).AddSeconds(1));
+            return game;
+        }
+        [Fact]
+        public async Task PacManCanEatAFruit()
+        {
+             var fruitLocation = _gameSettings.PacMan.Location.Left.Left.Left;
+            var game = await PlayGameUntilFruitAppears(fruitLocation);
 
-            game.Fruits.Should().BeEmpty();
+            var score = game.Score;
+            await _gameClock.Tick();
+            
+            game.Should().BeEquivalentTo(new {
+                Fruits = new Fruit[0],
+                Score = score + 100
+            });
+        }
+
+
+        [Fact]
+        public async Task NotificationsAreRaisedWhenFruitsAreEaten()
+        {
+            var game = await PlayGameUntilFruitAppears(_gameSettings.PacMan.Location.Left.Left.Left);
+            var numberOfNotificationsTriggered = 0;
+            game.Subscribe(GameNotification.EatFruit, () => numberOfNotificationsTriggered++);
+            
+             if (numberOfNotificationsTriggered != 0)
+            {
+                throw new Exception("No EatFruit notifications should have been triggered yet.");
+            }
+            
+            await _gameClock.Tick();
+            
+            numberOfNotificationsTriggered.Should().Be(1);
         }
     }
 }
-    
