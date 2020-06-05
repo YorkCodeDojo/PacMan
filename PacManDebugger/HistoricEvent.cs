@@ -6,18 +6,18 @@ namespace PacManDebugger
     {
         public CellLocation OriginalLocation { get; }
         public CellLocation FinalLocation { get; }
-        public bool WasMoveEvent { get; }
+        public bool EventSet { get; }
 
-        public HistoricEvent(CellLocation originalLocation, CellLocation finalLocation,  bool wasMoveEvent)
+        public HistoricEvent(CellLocation originalLocation, CellLocation finalLocation,  bool eventSet)
         {
             OriginalLocation = originalLocation;
             FinalLocation = finalLocation;
-            WasMoveEvent = wasMoveEvent;
+            EventSet = eventSet;
         }
 
         internal HistoricEvent WithFinalLocation(CellLocation finalLocation)
         {
-            return new HistoricEvent(OriginalLocation, finalLocation, WasMoveEvent);
+            return new HistoricEvent(OriginalLocation, finalLocation, EventSet);
         }
     }
 }

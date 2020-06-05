@@ -11,25 +11,13 @@ namespace PacManDebugger
         private HistoricPacManMovementEvent[] _pacmanMovements = new HistoricPacManMovementEvent[1000];
         private HistoricPacManStateChangeEvent[] _pacmanStateChanges = new HistoricPacManStateChangeEvent[1000];
 
-        public void AddHistoricEvent(string ghostName, int tickCounter, CellLocation originalLocation, CellLocation finalLocation)
-        {
-            if (!_ghostHistory.TryGetValue(ghostName, out var historicEvents))
-            {
-                historicEvents = new HistoricEvent[1000];
-                _ghostHistory.Add(ghostName, historicEvents);
-            }
-
-            var historicEvent = new HistoricEvent(originalLocation, finalLocation, wasMoveEvent: true);
-            historicEvents[tickCounter] = historicEvent;
-        }
-
         internal string[] GhostNames() => _ghostHistory.Keys.ToArray();
 
         internal HistoricEvent GetHistoricEventForTickCount(string ghostName, int tickCount)
         {
             if (_ghostHistory.TryGetValue(ghostName, out var historicEvents))
             {
-                while (!historicEvents[tickCount].WasMoveEvent && tickCount > 0)
+                while (!historicEvents[tickCount].EventSet && tickCount > 0)
                 {
                     tickCount--;
                 }
@@ -46,9 +34,10 @@ namespace PacManDebugger
         {
             _ghostHistory.Clear();
             _pacmanMovements = new HistoricPacManMovementEvent[1000];
+            _pacmanStateChanges = new HistoricPacManStateChangeEvent[1000];
         }
 
-        internal void AddHistoricPacManEvent(int tickCounter, CellLocation originalLocation, CellLocation finalLocation)
+        internal void AddHistoricPacManMovementEvent(int tickCounter, CellLocation originalLocation, CellLocation finalLocation)
         {
             var historicEvent = new HistoricPacManMovementEvent(originalLocation, finalLocation);
             _pacmanMovements[tickCounter] = historicEvent;
@@ -58,6 +47,22 @@ namespace PacManDebugger
         {
             var historicEvent = new HistoricPacManStateChangeEvent(lives, score, direction);
             _pacmanStateChanges[tickCounter] = historicEvent;
+        }
+
+        public void AddHistoricGhostMovementEvent(string ghostName, int tickCounter, CellLocation originalLocation, CellLocation finalLocation, string direction)
+        {
+            if (!_ghostHistory.TryGetValue(ghostName, out var historicEvents))
+            {
+                historicEvents = new HistoricEvent[1000];
+                _ghostHistory.Add(ghostName, historicEvents);
+            }
+
+            var historicEvent = new HistoricEvent(originalLocation, finalLocation, eventSet: true);
+            historicEvents[tickCounter] = historicEvent;
+        }
+
+        internal void AddHistoricGhostStateChangedEvent(string ghostName, int tickCounter, string strategy, bool edible, string direction)
+        {
         }
 
         internal HistoricPacManMovementEvent GetHistoricPacManMovementEventForTickCount(int tickCount)

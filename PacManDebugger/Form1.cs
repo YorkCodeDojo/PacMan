@@ -232,11 +232,11 @@ namespace PacManDebugger
         {
             var ghostColour = ghostName switch
             {
-                GhostNames.Blinky => new SolidBrush(Color.FromArgb(245, 41, 0)),
-                GhostNames.Clyde => new SolidBrush(Color.FromArgb(255, 160, 6)),
-                GhostNames.Inky => new SolidBrush(Color.FromArgb(6, 219, 223)),
-                GhostNames.Pinky => new SolidBrush(Color.FromArgb(255, 176, 180)),
-                _ => Brushes.White,
+                GhostNames.Blinky => Color.FromArgb(245, 41, 0),
+                GhostNames.Clyde => Color.FromArgb(255, 160, 6),
+                GhostNames.Inky => Color.FromArgb(6, 219, 223),
+                GhostNames.Pinky => Color.FromArgb(255, 176, 180),
+                _ => Color.Orange,
             };
 
             var ghostDetails = FindControlForGhost(ghostName);
@@ -245,6 +245,7 @@ namespace PacManDebugger
                 ghostDetails = new GhostDetails(ghostName)
                 {
                     BorderStyle = BorderStyle.FixedSingle,
+                    BackColor = ghostColour,
                     Location = new Point(gridRight + 30, _y),
                     Size = new Size(583, 116),
                 };
@@ -261,7 +262,7 @@ namespace PacManDebugger
 
                 var x = (xOffset + eventDetails.FinalLocation.X) * columnWidth;
                 var y = (yOffset + eventDetails.FinalLocation.Y) * rowHeight;
-                g.FillEllipse(ghostColour, x, y, columnWidth, rowHeight);
+                g.FillEllipse(new SolidBrush(ghostColour), x, y, columnWidth, rowHeight);
             }
 
         }

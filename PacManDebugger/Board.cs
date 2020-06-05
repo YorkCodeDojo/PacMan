@@ -10,8 +10,8 @@ namespace PacManDebugger
 
         public void UpdateDefinition(int width, int height, CellLocation[] walls)
         {
-            Width = width;
-            Height = height;
+            Width = width == 0 ? 25 : width;
+            Height = height == 0 ? 25 : height;
             Walls = walls;
         }
 
