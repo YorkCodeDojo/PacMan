@@ -45,6 +45,7 @@ namespace NPacMan.SharedUi
             RenderWalls(game);
             RenderCoins(game);
             RenderPowerPills(game);
+            RenderFruit(game);
 
             // Add the sprites
             RenderPacMan(game);
@@ -80,6 +81,16 @@ namespace NPacMan.SharedUi
             foreach (var coin in coins)
             {
                 _display.DrawOnBackground(coin.X,coin.Y+_boardY, _sprites.Coin());
+            }
+        }
+
+        private void RenderFruit(Game.Game game)
+        {
+            var fruits = game.Fruits;
+
+            foreach (var fruit in fruits)
+            {
+                _display.AddSprite(fruit.Location.X, fruit.Location.Y+_boardY, _sprites.Bonus[(int)fruit.Type]);
             }
         }
 
