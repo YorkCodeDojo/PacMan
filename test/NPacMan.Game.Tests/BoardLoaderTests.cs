@@ -18,9 +18,9 @@ namespace NPacMan.Game.Tests
             {
                 Walls = new CellLocation[] { (0, 0), (1, 0), (2, 0), (0, 1), (2, 1), (0, 2), (1, 2) },
                 Coins = new CellLocation[] { (1, 1), (2, 2) },
-                Doors = new CellLocation[] { new CellLocation(0, 4), new CellLocation(1, 4), new CellLocation(2, 4) },
+                Doors = new CellLocation[] { new CellLocation(0, 5), new CellLocation(1, 5), new CellLocation(2, 5) },
                 Width = 3,
-                Height = 5,
+                Height = 6,
                 Portals = new Dictionary<CellLocation, CellLocation >
                 {
                     {(-1,3), (3,3) },{(3,3), (-1,3) }
@@ -36,8 +36,9 @@ namespace NPacMan.Game.Tests
  X.X 
  XX. 
 T*▲*T
- ---
- HHH ";
+ --- 
+ HHH 
+  F  ";
             var gameBoard = GameSettingsLoader.Load(board);
 
             gameBoard.Should().BeEquivalentTo(new
@@ -48,7 +49,8 @@ T*▲*T
                 Doors = new CellLocation[] { new CellLocation(0, 4), new CellLocation(1, 4), new CellLocation(2, 4) },
                 GhostHouse = new CellLocation[] { new CellLocation(0, 5),  new CellLocation(1, 5), new CellLocation(2, 5) },
                 Width = 3,
-                Height = 6,
+                Height = 7,
+                Fruit = new CellLocation(1, 6),
                 Portals = new Dictionary<CellLocation, CellLocation>
                 {
                     {(-1,3), (3,3) },{(3,3), (-1,3) }
@@ -77,7 +79,7 @@ T*▲*T
         {
             var board = @" XXX 
  XX? 
- XXX ".Replace("?", expectedDirectionSymbol);
+ XFX ".Replace("?", expectedDirectionSymbol);
 
             var loadedBoard = GameSettingsLoader.Load(board);
 
@@ -93,7 +95,7 @@ T*▲*T
         {
             var board = @" XXX 
      
- ▲X 
+ ▲XF
  ....
 {""type"": ""Ghost"", ""name"": ""Pinky"", ""startingLocation"": {""x"":2,""y"":1}, ""scatterTarget"": {""x"":2, ""y"":3}, ""pillsToLeave"": 0 }
 {""type"": ""Ghost"", ""name"": ""Blinky"", ""startingLocation"": {""x"":0,""y"":1}, ""scatterTarget"": {""x"":-10, ""y"":-3}, ""pillsToLeave"": 0 }
@@ -144,7 +146,7 @@ T*▲*T
         [Fact]
         public void ShouldHaveGhostsWithCorrectHomeLocations()
         {
-            var board = @" XXX 
+            var board = @" XXF 
  BIP 
  ▲XC 
  ....

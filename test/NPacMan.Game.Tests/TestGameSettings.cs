@@ -53,6 +53,8 @@ namespace NPacMan.Game.Tests
         IReadOnlyCollection<Ghost> IGameSettings.Ghosts
             => this.Ghosts;
 
+        public CellLocation Fruit { get; set; }
+
         public PacMan PacMan { get; set; } = new PacMan(new CellLocation(10, 10), Direction.Right);
         public GameStatus InitialGameStatus { get; set; } = GameStatus.Alive;
         public int InitialLives { get; set; } = 3;
