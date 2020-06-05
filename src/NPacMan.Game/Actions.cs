@@ -27,6 +27,7 @@ namespace NPacMan.Game
 
         public static void CompleteRespawning(GameState gameState)
         {
+            MakeGhostsNotEdible(gameState);
             MoveGhostsHome(gameState);
             MovePacManHome(gameState);
             gameState.ShowGhosts();

@@ -110,6 +110,7 @@ namespace NPacMan.Game.Tests.GameTests
                 .WithDirection(Direction.Right)
                 .WithChaseStrategyRight()
                 .Create();
+            
             _gameSettings.Ghosts.Add(ghost);
 
             var game = new Game(_gameClock, _gameSettings);
@@ -745,6 +746,70 @@ namespace NPacMan.Game.Tests.GameTests
             });
              game.Ghosts[ghost2.Name].Should().BeEquivalentTo(new {
                 Location = ghostStart1
+            });
+        }
+
+        [Fact]
+        public async Task GhostsShouldBeNotEdibleAfterPacManComesBackToLife(){
+            //     G
+            // > .   #       G
+            var ghost1 = GhostBuilder.New()
+                .WithLocation(_gameSettings.PacMan.Location.Right.Right.Above)
+                .Create();
+            var ghost2 = GhostBuilder.New()
+                .WithLocation(_gameSettings.PacMan.Location.FarAway())
+                .Create();
+            var directionPicker = new TestDirectionPicker(){DefaultDirection = Direction.Down};
+            _gameSettings.DirectionPicker = directionPicker;
+            _gameSettings.Ghosts.Add(ghost1);
+            _gameSettings.Ghosts.Add(ghost2);
+            _gameSettings.Walls.Add(_gameSettings.PacMan.Location.Right.Right.Right);
+            _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Right);
+
+            var now = DateTime.UtcNow;
+            var game = new Game(_gameClock, _gameSettings);
+            game.StartGame();
+
+            // Eat PowerPill
+            await _gameClock.Tick(now);
+
+            WeExpectThat(game.Ghosts[ghost1.Name]).IsEdible();
+            WeExpectThat(game.Ghosts[ghost2.Name]).IsEdible();
+
+            var score = game.Score;
+
+            await _gameClock.Tick(now);
+            await _gameClock.Tick(now);
+
+
+            WeExpectThat(game.Ghosts[ghost1.Name]).IsAt(_gameSettings.PacMan.Location.Right.Right.Above);
+
+            if(score == game.Score)
+            {
+                throw new Exception("Score should increase as ghost is eaten");
+            }
+
+            WeExpectThat(game.Ghosts[ghost1.Name]).IsNotEdible();
+            WeExpectThat(game.Ghosts[ghost2.Name]).IsEdible();
+            
+            await game.ChangeDirection(Direction.Up);
+            await _gameClock.Tick(now);
+
+            if (game.Status != GameStatus.Dying)
+                throw new Exception($"Invalid Game State {game.Status:G} Should be Dying");
+            
+            await _gameClock.Tick(now.AddSeconds(4));
+
+            if (game.Status != GameStatus.Respawning)
+                throw new Exception($"Invalid Game State {game.Status:G} Should be Respawning");
+
+            await _gameClock.Tick(now.AddSeconds(8));
+
+            if (game.Status != GameStatus.Alive)
+                throw new Exception($"Invalid Game State {game.Status:G} Should be Alive");
+
+            game.Ghosts.Values.Should().AllBeEquivalentTo(new{
+                Edible = false
             });
         }
     }
