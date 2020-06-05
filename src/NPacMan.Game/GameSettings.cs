@@ -46,7 +46,7 @@ namespace NPacMan.Game
 
         public int InitialScatterTimeInSeconds { get; } = 7;
 
-        public int ChaseTimeInSeconds { get; } = 7;
+        public int ChaseTimeInSeconds { get; } = 20;
 
         public int FrightenedTimeInSeconds { get; } = 7;
 
