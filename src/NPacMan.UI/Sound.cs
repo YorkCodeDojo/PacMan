@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Media;
 
 namespace NPacMan.UI
@@ -9,9 +10,9 @@ namespace NPacMan.UI
         public readonly TimeSpan RepeatTime;
         public readonly bool Interrupt;
 
-        public Sound(string file, int milliseconds, bool interrupt)
+        public Sound(UnmanagedMemoryStream file, int milliseconds, bool interrupt)
         {
-            _soundSource = new SoundPlayer($"sound\\pacman_{file}.wav");
+            _soundSource = new SoundPlayer(file);
             _soundSource.Load();
             RepeatTime = TimeSpan.FromMilliseconds(milliseconds);
             Interrupt = interrupt;
