@@ -2,8 +2,10 @@
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.IO;
 using System.Windows.Forms;
 using NPacMan.SharedUi;
+using NPacMan.SharedUi.Properties;
 
 namespace NPacMan.UI
 {
@@ -46,8 +48,8 @@ namespace NPacMan.UI
             _fpsStopWatch=new Stopwatch();
             _fpsStopWatch.Start();
 
-            Gfx = new Bitmap("gfx.png");
-
+            using var ms = new MemoryStream(Resources.gfx);
+            Gfx = new Bitmap(ms);
         }
 
         /// <summary>

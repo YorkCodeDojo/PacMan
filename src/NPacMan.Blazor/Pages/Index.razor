@@ -2,18 +2,18 @@
 @using NPacMan.SharedUi
 @using NPacMan.Game
 @using NPacMan.Blazor.JsInterop
+@using NPacMan.SharedUi.Properties
+@using System.IO
 
 @inject IJSRuntime jsRuntime
 
 <canvas tabindex="0" @ref="_canvas" style="height: 100%; width: 100%;"></canvas>
-<img @ref="_spriteMap" src="gfx.png" hidden />
 
 @code
 {
     private NPacMan.Game.Game? _game;
 
     private ElementReference _canvas;
-    private ElementReference _spriteMap;
 
     private BoardRenderer? _boardRenderer;
 
@@ -35,12 +35,26 @@
         InteropTouch.TouchStart += TouchStart;
         InteropTouch.TouchEnd += TouchEnd;
 
-        _game = _game.StartGame();
-
         // Pass references of the canvas and spritemap to the javascript code
 
-        await jsRuntime.InvokeVoidAsync("SetupCanvas", _canvas, _spriteMap);
+        await jsRuntime.InvokeVoidAsync("SetupCanvas", _canvas,
+            Convert.ToBase64String(Resources.gfx));
+
+        await RegisterSound(Sounds.Chomp, Resources.pacman_chomp);
+        await RegisterSound(Sounds.Beginning, Resources.pacman_beginning);
+        await RegisterSound(Sounds.Death, Resources.pacman_death);
+        await RegisterSound(Sounds.EatFruit, Resources.pacman_eatfruit);
+        await RegisterSound(Sounds.EatGhost, Resources.pacman_eatghost);
+        await RegisterSound(Sounds.ExtraPac, Resources.pacman_extrapac);
+        await RegisterSound(Sounds.Intermission, Resources.pacman_intermission);
+
         _boardRenderer = new BoardRenderer();
+
+        AddSounds(_game);
+
+        // Don't start game until everything ready
+
+        _game = _game.StartGame();
 
         // Timer loop
 
@@ -173,4 +187,43 @@
         }
     }
 
+    private async Task RegisterSound(Sounds sound, UnmanagedMemoryStream ums)
+    {
+        byte[] bytes;
+        using (var ms = new MemoryStream())
+        {
+            ums.CopyTo(ms);
+            bytes = ms.ToArray();
+        }
+        var data = Convert.ToBase64String(bytes);
+        
+        await jsRuntime.InvokeVoidAsync("SoundSet", (int)sound, data);
+    }
+
+    private enum Sounds
+    {
+        Chomp,
+        Beginning,
+        Death,
+        EatFruit,
+        EatGhost,
+        ExtraPac,
+        Intermission
+    }
+
+    private void PlaySound(Sounds sound)
+    {
+        jsRuntime.InvokeVoidAsync("PlaySound", (int) sound);
+    }
+
+    private void AddSounds(Game game)
+    {
+        game.Subscribe(GameNotification.Beginning, () => PlaySound(Sounds.Beginning))
+            .Subscribe(GameNotification.EatCoin, () => PlaySound(Sounds.Chomp))
+            .Subscribe(GameNotification.Respawning, () => PlaySound(Sounds.Death))
+            .Subscribe(GameNotification.EatFruit, () => PlaySound(Sounds.EatFruit))
+            .Subscribe(GameNotification.EatGhost, () => PlaySound(Sounds.EatGhost))
+            .Subscribe(GameNotification.ExtraPac, () => PlaySound(Sounds.ExtraPac))
+            .Subscribe(GameNotification.Intermission, () => PlaySound(Sounds.Intermission));
+    }
 }

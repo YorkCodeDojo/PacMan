@@ -1,4 +1,5 @@
 ﻿using System;
+using NPacMan.SharedUi.Properties;
 
 namespace NPacMan.UI
 {
@@ -20,13 +21,13 @@ namespace NPacMan.UI
             // Length (in milliseconds)
             // Whether the sound can interrupt the current sound
 
-            _eatFruit = new Sound("eatfruit", 1000, true);
-            _chomp = new Sound("chomp", 600, false);
-            _death = new Sound("death", 2000, true);
-            _beginning = new Sound("beginning", 4000, true);
-            _intermission = new Sound("intermission", 1000, true);
-            _extraPac = new Sound("extrapac", 500, true);
-            _eatGhost = new Sound("eatghost", 1000, true);
+            _eatFruit = new Sound(Resources.pacman_eatfruit, 1000, true);
+            _chomp = new Sound(Resources.pacman_chomp, 600, false);
+            _death = new Sound(Resources.pacman_death, 2000, true);
+            _beginning = new Sound(Resources.pacman_beginning, 4000, true);
+            _intermission = new Sound(Resources.pacman_intermission, 1000, true);
+            _extraPac = new Sound(Resources.pacman_extrapac, 500, true);
+            _eatGhost = new Sound(Resources.pacman_eatghost, 1000, true);
 
             _nextSound = DateTime.Now;
         }
