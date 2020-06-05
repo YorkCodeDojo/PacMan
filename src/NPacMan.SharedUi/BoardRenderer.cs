@@ -151,7 +151,7 @@ namespace NPacMan.SharedUi
                 _ => GhostColour.Red,
             };
 
-            var sprite = _sprites.Ghost(ghostColour, Direction.Up, animated);
+            var sprite = _sprites.Ghost(ghostColour, ghost.Direction, animated);
             _display.AddSprite(ghost.Location.X, ghost.Location.Y+_boardY, sprite);
         }
 
