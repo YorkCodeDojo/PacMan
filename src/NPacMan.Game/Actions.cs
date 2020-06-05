@@ -40,10 +40,14 @@ namespace NPacMan.Game
             gameNotifications.Publish(GameNotification.Beginning);
         }
 
-        public static void CoinEaten(GameState gameState, CellLocation coinLocation, GameNotifications gameNotifications)
+        public static void CoinEaten(Game game, IGameSettings settings, GameState gameState, CellLocation coinLocation, GameNotifications gameNotifications)
         {
             gameState.RemoveCoin(coinLocation);
             gameState.IncreaseScore(10);
+            if(settings.FruitAppearsAfterCoinsEaten.Contains(game.StartingCoins.Count - game.Coins.Count))
+            {
+                gameState.ShowFruit();
+            }
             gameNotifications.Publish(GameNotification.EatCoin);
         }
 

@@ -49,7 +49,7 @@ namespace NPacMan.Game
                     .ThenAsync(async context => await Actions.MoveGhosts(game, context.Instance, context, this))
                     .ThenAsync(async context => await Actions.MovePacMan(game, context.Instance, context, this)),
                 When(CoinCollision)
-                    .Then(context => Actions.CoinEaten(context.Instance, context.Data.Location, gameNotifications)),
+                    .Then(context => Actions.CoinEaten(game, settings, context.Instance, context.Data.Location, gameNotifications)),
                 When(PowerPillCollision)
                     .Then(context => context.Instance.ChangeStateIn(settings.FrightenedTimeInSeconds))
                     .Then(context => Actions.PowerPillEaten(settings, context.Instance, context.Data.Location, gameNotifications))

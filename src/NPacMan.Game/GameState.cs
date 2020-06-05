@@ -51,6 +51,7 @@ namespace NPacMan.Game
         public IReadOnlyDictionary<string, Ghost> Ghosts { get; private set; }
         
         public PacMan PacMan { get; private set; }
+        public bool FruitVisible { get; private set; }
 
         internal void RemoveCoin(CellLocation location)
         {
@@ -91,6 +92,10 @@ namespace NPacMan.Game
             GhostsVisible = false;
         }
 
+        internal void ShowFruit()
+        {
+            FruitVisible = true;
+        }
         internal void RecordLastTick(DateTime now)
         {
             Interlocked.Increment(ref _tickCounter);

@@ -21,5 +21,8 @@ namespace NPacMan.Game
         public IReadOnlyDictionary<string, Ghost> Ghosts { get; }
 
         public PacMan PacMan { get; }
+
+        public bool FruitVisible { get; }
+
     }
 }

@@ -26,5 +26,6 @@ namespace NPacMan.Game
         int FrightenedTimeInSeconds { get; }
         
         IDirectionPicker DirectionPicker { get; }
+        IReadOnlyCollection<int> FruitAppearsAfterCoinsEaten { get; }
     }
 }

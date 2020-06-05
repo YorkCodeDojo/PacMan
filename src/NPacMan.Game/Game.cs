@@ -6,6 +6,17 @@ using System.Threading.Tasks;
 
 namespace NPacMan.Game
 {
+    public class Fruit
+    {
+        public CellLocation Location { get; }
+        public FruitType Type { get; }
+
+        public Fruit(CellLocation location, FruitType type)
+        {
+            this.Location = location;
+            this.Type = type;
+        }
+    }
     public class Game
     {
 
@@ -105,6 +116,10 @@ namespace NPacMan.Game
             nameof(GameStateMachine.Dead) => GameStatus.Dead,
             _ => throw new NotImplementedException($"No map for status '{_gameState.Status}'")
         };
+
+        public Fruit[] Fruits =>
+            _gameState.FruitVisible ?
+            new []{new Fruit(_settings.Fruit, FruitType.Cherry)} : Array.Empty<Fruit>();
 
         private async Task Tick(DateTime now)
         {

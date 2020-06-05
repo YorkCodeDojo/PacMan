@@ -53,6 +53,12 @@ namespace NPacMan.Game.Tests
         IReadOnlyCollection<Ghost> IGameSettings.Ghosts
             => this.Ghosts;
 
+        public List<int> FruitAppearsAfterCoinsEaten { get; }
+            = new List<int>();
+        IReadOnlyCollection<int> IGameSettings.FruitAppearsAfterCoinsEaten
+            => this.FruitAppearsAfterCoinsEaten;
+
+
         public CellLocation Fruit { get; set; }
 
         public PacMan PacMan { get; set; } = new PacMan(new CellLocation(10, 10), Direction.Right);
@@ -62,6 +68,5 @@ namespace NPacMan.Game.Tests
         public int ChaseTimeInSeconds { get; set; } = 7;
         public int FrightenedTimeInSeconds { get; set; } = 7;
         public IDirectionPicker DirectionPicker { get; internal set; } = new TestDirectionPicker();
-
     }
 }
