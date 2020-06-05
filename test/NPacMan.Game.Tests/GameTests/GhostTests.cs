@@ -812,5 +812,44 @@ namespace NPacMan.Game.Tests.GameTests
                 Edible = false
             });
         }
+
+        [Fact]
+        public async Task ScoreShouldIncreaseExponentiallyAfterEatingEachGhost()
+        {
+            var ghostStart = _gameSettings.PacMan.Location.Left.Left.Left;
+            var ghost1 = GhostBuilder.New().WithLocation(ghostStart).WithChaseStrategyRight()
+                .Create();
+            
+            _gameSettings.Ghosts.Add(ghost1);
+            
+            _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Left);
+
+            var game = new Game(_gameClock, _gameSettings);
+            var numberOfNotificationsTriggered = 0;
+            game.Subscribe(GameNotification.EatGhost, () => numberOfNotificationsTriggered++);            
+            game.StartGame();
+
+            await game.ChangeDirection(Direction.Left);
+
+            await _gameClock.Tick();
+
+            WeExpectThat(game.PacMan).IsAt(_gameSettings.PacMan.Location.Left);
+           
+            WeExpectThat(game.Ghosts.Values).IsAt(ghostStart.Right);
+
+            if (numberOfNotificationsTriggered != 0)
+            {
+                throw new Exception($"No EatGhost notifications should have been fired but {numberOfNotificationsTriggered} were.");
+            }
+
+            await _gameClock.Tick();
+
+            WeExpectThat(game.PacMan).IsAt(_gameSettings.PacMan.Location.Left.Left);
+
+            numberOfNotificationsTriggered.Should().Be(1);
+        }
     }
 }
+
+
+

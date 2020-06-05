@@ -60,11 +60,12 @@ namespace NPacMan.Game
             gameState.RemovePowerPill(powerPillLocation);
         }
 
-        public static void GhostEaten(GameState gameState, Ghost ghost, Game game)
+        public static void GhostEaten(GameState gameState, Ghost ghost, Game game, GameNotifications gameNotifications)
         {
             SendGhostHome(gameState, ghost);
             IncreaseScoreAfterEatingGhost(gameState, game);
             MakeGhostNotEdible(gameState, ghost);
+            gameNotifications.Publish(GameNotification.EatGhost);
         }
 
         internal static void FruitEaten(Game game, IGameSettings settings, GameState gameState, CellLocation location, GameNotifications gameNotifications)
