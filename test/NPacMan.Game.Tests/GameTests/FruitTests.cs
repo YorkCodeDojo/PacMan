@@ -4,6 +4,7 @@ using Xunit;
 using System.Linq;
 using NPacMan.Game.Tests.Helpers;
 using System.Threading.Tasks;
+using System;
 
 namespace NPacMan.Game.Tests.GameTests
 {
@@ -56,5 +57,34 @@ namespace NPacMan.Game.Tests.GameTests
                 Type = FruitType.Cherry
             });
         }
+        
+        [Fact]
+        public async Task FruitShouldDisappearAfterAConfiguredAmountOfTime()
+        {
+            var now = DateTime.UtcNow;
+            var fruitLocation = _gameSettings.PacMan.Location.FarAway();
+            _gameSettings.Fruit = fruitLocation;
+            _gameSettings.FruitVisibleForSeconds = 5;
+            _gameSettings.FruitAppearsAfterCoinsEaten.Add(2);
+
+            _gameSettings.Coins.Add(_gameSettings.PacMan.Location.Left);
+            _gameSettings.Coins.Add(_gameSettings.PacMan.Location.Left.Left);
+
+            var game = new Game(_gameClock, _gameSettings);
+            game.StartGame();
+            await game.ChangeDirection(Direction.Left);
+            await _gameClock.Tick(now);
+            await _gameClock.Tick(now);
+
+            if (!game.Fruits.Any())
+            {
+                throw new Exception("Fruit should be visible");
+            }
+
+            await _gameClock.Tick(now.AddSeconds(_gameSettings.FruitVisibleForSeconds).AddSeconds(1));
+
+            game.Fruits.Should().BeEmpty();
+        }
     }
 }
+    

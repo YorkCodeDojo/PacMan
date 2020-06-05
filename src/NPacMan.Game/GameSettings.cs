@@ -55,5 +55,7 @@ namespace NPacMan.Game
         public IReadOnlyCollection<int> FruitAppearsAfterCoinsEaten {get;}= new []{
             70, 170
         };
+
+        public int FruitVisibleForSeconds { get; } = 9;
     }
 }

@@ -27,5 +27,7 @@ namespace NPacMan.Game
         
         IDirectionPicker DirectionPicker { get; }
         IReadOnlyCollection<int> FruitAppearsAfterCoinsEaten { get; }
+        int FruitVisibleForSeconds { get; }
+
     }
 }

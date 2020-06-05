@@ -46,7 +46,7 @@ namespace NPacMan.Game
             gameState.IncreaseScore(10);
             if(settings.FruitAppearsAfterCoinsEaten.Contains(game.StartingCoins.Count - game.Coins.Count))
             {
-                gameState.ShowFruit();
+                gameState.ShowFruit(settings.FruitVisibleForSeconds);
             }
             gameNotifications.Publish(GameNotification.EatCoin);
         }

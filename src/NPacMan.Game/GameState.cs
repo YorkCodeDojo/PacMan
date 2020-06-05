@@ -43,6 +43,7 @@ namespace NPacMan.Game
         public int TickCounter => _tickCounter;
 
         private int _tickCounter;
+        private DateTime? _fruitVisibleUntil;
 
         public IReadOnlyCollection<CellLocation> RemainingCoins { get; private set; }
 
@@ -51,7 +52,7 @@ namespace NPacMan.Game
         public IReadOnlyDictionary<string, Ghost> Ghosts { get; private set; }
         
         public PacMan PacMan { get; private set; }
-        public bool FruitVisible { get; private set; }
+        public bool FruitVisible => LastTick <= _fruitVisibleUntil;
 
         internal void RemoveCoin(CellLocation location)
         {
@@ -92,9 +93,9 @@ namespace NPacMan.Game
             GhostsVisible = false;
         }
 
-        internal void ShowFruit()
+        internal void ShowFruit(int showForSeconds)
         {
-            FruitVisible = true;
+            _fruitVisibleUntil = LastTick.AddSeconds(showForSeconds);
         }
         internal void RecordLastTick(DateTime now)
         {

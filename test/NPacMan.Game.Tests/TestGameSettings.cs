@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using NPacMan.Game.Tests.GameTests;
 
@@ -68,5 +69,6 @@ namespace NPacMan.Game.Tests
         public int ChaseTimeInSeconds { get; set; } = 7;
         public int FrightenedTimeInSeconds { get; set; } = 7;
         public IDirectionPicker DirectionPicker { get; internal set; } = new TestDirectionPicker();
+        public int FruitVisibleForSeconds { get; set; } = 7;
     }
 }
