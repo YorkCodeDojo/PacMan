@@ -54,6 +54,7 @@ namespace NPacMan.Game
             var doors = new List<CellLocation>();
             var portalParts = new List<CellLocation>();
             var ghostHouse = new List<CellLocation>();
+            CellLocation? fruit = null;
             PacMan? pacMan = null;
             for (int rowNumber = 0; rowNumber < height; rowNumber++)
             {
@@ -92,7 +93,10 @@ namespace NPacMan.Game
                             break;
                         case 'H':
                             ghostHouse.Add(location);
-                            break;                            
+                            break;             
+                        case 'F':
+                            fruit = location;
+                            break;              
                         default:
                             break;
                     }
@@ -114,7 +118,10 @@ namespace NPacMan.Game
             if (pacMan is null)
                 throw new Exception("Pacman seems to be missing from the board.");
 
-            return new GameSettings(width - 2, height, walls, coins, powerPills, portals, pacMan, ghosts, doors, ghostHouse);
+            if (!fruit.HasValue)
+                throw new Exception("Fruit seems to be missing from the board.");
+
+            return new GameSettings(width - 2, height, walls, coins, powerPills, portals, pacMan, ghosts, doors, ghostHouse, fruit.Value);
         }
 
         class GhostSetup

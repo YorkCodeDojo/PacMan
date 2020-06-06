@@ -106,6 +106,10 @@ namespace NPacMan.Game
             _ => throw new NotImplementedException($"No map for status '{_gameState.Status}'")
         };
 
+        public Fruit[] Fruits =>
+            _gameState.FruitVisible ?
+            new []{new Fruit(_settings.Fruit, FruitType.Cherry)} : Array.Empty<Fruit>();
+
         private async Task Tick(DateTime now)
         {
             await _gameStateMachineInstance.Raise(_gameStateMachine.Tick, new Tick(now));

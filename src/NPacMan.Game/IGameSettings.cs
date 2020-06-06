@@ -14,6 +14,8 @@ namespace NPacMan.Game
         int Width { get; }
         int Height { get; }
         IReadOnlyCollection<Ghost> Ghosts { get; }
+        CellLocation Fruit { get; }
+
         GameStatus InitialGameStatus { get; }
         int InitialLives { get; }
 
@@ -24,5 +26,8 @@ namespace NPacMan.Game
         int FrightenedTimeInSeconds { get; }
         
         IDirectionPicker DirectionPicker { get; }
+        IReadOnlyCollection<int> FruitAppearsAfterCoinsEaten { get; }
+        int FruitVisibleForSeconds { get; }
+
     }
 }

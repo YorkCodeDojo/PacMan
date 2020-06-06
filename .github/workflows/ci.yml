@@ -35,11 +35,9 @@ jobs:
         path: ./blazor
     - run: |
        cd blazor
-       pwd
-       ls
        cd wwwroot
-       ls
-       pwd
+       sed -i 's/<base href="\/" \/>/<base href="\/PacMan\/" \/>/g' index.html
+       
        git config user.name "ci@yorkdevelopers.org"
        git config user.email "ci@yorkdevelopers.org"
        git add .

@@ -17,5 +17,17 @@ namespace NPacMan.Game.Tests.Helpers
                 throw new Exception($"Ghost should be at {expectedLocation} not {_ghost.Location}");
         }
 
+        internal void IsEdible()
+        {
+            if (!_ghost.Edible)
+                throw new Exception($"Ghost {_ghost.Name} should be edible");
+        }
+
+        internal void IsNotEdible()
+        {
+            if (_ghost.Edible)
+                throw new Exception($"Ghost {_ghost.Name} should be not edible");
+        }
+
     }
 }

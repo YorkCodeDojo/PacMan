@@ -20,6 +20,7 @@
         var gameContext;
         var backCanvas;
         var backContext;
+        var sounds = [];
 
         function SetupCanvas(cv, sp) {
 
@@ -29,7 +30,25 @@
 
             // Reference the sprite map
 
-            spriteMap = sp;
+            spriteMap = document.createElement('img');
+            spriteMap.src = "data:image/png;base64," + sp;
+        }
+
+        function SoundSet(num, data) {
+
+            // Create audio resource from passed in b64 data
+            // Register it as sound number num
+
+            sounds[num] = new window.Audio();
+            sounds[num].src = "data:audio/wav;base64," + data;
+        }
+
+        function PlaySound(num) {
+
+            // Play sounds number num from audio resources
+
+            sounds[num].currentTime = 0;
+            sounds[num].play();
         }
 
         function DrawSprite(ctx, fx, fy, fs, tx, ty) {

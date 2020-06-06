@@ -47,16 +47,18 @@ namespace NPacMan.Game
                     .Then(context => Actions.ChangeDirection(game, context.Instance, context.Data.NewDirection)),
                 When(Tick)
                     .ThenAsync(async context => await Actions.MoveGhosts(game, context.Instance, context, this))
-                    .ThenAsync(async context => await Actions.MovePacMan(game, context.Instance, context, this)),
+                    .ThenAsync(async context => await Actions.MovePacMan(game, context.Instance, context, this, settings)),
                 When(CoinCollision)
-                    .Then(context => Actions.CoinEaten(context.Instance, context.Data.Location, gameNotifications)),
+                    .Then(context => Actions.CoinEaten(game, settings, context.Instance, context.Data.Location, gameNotifications)),
+                When(FruitCollision)
+                    .Then(context => Actions.FruitEaten(game, settings, context.Instance, context.Data.Location, gameNotifications)),
                 When(PowerPillCollision)
                     .Then(context => context.Instance.ChangeStateIn(settings.FrightenedTimeInSeconds))
                     .Then(context => Actions.PowerPillEaten(settings, context.Instance, context.Data.Location, gameNotifications))
                     .TransitionTo(Frightened),
                 When(GhostCollision)
                     .IfElse(x => x.Data.Ghost.Edible,
-                    binder => binder.Then(context => Actions.GhostEaten(context.Instance, context.Data.Ghost, game)),
+                    binder => binder.Then(context => Actions.GhostEaten(context.Instance, context.Data.Ghost, game, gameNotifications)),
                     binder => binder.Then(context => Actions.EatenByGhost(context.Instance))
                                     .TransitionTo(Dying))); 
 
@@ -101,5 +103,6 @@ namespace NPacMan.Game
         public Event<CoinCollision> CoinCollision { get; private set; } = null!;
         public Event<PowerPillCollision> PowerPillCollision { get; private set; } = null!;
         public Event<PlayersWishesToChangeDirection> PlayersWishesToChangeDirection { get; private set; } = null!;
+        public Event<FruitCollision> FruitCollision { get; private set; } = null!;
     }
 }

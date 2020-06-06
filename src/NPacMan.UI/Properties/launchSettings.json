@@ -2,7 +2,7 @@
   "profiles": {
     "NPacMan.UI": {
       "commandName": "Project",
-      "commandLineArgs": "--process \"C:\\personal\\PacMan\\src\\NPacMan.StdInOutBot\\bin\\Debug\\netcoreapp3.1\\NPacMan.StdInOutBot.exe\""
+      "commandLineArgs": "--process \"..\\..\\..\\..\\NPacMan.StdInOutBot\\bin\\Debug\\netcoreapp3.1\\NPacMan.StdInOutBot.exe\""
     }
   }
 }
