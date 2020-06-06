@@ -58,7 +58,7 @@ namespace NPacMan.Game
                     }
                     var newGhostLocation = Location + outDirection;
 
-                    PacManEventSource.Log.GhostMoved(Name, gameState.TickCounter, Location.X, Location.Y, newGhostLocation.X, newGhostLocation.Y);
+                    PacManEventSource.Log.GhostMoved(Name, gameState.TickCounter, Location.X, Location.Y, newGhostLocation.X, newGhostLocation.Y, outDirection.ToText());
 
                     return WithNewLocationAndDirection(newGhostLocation, outDirection);
                 }
@@ -74,12 +74,12 @@ namespace NPacMan.Game
             if (nextDirection is Direction newDirection)
             {
                 var newGhostLocation = Location + newDirection;
-                PacManEventSource.Log.GhostMoved(Name, gameState.TickCounter, Location.X, Location.Y, newGhostLocation.X, newGhostLocation.Y);
+                PacManEventSource.Log.GhostMoved(Name, gameState.TickCounter, Location.X, Location.Y, newGhostLocation.X, newGhostLocation.Y, newDirection.ToText());
 
                 if (game.Portals.TryGetValue(newGhostLocation, out var otherEndOfThePortal))
                 {
                     newGhostLocation = otherEndOfThePortal + newDirection;
-                    PacManEventSource.Log.GhostMoved(Name, gameState.TickCounter, Location.X, Location.Y, newGhostLocation.X, newGhostLocation.Y);
+                    PacManEventSource.Log.GhostMoved(Name, gameState.TickCounter, Location.X, Location.Y, newGhostLocation.X, newGhostLocation.Y, newDirection.ToText());
                 }
 
                 return WithNewLocationAndDirection(newGhostLocation, newDirection);
@@ -90,14 +90,14 @@ namespace NPacMan.Game
 
         internal Ghost Chase(IReadOnlyGameState gameState)
         {
-            PacManEventSource.Log.GhostChangedState(Name, gameState.TickCounter, Location.X, Location.Y, "Chase", Edible);
+            PacManEventSource.Log.GhostChangedState(Name, gameState.TickCounter, "Chase", Edible, Direction.Opposite().ToText());
 
             return WithNewCurrentStrategyAndDirection(ChaseStrategy, Direction.Opposite());
         }
 
         internal Ghost Scatter(IReadOnlyGameState gameState)
         {
-            PacManEventSource.Log.GhostChangedState(Name, gameState.TickCounter, Location.X, Location.Y, "Scatter", Edible);
+            PacManEventSource.Log.GhostChangedState(Name, gameState.TickCounter, "Scatter", Edible, Direction.Opposite().ToText());
 
             var strategy = new DirectToStrategy(new DirectToGhostScatterTarget(this));
             return WithNewCurrentStrategyAndDirection(strategy, Direction.Opposite());
@@ -105,14 +105,14 @@ namespace NPacMan.Game
 
         internal Ghost SetToHome(IReadOnlyGameState gameState)
         {
-            PacManEventSource.Log.GhostMoved(Name, gameState.TickCounter, Location.X, Location.Y, Home.X, Home.Y);
+            PacManEventSource.Log.GhostMoved(Name, gameState.TickCounter, Location.X, Location.Y, Home.X, Home.Y, Direction.ToText());
 
             return WithNewLocation(Home);
         }
 
         internal Ghost SetToEdible(IReadOnlyGameState gameState, IDirectionPicker directionPicker)
         {
-            PacManEventSource.Log.GhostChangedState(Name, gameState.TickCounter, Location.X, Location.Y, "Random", edible: true);
+            PacManEventSource.Log.GhostChangedState(Name, gameState.TickCounter, "Random", edible: true, Direction.Opposite().ToText());
 
             var strategy = new RandomStrategy(directionPicker);
             return WithNewEdibleAndDirectionAndStrategy(true, Direction.Opposite(), strategy);
@@ -120,7 +120,7 @@ namespace NPacMan.Game
 
         internal Ghost SetToNotEdible(IReadOnlyGameState gameState)
         {
-            PacManEventSource.Log.GhostChangedState(Name, gameState.TickCounter, Location.X, Location.Y, "Chase", edible: false);
+            PacManEventSource.Log.GhostChangedState(Name, gameState.TickCounter, "Chase", edible: false, Direction.ToText());
 
             return WithNewEdibleAndDirectionAndStrategy(false, Direction, ChaseStrategy);
         }

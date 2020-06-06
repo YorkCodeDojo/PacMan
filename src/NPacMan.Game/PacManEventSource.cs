@@ -12,7 +12,7 @@ namespace NPacMan.Game
             WriteEvent(1, width, height, wallsJson);
         }
 
-        public void GhostMoved(string ghostName, int tickCounter, int fromLocationX, int fromLocationY, int toLocationX, int toLocationY)
+        public void GhostMoved(string ghostName, int tickCounter, int fromLocationX, int fromLocationY, int toLocationX, int toLocationY, string direction)
         {
             WriteEvent(2, ghostName, tickCounter, fromLocationX, fromLocationY, toLocationX, toLocationY);
         }
@@ -22,9 +22,9 @@ namespace NPacMan.Game
             WriteEvent(3, ghostName, tickCounter, fromLocationX, fromLocationY, numberOfCoinsRequiredToExitHouse);
         }
 
-        internal void GhostChangedState(string ghostName, int tickCounter, int locationX, int locationY, string strategy, bool edible)
+        internal void GhostChangedState(string ghostName, int tickCounter, string strategy, bool edible, string direction)
         {
-            WriteEvent(4, ghostName, tickCounter, locationX, locationY, strategy, edible);
+            WriteEvent(4, ghostName, tickCounter, strategy, edible);
         }
 
         internal void PacManMoved(int tickCounter, int fromLocationX, int fromLocationY, int toLocationX, int toLocationY)
