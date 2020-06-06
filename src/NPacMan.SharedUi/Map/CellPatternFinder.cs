@@ -87,7 +87,8 @@ namespace NPacMan.SharedUi.Map
             }
 #endif
 
-            throw new Exception($"No matching board piece pattern @ c{board.X},{board.Y}");
+            //throw new Exception($"No matching board piece pattern @ c{board.X},{board.Y}");
+            return BoardPiece.Bottom;
         }
     }
 }
