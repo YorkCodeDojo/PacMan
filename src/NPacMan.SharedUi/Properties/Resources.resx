@@ -127,6 +127,12 @@
   <data name="pacman_chomp" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\sound\pacman_chomp.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="pacman_chomp1" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\sound\pacman_chomp1.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="pacman_chomp2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\sound\pacman_chomp2.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="pacman_death" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\sound\pacman_death.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
