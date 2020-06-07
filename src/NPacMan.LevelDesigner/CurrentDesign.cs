@@ -1,74 +1,134 @@
-﻿using System;
-using System.Collections.Generic;
-using NPacMan.Game;
+﻿using NPacMan.Game;
+using NPacMan.UI;
 
-namespace NPacMan.UI
+namespace NPacMan.LevelDesigner
 {
-    internal class CurrentDesign : IGameSettings
+    public class CurrentDesign
     {
-        public List<CellLocation> Walls { get; set; }
-      = new List<CellLocation>();
+        public int Width => 30;
+        public int Height => 30;
 
-        IReadOnlyCollection<CellLocation> IGameSettings.Walls
-            => this.Walls;
+        private readonly char[,] _board;
 
-        public List<CellLocation> Coins { get; set; }
-            = new List<CellLocation>();
+        public CurrentDesign()
+        {
+            _board = new char[Width, Height];
+            _board[0, 0] = 'X';
+            _board[1, 0] = 'X';
+            _board[2, 0] = 'X';
+            _board[3, 0] = 'X';
+            _board[0, 1] = 'X';
+            _board[0, 2] = 'X';
+            _board[0, 3] = 'X';
+        }
 
-        IReadOnlyCollection<CellLocation> IGameSettings.Coins
-            => this.Coins;
+        public IGameSettings GameSettingsForDesign()
+        {
+            var currentDesign = new GameSettingsForCurrentDesign
+            {
+                InitialLives = 0,
+                Height = 30,
+                Width = 30
+            };
 
-        public List<CellLocation> PowerPills { get; set; }
-            = new List<CellLocation>();
+            CellLocation fruit = new CellLocation(10,10);
+            PacMan pacMan = new PacMan(new CellLocation(11, 11), Direction.Up);
 
-        IReadOnlyCollection<CellLocation> IGameSettings.PowerPills
-            => this.PowerPills;
+            for (int rowNumber = 0; rowNumber < Height; rowNumber++)
+            {
+                for (int columnNumber = 0; columnNumber < Width; columnNumber++)
+                {
+                    var location = new CellLocation(columnNumber, rowNumber);
+                    switch (_board[columnNumber, rowNumber])
+                    {
+                        case '▲':
+                            pacMan = new PacMan(location, Direction.Up);
+                            break;
+                        case '▼':
+                            pacMan = new PacMan(location, Direction.Down);
+                            break;
+                        case '►':
+                            pacMan = new PacMan(location, Direction.Right);
+                            break;
+                        case '◄':
+                            pacMan = new PacMan(location, Direction.Left);
+                            break;
+                        case 'X':
+                            currentDesign.Walls.Add(location);
+                            break;
+                        case '-':
+                            currentDesign.Doors.Add(location);
+                            break;
+                        case 'T':
+                            //currentDesign.Portals.Add(location);
+                            break;
+                        case '.':
+                            currentDesign.Coins.Add(location);
+                            break;
+                        case '*':
+                            currentDesign.PowerPills.Add(location);
+                            break;
+                        case 'H':
+                            currentDesign.GhostHouse.Add(location);
+                            break;
+                        case 'F':
+                            fruit = location;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
 
-        public List<CellLocation> Doors { get; set; }
-            = new List<CellLocation>();
+            currentDesign.Fruit = fruit;
+            currentDesign.PacMan = pacMan;
 
-        IReadOnlyCollection<CellLocation> IGameSettings.Doors
-            => this.Doors;
+            return currentDesign;
+        }
 
-        public Dictionary<CellLocation, CellLocation> Portals { get; set; }
-            = new Dictionary<CellLocation, CellLocation>();
-
-        IReadOnlyDictionary<CellLocation, CellLocation> IGameSettings.Portals
-            => this.Portals;
-
-
-        public List<CellLocation> GhostHouse { get; set; }
-            = new List<CellLocation>();
-
-        IReadOnlyCollection<CellLocation> IGameSettings.GhostHouse
-            => this.GhostHouse;
-
-
-        public int Width { get; set; }
-
-        public int Height { get; set; }
-
-        public List<Ghost> Ghosts { get; }
-            = new List<Ghost>();
-
-        IReadOnlyCollection<Ghost> IGameSettings.Ghosts
-            => this.Ghosts;
-
-        public List<int> FruitAppearsAfterCoinsEaten { get; }
-            = new List<int>();
-        IReadOnlyCollection<int> IGameSettings.FruitAppearsAfterCoinsEaten
-            => this.FruitAppearsAfterCoinsEaten;
-
-
-        public CellLocation Fruit { get; set; }
-
-        public PacMan PacMan { get; set; } = new PacMan(new CellLocation(10, 10), Direction.Right);
-        public GameStatus InitialGameStatus { get; set; } = GameStatus.Alive;
-        public int InitialLives { get; set; } = 3;
-        public int InitialScatterTimeInSeconds { get; set; } = 7;
-        public int ChaseTimeInSeconds { get; set; } = 7;
-        public int FrightenedTimeInSeconds { get; set; } = 7;
-        public IDirectionPicker DirectionPicker { get; internal set; } = new RandomDirectionPicker();
-        public int FruitVisibleForSeconds { get; set; } = 7;
+        internal void AddPacManLeft(int x, int y)
+        {
+            _board[x, y] = '◄';
+        }
+        internal void AddPacManRight(int x, int y)
+        {
+            _board[x, y] = '►';
+        }
+        internal void AddPacManUp(int x, int y)
+        {
+            _board[x, y] = '▲';
+        }
+        internal void AddPacManDown(int x, int y)
+        {
+            _board[x, y] = '▼';
+        }
+        internal void AddDoor(int x, int y)
+        {
+            _board[x, y] = '-';
+        }
+        internal void AddPortal(int x, int y)
+        {
+            _board[x, y] = 'T';
+        }
+        internal void AddCoin(int x, int y)
+        {
+            _board[x, y] = '.';
+        }
+        internal void AddWall(int x, int y)
+        {
+            _board[x, y] = 'X';
+        }
+        internal void AddPowerPill(int x, int y)
+        {
+            _board[x, y] = '*';
+        }
+        internal void AddGhostHouse(int x, int y)
+        {
+            _board[x, y] = 'H';
+        }
+        internal void AddFruit(int x, int y)
+        {
+            _board[x, y] = 'F';
+        }
     }
 }
