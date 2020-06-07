@@ -219,11 +219,20 @@ namespace NPacMan.UI
             // Draw any sprites onto the foreground
             var gSprite = GetBitmapBuffer(boardRenderer.DisplayWidth * PixelGrid,
                 boardRenderer.DisplayHeight * PixelGrid);
+
+            DrawGrid(boardRenderer, gSprite);
+
             foreach (var sprite in boardRenderer.SpritesToDisplay)
             {
                 RenderSprite(gSprite, sprite.XPos, sprite.YPos, sprite.Sprite);
             }
 
+            // Push out onto the screen
+            Render();
+        }
+
+        private static void DrawGrid(BoardRenderer boardRenderer, Graphics gSprite)
+        {
             for (int columnNumber = 0; columnNumber < boardRenderer.DisplayWidth; columnNumber++)
             {
                 gSprite.DrawLine(Pens.LightGray,
@@ -237,10 +246,6 @@ namespace NPacMan.UI
                                  0, rowNumber * PixelGrid,
                                  (boardRenderer.DisplayWidth - 1) * PixelGrid, rowNumber * PixelGrid);
             }
-
-
-            // Push out onto the screen
-            Render();
         }
 
         private const int PixelGrid = 8;

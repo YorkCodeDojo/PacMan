@@ -12,7 +12,14 @@ namespace NPacMan.UI
         private readonly RadioButton _addWall;
         private readonly RadioButton _addCoin;
         private readonly RadioButton _addPill;
-
+        private readonly RadioButton _addPacManLeft;
+        private readonly RadioButton _addPacManRight;
+        private readonly RadioButton _addPacManUp;
+        private readonly RadioButton _addPacManDown;
+        private readonly RadioButton _addDoor;
+        private readonly RadioButton _addPortal;
+        private readonly RadioButton _addGhostHouse;
+        private readonly RadioButton _addFruit;
 
         public Form1()
         {
@@ -25,35 +32,37 @@ namespace NPacMan.UI
             };
             this.Controls.Add(lbl);
 
-            _addWall = new RadioButton
-            {
-                Name = "rbWall",
-                Text = "Add Wall",
-                Location = new System.Drawing.Point(10, 30)
-            };
-            this.Controls.Add(_addWall);
-
-            _addCoin = new RadioButton
-            {
-                Name = "rbCoin",
-                Text = "Add Coin",
-                Location = new System.Drawing.Point(10, 60)
-            };
-            this.Controls.Add(_addCoin);
-
-            _addPill = new RadioButton
-            {
-                Name = "rbPill",
-                Text = "Add Pill",
-                Location = new System.Drawing.Point(10, 90)
-            };
-            this.Controls.Add(_addPill);
+            _addWall = AddRadioButton("rbWall", "Add Wall", 1);
+            _addCoin = AddRadioButton("rbCoin", "Add Coin", 2);
+            _addPill = AddRadioButton("rbPill", "Add Pill", 3);
+            _addPacManLeft = AddRadioButton("addPacManLeft", "Add PacMan Left", 4);
+            _addPacManRight = AddRadioButton("addPacManLeft", "Add PacMan Right", 5);
+            _addPacManUp = AddRadioButton("addPacManLeft", "Add PacMan Up", 6);
+            _addPacManDown = AddRadioButton("addPacManLeft", "Add PacMan Down", 7);
+            _addDoor = AddRadioButton("AddDoor", "Add PacMan Down", 8);
+            _addPortal = AddRadioButton("AddPortal", "Add Portal", 9);
+            _addGhostHouse = AddRadioButton("AddGhostHouse", "Add Ghost House", 10);
+            _addFruit = AddRadioButton("AddFruit", "Add Fruit", 11);
 
             this.StartPosition = FormStartPosition.CenterScreen;
             this.Text = "PacMan Designer";
             this.WindowState = FormWindowState.Maximized;
 
             this.Click += Form1_Click;
+        }
+
+        private RadioButton AddRadioButton(string name, string text, int buttonNumber)
+        {
+            var button = new RadioButton
+            {
+                Name = name,
+                Text = text,
+                Location = new System.Drawing.Point(10, buttonNumber * 30),
+                AutoSize = true,
+            };
+            this.Controls.Add(button);
+
+            return button;
         }
 
         private void Form1_Click(object? sender, EventArgs e)
