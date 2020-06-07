@@ -104,7 +104,7 @@ namespace NPacMan.Game
             gameState.ApplyToGhosts(ghost => ghost.SetToNotEdible());
         }
 
-        public async static Task MovePacMan(Game game, GameState gameState, BehaviorContext<GameState, Tick> context, GameStateMachine gameStateMachine, IGameSettings settings)
+        public static async Task MovePacMan(Game game, GameState gameState, BehaviorContext<GameState, Tick> context, GameStateMachine gameStateMachine, IGameSettings settings)
         {
             var newPacManLocation = gameState.PacMan.Location + gameState.PacMan.Direction;
 

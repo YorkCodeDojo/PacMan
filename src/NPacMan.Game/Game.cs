@@ -21,9 +21,6 @@ namespace NPacMan.Game
 
         private readonly InstanceLift<GameStateMachine> _gameStateMachineInstance;
 
-        private readonly IReadOnlyCollection<CellLocation> _walls;
-        public int TickCounter { get;private set; }
-
         public Game(IGameClock gameClock, IGameSettings settings)
         {
             _gameClock = gameClock;
@@ -32,7 +29,7 @@ namespace NPacMan.Game
             var gameState = new GameState(settings);
             _gameState = gameState;
             _gameStateMachineInstance = _gameStateMachine.CreateInstanceLift(gameState);
-            _walls = _settings.Walls.Union(_settings.Doors).ToList().AsReadOnly();
+            Walls = _settings.Walls.Union(_settings.Doors).ToList().AsReadOnly();
         }
 
         public Game StartGame()
@@ -65,8 +62,7 @@ namespace NPacMan.Game
         public IReadOnlyCollection<CellLocation> PowerPills
             => _gameState.RemainingPowerPills;
 
-        public IReadOnlyCollection<CellLocation> Walls
-            => _walls;
+        public IReadOnlyCollection<CellLocation> Walls { get; }
 
         public IReadOnlyCollection<CellLocation> Doors
             => _settings.Doors;

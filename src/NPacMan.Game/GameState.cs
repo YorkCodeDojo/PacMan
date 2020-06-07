@@ -28,7 +28,7 @@ namespace NPacMan.Game
             Ghosts = settings.Ghosts.ToDictionary(x => x.Name, x => x);
         }
 
-        public string Status { get; set; } = null!;
+        public string Status { get; set; }
 
         public DateTime? TimeToChangeState { get;private set; }
 
@@ -43,6 +43,7 @@ namespace NPacMan.Game
         public int TickCounter => _tickCounter;
 
         private int _tickCounter;
+
         private DateTime? _fruitVisibleUntil;
 
         public IReadOnlyCollection<CellLocation> RemainingCoins { get; private set; }
