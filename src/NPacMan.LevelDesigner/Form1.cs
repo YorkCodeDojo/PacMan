@@ -1,8 +1,8 @@
-﻿using System;
-using System.Windows.Forms;
-using NPacMan.Game;
+﻿using NPacMan.Game;
 using NPacMan.LevelDesigner;
 using NPacMan.SharedUi;
+using System;
+using System.Windows.Forms;
 
 namespace NPacMan.UI
 {
@@ -12,7 +12,7 @@ namespace NPacMan.UI
         private readonly RadioButton _addWall;
         private readonly RadioButton _addCoin;
         private readonly RadioButton _addPill;
-        
+
 
         public Form1()
         {
@@ -64,8 +64,8 @@ namespace NPacMan.UI
             var graphicsBuffers = new GraphicsBuffers(this) { ShowFps = false };
             graphicsBuffers.CalculateOffsets(_currentDesign.Width, _currentDesign.Height + 5);
 
-            var x = (int)((pixelX - graphicsBuffers.OffsetX) / 8)-2;
-            var y = (int)((pixelY - graphicsBuffers.OffsetY) / 8)-3-12;
+            var x = (int)((pixelX - graphicsBuffers.OffsetX) / 8) - 2;
+            var y = (int)((pixelY - graphicsBuffers.OffsetY) / 8) - 3 - 12;
 
             MessageBox.Show($"{x}, {y}");
 
@@ -103,6 +103,11 @@ namespace NPacMan.UI
             var graphicsBuffers = new GraphicsBuffers(this) { ShowFps = false };
             graphicsBuffers.RenderBackgroundUpdate(boardRenderer);
             graphicsBuffers.RenderBackgroundUpdate(boardRenderer);
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            DisplayBoard();
         }
     }
 }

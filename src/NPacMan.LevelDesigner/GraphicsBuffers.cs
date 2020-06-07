@@ -49,7 +49,7 @@ namespace NPacMan.UI
             _currentContext = BufferedGraphicsManager.Current;
             _formSize = _form.DisplayRectangle;
 
-            _fpsStopWatch=new Stopwatch();
+            _fpsStopWatch = new Stopwatch();
             _fpsStopWatch.Start();
 
             using var ms = new MemoryStream(Resources.gfx);
@@ -128,11 +128,11 @@ namespace NPacMan.UI
                 _backgroundGraphics.SmoothingMode = SmoothingMode.None;
                 _backgroundGraphics.InterpolationMode = InterpolationMode.NearestNeighbor;
             }
-            
+
             return _backgroundGraphics;
         }
 
-        public void CalculateOffsets(int width,int height)
+        public void CalculateOffsets(int width, int height)
         {
             // Scale to fit, with aspect ratio
             var scale = Math.Min((float)_formSize.Width / width,
@@ -176,6 +176,7 @@ namespace NPacMan.UI
                     _screenGraphics.FillRectangle(_fpsBrush, 0, 0, 50, 20);
                     _screenGraphics.DrawString($"{_fpsLast} fps", _fpsFont, Brushes.White, 0, 0);
                 }
+
             }
 
             _screenBuffer?.Render();
@@ -205,7 +206,7 @@ namespace NPacMan.UI
         public void RenderBackgroundUpdate(BoardRenderer boardRenderer)
         {
             // Update the static background with any changes
-            var gBack = GetBitmapBackgroundBuffer(boardRenderer.DisplayWidth * PixelGrid, 
+            var gBack = GetBitmapBackgroundBuffer(boardRenderer.DisplayWidth * PixelGrid,
                 boardRenderer.DisplayHeight * PixelGrid);
             foreach (var sprite in boardRenderer.BackgroundToUpdate)
             {
@@ -222,6 +223,21 @@ namespace NPacMan.UI
             {
                 RenderSprite(gSprite, sprite.XPos, sprite.YPos, sprite.Sprite);
             }
+
+            for (int columnNumber = 0; columnNumber < boardRenderer.DisplayWidth; columnNumber++)
+            {
+                gSprite.DrawLine(Pens.LightGray,
+                                 columnNumber * PixelGrid, 3 * PixelGrid,
+                                 columnNumber * PixelGrid, boardRenderer.DisplayWidth * PixelGrid);
+            }
+
+            for (int rowNumber = 3; rowNumber <= (boardRenderer.DisplayHeight - 5); rowNumber++)
+            {
+                gSprite.DrawLine(Pens.LightGray,
+                                 0, rowNumber * PixelGrid,
+                                 (boardRenderer.DisplayWidth - 1) * PixelGrid, rowNumber * PixelGrid);
+            }
+
 
             // Push out onto the screen
             Render();

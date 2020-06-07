@@ -32,7 +32,7 @@ namespace NPacMan.LevelDesigner
             };
 
             CellLocation fruit = new CellLocation(10,10);
-            PacMan pacMan = new PacMan(new CellLocation(11, 11), Direction.Up);
+            PacMan pacMan = new PacMan(new CellLocation(11, 11), Direction.Right);
 
             for (int rowNumber = 0; rowNumber < Height; rowNumber++)
             {
