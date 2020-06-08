@@ -30,6 +30,7 @@ namespace NPacMan.Game
             _gameState = gameState;
             _gameStateMachineInstance = _gameStateMachine.CreateInstanceLift(gameState);
             Walls = _settings.Walls.Union(_settings.Doors).ToList().AsReadOnly();
+            _fruitForLevel = new[] { new Fruit(_settings.Fruit, FruitType.Cherry) };
         }
 
         public Game StartGame()
@@ -104,7 +105,9 @@ namespace NPacMan.Game
 
         public Fruit[] Fruits =>
             _gameState.FruitVisible ?
-            new []{new Fruit(_settings.Fruit, FruitType.Cherry)} : Array.Empty<Fruit>();
+            _fruitForLevel : Array.Empty<Fruit>();
+
+        private readonly Fruit[] _fruitForLevel;
 
         private async Task Tick(DateTime now)
         {

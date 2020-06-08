@@ -4,6 +4,7 @@
 @using NPacMan.Blazor.JsInterop
 @using NPacMan.SharedUi.Properties
 @using System.IO
+@using System.Threading
 
 @inject IJSRuntime jsRuntime
 
@@ -16,6 +17,8 @@
     private ElementReference _canvas;
 
     private BoardRenderer? _boardRenderer;
+
+    private Timer? _timer;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -56,18 +59,8 @@
 
         _game = _game.StartGame();
 
-        // Timer loop
 
-        var timer = new DateTime().AddSeconds(0.5);
-        while (true)
-        {
-            await Task.Delay(1);
-            if (DateTime.Now > timer)
-            {
-                timer = DateTime.Now.AddMilliseconds(50);
-                Tick();
-            }
-        }
+        _timer = new Timer(state => Tick(), null, 0, 50);
     }
 
 
@@ -190,13 +183,13 @@
     private async Task RegisterSound(Sounds sound, UnmanagedMemoryStream ums)
     {
         byte[] bytes;
-        using (var ms = new MemoryStream())
+        await using (var ms = new MemoryStream())
         {
-            ums.CopyTo(ms);
+            await ums.CopyToAsync(ms);
             bytes = ms.ToArray();
         }
         var data = Convert.ToBase64String(bytes);
-        
+
         await jsRuntime.InvokeVoidAsync("SoundSet", (int)sound, data);
     }
 
