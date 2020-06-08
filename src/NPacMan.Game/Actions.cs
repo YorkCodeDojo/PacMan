@@ -20,6 +20,11 @@ namespace NPacMan.Game
             gameNotifications.Publish(GameNotification.Dying);
         }
 
+        public static void GetReadyForNextLevel(GameState gameState)
+        {
+            gameState.IncrementLevel();                
+        }
+
         public static void BeginRespawning(GameNotifications gameNotifications)
         {
             gameNotifications.Publish(GameNotification.Respawning);

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -195,6 +196,31 @@ namespace NPacMan.Game.Tests.GameTests
 
             game.Should().BeEquivalentTo(new {
                 Level = 1
+            });
+        }
+
+        [Fact]
+        public async Task TransitionsFromChangingLevelToNextLevelAfterSevenSeconds()
+        {
+            var now = DateTime.UtcNow;
+            var gameClock = new TestGameClock();
+            _gameSettings.Coins.Add(_gameSettings.PacMan.Location.Left);
+            var game = new Game(gameClock, _gameSettings);
+            
+            game.StartGame();
+            await game.ChangeDirection(Direction.Left);
+            await gameClock.Tick(now);
+
+            if (game.Status != GameStatus.ChangingLevel)
+            {
+                throw new Exception($"Game status should be GameStatus.ChangingLevel not {game.Status}");
+            }
+
+            await gameClock.Tick(now.AddSeconds(7));
+
+            game.Should().BeEquivalentTo(new {
+                Status = GameStatus.Alive,
+                Level = 2
             });
         }
     }

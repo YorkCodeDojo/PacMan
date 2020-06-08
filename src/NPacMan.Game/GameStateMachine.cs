@@ -28,6 +28,13 @@ namespace NPacMan.Game
                 When(Tick, context => context.Data.Now >= context.Instance.TimeToChangeState)
                     .TransitionTo(GhostChase));
 
+            During(ChangingLevel,
+                When(Tick, context => context.Data.Now >= context.Instance.TimeToChangeState)
+                    .TransitionTo(Scatter));
+
+            
+            WhenLeave(ChangingLevel, binder => binder.Then(context => Actions.GetReadyForNextLevel(context.Instance)));
+            
             WhenEnter(GhostChase,
                        binder => binder
                             .Then(context => context.Instance.ChangeStateIn(settings.ChaseTimeInSeconds))
@@ -66,6 +73,12 @@ namespace NPacMan.Game
                     binder => binder.Then(context => Actions.GhostEaten(context.Instance, context.Data.Ghost, game, gameNotifications)),
                     binder => binder.Then(context => Actions.EatenByGhost(context.Instance))
                                     .TransitionTo(Dying))); 
+
+
+            WhenEnter(ChangingLevel,
+                       binder => binder
+                                .Then(context => context.Instance.ChangeStateIn(7)));
+
 
             WhenEnter(Dying,
                        binder => binder

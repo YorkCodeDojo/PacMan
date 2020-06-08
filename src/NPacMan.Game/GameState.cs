@@ -114,6 +114,11 @@ namespace NPacMan.Game
             LastTick = now;
         }
 
+        internal void IncrementLevel()
+        {
+            Level++;
+        }
+
         internal void ChangeStateIn(int timeInSeconds)
         {
             TimeToChangeState = LastTick.AddSeconds(timeInSeconds);
