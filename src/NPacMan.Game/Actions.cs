@@ -174,7 +174,7 @@ namespace NPacMan.Game
             gameState.ApplyToGhost(ghost => ghost.SetToNotEdible(), ghostToUpdate);
         }
 
-        private static void MovePacManHome(GameState gameState, IGameSettings gameSettings) => gameState.MovePacManHome(gameSettings.PacMan);
+        private static void MovePacManHome(GameState gameState, IGameSettings gameSettings) => gameState.ReplacePacMan(gameSettings.PacMan);
 
         private static void SendGhostHome(GameState gameState, Ghost ghostToUpdate)
         {

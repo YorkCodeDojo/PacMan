@@ -147,7 +147,7 @@ namespace NPacMan.Game
             });
         }
 
-        internal void MovePacManHome(PacMan pacMan)
+        internal void ReplacePacMan(PacMan pacMan)
         {
             PacMan = pacMan;
         }
