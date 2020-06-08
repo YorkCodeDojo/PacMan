@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -204,7 +205,14 @@ namespace NPacMan.Game.Tests.GameTests
         {
             var now = DateTime.UtcNow;
             var gameClock = new TestGameClock();
+            var ghostHomeLocation = _gameSettings.PacMan.Location.FarAway();
+            var ghosts = GhostBuilder.New()
+                    .WithChaseStrategyRight()
+                    .WithLocation(ghostHomeLocation)
+                    .CreateMany(3);
             _gameSettings.Coins.Add(_gameSettings.PacMan.Location.Left);
+            _gameSettings.Ghosts.AddRange(ghosts);
+            
             var game = new Game(gameClock, _gameSettings);
             
             game.StartGame();
@@ -216,13 +224,18 @@ namespace NPacMan.Game.Tests.GameTests
                 throw new Exception($"Game status should be GameStatus.ChangingLevel not {game.Status}");
             }
 
+            WeExpectThat(game.PacMan).IsAt(_gameSettings.PacMan.Location.Left);
+            WeExpectThat(game.Ghosts.Values.ElementAt(0)).IsAt(ghostHomeLocation.Right);
+            WeExpectThat(game.Ghosts.Values.ElementAt(1)).IsAt(ghostHomeLocation.Right);
+            WeExpectThat(game.Ghosts.Values.ElementAt(2)).IsAt(ghostHomeLocation.Right);
+
             await gameClock.Tick(now.AddSeconds(7));
 
             game.Should().BeEquivalentTo(new {
                 Status = GameStatus.Alive,
                 Level = 2,
                 PacMan = _gameSettings.PacMan,
-                
+                Ghosts = ghosts.ToDictionary(x => x.Name, x => new {Location = x.Home})
             });
         }
     }
