@@ -25,7 +25,6 @@ namespace NPacMan.Blazor
         public SoundSet(IJSRuntime jsRuntime)
         {
             _eatFruit = new Sound(jsRuntime, Resources.pacman_eatfruit, 0, 1000, true);
-//            _chomp = new Sound(jsRuntime, Resources.pacman_chomp, 1, 600, false);
             _chomp1 = new Sound(jsRuntime, Resources.pacman_chomp1, 1, 120, false);
             _chomp2 = new Sound(jsRuntime, Resources.pacman_chomp2, 2, 120, false);
             _death = new Sound(jsRuntime, Resources.pacman_death, 3, 2000, true);

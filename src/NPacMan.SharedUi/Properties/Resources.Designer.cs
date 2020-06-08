@@ -82,15 +82,6 @@ namespace NPacMan.SharedUi.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
         /// </summary>
-        public static System.IO.UnmanagedMemoryStream pacman_chomp {
-            get {
-                return ResourceManager.GetStream("pacman_chomp", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
-        /// </summary>
         public static System.IO.UnmanagedMemoryStream pacman_chomp1 {
             get {
                 return ResourceManager.GetStream("pacman_chomp1", resourceCulture);
