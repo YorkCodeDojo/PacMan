@@ -215,12 +215,15 @@ namespace NPacMan.Game.Tests.GameTests
                     .WithLocation(ghostHomeLocation)
                     .CreateMany(3);
             _gameSettings.Coins.Add(_gameSettings.PacMan.Location.Left);
+            _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Left.Left);
             _gameSettings.Ghosts.AddRange(ghosts);
+            _gameSettings.FruitAppearsAfterCoinsEaten.Add(1);
             
             var game = new Game(gameClock, _gameSettings);
             
             game.StartGame();
             await game.ChangeDirection(Direction.Left);
+            await gameClock.Tick(now);
             await gameClock.Tick(now);
 
             if (game.Status != GameStatus.ChangingLevel)
@@ -228,7 +231,7 @@ namespace NPacMan.Game.Tests.GameTests
                 throw new Exception($"Game status should be GameStatus.ChangingLevel not {game.Status}");
             }
 
-            WeExpectThat(game.PacMan).IsAt(_gameSettings.PacMan.Location.Left);
+            WeExpectThat(game.PacMan).IsAt(_gameSettings.PacMan.Location.Left.Left);
 
             await gameClock.Tick(now.AddSeconds(7));
 
@@ -236,7 +239,10 @@ namespace NPacMan.Game.Tests.GameTests
                 Status = GameStatus.Alive,
                 Level = 2,
                 PacMan = _gameSettings.PacMan,
-                Ghosts = ghosts.ToDictionary(x => x.Name, x => new {Location = x.Home})
+                Ghosts = ghosts.ToDictionary(x => x.Name, x => new {Location = x.Home}),
+                Coins = _gameSettings.Coins,
+                PowerPills = _gameSettings.PowerPills,
+                Fruits = new object[0]
             });
 
             //TODO: Coins, pill, fruit?

@@ -73,6 +73,15 @@ namespace NPacMan.Game
             RemainingPowerPills = RemainingPowerPills.Where(p => p != location).ToList();
         }
 
+        internal void ReplaceCoins(IReadOnlyCollection<CellLocation> coins)
+        {
+            RemainingCoins = coins;
+        }
+        internal void ReplacePowerPills(IReadOnlyCollection<CellLocation> powerPills)
+        {
+            RemainingPowerPills = powerPills;
+        }
+
         internal void HideFruit()
         {
             _fruitVisibleUntil = null;

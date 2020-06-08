@@ -26,6 +26,9 @@ namespace NPacMan.Game
             MovePacManHome(gameState, gameSettings);
             MoveGhostsHome(gameState);
             gameState.ShowGhosts();
+            gameState.ReplaceCoins(gameSettings.Coins);
+            gameState.ReplacePowerPills(gameSettings.PowerPills);
+            gameState.HideFruit();
         }
 
         public static void BeginRespawning(GameNotifications gameNotifications)
