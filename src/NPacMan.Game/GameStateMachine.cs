@@ -77,7 +77,7 @@ namespace NPacMan.Game
             WhenEnter(ChangingLevel,
                        binder => binder
                                 .Then(context => context.Instance.HideGhosts())
-                                .Then(context => context.Instance.ChangeStateIn(7)));
+                                .Then(context => context.Instance.ChangeStateIn(4)));
 
 
             WhenEnter(Dying,
@@ -103,7 +103,7 @@ namespace NPacMan.Game
 
             During(Dead, Ignore(Tick));
 
-            During(Dying, Respawning, Dead,
+            During(Dying, Respawning, Dead, ChangingLevel,
                     Ignore(PlayersWishesToChangeDirection),
                     Ignore(CoinCollision),
                     Ignore(PowerPillCollision),

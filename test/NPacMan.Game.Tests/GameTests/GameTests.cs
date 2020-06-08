@@ -205,7 +205,7 @@ namespace NPacMan.Game.Tests.GameTests
         }
 
         [Fact]
-        public async Task TransitionsFromChangingLevelToNextLevelAfterSevenSeconds()
+        public async Task TransitionsFromChangingLevelToNextLevelAfterFourSeconds()
         {
             var now = DateTime.UtcNow;
             var gameClock = new TestGameClock();
@@ -233,7 +233,7 @@ namespace NPacMan.Game.Tests.GameTests
 
             WeExpectThat(game.PacMan).IsAt(_gameSettings.PacMan.Location.Left.Left);
 
-            await gameClock.Tick(now.AddSeconds(7));
+            await gameClock.Tick(now.AddSeconds(4));
 
             game.Should().BeEquivalentTo(new {
                 Status = GameStatus.Alive,
