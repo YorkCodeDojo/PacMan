@@ -61,12 +61,10 @@ namespace NPacMan.SharedUi.Map
                 new CellPattern("-#0-#X---", BoardPiece.JoinLeftHandTop),
                 new CellPattern("0#-X#----", BoardPiece.JoinRightHandTop),
                 new CellPattern("----#X-#0", BoardPiece.JoinLeftHandBottom),
-                new CellPattern("---X#-0#-", BoardPiece.JoinRightHandBottom)
+                new CellPattern("---X#-0#-", BoardPiece.JoinRightHandBottom),
+                new CellPattern("-X0-##---", BoardPiece.JoinBottomRight),
+                new CellPattern("0X-##----", BoardPiece.JoinBottomLeft)
             };
-            
-            //CheckList.Add(new BoardPiecePattern("-X0-##---", BoardPiece.JoinBottomRight));
-            //CheckList.Add(new BoardPiecePattern("0X-##----", BoardPiece.JoinBottomLeft));
-
         }
 
         public BoardPiece FindBoardPiece(MapCellDetail board)
@@ -77,17 +75,20 @@ namespace NPacMan.SharedUi.Map
                     return pattern.BoardPiece;
             }
 
-#if DEBUG
+            return BoardPiece.Undefined;
+
             // Failed to match - loop through again to help debug layout
 
-            foreach (var pattern in _patterns)
-            {
-                if (pattern.DoCellsMatchPattern(board))
-                    return pattern.BoardPiece;
-            }
-#endif
+//#if DEBUG
 
-            throw new Exception($"No matching board piece pattern @ c{board.X},{board.Y}");
+//            foreach (var pattern in _patterns)
+//            {
+//                if (pattern.DoCellsMatchPattern(board))
+//                    return pattern.BoardPiece;
+//            }
+//#endif
+
+//            throw new Exception($"No matching board piece pattern @ c{board.X},{board.Y}");
         }
     }
 }

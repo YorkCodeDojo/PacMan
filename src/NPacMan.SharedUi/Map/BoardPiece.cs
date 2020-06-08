@@ -9,6 +9,7 @@
         GhostTopRight, GhostTopLeft, GhostBottomRight, GhostBottomLeft, GhostEndLeft, GhostEndRight,
         JoinTopRight, JoinTopLeft, GhostDoor,
         InnerTopRight, InnerTopLeft, InnerBottomRight, InnerBottomLeft,
-        InsideWalls
+        InsideWalls, Undefined,
+        JoinBottomRight, JoinBottomLeft
     }
 }
