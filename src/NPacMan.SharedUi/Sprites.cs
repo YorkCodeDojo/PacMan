@@ -248,6 +248,12 @@ namespace NPacMan.SharedUi
                     return new SpriteSource(20, 7, 1);
                 case BoardPiece.InsideWalls:
                     return new SpriteSource(1, 6, 1);
+                case BoardPiece.Undefined:
+                    return new SpriteSource(13, 6, 1);
+                case BoardPiece.JoinBottomRight:
+                    return new SpriteSource(30, 7, 1);
+                case BoardPiece.JoinBottomLeft:
+                    return new SpriteSource(31, 7, 1);
                 default:
                     throw new Exception("Bad board piece");
             }
