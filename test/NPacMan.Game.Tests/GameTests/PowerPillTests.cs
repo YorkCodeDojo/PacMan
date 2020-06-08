@@ -160,6 +160,7 @@ namespace NPacMan.Game.Tests.GameTests
                 .Create();
             _gameSettings.Ghosts.AddRange(new[] { ghost1, ghost2, ghost3, ghost4 });
 
+            _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.FarAway());
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Right);
 
             var game = new Game(_gameClock, _gameSettings);

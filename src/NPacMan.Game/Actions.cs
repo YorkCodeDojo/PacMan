@@ -25,6 +25,7 @@ namespace NPacMan.Game
             gameState.IncrementLevel();
             MovePacManHome(gameState, gameSettings);
             MoveGhostsHome(gameState);
+            gameState.ShowGhosts();
         }
 
         public static void BeginRespawning(GameNotifications gameNotifications)

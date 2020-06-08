@@ -103,6 +103,7 @@ namespace NPacMan.Game.Tests.GameTests
         public async Task EatingLastCoinCompletesLevel()
         {
             var gameClock = new TestGameClock();
+            _gameSettings.Ghosts.Add(GhostBuilder.New().WithLocation(_gameSettings.PacMan.Location.FarAway()).Create());
             _gameSettings.Coins.Add(_gameSettings.PacMan.Location.Left);
             var game = new Game(gameClock, _gameSettings);
             
@@ -112,7 +113,8 @@ namespace NPacMan.Game.Tests.GameTests
 
             game.Should().BeEquivalentTo(new {
                 Status = GameStatus.ChangingLevel,
-                Level = 1
+                Level = 1,
+                Ghosts = new Dictionary<string, Ghost>()
             });
         }
 
@@ -141,6 +143,7 @@ namespace NPacMan.Game.Tests.GameTests
         public async Task EatingLastPillCompletesLevel()
         {
             var gameClock = new TestGameClock();
+            _gameSettings.Ghosts.Add(GhostBuilder.New().WithLocation(_gameSettings.PacMan.Location.FarAway()).Create());
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Left);
             var game = new Game(gameClock, _gameSettings);
             
@@ -150,7 +153,8 @@ namespace NPacMan.Game.Tests.GameTests
 
             game.Should().BeEquivalentTo(new {
                 Status = GameStatus.ChangingLevel,
-                Level = 1
+                Level = 1,
+                Ghosts = new Dictionary<string, Ghost>()
             });
         }
 
@@ -225,9 +229,6 @@ namespace NPacMan.Game.Tests.GameTests
             }
 
             WeExpectThat(game.PacMan).IsAt(_gameSettings.PacMan.Location.Left);
-            WeExpectThat(game.Ghosts.Values.ElementAt(0)).IsAt(ghostHomeLocation.Right);
-            WeExpectThat(game.Ghosts.Values.ElementAt(1)).IsAt(ghostHomeLocation.Right);
-            WeExpectThat(game.Ghosts.Values.ElementAt(2)).IsAt(ghostHomeLocation.Right);
 
             await gameClock.Tick(now.AddSeconds(7));
 
@@ -237,6 +238,8 @@ namespace NPacMan.Game.Tests.GameTests
                 PacMan = _gameSettings.PacMan,
                 Ghosts = ghosts.ToDictionary(x => x.Name, x => new {Location = x.Home})
             });
+
+            //TODO: Coins, pill, fruit?
         }
     }
 }
