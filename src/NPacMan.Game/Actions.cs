@@ -25,6 +25,7 @@ namespace NPacMan.Game
             gameState.IncrementLevel();
             MovePacManHome(gameState, gameSettings);
             MoveGhostsHome(gameState);
+            MakeGhostsNotEdible(gameState);
             gameState.ShowGhosts();
             gameState.ReplaceCoins(gameSettings.Coins);
             gameState.ReplacePowerPills(gameSettings.PowerPills);

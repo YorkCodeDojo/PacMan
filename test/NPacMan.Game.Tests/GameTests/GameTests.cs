@@ -239,7 +239,10 @@ namespace NPacMan.Game.Tests.GameTests
                 Status = GameStatus.Alive,
                 Level = 2,
                 PacMan = _gameSettings.PacMan,
-                Ghosts = ghosts.ToDictionary(x => x.Name, x => new {Location = x.Home}),
+                Ghosts = ghosts.ToDictionary(x => x.Name, x => new {
+                    Location = x.Home,
+                    Edible = false
+                }),
                 Coins = _gameSettings.Coins,
                 PowerPills = _gameSettings.PowerPills,
                 Fruits = new object[0]
