@@ -154,5 +154,10 @@ namespace NPacMan.Game
                 PacMan = PacMan.WithNewDirection(direction);
             }
         }
+
+        internal bool IsLevelComplete()
+        {
+            return RemainingCoins.Count == 0 && RemainingPowerPills.Count == 0;
+        }
     }
 }

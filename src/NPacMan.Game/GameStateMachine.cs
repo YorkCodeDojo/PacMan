@@ -50,13 +50,13 @@ namespace NPacMan.Game
                     .ThenAsync(async context => await Actions.MovePacMan(game, context.Instance, context, this, settings)),
                 When(CoinCollision)
                     .Then(context => Actions.CoinEaten(game, settings, context.Instance, context.Data.Location, gameNotifications))
-                    .If(context => context.Instance.RemainingCoins.Count == 0 && context.Instance.RemainingPowerPills.Count == 0, 
+                    .If(context => context.Instance.IsLevelComplete(), 
                             binder => binder.TransitionTo(ChangingLevel)),
                 When(FruitCollision)
                     .Then(context => Actions.FruitEaten(game, settings, context.Instance, context.Data.Location, gameNotifications)),
                 When(PowerPillCollision)
                     .Then(context => Actions.PowerPillEaten(settings, context.Instance, context.Data.Location, gameNotifications))
-                    .IfElse(context => context.Instance.RemainingCoins.Count == 0 && context.Instance.RemainingPowerPills.Count == 0, 
+                    .IfElse(context => context.Instance.IsLevelComplete(), 
                             binder => binder.TransitionTo(ChangingLevel),
                         binder =>
                             binder.Then(context => context.Instance.ChangeStateIn(settings.FrightenedTimeInSeconds))
