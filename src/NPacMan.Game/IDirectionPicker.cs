@@ -4,6 +4,6 @@ namespace NPacMan.Game
 {
     public interface IDirectionPicker
     {
-        Direction Pick(IEnumerable<Direction> directions);
+        Direction Pick(IReadOnlyCollection<Direction> directions);
     }
 }

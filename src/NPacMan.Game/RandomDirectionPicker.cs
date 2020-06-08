@@ -6,7 +6,7 @@ namespace NPacMan.Game
     public class RandomDirectionPicker : IDirectionPicker
     {
         private int _count = 0;
-        public Direction Pick(IEnumerable<Direction> directions)
+        public Direction Pick(IReadOnlyCollection<Direction> directions)
         {
             var random = _count % directions.Count();
             _count++;
