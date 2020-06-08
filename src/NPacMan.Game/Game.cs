@@ -84,6 +84,9 @@ namespace NPacMan.Game
             => _gameState.Lives;
 
         public int Score => _gameState.Score;
+
+        public int Level => _gameState.Level;
+
         public PacMan PacMan => _gameState.PacMan;
 
         public IReadOnlyDictionary<string, Ghost> Ghosts
@@ -100,6 +103,7 @@ namespace NPacMan.Game
             nameof(GameStateMachine.Dying) => GameStatus.Dying,
             nameof(GameStateMachine.Respawning) => GameStatus.Respawning,
             nameof(GameStateMachine.Dead) => GameStatus.Dead,
+            nameof(GameStateMachine.ChangingLevel) => GameStatus.ChangingLevel,
             _ => throw new NotImplementedException($"No map for status '{_gameState.Status}'")
         };
 

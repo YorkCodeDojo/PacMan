@@ -49,13 +49,18 @@ namespace NPacMan.Game
                     .ThenAsync(async context => await Actions.MoveGhosts(game, context.Instance, context, this))
                     .ThenAsync(async context => await Actions.MovePacMan(game, context.Instance, context, this, settings)),
                 When(CoinCollision)
-                    .Then(context => Actions.CoinEaten(game, settings, context.Instance, context.Data.Location, gameNotifications)),
+                    .Then(context => Actions.CoinEaten(game, settings, context.Instance, context.Data.Location, gameNotifications))
+                    .If(context => context.Instance.RemainingCoins.Count == 0 && context.Instance.RemainingPowerPills.Count == 0, 
+                            binder => binder.TransitionTo(ChangingLevel)),
                 When(FruitCollision)
                     .Then(context => Actions.FruitEaten(game, settings, context.Instance, context.Data.Location, gameNotifications)),
                 When(PowerPillCollision)
-                    .Then(context => context.Instance.ChangeStateIn(settings.FrightenedTimeInSeconds))
                     .Then(context => Actions.PowerPillEaten(settings, context.Instance, context.Data.Location, gameNotifications))
-                    .TransitionTo(Frightened),
+                    .IfElse(context => context.Instance.RemainingCoins.Count == 0 && context.Instance.RemainingPowerPills.Count == 0, 
+                            binder => binder.TransitionTo(ChangingLevel),
+                        binder =>
+                            binder.Then(context => context.Instance.ChangeStateIn(settings.FrightenedTimeInSeconds))
+                                .TransitionTo(Frightened)),
                 When(GhostCollision)
                     .IfElse(x => x.Data.Ghost.Edible,
                     binder => binder.Then(context => Actions.GhostEaten(context.Instance, context.Data.Ghost, game, gameNotifications)),
@@ -98,6 +103,7 @@ namespace NPacMan.Game
         public State Dying { get; private set; } = null!;
         public State Respawning { get; private set; } = null!;
         public State Dead { get; private set; } = null!;
+        public State ChangingLevel { get; private set; } = null!;
         public Event<Tick> Tick { get; private set; } = null!;
         public Event<GhostCollision> GhostCollision { get; private set; } = null!;
         public Event<CoinCollision> CoinCollision { get; private set; } = null!;

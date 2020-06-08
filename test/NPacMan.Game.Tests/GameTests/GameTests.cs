@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using NPacMan.Game.Tests.Helpers;
 using Xunit;
 using static NPacMan.Game.Tests.Helpers.Ensure;
 
@@ -96,5 +97,105 @@ namespace NPacMan.Game.Tests.GameTests
             numberOfNotificationsTriggered.Should().Be(3);
         }
 
+        [Fact]
+        public async Task EatingLastCoinCompletesLevel()
+        {
+            var gameClock = new TestGameClock();
+            _gameSettings.Coins.Add(_gameSettings.PacMan.Location.Left);
+            var game = new Game(gameClock, _gameSettings);
+            
+            game.StartGame();
+            await game.ChangeDirection(Direction.Left);
+            await gameClock.Tick();
+
+            game.Should().BeEquivalentTo(new {
+                Status = GameStatus.ChangingLevel,
+                Level = 1
+            });
+        }
+
+        [Fact]
+        public async Task EatingLastCoinWhenPowerPillExistsDoesntChangeGameStatus()
+        {
+            var gameClock = new TestGameClock();
+            _gameSettings.Coins.Add(_gameSettings.PacMan.Location.Left);
+            _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.FarAway());
+            var game = new Game(gameClock, _gameSettings);
+            
+            game.StartGame();
+            await game.ChangeDirection(Direction.Left);
+
+            var status = game.Status;
+            
+            await gameClock.Tick();
+
+            game.Should().BeEquivalentTo(new {
+                Status = status,
+                Level = 1
+            });
+        }
+
+        [Fact]
+        public async Task EatingLastPillCompletesLevel()
+        {
+            var gameClock = new TestGameClock();
+            _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Left);
+            var game = new Game(gameClock, _gameSettings);
+            
+            game.StartGame();
+            await game.ChangeDirection(Direction.Left);
+            await gameClock.Tick();
+
+            game.Should().BeEquivalentTo(new {
+                Status = GameStatus.ChangingLevel,
+                Level = 1
+            });
+        }
+
+        [Fact]
+        public async Task EatingLastPillWhenCoinExistsDoesntChangeGameStatus()
+        {
+            var gameClock = new TestGameClock();
+            _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Left);
+            _gameSettings.Coins.Add(_gameSettings.PacMan.Location.FarAway());
+            var game = new Game(gameClock, _gameSettings);
+            
+            game.StartGame();
+
+            var status = game.Status;
+            await game.ChangeDirection(Direction.Left);
+            await gameClock.Tick();
+
+            game.Should().BeEquivalentTo(new {
+                Status = status,
+                Level = 1
+            });
+        }
+
+        [Fact]
+        public void TheScoreIsZeroWhenTheGameStarts()
+        {
+            var gameClock = new TestGameClock();
+            var game = new Game(gameClock, _gameSettings);
+            
+            game.StartGame();
+
+            game.Should().BeEquivalentTo(new {
+                Score = 0
+            });
+        }
+
+        [Fact]
+        public void TheLevelIsOneWhenTheGameStarts()
+        {
+            var gameClock = new TestGameClock();
+            var game = new Game(gameClock, _gameSettings);
+            
+            game.StartGame();
+
+            game.Should().BeEquivalentTo(new {
+                Level = 1
+            });
+        }
     }
 }

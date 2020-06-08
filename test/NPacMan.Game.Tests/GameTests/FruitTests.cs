@@ -78,6 +78,7 @@ namespace NPacMan.Game.Tests.GameTests
 
             _gameSettings.Coins.Add(_gameSettings.PacMan.Location.Left);
             _gameSettings.Coins.Add(_gameSettings.PacMan.Location.Left.Left);
+            _gameSettings.Coins.Add(_gameSettings.PacMan.Location.FarAway());
 
             var game = new Game(_gameClock, _gameSettings);
             game.StartGame();

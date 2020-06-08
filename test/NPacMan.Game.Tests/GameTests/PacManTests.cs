@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using FluentAssertions;
+using NPacMan.Game.Tests.Helpers;
 using Xunit;
 using static NPacMan.Game.Tests.Helpers.Ensure;
 
@@ -362,6 +363,7 @@ namespace NPacMan.Game.Tests.GameTests
             
             _gameSettings.Ghosts.AddRange(ghosts);
             
+            _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.FarAway());
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Left);
 
             var game = new Game(_gameClock, _gameSettings);

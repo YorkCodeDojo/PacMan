@@ -49,6 +49,7 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public async Task CannotCollectTheSamePowerPillTwice()
         {
+            _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.FarAway());
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Below);
             var game = new Game(_gameClock, _gameSettings);
             game.StartGame();

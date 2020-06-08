@@ -20,6 +20,7 @@ namespace NPacMan.Game
                 _ => throw new NotImplementedException($"No map for InitialGameStatus '{settings.InitialGameStatus}")
             };
             Score = 0;
+            Level = 1;
             GhostsVisible = true;
             TimeToChangeState = null;
             RemainingCoins = new List<CellLocation>(settings.Coins);
@@ -33,6 +34,8 @@ namespace NPacMan.Game
         public DateTime? TimeToChangeState { get;private set; }
 
         public int Lives { get; private set; }
+
+        public int Level { get; private set; }
 
         public bool GhostsVisible { get; private set; }
 

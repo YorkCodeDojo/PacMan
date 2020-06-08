@@ -5,6 +5,7 @@ using System;
 using System.Threading.Tasks;
 using NPacMan.Game.Tests.GhostStrategiesForTests;
 using static NPacMan.Game.Tests.Helpers.Ensure;
+using NPacMan.Game.Tests.Helpers;
 
 namespace NPacMan.Game.Tests.GameTests
 {
@@ -53,6 +54,7 @@ namespace NPacMan.Game.Tests.GameTests
         {
             var pacManStartingLocation = _gameSettings.PacMan.Location;
             _gameSettings.Coins.Add(pacManStartingLocation.Below);
+            _gameSettings.Coins.Add(pacManStartingLocation.FarAway());
 
             var game = new Game(_gameClock, _gameSettings);
             game.StartGame();

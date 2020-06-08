@@ -20,7 +20,9 @@ namespace NPacMan.Game.Tests.GameTests
 
         public GhostTests()
         {
-            _gameSettings = new TestGameSettings();
+            _gameSettings = new TestGameSettings{
+                PowerPills = { new CellLocation(50,50) }
+            };
             _gameClock = new TestGameClock();
         }
 
@@ -722,6 +724,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Ghosts.Add(ghost1);
             _gameSettings.Ghosts.Add(ghost2);
            
+            _gameSettings.Coins.Add(_gameSettings.PacMan.Location.FarAway());
             _gameSettings.Coins.Add(_gameSettings.PacMan.Location.Left);
 
             var game = new Game(_gameClock, _gameSettings);

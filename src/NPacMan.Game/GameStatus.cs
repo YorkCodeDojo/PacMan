@@ -7,5 +7,6 @@
         Dying,
         Respawning,
         Dead,
+        ChangingLevel
     }
 }
