@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using NPacMan.SharedUi.Properties;
+using NPacMan.UI.Audio;
 
 namespace NPacMan.UI
 {
@@ -16,6 +17,8 @@ namespace NPacMan.UI
         private readonly Sound _eatGhost;
 
         private DateTime _nextSound;
+
+        private readonly AudioPlaybackEngine _audioPlaybackEngine;
 
         public SoundSet()
         {
@@ -33,6 +36,8 @@ namespace NPacMan.UI
             _eatGhost = new Sound(Resources.pacman_eatghost, 1000, true);
 
             _nextSound = DateTime.Now;
+
+            _audioPlaybackEngine = new AudioPlaybackEngine(11025, 1);
         }
 
         private void Play(Sound sound)
@@ -40,7 +45,7 @@ namespace NPacMan.UI
             if (DateTime.Now > _nextSound || sound.Interrupt)
             {
                 _nextSound = DateTime.Now.Add(sound.RepeatTime);
-                sound.Play();
+                _audioPlaybackEngine.PlaySound(sound.SoundSource);
             }
         }
 
