@@ -26,5 +26,6 @@ namespace NPacMan.Game
 
         public bool FruitVisible { get; }
 
+        public FruitType FruitTypeToShow { get; }
     }
 }

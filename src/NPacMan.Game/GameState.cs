@@ -59,6 +59,8 @@ namespace NPacMan.Game
 
         public bool FruitVisible => LastTick <= _fruitVisibleUntil;
 
+        public FruitType FruitTypeToShow { get; private set; }
+
         internal void RemoveCoin(CellLocation location)
         {
             // Note - this is not the same as gameState.RemainingCoins = gameState.RemainingCoins.Remove(location)
@@ -112,10 +114,12 @@ namespace NPacMan.Game
             GhostsVisible = false;
         }
 
-        internal void ShowFruit(int showForSeconds)
+        internal void ShowFruit(int showForSeconds, FruitType fruitToShow)
         {
             _fruitVisibleUntil = LastTick.AddSeconds(showForSeconds);
+            FruitTypeToShow = fruitToShow;
         }
+        
         internal void RecordLastTick(DateTime now)
         {
             Interlocked.Increment(ref _tickCounter);

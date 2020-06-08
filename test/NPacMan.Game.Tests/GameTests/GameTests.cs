@@ -244,8 +244,6 @@ namespace NPacMan.Game.Tests.GameTests
                 PowerPills = _gameSettings.PowerPills,
                 Fruits = new object[0]
             });
-
-            //TODO: Coins, pill, fruit?
         }
     }
 }

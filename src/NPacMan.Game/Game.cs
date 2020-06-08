@@ -107,9 +107,24 @@ namespace NPacMan.Game
             _ => throw new NotImplementedException($"No map for status '{_gameState.Status}'")
         };
 
-        public Fruit[] Fruits =>
-            _gameState.FruitVisible ?
-            _fruitForLevel : Array.Empty<Fruit>();
+        public Fruit[] Fruits 
+        {
+            get 
+            {
+                if (_gameState.FruitVisible)
+                {
+                    if (_fruitForLevel[0].Type != _gameState.FruitTypeToShow)
+                    {
+                        _fruitForLevel[0] = new Fruit(_settings.Fruit, _gameState.FruitTypeToShow);
+                    }
+                    return _fruitForLevel;                        
+                }   
+                else
+                {
+                    return Array.Empty<Fruit>();;
+                }                 
+            }
+        }
 
         private readonly Fruit[] _fruitForLevel;
 
