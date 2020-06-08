@@ -1,6 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
   <ItemGroup>
+    <PackageReference Include="NAudio" Version="1.10.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\NPacMan.Game\NPacMan.Game.csproj" />
     <ProjectReference Include="..\NPacMan.SharedUi\NPacMan.SharedUi.csproj" />
   </ItemGroup>

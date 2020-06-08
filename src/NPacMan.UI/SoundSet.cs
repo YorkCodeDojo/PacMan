@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using NPacMan.SharedUi.Properties;
 
 namespace NPacMan.UI
@@ -6,7 +7,8 @@ namespace NPacMan.UI
     public class SoundSet
     {
         private readonly Sound _eatFruit;
-        private readonly Sound _chomp;
+        private readonly Sound _chomp1;
+        private readonly Sound _chomp2;
         private readonly Sound _beginning;
         private readonly Sound _death;
         private readonly Sound _intermission;
@@ -22,7 +24,8 @@ namespace NPacMan.UI
             // Whether the sound can interrupt the current sound
 
             _eatFruit = new Sound(Resources.pacman_eatfruit, 1000, true);
-            _chomp = new Sound(Resources.pacman_chomp, 600, false);
+            _chomp1 = new Sound(Resources.pacman_chomp1, 120, false);
+            _chomp2 = new Sound(Resources.pacman_chomp2, 120, false);
             _death = new Sound(Resources.pacman_death, 2000, true);
             _beginning = new Sound(Resources.pacman_beginning, 4000, true);
             _intermission = new Sound(Resources.pacman_intermission, 1000, true);
@@ -36,14 +39,17 @@ namespace NPacMan.UI
         {
             if (DateTime.Now > _nextSound || sound.Interrupt)
             {
-                sound.Play();
                 _nextSound = DateTime.Now.Add(sound.RepeatTime);
+                sound.Play();
             }
         }
 
+        private bool _chompSwitch;
+
         public void Chomp()
         {
-            Play(_chomp);
+            _chompSwitch = !_chompSwitch;
+            Play(_chompSwitch ? _chomp1 : _chomp2);
         }
 
         public void EatFruit()
