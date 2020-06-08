@@ -33,7 +33,7 @@ namespace NPacMan.Game
                     .TransitionTo(Scatter));
 
             
-            WhenLeave(ChangingLevel, binder => binder.Then(context => Actions.GetReadyForNextLevel(context.Instance)));
+            WhenLeave(ChangingLevel, binder => binder.Then(context => Actions.GetReadyForNextLevel(context.Instance, settings)));
             
             WhenEnter(GhostChase,
                        binder => binder
@@ -98,7 +98,7 @@ namespace NPacMan.Game
 
             During(Respawning,
                 When(Tick, context => context.Data.Now >= context.Instance.TimeToChangeState)
-                    .Then(context => Actions.CompleteRespawning(context.Instance))
+                    .Then(context => Actions.CompleteRespawning(context.Instance, settings))
                     .TransitionTo(GhostChase));
 
             During(Dead, Ignore(Tick));

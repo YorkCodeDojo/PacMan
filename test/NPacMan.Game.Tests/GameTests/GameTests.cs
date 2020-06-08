@@ -220,7 +220,9 @@ namespace NPacMan.Game.Tests.GameTests
 
             game.Should().BeEquivalentTo(new {
                 Status = GameStatus.Alive,
-                Level = 2
+                Level = 2,
+                PacMan = _gameSettings.PacMan,
+                
             });
         }
     }

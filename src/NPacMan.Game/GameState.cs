@@ -147,9 +147,9 @@ namespace NPacMan.Game
             });
         }
 
-        internal void MovePacManHome()
+        internal void MovePacManHome(PacMan pacMan)
         {
-            PacMan = PacMan.SetToHome();
+            PacMan = pacMan;
         }
 
         internal void ChangeDirectionOfPacMan(Direction direction)

@@ -20,9 +20,10 @@ namespace NPacMan.Game
             gameNotifications.Publish(GameNotification.Dying);
         }
 
-        public static void GetReadyForNextLevel(GameState gameState)
+        public static void GetReadyForNextLevel(GameState gameState, IGameSettings gameSettings)
         {
-            gameState.IncrementLevel();                
+            gameState.IncrementLevel();
+            MovePacManHome(gameState, gameSettings);
         }
 
         public static void BeginRespawning(GameNotifications gameNotifications)
@@ -30,11 +31,11 @@ namespace NPacMan.Game
             gameNotifications.Publish(GameNotification.Respawning);
         }
 
-        public static void CompleteRespawning(GameState gameState)
+        public static void CompleteRespawning(GameState gameState, IGameSettings gameSettings)
         {
             MakeGhostsNotEdible(gameState);
             MoveGhostsHome(gameState);
-            MovePacManHome(gameState);
+            MovePacManHome(gameState, gameSettings);
             gameState.ShowGhosts();
         }
 
@@ -173,7 +174,7 @@ namespace NPacMan.Game
             gameState.ApplyToGhost(ghost => ghost.SetToNotEdible(), ghostToUpdate);
         }
 
-        private static void MovePacManHome(GameState gameState) => gameState.MovePacManHome();
+        private static void MovePacManHome(GameState gameState, IGameSettings gameSettings) => gameState.MovePacManHome(gameSettings.PacMan);
 
         private static void SendGhostHome(GameState gameState, Ghost ghostToUpdate)
         {
