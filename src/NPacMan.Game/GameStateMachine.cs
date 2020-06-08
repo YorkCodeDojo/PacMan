@@ -99,7 +99,7 @@ namespace NPacMan.Game
             During(Respawning,
                 When(Tick, context => context.Data.Now >= context.Instance.TimeToChangeState)
                     .Then(context => Actions.CompleteRespawning(context.Instance, settings))
-                    .TransitionTo(GhostChase));
+                    .TransitionTo(Scatter));
 
             During(Dead, Ignore(Tick));
 

@@ -392,7 +392,7 @@ namespace NPacMan.Game.Tests.GameTests
 
 
         [Fact]
-        public async Task AllGhostsShouldShouldStayInSameLocationWhenTransitioningToNoneEdiable()
+        public async Task AllGhostsShouldShouldStayInSameLocationWhenTransitioningToNoneEdible()
         {
             var ghostStart = _gameSettings.PacMan.Location.Below.Right;
             var ghosts = GhostBuilder.New()
@@ -851,6 +851,52 @@ namespace NPacMan.Game.Tests.GameTests
 
             numberOfNotificationsTriggered.Should().Be(1);
         }
+
+
+          [Fact]
+        public async Task GhostsShouldBeInScatterModeAfterPacManComesBackToLife(){
+            //   G         
+            // > .       
+            var ghost = GhostBuilder.New()
+                .WithLocation(_gameSettings.PacMan.Location.Right.Above)
+                .WithScatterTarget(_gameSettings.PacMan.Location.Right.Above.Above)
+                .Create();
+
+            var directionPicker = new TestDirectionPicker(){DefaultDirection = Direction.Down};
+            _gameSettings.DirectionPicker = directionPicker;
+            _gameSettings.Ghosts.Add(ghost);
+
+            var now = DateTime.UtcNow;
+            var game = new Game(_gameClock, _gameSettings);
+            game.StartGame();
+
+            await game.ChangeDirection(Direction.Right);
+            await _gameClock.Tick(now);
+
+            await game.ChangeDirection(Direction.Up);
+            await _gameClock.Tick(now);   //Now dead
+
+            if (game.Status != GameStatus.Dying)
+                throw new Exception($"Invalid Game State {game.Status:G} Should be Dying");
+            
+            await _gameClock.Tick(now.AddSeconds(4));
+
+            if (game.Status != GameStatus.Respawning)
+                throw new Exception($"Invalid Game State {game.Status:G} Should be Respawning");
+
+            await _gameClock.Tick(now.AddSeconds(8));
+
+            if (game.Status != GameStatus.Alive)
+                throw new Exception($"Invalid Game State {game.Status:G} Should be Alive");
+
+            await _gameClock.Tick(now.AddSeconds(9));
+
+            game.Ghosts.Values.Should().AllBeEquivalentTo(new{
+                Edible = false,
+                Location = _gameSettings.PacMan.Location.Right.Above.Above
+            });
+        }
+
     }
 }
 
