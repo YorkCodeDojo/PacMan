@@ -7,7 +7,7 @@ namespace NPacMan.Game.Tests.GameTests
     public class TestDirectionPicker : IDirectionPicker
     {
         public Direction DefaultDirection { get; set; } = Direction.Right;
-        public Direction Pick(IEnumerable<Direction> directions)
+        public Direction Pick(IReadOnlyCollection<Direction> directions)
         {
             var rKey = _returnValues.Keys.Where(x => x.Count() == directions.Count() && x.All(y => directions.Contains(y)))
                                 .FirstOrDefault();

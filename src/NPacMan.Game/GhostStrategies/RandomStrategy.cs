@@ -5,7 +5,7 @@ namespace NPacMan.Game.GhostStrategies
 {
     public class RandomStrategy : IGhostStrategy
     {
-        private IDirectionPicker _directionPicker;
+        private readonly IDirectionPicker _directionPicker;
         public RandomStrategy(IDirectionPicker directionPicker)
         {
             _directionPicker = directionPicker;
