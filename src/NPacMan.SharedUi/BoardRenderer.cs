@@ -22,6 +22,8 @@ namespace NPacMan.SharedUi
 
         private int _boardY = 3;
 
+        private int _ticks = 0;
+
         public BoardRenderer()
         {
             _display = new Display();
@@ -42,14 +44,25 @@ namespace NPacMan.SharedUi
 
             // Build the static background
             RenderScore(game);
-            RenderWalls(game);
-            RenderCoins(game);
-            RenderPowerPills(game);
+
+            _ticks++;
+
+            if(game.Status == GameStatus.ChangingLevel && _ticks % 10 < 5)
+            {
+                FlashBoard();
+            }
+            else
+            {
+                RenderWalls(game);
+                RenderCoins(game);
+                RenderPowerPills(game);
+                RenderGhosts(game);
+            }
+
             RenderFruit(game);
 
             // Add the sprites
             RenderPacMan(game);
-            RenderGhosts(game);
             RenderLives(game);
         }
 
@@ -58,6 +71,17 @@ namespace NPacMan.SharedUi
             for (int x = 0; x < _mapLayout.DisplayWidth; x++)
             {
                 _display.DrawOnBackground(x,row, _sprites.Map(BoardPiece.Blank));
+            }
+        }
+
+        private void FlashBoard()
+        {
+            for (int y = 0; y < _mapLayout.DisplayHeight; y++)
+            {
+                for (int x = 0; x < _mapLayout.DisplayWidth; x++)
+                {
+                    _display.DrawOnBackground(x, y+_boardY, _sprites.Map(BoardPiece.Blank));
+                }
             }
         }
 
