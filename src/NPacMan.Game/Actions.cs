@@ -58,7 +58,7 @@ namespace NPacMan.Game
         }
 
 
-        private static void IncreaseScore(IGameSettings gameSettings, GameState gameState, int amount)
+        private static void IncreaseScoreAndCheckForBonusLife(IGameSettings gameSettings, GameState gameState, int amount)
         {
             var bonusLifeAlreadyAwarded = (gameState.Score >= gameSettings.PointsNeededForBonusLife);
 
@@ -73,7 +73,7 @@ namespace NPacMan.Game
         public static void CoinEaten(Game game, IGameSettings gameSettings, GameState gameState, CellLocation coinLocation, GameNotifications gameNotifications)
         {
             gameState.RemoveCoin(coinLocation);
-            IncreaseScore(gameSettings, gameState, 10);
+            IncreaseScoreAndCheckForBonusLife(gameSettings, gameState, 10);
             if(gameSettings.FruitAppearsAfterCoinsEaten.Contains(game.StartingCoins.Count - game.Coins.Count))
             {
                 var fruitType = Fruits.FruitForLevel(gameState.Level).FruitType;
@@ -85,7 +85,7 @@ namespace NPacMan.Game
 
         public static void PowerPillEaten(IGameSettings gameSettings, GameState gameState, CellLocation powerPillLocation, GameNotifications gameNotifications)
         {
-            IncreaseScore(gameSettings, gameState, 50);
+            IncreaseScoreAndCheckForBonusLife(gameSettings, gameState, 50);
             gameNotifications.Publish(GameNotification.EatPowerPill);
             MakeGhostsEdible(gameSettings, gameState);
             gameState.RemovePowerPill(powerPillLocation);
@@ -102,7 +102,7 @@ namespace NPacMan.Game
         internal static void FruitEaten(Game game, IGameSettings settings, GameState gameState, CellLocation location, GameNotifications gameNotifications)
         {
             var scoreIncrement = Fruits.FruitForLevel(gameState.Level).Score;
-            gameState.IncreaseScore(scoreIncrement);
+            IncreaseScoreAndCheckForBonusLife(settings, gameState, scoreIncrement);
             gameState.HideFruit();
             gameNotifications.Publish(GameNotification.EatFruit);
         }
