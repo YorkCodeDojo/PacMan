@@ -17,15 +17,15 @@ namespace NPacMan.Game
             Initially(
                 When(Tick)
                     .Then(context => Actions.Tick(context.Instance, context.Data.Now, gameNotifications))
-                   // .Then(context => Actions.SetupGame(context.Instance, context.Data.Now, gameNotifications))
                     .TransitionTo(AttractMode));
 
             WhenEnter(AttractMode,
                 binder => binder
-                    .Then(context => Actions.SetupGame(context.Instance, settings, gameNotifications)));
+                    .Then(context => Actions.SetupGame(context.Instance, settings)));
 
             During(AttractMode,
                 When(PressStart)
+                    .Then(context => gameNotifications.Publish(GameNotification.Beginning))
                     .TransitionTo(Scatter));
 
             WhenEnter(Scatter,

@@ -360,7 +360,69 @@ namespace NPacMan.Game.Tests.GameTests
                 Fruits = new object[0]
             });
         }
+        
+        [Fact]
+        public async Task AfterGameOverAndStartingNewGameThenBeginningGameNotificationIsPublished()
+        {
+            var now = DateTime.UtcNow;
+            var gameClock = new TestGameClock();
+            var killerGhost = GhostBuilder.New()
+                    .WithLocation(_gameSettings.PacMan.Location.Left)
+                    .Create();
+            _gameSettings.Coins.Add(_gameSettings.PacMan.Location.FarAway());
+            _gameSettings.InitialLives = 1;
+            _gameSettings.Ghosts.Add(killerGhost);
+            
+            var game = new Game(gameClock, _gameSettings);
 
-        //  gameNotifications.Publish(GameNotification.Beginning); is played when we exit the attract mode
+            var numberOfNotificationsTriggered = 0;
+            game.Subscribe(GameNotification.Beginning, () => numberOfNotificationsTriggered++);
+
+            game.StartGame();
+            await game.ChangeDirection(Direction.Left);
+            await gameClock.Tick(now);
+
+            if (game.Status != GameStatus.Dying)
+            {
+                throw new Exception($"Game status should be GameStatus.Dying not {game.Status}");
+            }
+            await gameClock.Tick(now.AddSeconds(4));
+
+            if (game.Status != GameStatus.AttractMode)
+            {
+                throw new Exception($"Game status should be GameStatus.AttractMode not {game.Status}");
+            }
+            numberOfNotificationsTriggered.Should().Be(0);
+            await game.PressStart();
+
+            numberOfNotificationsTriggered.Should().Be(1);
+        }
+
+        [Fact]
+        public async Task BeginningGameNotificationIsPublishedWhenGameMovesToAliveWhenUserPressesStart()
+        {
+            var gameClock = new TestGameClock();
+            _gameSettings.InitialGameStatus = GameStatus.Initial;
+            var game = new Game(gameClock, _gameSettings);
+                        
+            var numberOfNotificationsTriggered = 0;
+            game.Subscribe(GameNotification.Beginning, () => numberOfNotificationsTriggered++);
+
+            game.StartGame();
+            
+            await gameClock.Tick();
+
+            if (game.Status != GameStatus.AttractMode)
+            {
+                throw new Exception($"Game status should be GameStatus.AttractMode not {game.Status}");
+            }
+
+            numberOfNotificationsTriggered.Should().Be(0);
+            await game.PressStart();
+
+            numberOfNotificationsTriggered.Should().Be(1);
+
+            game.Status.Should().Be(GameStatus.Alive);
+        }
     }
 }

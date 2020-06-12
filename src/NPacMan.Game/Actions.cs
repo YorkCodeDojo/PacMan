@@ -50,12 +50,11 @@ namespace NPacMan.Game
             gameState.ShowGhosts();
         }
 
-        public static void SetupGame(GameState gameState, IGameSettings gameSettings, GameNotifications gameNotifications)
+        public static void SetupGame(GameState gameState, IGameSettings gameSettings)
         {
             ResetBoard(gameState, gameSettings);
             gameState.ResetLives(gameSettings.InitialLives);
             gameState.ResetScore();
-            gameNotifications.Publish(GameNotification.Beginning);
         }
 
 
