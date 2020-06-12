@@ -470,7 +470,7 @@ namespace NPacMan.Game.Tests.GameTests
             game.Status.Should().Be(GameStatus.Alive);
         }
 
-
+     
         
     }
 }

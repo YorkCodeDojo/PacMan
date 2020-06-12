@@ -820,7 +820,7 @@ namespace NPacMan.Game.Tests.GameTests
         }
 
         [Fact]
-        public async Task ScoreShouldIncreaseExponentiallyAfterEatingEachGhost()
+        public async Task EatenGhostNotificationShouldBeFiredAfterEatingAGhost()
         {
             var ghostStart = _gameSettings.PacMan.Location.Left.Left.Left;
             var ghost1 = GhostBuilder.New().WithLocation(ghostStart).WithChaseStrategyRight()

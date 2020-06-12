@@ -91,10 +91,10 @@ namespace NPacMan.Game
             gameState.RemovePowerPill(powerPillLocation);
         }
 
-        public static void GhostEaten(GameState gameState, Ghost ghost, Game game, GameNotifications gameNotifications)
+        public static void GhostEaten(IGameSettings gameSettings, GameState gameState, Ghost ghost, Game game, GameNotifications gameNotifications)
         {
             SendGhostHome(gameState, ghost);
-            IncreaseScoreAfterEatingGhost(gameState, game);
+            IncreaseScoreAfterEatingGhost(gameSettings, gameState, game);
             MakeGhostNotEdible(gameState, ghost);
             gameNotifications.Publish(GameNotification.EatGhost);
         }
@@ -188,11 +188,11 @@ namespace NPacMan.Game
             return gameState.Ghosts.Values.Where(ghost => ghost.Location == gameState.PacMan.Location);
         }
 
-        private static void IncreaseScoreAfterEatingGhost(GameState gameState, Game game)
+        private static void IncreaseScoreAfterEatingGhost(IGameSettings gameSettings, GameState gameState, Game game)
         {
             var numberOfInEdibleGhosts = game.Ghosts.Values.Count(g => !g.Edible);
             var increaseInScore = (int)Math.Pow(2, numberOfInEdibleGhosts) * 200;
-            gameState.IncreaseScore(increaseInScore);
+            IncreaseScoreAndCheckForBonusLife(gameSettings, gameState, increaseInScore);
         }
 
         private static void MakeGhostNotEdible(GameState gameState, Ghost ghostToUpdate)

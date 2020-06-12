@@ -151,9 +151,6 @@ namespace NPacMan.Game.Tests.GameTests
                     gameSettings.PointsNeededForBonusLife = 100;
                 });
 
-            // Fruit Below, below
-            // Bonus life at 100;
-            // Fruit shown at 1 coin
             game.StartGame();
 
             await game.ChangeDirection(Direction.Down);
@@ -172,6 +169,35 @@ namespace NPacMan.Game.Tests.GameTests
 
             game.Lives.Should().Be(previousLives + 1);
         }
+        
+        [Fact]
+        public async Task LivesIncreaseWhenScoreReachesBonusLifePointAfterEatingAGhost()
+        {
+            var game = CreateInitialGameSettings(gameSettings =>
+                {
+                    var ghostStart = gameSettings.PacMan.Location.Left.Left.Left;
+                    var ghosts = GhostBuilder.New().WithLocation(ghostStart).WithChaseStrategyRight()
+                        .Create();
+                    
+                    gameSettings.Ghosts.Add(ghosts);
+                    
+                    gameSettings.PowerPills.Add(gameSettings.PacMan.Location.FarAway());
+                    gameSettings.PowerPills.Add(gameSettings.PacMan.Location.Left);
+                    gameSettings.PointsNeededForBonusLife = 200;
+                });
+            game.StartGame();
+
+            await game.ChangeDirection(Direction.Left);
+
+            await _gameClock.Tick();
+
+            var previousLives = game.Lives;
+            
+            await _gameClock.Tick();
+
+            game.Lives.Should().Be(previousLives + 1);
+        }
+           
     }
 
 
