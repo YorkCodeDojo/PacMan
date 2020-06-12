@@ -3,6 +3,7 @@ using Xunit;
 using NPacMan.Game.Tests.Helpers;
 using System.Threading.Tasks;
 using System;
+using FluentAssertions.Execution;
 
 namespace NPacMan.Game.Tests.GameTests
 {
@@ -10,11 +11,14 @@ namespace NPacMan.Game.Tests.GameTests
     {
         private readonly DateTime _now;
         private readonly TestGameClock _gameClock;
+        
+        private int _numberOfNotificationsTriggered;
 
         public BonusLivesTests()
         {
             _now = DateTime.UtcNow;
             _gameClock = new TestGameClock();
+            _numberOfNotificationsTriggered = 0;
         }
 
         private Game CreateInitialGameSettings(Action<TestGameSettings> configure)
@@ -23,10 +27,11 @@ namespace NPacMan.Game.Tests.GameTests
             {
                 PointsNeededForBonusLife = 5
             };
-
+            
             configure(gameSettings);
 
-            return new Game(_gameClock, gameSettings);
+            return new Game(_gameClock, gameSettings)
+                        .Subscribe(GameNotification.ExtraPac, () => _numberOfNotificationsTriggered++);    
         }
 
         private async Task PlayUntilBonusLife(Game game)
@@ -39,7 +44,7 @@ namespace NPacMan.Game.Tests.GameTests
         }
 
         [Fact]
-        public async Task LivesIncreaseWhenScoreReachesBonusLifePointAfterEatingCoin()
+        public async Task WeGetAnExtraLifeWhenScoreReachesBonusLifePointAfterEatingCoin()
         {
             var game = CreateInitialGameSettings(gameSettings =>
                 {
@@ -53,14 +58,16 @@ namespace NPacMan.Game.Tests.GameTests
             var previousLives = game.Lives;
 
             await _gameClock.Tick();
-
+            
+            using var _ = new AssertionScope();
             game.Lives.Should().Be(previousLives + 1);
+            _numberOfNotificationsTriggered.Should().Be(1);
         }
 
 
 
         [Fact]
-        public async Task LivesIncreaseWhenScoreReachesBonusLifePointAfterEatingCoinThatCompletesLevel()
+        public async Task WeGetAnExtraLifeWhenScoreReachesBonusLifePointAfterEatingCoinThatCompletesLevel()
         {
             var game = CreateInitialGameSettings(gameSettings =>
                         gameSettings.Coins.Add(gameSettings.PacMan.Location.Below));
@@ -69,12 +76,14 @@ namespace NPacMan.Game.Tests.GameTests
 
             await PlayUntilBonusLife(game);
 
+            using var _ = new AssertionScope();
             game.Lives.Should().Be(previousLives + 1);
+            _numberOfNotificationsTriggered.Should().Be(1);
         }
 
 
         [Fact]
-        public async Task LivesIncreaseOnceWhenScoreReachesBonusLifePointAfterScoreIncreasesFromEatingFurtherCoins()
+        public async Task WeGetAnExtraLifeOnceWhenScoreReachesBonusLifePointAfterScoreIncreasesFromEatingFurtherCoins()
         {
             var game = CreateInitialGameSettings(gameSettings =>
             {
@@ -87,11 +96,13 @@ namespace NPacMan.Game.Tests.GameTests
 
             await _gameClock.Tick();
 
+            using var _ = new AssertionScope();
             game.Lives.Should().Be(previousLives + 1);
+            _numberOfNotificationsTriggered.Should().Be(1);
         }
 
         [Fact]
-        public async Task LivesIncreaseWhenScoreReachesBonusLifePointAfterEatingPowerPill()
+        public async Task WeGetAnExtraLifeWhenScoreReachesBonusLifePointAfterEatingPowerPill()
         {
             var game = CreateInitialGameSettings(gameSettings =>
                 {
@@ -106,11 +117,15 @@ namespace NPacMan.Game.Tests.GameTests
 
             await _gameClock.Tick();
 
+              using var _ = new AssertionScope();
+            
             game.Lives.Should().Be(previousLives + 1);
+
+            _numberOfNotificationsTriggered.Should().Be(1);
         }
 
         [Fact]
-        public async Task LivesIncreaseWhenScoreReachesBonusLifePointAfterEatingPowerPillThatCompletesLevel()
+        public async Task WeGetAnExtraLifeWhenScoreReachesBonusLifePointAfterEatingPowerPillThatCompletesLevel()
         {
             var game = CreateInitialGameSettings(gameSettings =>
                         gameSettings.PowerPills.Add(gameSettings.PacMan.Location.Below));
@@ -119,11 +134,15 @@ namespace NPacMan.Game.Tests.GameTests
 
             await PlayUntilBonusLife(game);
 
+            using var _ = new AssertionScope();
+            
             game.Lives.Should().Be(previousLives + 1);
+
+            _numberOfNotificationsTriggered.Should().Be(1);
         }
 
-        [Fact(DisplayName = "Lives increase once when score reaches bonus life point after score increases from eating further power pills")]
-        public async Task LivesIncreaseOnceWhenScoreReachesBonusLifePointAfterScoreIncreasesFromEatingFurtherPowerPills()
+        [Fact(DisplayName = "We get an extra life once when score reaches bonus life point after score increases from eating further power pills")]
+        public async Task WeGetAnExtraLifeOnceWhenScoreReachesBonusLifePointAfterScoreIncreasesFromEatingFurtherPowerPills()
         {
             var game = CreateInitialGameSettings(gameSettings =>
             {
@@ -135,12 +154,16 @@ namespace NPacMan.Game.Tests.GameTests
             await PlayUntilBonusLife(game);
 
             await _gameClock.Tick();
-
+            
+            using var _ = new AssertionScope();
+            
             game.Lives.Should().Be(previousLives + 1);
+
+            _numberOfNotificationsTriggered.Should().Be(1);
         }
 
         [Fact]
-        public async Task LivesIncreaseWhenScoreReachesBonusLifePointAfterEatingFruit()
+        public async Task WeGetAnExtraLifeWhenScoreReachesBonusLifePointAfterEatingFruit()
         {
             var game = CreateInitialGameSettings(gameSettings =>
                 {
@@ -166,12 +189,15 @@ namespace NPacMan.Game.Tests.GameTests
 
             await _gameClock.Tick(); // eats fruit
 
-
+            using var _ = new AssertionScope();
+            
             game.Lives.Should().Be(previousLives + 1);
+
+            _numberOfNotificationsTriggered.Should().Be(1);
         }
         
         [Fact]
-        public async Task LivesIncreaseWhenScoreReachesBonusLifePointAfterEatingAGhost()
+        public async Task WeGetAnExtraLifeWhenScoreReachesBonusLifePointAfterEatingAGhost()
         {
             var game = CreateInitialGameSettings(gameSettings =>
                 {
@@ -195,10 +221,12 @@ namespace NPacMan.Game.Tests.GameTests
             
             await _gameClock.Tick();
 
+
+            using var _ = new AssertionScope();
+            
             game.Lives.Should().Be(previousLives + 1);
+
+            _numberOfNotificationsTriggered.Should().Be(1);
         }
-           
     }
-
-
 }

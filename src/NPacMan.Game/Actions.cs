@@ -58,7 +58,7 @@ namespace NPacMan.Game
         }
 
 
-        private static void IncreaseScoreAndCheckForBonusLife(IGameSettings gameSettings, GameState gameState, int amount)
+        private static void IncreaseScoreAndCheckForBonusLife(IGameSettings gameSettings, GameState gameState, GameNotifications gameNotifications, int amount)
         {
             var bonusLifeAlreadyAwarded = (gameState.Score >= gameSettings.PointsNeededForBonusLife);
 
@@ -67,13 +67,14 @@ namespace NPacMan.Game
             if(!bonusLifeAlreadyAwarded && gameState.Score >= gameSettings.PointsNeededForBonusLife)
             {
                 gameState.AddBonusLife();
+                gameNotifications.Publish(GameNotification.ExtraPac);
             }
         }
 
         public static void CoinEaten(Game game, IGameSettings gameSettings, GameState gameState, CellLocation coinLocation, GameNotifications gameNotifications)
         {
             gameState.RemoveCoin(coinLocation);
-            IncreaseScoreAndCheckForBonusLife(gameSettings, gameState, 10);
+            IncreaseScoreAndCheckForBonusLife(gameSettings, gameState, gameNotifications, 10);
             if(gameSettings.FruitAppearsAfterCoinsEaten.Contains(game.StartingCoins.Count - game.Coins.Count))
             {
                 var fruitType = Fruits.FruitForLevel(gameState.Level).FruitType;
@@ -85,7 +86,7 @@ namespace NPacMan.Game
 
         public static void PowerPillEaten(IGameSettings gameSettings, GameState gameState, CellLocation powerPillLocation, GameNotifications gameNotifications)
         {
-            IncreaseScoreAndCheckForBonusLife(gameSettings, gameState, 50);
+            IncreaseScoreAndCheckForBonusLife(gameSettings, gameState, gameNotifications, 50);
             gameNotifications.Publish(GameNotification.EatPowerPill);
             MakeGhostsEdible(gameSettings, gameState);
             gameState.RemovePowerPill(powerPillLocation);
@@ -94,7 +95,7 @@ namespace NPacMan.Game
         public static void GhostEaten(IGameSettings gameSettings, GameState gameState, Ghost ghost, Game game, GameNotifications gameNotifications)
         {
             SendGhostHome(gameState, ghost);
-            IncreaseScoreAfterEatingGhost(gameSettings, gameState, game);
+            IncreaseScoreAfterEatingGhost(gameSettings, gameState, game, gameNotifications);
             MakeGhostNotEdible(gameState, ghost);
             gameNotifications.Publish(GameNotification.EatGhost);
         }
@@ -102,7 +103,7 @@ namespace NPacMan.Game
         internal static void FruitEaten(Game game, IGameSettings settings, GameState gameState, CellLocation location, GameNotifications gameNotifications)
         {
             var scoreIncrement = Fruits.FruitForLevel(gameState.Level).Score;
-            IncreaseScoreAndCheckForBonusLife(settings, gameState, scoreIncrement);
+            IncreaseScoreAndCheckForBonusLife(settings, gameState, gameNotifications, scoreIncrement);
             gameState.HideFruit();
             gameNotifications.Publish(GameNotification.EatFruit);
         }
@@ -188,11 +189,11 @@ namespace NPacMan.Game
             return gameState.Ghosts.Values.Where(ghost => ghost.Location == gameState.PacMan.Location);
         }
 
-        private static void IncreaseScoreAfterEatingGhost(IGameSettings gameSettings, GameState gameState, Game game)
+        private static void IncreaseScoreAfterEatingGhost(IGameSettings gameSettings, GameState gameState, Game game, GameNotifications gameNotifications)
         {
             var numberOfInEdibleGhosts = game.Ghosts.Values.Count(g => !g.Edible);
             var increaseInScore = (int)Math.Pow(2, numberOfInEdibleGhosts) * 200;
-            IncreaseScoreAndCheckForBonusLife(gameSettings, gameState, increaseInScore);
+            IncreaseScoreAndCheckForBonusLife(gameSettings, gameState, gameNotifications, increaseInScore);
         }
 
         private static void MakeGhostNotEdible(GameState gameState, Ghost ghostToUpdate)
