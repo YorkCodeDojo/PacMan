@@ -16,7 +16,16 @@ namespace NPacMan.Game
 
             Initially(
                 When(Tick)
-                    .Then(context => Actions.SetupGame(context.Instance, context.Data.Now, gameNotifications))
+                    .Then(context => Actions.Tick(context.Instance, context.Data.Now, gameNotifications))
+                   // .Then(context => Actions.SetupGame(context.Instance, context.Data.Now, gameNotifications))
+                    .TransitionTo(AttractMode));
+
+            WhenEnter(AttractMode,
+                binder => binder
+                    .Then(context => Actions.SetupGame(context.Instance, gameNotifications)));
+
+            During(AttractMode,
+                When(PressStart)
                     .TransitionTo(Scatter));
 
             WhenEnter(Scatter,
@@ -117,11 +126,13 @@ namespace NPacMan.Game
         public State Respawning { get; private set; } = null!;
         public State Dead { get; private set; } = null!;
         public State ChangingLevel { get; private set; } = null!;
+        public State AttractMode { get; private set; } = null!;
         public Event<Tick> Tick { get; private set; } = null!;
         public Event<GhostCollision> GhostCollision { get; private set; } = null!;
         public Event<CoinCollision> CoinCollision { get; private set; } = null!;
         public Event<PowerPillCollision> PowerPillCollision { get; private set; } = null!;
         public Event<PlayersWishesToChangeDirection> PlayersWishesToChangeDirection { get; private set; } = null!;
         public Event<FruitCollision> FruitCollision { get; private set; } = null!;
+        public Event<PressStart> PressStart { get; private set; } = null!;
     }
 }

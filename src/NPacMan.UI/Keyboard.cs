@@ -50,7 +50,9 @@ namespace NPacMan.UI
 
         public async void CheckForKeyPress()
         {
-            if (IsKeyDown(Keys.Left))
+            if(_game.Status == GameStatus.AttractMode && IsKeyDown(Keys.Space))
+                await _game.PressStart();
+            else if (IsKeyDown(Keys.Left))
                 await _game.ChangeDirection(Direction.Left);
             else if (IsKeyDown(Keys.Right))
                 await _game.ChangeDirection(Direction.Right);

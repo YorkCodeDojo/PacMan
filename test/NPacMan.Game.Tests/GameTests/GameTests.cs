@@ -248,5 +248,43 @@ namespace NPacMan.Game.Tests.GameTests
                 Fruits = new object[0]
             });
         }
+
+        [Fact]
+        public async Task GameMovesStraightIntoAttactMode()  
+        {
+            var gameClock = new TestGameClock();
+            _gameSettings.InitialGameStatus = GameStatus.Initial;
+            var game = new Game(gameClock, _gameSettings);
+            
+            game.StartGame();
+            
+            await gameClock.Tick();
+
+            game.Status.Should().Be(GameStatus.AttractMode);
+        }
+
+        [Fact]
+        public async Task GameMovesToAliveWhenUserPressesStart()
+        {
+            var gameClock = new TestGameClock();
+            _gameSettings.InitialGameStatus = GameStatus.Initial;
+            var game = new Game(gameClock, _gameSettings);
+            
+            game.StartGame();
+            
+            await gameClock.Tick();
+
+            if (game.Status != GameStatus.AttractMode)
+            {
+                throw new Exception($"Game status should be GameStatus.AttractMode not {game.Status}");
+            }
+
+            await game.PressStart();
+
+            game.Status.Should().Be(GameStatus.Alive);
+        }
+
+        //  gameNotifications.Publish(GameNotification.Beginning); is played when we exit the attract mode
+
     }
 }

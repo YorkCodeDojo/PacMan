@@ -97,6 +97,7 @@ namespace NPacMan.Game
         public GameStatus Status => _gameState.Status switch
         {
             nameof(GameStateMachine.Initial) => GameStatus.Initial,
+            nameof(GameStateMachine.AttractMode) => GameStatus.AttractMode,
             nameof(GameStateMachine.GhostChase) => GameStatus.Alive,
             nameof(GameStateMachine.Scatter) => GameStatus.Alive,
             nameof(GameStateMachine.Frightened) => GameStatus.Alive,
@@ -135,6 +136,11 @@ namespace NPacMan.Game
         public async Task ChangeDirection(Direction direction)
         {
             await _gameStateMachineInstance.Raise(_gameStateMachine.PlayersWishesToChangeDirection, new PlayersWishesToChangeDirection(direction));
+        }
+
+        public async Task PressStart()
+        {
+            await _gameStateMachineInstance.Raise(_gameStateMachine.PressStart, new PressStart());
         }
     }
 }

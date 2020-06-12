@@ -13,6 +13,7 @@ namespace NPacMan.Game
             Status = settings.InitialGameStatus switch
             {
                 GameStatus.Initial => nameof(GameStateMachine.Initial),
+                GameStatus.AttractMode => nameof(GameStateMachine.AttractMode),
                 GameStatus.Alive => nameof(GameStateMachine.GhostChase),
                 GameStatus.Dying => nameof(GameStateMachine.Dying),
                 GameStatus.Respawning => nameof(GameStateMachine.Respawning),

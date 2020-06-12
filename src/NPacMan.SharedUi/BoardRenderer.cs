@@ -47,6 +47,10 @@ namespace NPacMan.SharedUi
 
             _ticks++;
 
+            if(game.Status == GameStatus.AttractMode)
+            {
+                _scoreBoard.PressStart();
+            }
             if(game.Status == GameStatus.ChangingLevel && _ticks % 10 < 5)
             {
                 FlashBoard();

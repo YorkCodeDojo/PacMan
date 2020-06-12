@@ -45,9 +45,9 @@ namespace NPacMan.Game
             gameState.ShowGhosts();
         }
 
-        public static void SetupGame(GameState gameState, DateTime now, GameNotifications gameNotifications)
+        public static void SetupGame(GameState gameState, GameNotifications gameNotifications)
         {
-            gameState.RecordLastTick(now);
+            //gameState.RecordLastTick(now);
             MoveGhostsHome(gameState);
             gameState.ShowGhosts();
             gameNotifications.Publish(GameNotification.Beginning);

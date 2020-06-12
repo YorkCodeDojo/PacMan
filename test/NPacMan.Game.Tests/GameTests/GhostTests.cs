@@ -160,6 +160,7 @@ namespace NPacMan.Game.Tests.GameTests
             var game = new Game(_gameClock, _gameSettings);
             game.StartGame();
             await _gameClock.Tick();
+            await game.PressStart();
             await _gameClock.Tick();
             await _gameClock.Tick();
 
@@ -177,7 +178,7 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public async Task GhostShouldChaseAfter7Seconds()
         {
-            _gameSettings.InitialGameStatus = GameStatus.Initial;
+            _gameSettings.InitialGameStatus = GameStatus.AttractMode;
             _gameSettings.PacMan = new PacMan((29, 10), Direction.Left);
             var startingLocation = new CellLocation(30, 1);
             var scatterLocation = new CellLocation(1, 1);
@@ -194,6 +195,8 @@ namespace NPacMan.Game.Tests.GameTests
             game.StartGame();
             var now = DateTime.UtcNow;
             await _gameClock.Tick(now);
+            await game.PressStart();
+            
             await _gameClock.Tick(now);
 
             if (game.Ghosts.Values.First().Location.X != 29 || game.Ghosts.Values.First().Location.Y != 1)
@@ -216,7 +219,7 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public async Task GhostShouldScatter7SecondsAfterChase()
         {
-            _gameSettings.InitialGameStatus = GameStatus.Initial;
+            _gameSettings.InitialGameStatus = GameStatus.AttractMode;
             _gameSettings.PacMan = new PacMan((29, 10), Direction.Left);
             var startingLocation = new CellLocation(30, 1);
             var scatterLocation = new CellLocation(1, 1);
@@ -232,8 +235,8 @@ namespace NPacMan.Game.Tests.GameTests
             var game = new Game(_gameClock, _gameSettings);
             game.StartGame();
             var now = DateTime.UtcNow;
-
             await _gameClock.Tick(now);
+            await game.PressStart();
             WeExpectThat(ourGhost()).IsAt(startingLocation);
             await _gameClock.Tick(now);
             WeExpectThat(ourGhost()).IsAt(startingLocation.Left);

@@ -30,6 +30,11 @@ namespace NPacMan.SharedUi
             RenderString(high.ToString().PadLeft(6), 11, 1);
         }
 
+        public void PressStart()
+        {
+            RenderString("PRESS SPACE TO START", 4, 2);
+        }
+
         public void RenderLivesBonus(int lives, decimal offSetY)
         {
             var lifeSprite = _sprites.PacMan(Direction.Left, 1, false);
