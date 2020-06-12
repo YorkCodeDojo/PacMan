@@ -54,6 +54,16 @@ namespace NPacMan.Game
 
         public IReadOnlyCollection<CellLocation> RemainingPowerPills { get; private set; }
 
+        internal void ResetLives(int initialLives)
+        {
+            Lives = initialLives;
+        }
+
+        internal void ResetScore()
+        {
+            Score = 0;
+        }
+
         public IReadOnlyDictionary<string, Ghost> Ghosts { get; private set; }
         
         public PacMan PacMan { get; private set; }

@@ -22,7 +22,7 @@ namespace NPacMan.Game
 
             WhenEnter(AttractMode,
                 binder => binder
-                    .Then(context => Actions.SetupGame(context.Instance, gameNotifications)));
+                    .Then(context => Actions.SetupGame(context.Instance, settings, gameNotifications)));
 
             During(AttractMode,
                 When(PressStart)
@@ -98,7 +98,7 @@ namespace NPacMan.Game
                 When(Tick, context => context.Data.Now >= context.Instance.TimeToChangeState)
                     .IfElse(context => context.Instance.Lives > 0,
                         binder => binder.TransitionTo(Respawning),
-                        binder => binder.TransitionTo(Dead)));
+                        binder => binder.TransitionTo(AttractMode)));
 
             WhenEnter(Respawning,
                        binder => binder
@@ -110,9 +110,9 @@ namespace NPacMan.Game
                     .Then(context => Actions.CompleteRespawning(context.Instance, settings))
                     .TransitionTo(Scatter));
 
-            During(Dead, Ignore(Tick));
+            During(AttractMode, Ignore(Tick));
 
-            During(Dying, Respawning, Dead, ChangingLevel,
+            During(Dying, Respawning, AttractMode, ChangingLevel,
                     Ignore(PlayersWishesToChangeDirection),
                     Ignore(CoinCollision),
                     Ignore(PowerPillCollision),

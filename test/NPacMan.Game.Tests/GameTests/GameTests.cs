@@ -284,7 +284,83 @@ namespace NPacMan.Game.Tests.GameTests
             game.Status.Should().Be(GameStatus.Alive);
         }
 
-        //  gameNotifications.Publish(GameNotification.Beginning); is played when we exit the attract mode
+        [Fact]
+        public async Task GameShouldBeInAttractModeWhenNoLivesLeft()
+        {
+            _gameSettings.InitialLives = 1;
+            _gameSettings.PacMan = new PacMan((5, 2), Direction.Left);
+            _gameSettings.Ghosts.Add(GhostBuilder.New().WithLocation((1, 2)).WithChaseStrategyRight().Create());
 
+            var game = new Game(_gameClock, _gameSettings);
+            game.StartGame();
+            var now = DateTime.UtcNow;
+
+            await _gameClock.Tick(now);
+            await _gameClock.Tick(now);
+            await _gameClock.Tick(now.AddSeconds(4));
+
+            game.Status.Should().Be(GameStatus.AttractMode);
+        }
+
+        [Fact]
+        public async Task AfterGameOverAndStartingNewGameAllStateIsRestored()
+        {
+            var now = DateTime.UtcNow;
+            var gameClock = new TestGameClock();
+            var ghostHomeLocation = _gameSettings.PacMan.Location.FarAway();
+            var ghosts = GhostBuilder.New()
+                    .WithChaseStrategyRight()
+                    .WithLocation(ghostHomeLocation)
+                    .CreateMany(3);
+            var killerGhost = GhostBuilder.New()
+                    .WithLocation(_gameSettings.PacMan.Location.Left.Left.Left)
+                    .Create();
+            _gameSettings.Coins.Add(_gameSettings.PacMan.Location.Left);
+            _gameSettings.Coins.Add(_gameSettings.PacMan.Location.FarAway());
+            _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Left.Left);
+            _gameSettings.Ghosts.AddRange(ghosts);
+            _gameSettings.Ghosts.Add(killerGhost);
+            _gameSettings.FruitAppearsAfterCoinsEaten.Add(1);
+            _gameSettings.InitialLives = 1;
+            
+            var game = new Game(gameClock, _gameSettings);
+            
+            game.StartGame();
+            await game.ChangeDirection(Direction.Left);
+            await gameClock.Tick(now);
+            await gameClock.Tick(now);
+            await gameClock.Tick(now);
+            await gameClock.Tick(now);
+
+            if (game.Status != GameStatus.Dying)
+            {
+                throw new Exception($"Game status should be GameStatus.Dying not {game.Status}");
+            }
+            await gameClock.Tick(now.AddSeconds(4));
+
+            if (game.Status != GameStatus.AttractMode)
+            {
+                throw new Exception($"Game status should be GameStatus.AttractMode not {game.Status}");
+            }
+            
+            await game.PressStart();
+
+            game.Should().BeEquivalentTo(new {
+                Status = GameStatus.Alive,
+                Score = 0,
+                Level = 1,
+                Lives = 1,
+                PacMan = _gameSettings.PacMan,
+                Ghosts = ghosts.Concat(new []{killerGhost}).ToDictionary(x => x.Name, x => new {
+                    Location = x.Home,
+                    Edible = false
+                }),
+                Coins = _gameSettings.Coins,
+                PowerPills = _gameSettings.PowerPills,
+                Fruits = new object[0]
+            });
+        }
+
+        //  gameNotifications.Publish(GameNotification.Beginning); is played when we exit the attract mode
     }
 }

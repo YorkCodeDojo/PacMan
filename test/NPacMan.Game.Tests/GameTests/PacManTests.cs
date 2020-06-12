@@ -331,24 +331,6 @@ namespace NPacMan.Game.Tests.GameTests
             });
         }
 
-        [Fact]
-        public async Task PacManShouldBeDeadWhenNoLivesLeft()
-        {
-            _gameSettings.InitialLives = 1;
-            _gameSettings.PacMan = new PacMan((5, 2), Direction.Left);
-            _gameSettings.Ghosts.Add(GhostBuilder.New().WithLocation((1, 2)).WithChaseStrategyRight().Create());
-
-            var game = new Game(_gameClock, _gameSettings);
-            game.StartGame();
-            var now = DateTime.UtcNow;
-
-            await _gameClock.Tick(now);
-            await _gameClock.Tick(now);
-            await _gameClock.Tick(now.AddSeconds(4));
-
-            game.Status.Should().Be(GameStatus.Dead);
-        }
-
         [Theory]
         [InlineData(1, 200)]
         [InlineData(2, 600)]

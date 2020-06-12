@@ -23,6 +23,11 @@ namespace NPacMan.Game
         public static void GetReadyForNextLevel(GameState gameState, IGameSettings gameSettings)
         {
             gameState.IncrementLevel();
+            ResetBoard(gameState, gameSettings);
+        }
+
+        private static void ResetBoard(GameState gameState, IGameSettings gameSettings)
+        {
             MovePacManHome(gameState, gameSettings);
             MoveGhostsHome(gameState);
             MakeGhostsNotEdible(gameState);
@@ -45,11 +50,11 @@ namespace NPacMan.Game
             gameState.ShowGhosts();
         }
 
-        public static void SetupGame(GameState gameState, GameNotifications gameNotifications)
+        public static void SetupGame(GameState gameState, IGameSettings gameSettings, GameNotifications gameNotifications)
         {
-            //gameState.RecordLastTick(now);
-            MoveGhostsHome(gameState);
-            gameState.ShowGhosts();
+            ResetBoard(gameState, gameSettings);
+            gameState.ResetLives(gameSettings.InitialLives);
+            gameState.ResetScore();
             gameNotifications.Publish(GameNotification.Beginning);
         }
 
