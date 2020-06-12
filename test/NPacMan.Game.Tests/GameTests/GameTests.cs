@@ -399,6 +399,51 @@ namespace NPacMan.Game.Tests.GameTests
         }
 
         [Fact]
+        public async Task WhenStartingANewGameThenBonusLifeCanBeCollectedAgain()
+        {
+            var now = DateTime.UtcNow;
+            var gameClock = new TestGameClock();
+            var killerGhost = GhostBuilder.New()
+                    .WithLocation(_gameSettings.PacMan.Location.Left.Left)
+                    .Create();
+            _gameSettings.Coins.Add(_gameSettings.PacMan.Location.Left);
+            _gameSettings.Coins.Add(_gameSettings.PacMan.Location.FarAway());
+            _gameSettings.InitialLives = 0;
+            _gameSettings.PointsNeededForBonusLife = 1;
+            _gameSettings.Ghosts.Add(killerGhost);
+            
+            var game = new Game(gameClock, _gameSettings);
+
+            game.StartGame();
+            await game.ChangeDirection(Direction.Left);
+            await gameClock.Tick(now); // Collects coin - awards bonus life
+
+            if (game.Lives != _gameSettings.InitialLives + 1)
+            {
+                throw new Exception($"Bonus life was not awarded - we have {game.Lives} lives not {_gameSettings.InitialLives + 1}.");
+            }
+            
+            await gameClock.Tick(now); // Hits ghost
+
+            if (game.Status != GameStatus.Dying)
+            {
+                throw new Exception($"Game status should be GameStatus.Dying not {game.Status}");
+            }
+            await gameClock.Tick(now.AddSeconds(4));
+    
+            if (game.Status != GameStatus.AttractMode)
+            {
+                throw new Exception($"Game status should be GameStatus.AttractMode not {game.Status}");
+            }
+            await game.PressStart();
+
+            await game.ChangeDirection(Direction.Left);
+            await gameClock.Tick(now); // Collects coin - awards bonus life
+
+            game.Lives.Should().Be(_gameSettings.InitialLives + 1);
+        }
+
+        [Fact]
         public async Task BeginningGameNotificationIsPublishedWhenGameMovesToAliveWhenUserPressesStart()
         {
             var gameClock = new TestGameClock();
@@ -424,5 +469,8 @@ namespace NPacMan.Game.Tests.GameTests
 
             game.Status.Should().Be(GameStatus.Alive);
         }
+
+
+        
     }
 }

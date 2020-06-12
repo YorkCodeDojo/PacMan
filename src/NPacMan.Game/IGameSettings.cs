@@ -29,5 +29,6 @@ namespace NPacMan.Game
         IReadOnlyCollection<int> FruitAppearsAfterCoinsEaten { get; }
         int FruitVisibleForSeconds { get; }
 
+        int PointsNeededForBonusLife { get; }
     }
 }

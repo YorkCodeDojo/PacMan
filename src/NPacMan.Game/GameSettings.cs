@@ -57,5 +57,7 @@ namespace NPacMan.Game
         };
 
         public int FruitVisibleForSeconds { get; } = 9;
+
+        public int PointsNeededForBonusLife { get; } = 10000;
     }
 }

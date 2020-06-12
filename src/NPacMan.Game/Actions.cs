@@ -67,6 +67,10 @@ namespace NPacMan.Game
                 var fruitType = Fruits.FruitForLevel(gameState.Level).FruitType;
                 gameState.ShowFruit(settings.FruitVisibleForSeconds, fruitType);
             }
+            if(game.Score > settings.PointsNeededForBonusLife)
+            {
+                gameState.TryAddBonusLife();
+            }
             gameNotifications.Publish(GameNotification.EatCoin);
         }
 
