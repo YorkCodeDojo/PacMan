@@ -130,7 +130,11 @@
 
     private async void OnKeyDown(object sender, ConsoleKey e)
     {
-        if (_game != null && KeysMap.TryGetValue(e, out var direction))
+        if(_game?.Status == GameStatus.AttractMode && e == ConsoleKey.Spacebar)
+        {
+            await _game.PressStart();
+        }
+        else if (_game != null && KeysMap.TryGetValue(e, out var direction))
         {
             await _game.ChangeDirection(direction);
         }
@@ -138,8 +142,13 @@
 
     private double startTouchX = 0;
     private double startTouchY = 0;
-    private void TouchStart(object sender, TouchEvent e)
+    private async void TouchStart(object sender, TouchEvent e)
     {
+        if(_game?.Status == GameStatus.AttractMode)
+        {
+            await _game!.PressStart();
+        }
+
         startTouchX = e.Touches.FirstOrDefault()?.ClientX ?? 0;
         startTouchY = e.Touches.FirstOrDefault()?.ClientY ?? 0;
     }
