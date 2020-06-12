@@ -57,7 +57,6 @@ namespace NPacMan.Game
         internal void ResetLives(int initialLives)
         {
             Lives = initialLives;
-            _consumedBonusLife = false;
         }
 
         internal void ResetScore()
@@ -80,14 +79,9 @@ namespace NPacMan.Game
             RemainingCoins = RemainingCoins.Where(c => c != location).ToList();
         }
 
-        private bool _consumedBonusLife = false;
-        internal void TryAddBonusLife()
+        internal void AddBonusLife()
         {
-            if(!_consumedBonusLife)
-            {
-                _consumedBonusLife = true;
-                Lives++;
-            }
+            Lives++;
         }
 
         internal void RemovePowerPill(CellLocation location)

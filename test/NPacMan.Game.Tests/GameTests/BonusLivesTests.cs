@@ -17,6 +17,27 @@ namespace NPacMan.Game.Tests.GameTests
             _gameClock = new TestGameClock();
         }
 
+        private Game CreateInitialGameSettings(Action<TestGameSettings> configure)
+        {
+            var gameSettings = new TestGameSettings
+            {
+                PointsNeededForBonusLife = 5
+            };
+
+            configure(gameSettings);
+
+            return new Game(_gameClock, gameSettings);
+        }
+
+        private async Task PlayUntilBonusLife(Game game)
+        {
+             game.StartGame();
+
+            await game.ChangeDirection(Direction.Down);
+
+            await _gameClock.Tick();
+        }
+
         [Fact]
         public async Task LivesIncreaseWhenScoreReachesBonusLifePointAfterEatingCoin()
         {
@@ -36,16 +57,7 @@ namespace NPacMan.Game.Tests.GameTests
             game.Lives.Should().Be(previousLives + 1);
         }
 
-        private Game CreateInitialGameSettings(Action<TestGameSettings> configure)
-        {
-            var gameSettings = new TestGameSettings();            
-
-            gameSettings.PointsNeededForBonusLife = 5;
-
-            configure(gameSettings);
-
-            return new Game(_gameClock, gameSettings);
-        }
+        
 
         [Fact]
         public async Task LivesIncreaseWhenScoreReachesBonusLifePointAfterEatingCoinThatCompletesLevel()
@@ -60,17 +72,9 @@ namespace NPacMan.Game.Tests.GameTests
             game.Lives.Should().Be(previousLives + 1);
         }
 
-        private async Task PlayUntilBonusLife(Game game)
-        {
-             game.StartGame();
-
-            await game.ChangeDirection(Direction.Down);
-
-            await _gameClock.Tick();
-        }
-
+      
         [Fact]
-        public async Task LivesIncreaseOnceWhenScoreReachesBonusLifePointAfterScoreIncreasesFurther()
+        public async Task LivesIncreaseOnceWhenScoreReachesBonusLifePointAfterScoreIncreasesFromEatingFurtherCoins()
         {
             var game = CreateInitialGameSettings(gameSettings => {
                 gameSettings.Coins.Add(gameSettings.PacMan.Location.Below);
@@ -84,5 +88,55 @@ namespace NPacMan.Game.Tests.GameTests
 
             game.Lives.Should().Be(previousLives + 1);
         }
+
+              [Fact]
+        public async Task LivesIncreaseWhenScoreReachesBonusLifePointAfterEatingPowerPill()
+        {
+            var game = CreateInitialGameSettings(gameSettings => 
+                {
+                    gameSettings.PowerPills.Add(gameSettings.PacMan.Location.Below);
+                    gameSettings.PowerPills.Add(gameSettings.PacMan.Location.FarAway());
+                });
+            game.StartGame();
+
+            await game.ChangeDirection(Direction.Down);
+
+            var previousLives = game.Lives;
+
+            await _gameClock.Tick();
+
+            game.Lives.Should().Be(previousLives + 1);
+        }
+
+        [Fact]
+        public async Task LivesIncreaseWhenScoreReachesBonusLifePointAfterEatingPowerPillThatCompletesLevel()
+        {
+            var game = CreateInitialGameSettings(gameSettings =>
+                        gameSettings.PowerPills.Add(gameSettings.PacMan.Location.Below));
+                        
+            var previousLives = game.Lives;
+
+            await PlayUntilBonusLife(game);
+
+            game.Lives.Should().Be(previousLives + 1);
+        }
+      
+        [Fact(DisplayName="Lives Increase Once When Score Reaches Bonus Life Point After Score Increases From Eating Further Power Pills")]
+        public async Task LivesIncreaseOnceWhenScoreReachesBonusLifePointAfterScoreIncreasesFromEatingFurtherPowerPills()
+        {
+            var game = CreateInitialGameSettings(gameSettings => {
+                gameSettings.PowerPills.Add(gameSettings.PacMan.Location.Below);
+                gameSettings.PowerPills.Add(gameSettings.PacMan.Location.Below.Below);
+                gameSettings.PowerPills.Add(gameSettings.PacMan.Location.FarAway());
+            });
+            var previousLives = game.Lives;
+            await PlayUntilBonusLife(game);
+
+            await _gameClock.Tick();
+
+            game.Lives.Should().Be(previousLives + 1);
+        }
     }
+
+
 }

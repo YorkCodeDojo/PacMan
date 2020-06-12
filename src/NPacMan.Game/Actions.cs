@@ -58,25 +58,34 @@ namespace NPacMan.Game
         }
 
 
-        public static void CoinEaten(Game game, IGameSettings settings, GameState gameState, CellLocation coinLocation, GameNotifications gameNotifications)
+        private static void IncreaseScore(IGameSettings gameSettings, GameState gameState, int amount)
+        {
+            var bonusLifeAlreadyAwarded = (gameState.Score >= gameSettings.PointsNeededForBonusLife);
+
+            gameState.IncreaseScore(amount);
+
+            if(!bonusLifeAlreadyAwarded && gameState.Score >= gameSettings.PointsNeededForBonusLife)
+            {
+                gameState.AddBonusLife();
+            }
+        }
+
+        public static void CoinEaten(Game game, IGameSettings gameSettings, GameState gameState, CellLocation coinLocation, GameNotifications gameNotifications)
         {
             gameState.RemoveCoin(coinLocation);
-            gameState.IncreaseScore(10);
-            if(settings.FruitAppearsAfterCoinsEaten.Contains(game.StartingCoins.Count - game.Coins.Count))
+            IncreaseScore(gameSettings, gameState, 10);
+            if(gameSettings.FruitAppearsAfterCoinsEaten.Contains(game.StartingCoins.Count - game.Coins.Count))
             {
                 var fruitType = Fruits.FruitForLevel(gameState.Level).FruitType;
-                gameState.ShowFruit(settings.FruitVisibleForSeconds, fruitType);
+                gameState.ShowFruit(gameSettings.FruitVisibleForSeconds, fruitType);
             }
-            if(game.Score > settings.PointsNeededForBonusLife)
-            {
-                gameState.TryAddBonusLife();
-            }
+            
             gameNotifications.Publish(GameNotification.EatCoin);
         }
 
         public static void PowerPillEaten(IGameSettings gameSettings, GameState gameState, CellLocation powerPillLocation, GameNotifications gameNotifications)
         {
-            gameState.IncreaseScore(50);
+            IncreaseScore(gameSettings, gameState, 50);
             gameNotifications.Publish(GameNotification.EatPowerPill);
             MakeGhostsEdible(gameSettings, gameState);
             gameState.RemovePowerPill(powerPillLocation);
