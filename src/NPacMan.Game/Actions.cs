@@ -226,5 +226,10 @@ namespace NPacMan.Game
         {
             gameState.ApplyToGhosts(ghost => ghost.SetToEdible(_gameSettings.DirectionPicker));
         }
+
+        public void Start()
+        {
+            _gameNotifications.Publish(GameNotification.Beginning);
+        }
     }
 }

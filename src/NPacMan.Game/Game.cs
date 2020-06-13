@@ -25,7 +25,9 @@ namespace NPacMan.Game
         {
             _gameClock = gameClock;
             _settings = settings;
-            _gameStateMachine = new GameStateMachine(settings, _gameNotifications, this);
+            var actions = new Actions(settings, _gameNotifications);
+
+            _gameStateMachine = new GameStateMachine(actions, settings, this);
             var gameState = new GameState(settings);
             _gameState = gameState;
             _gameStateMachineInstance = _gameStateMachine.CreateInstanceLift(gameState);

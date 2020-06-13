@@ -6,9 +6,8 @@ namespace NPacMan.Game
     internal class GameStateMachine :
         AutomatonymousStateMachine<GameState>
     {
-        public GameStateMachine(IGameSettings settings, GameNotifications gameNotifications, Game game)
+        public GameStateMachine(Actions actions, IGameSettings settings, Game game)
         {
-            var actions = new Actions(settings, gameNotifications);
             InstanceState(x => x.Status);
 
             DuringAny(
@@ -26,7 +25,7 @@ namespace NPacMan.Game
 
             During(AttractMode,
                 When(PressStart)
-                    .Then(context => gameNotifications.Publish(GameNotification.Beginning))
+                    .Then(context => actions.Start())
                     .TransitionTo(Scatter));
 
             WhenEnter(Scatter,
