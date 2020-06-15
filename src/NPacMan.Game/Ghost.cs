@@ -102,6 +102,8 @@ namespace NPacMan.Game
 
         internal Ghost SetToHome() => WithNewLocation(Home);
 
+        internal Ghost SendHome() => WithNewStatusAndStrategy(GhostStatus.RunningHome, CurrentStrategy);
+
         internal Ghost SetToEdible(IDirectionPicker directionPicker)
         {
             var strategy = new RandomStrategy(directionPicker);

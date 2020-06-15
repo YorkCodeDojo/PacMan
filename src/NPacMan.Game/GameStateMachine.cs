@@ -112,7 +112,8 @@ namespace NPacMan.Game
 
             During(EatingGhost,
                 When(Tick, context => context.Data.Now >= context.Instance.TimeToResumeState)
-                     .TransitionTo(Frightened),
+                    .Then(context => Actions.SendGhostHome1(context.Instance))
+                    .TransitionTo(Frightened),
                 When(GhostCollision)
                     .IfElse(x => x.Data.Ghost.Edible,
                     binder => binder.Then(context => Actions.GhostEaten(settings, context.Instance, context.Data.Ghost, game, gameNotifications))

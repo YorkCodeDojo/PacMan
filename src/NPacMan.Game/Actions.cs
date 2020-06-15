@@ -209,6 +209,13 @@ namespace NPacMan.Game
             gameState.ApplyToGhost(ghost => ghost.SetToHome(), ghostToUpdate);
         }
 
+        public static void SendGhostHome1(GameState gameState)
+        {
+            var ghosts = gameState.Ghosts.Values.Where(x => x.Status == GhostStatus.Score);
+
+            gameState.ApplyToGhosts(ghost => ghost.SendHome(), ghosts);
+        }
+
         private static void MoveGhostsHome(GameState gameState)
         {
             gameState.ApplyToGhosts(ghost => ghost.SetToHome());

@@ -981,7 +981,11 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public async Task TheGameResumesAfterBeingPausedForOneSecondAfterGhostIsEaten()
         {
-            var ghostStart1 = _gameSettings.PacMan.Location.Left.Left.Left;
+            //      P
+            //   .  *
+            // G .  .
+
+            var ghostStart1 = _gameSettings.PacMan.Location.Below.Below.Left.Left;
             var ghost1 = GhostBuilder.New()
                 .WithLocation(ghostStart1)
                 .WithChaseStrategyRight()
@@ -993,42 +997,85 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Ghosts.Add(ghost1);
             _gameSettings.Ghosts.Add(ghost2);
 
-            _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Left);
+            _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Below);
 
-            var game = new Game(_gameClock, _gameSettings);
-            game.StartGame();
 
-            await game.ChangeDirection(Direction.Left);
+            var gameHarness = new GameHarness(_gameSettings);
+            gameHarness.Game.StartGame();
 
-            var now = DateTime.UtcNow;
-            await _gameClock.Tick(now);
+            await gameHarness.ChangeDirection(Direction.Down);
+            await gameHarness.EatPill();
 
-            WeExpectThat(game.PacMan).IsAt(_gameSettings.PacMan.Location.Left);
-            WeExpectThat(game.Ghosts[ghost1.Name]).IsAt(ghostStart1.Right);
+            gameHarness.WeExpectThatPacMan().IsAt(_gameSettings.PacMan.Location.Below);
+            gameHarness.WeExpectThatGhost(ghost1).IsAt(ghostStart1.Right);
 
-            await _gameClock.Tick(now);
-            WeExpectThat(game.PacMan).IsAt(_gameSettings.PacMan.Location.Left.Left);
+            await gameHarness.EatGhost(ghost1);
+            gameHarness.WeExpectThatPacMan().IsAt(_gameSettings.PacMan.Location.Below.Below);
 
-            var pacManLocation = game.PacMan.Location;
-            var ghostLocations = game.Ghosts.Values.Select(x => new {
+            var pacManLocation = gameHarness.Game.PacMan.Location;
+            var ghostLocations = gameHarness.Game.Ghosts.Values.Select(x => new {
                 x.Name,
-                x.Location,
-                Status = x.Name == ghost1.Name ? GhostStatus.RunningHome : GhostStatus.Edible
+                x.Location
             }).ToDictionary(x => x.Name);
 
-            
-            await _gameClock.Tick(now.AddSeconds(1));
-            await _gameClock.Tick(now.AddSeconds(1));
+            await gameHarness.WaitForPauseToComplete();
+            await gameHarness.Move();
 
             using var _ = new AssertionScope();
-            game.Should().NotBeEquivalentTo(new
-            {
-                PacMan = new
+            gameHarness.Game.PacMan.Should().NotBeEquivalentTo(new
                 {
                     Location = pacManLocation
-                },
-                Ghosts = ghostLocations
-            });
+                });
+            gameHarness.Game.Ghosts.Should().NotBeEmpty();
+            gameHarness.Game.Ghosts.Should().NotBeEquivalentTo(ghostLocations);
+        }
+
+        [Fact]
+        public async Task GhostShouldBeRunningHomeAfterThePauseAfterBeingTheEaten()
+        {
+                    //      P
+            //   .  *
+            // G .  .
+
+            var ghostStart1 = _gameSettings.PacMan.Location.Below.Below.Left.Left;
+            var ghost1 = GhostBuilder.New()
+                .WithLocation(ghostStart1)
+                .WithChaseStrategyRight()
+                .Create();
+            var ghost2 = GhostBuilder.New()
+                .WithLocation(_gameSettings.PacMan.Location.FarAway())
+                .WithChaseStrategyRight()
+                .Create();
+            _gameSettings.Ghosts.Add(ghost1);
+            _gameSettings.Ghosts.Add(ghost2);
+
+            _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Below);
+
+
+            var gameHarness = new GameHarness(_gameSettings);
+            gameHarness.Game.StartGame();
+
+            await gameHarness.ChangeDirection(Direction.Down);
+            await gameHarness.EatPill();
+
+            gameHarness.WeExpectThatPacMan().IsAt(_gameSettings.PacMan.Location.Below);
+            gameHarness.WeExpectThatGhost(ghost1).IsAt(ghostStart1.Right);
+
+            await gameHarness.EatGhost(ghost1);
+            gameHarness.WeExpectThatPacMan().IsAt(_gameSettings.PacMan.Location.Below.Below);
+
+            var pacManLocation = gameHarness.Game.PacMan.Location;
+            var ghostLocations = gameHarness.Game.Ghosts.Values.Select(x => new {
+                x.Name,
+                x.Location
+            }).ToDictionary(x => x.Name);
+
+            await gameHarness.WaitForPauseToComplete();
+            await gameHarness.Move();
+
+            using var _ = new AssertionScope();
+            gameHarness.Game.Ghosts[ghost1.Name].Status.Should().Be(GhostStatus.RunningHome);
+            gameHarness.Game.Ghosts[ghost2.Name].Status.Should().Be(GhostStatus.Edible);
         }
     }
 }

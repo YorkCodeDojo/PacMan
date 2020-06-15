@@ -1,9 +1,11 @@
 using FluentAssertions;
+using NPacMan.Game.Tests.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
+using static NPacMan.Game.Tests.Helpers.Ensure;
 
 namespace NPacMan.Game.Tests
 {
@@ -97,6 +99,25 @@ namespace NPacMan.Game.Tests
             await Move();
             EnsureGameStatus(GameStatus.Dying);
         }
+
+        public async Task EatGhost(Ghost ghost)
+        {
+            await Move();
+
+            var actualGhostStatus = Game.Ghosts[ghost.Name].Status;
+            if(Game.Ghosts[ghost.Name].Status != GhostStatus.Score)
+            {
+                throw new Exception($"Expected ghost ({ghost.Name}) status to be {GhostStatus.Score} but was {actualGhostStatus} ");
+            }
+        }
+
+        public EnsureThatPacMan WeExpectThatPacMan() => WeExpectThat(_game.PacMan);
+        
+        public EnsureThatGhost WeExpectThatGhost(Ghost ghost)
+        {
+            return WeExpectThat(Game.Ghosts[ghost.Name]);
+        }
+
 
         public async Task ChangeDirection(Direction newDirection)
         {

@@ -176,6 +176,20 @@ namespace NPacMan.Game
             Ghosts = newPositionOfGhosts;
         }
 
+        internal void ApplyToGhosts(Func<Ghost, Ghost> action, IEnumerable<Ghost> ghostsToUpdate)
+        {
+            var names = ghostsToUpdate.Select(x => x.Name).ToHashSet();
+            
+            ApplyToGhosts(ghost =>
+            {
+                if (names.Contains(ghost.Name))
+                {
+                    ghost = action(ghost);
+                }
+                return ghost;
+            });
+        }
+
         internal void ApplyToGhost(Func<Ghost, Ghost> action, Ghost ghostToUpdate)
         {
             ApplyToGhosts(ghost =>
