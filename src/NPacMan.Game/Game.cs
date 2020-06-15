@@ -101,6 +101,7 @@ namespace NPacMan.Game
             nameof(GameStateMachine.GhostChase) => GameStatus.Alive,
             nameof(GameStateMachine.Scatter) => GameStatus.Alive,
             nameof(GameStateMachine.Frightened) => GameStatus.Alive,
+            nameof(GameStateMachine.EatingGhost) => GameStatus.Alive,
             nameof(GameStateMachine.Dying) => GameStatus.Dying,
             nameof(GameStateMachine.Respawning) => GameStatus.Respawning,
             nameof(GameStateMachine.Dead) => GameStatus.Dead,

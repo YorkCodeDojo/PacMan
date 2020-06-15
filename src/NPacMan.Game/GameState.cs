@@ -34,6 +34,7 @@ namespace NPacMan.Game
 
         public DateTime? TimeToChangeState { get;private set; }
 
+        public DateTime? TimeToResumeState { get;private set; }
         public int Lives { get; private set; }
 
         public int Level { get; private set; }
@@ -153,6 +154,10 @@ namespace NPacMan.Game
             TimeToChangeState = LastTick.AddSeconds(timeInSeconds);
         }
 
+        internal void ResumeStateIn(int timeInSeconds)
+        {
+            TimeToResumeState = LastTick.AddSeconds(timeInSeconds);
+        }
         internal void ApplyToGhosts(Func<Ghost, Ghost> action)
         {
             var newPositionOfGhosts = new Dictionary<string, Ghost>(Ghosts.Count);

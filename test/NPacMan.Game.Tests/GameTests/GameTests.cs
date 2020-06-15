@@ -327,10 +327,11 @@ namespace NPacMan.Game.Tests.GameTests
             
             game.StartGame();
             await game.ChangeDirection(Direction.Left);
-            await gameClock.Tick(now);
-            await gameClock.Tick(now);
-            await gameClock.Tick(now);
-            await gameClock.Tick(now);
+            await gameClock.Tick(now); // Eat Coin
+            await gameClock.Tick(now); // Eat pill
+            await gameClock.Tick(now); // Eat ghost
+            await gameClock.Tick(now.AddSeconds(1)); // Wait for pause to complete
+            await gameClock.Tick(now); // Eaten by ghost
 
             if (game.Status != GameStatus.Dying)
             {

@@ -78,7 +78,8 @@ namespace NPacMan.Game
                                 .TransitionTo(Frightened)),
                 When(GhostCollision)
                     .IfElse(x => x.Data.Ghost.Edible,
-                    binder => binder.Then(context => Actions.GhostEaten(settings, context.Instance, context.Data.Ghost, game, gameNotifications)),
+                    binder => binder.Then(context => Actions.GhostEaten(settings, context.Instance, context.Data.Ghost, game, gameNotifications))
+                                .TransitionTo(EatingGhost),
                     binder => binder.Then(context => Actions.EatenByGhost(context.Instance))
                                     .TransitionTo(Dying))); 
 
@@ -105,6 +106,20 @@ namespace NPacMan.Game
                                 .Then(context => context.Instance.ChangeStateIn(4))
                                 .Then(context => Actions.BeginRespawning(gameNotifications)));
 
+            WhenEnter(EatingGhost,
+                       binder => binder
+                                .Then(context => context.Instance.ResumeStateIn(1)));
+
+            During(EatingGhost,
+                When(Tick, context => context.Data.Now >= context.Instance.TimeToResumeState)
+                     .TransitionTo(Frightened),
+                When(GhostCollision)
+                    .IfElse(x => x.Data.Ghost.Edible,
+                    binder => binder.Then(context => Actions.GhostEaten(settings, context.Instance, context.Data.Ghost, game, gameNotifications))
+                                .TransitionTo(EatingGhost),
+                    binder => binder.Then(context => Actions.EatenByGhost(context.Instance))
+                                    .TransitionTo(Dying))); 
+
             During(Respawning,
                 When(Tick, context => context.Data.Now >= context.Instance.TimeToChangeState)
                     .Then(context => Actions.CompleteRespawning(context.Instance, settings))
@@ -112,7 +127,12 @@ namespace NPacMan.Game
 
             During(AttractMode, Ignore(Tick));
 
-            During(Dying, Respawning, AttractMode, ChangingLevel,
+            During(EatingGhost,
+                    Ignore(PlayersWishesToChangeDirection),
+                    Ignore(CoinCollision),
+                    Ignore(PowerPillCollision));
+
+            During(new [] {Dying, Respawning, AttractMode, ChangingLevel},
                     Ignore(PlayersWishesToChangeDirection),
                     Ignore(CoinCollision),
                     Ignore(PowerPillCollision),
@@ -127,6 +147,7 @@ namespace NPacMan.Game
         public State Dead { get; private set; } = null!;
         public State ChangingLevel { get; private set; } = null!;
         public State AttractMode { get; private set; } = null!;
+        public State EatingGhost { get; private set; } = null!;
         public Event<Tick> Tick { get; private set; } = null!;
         public Event<GhostCollision> GhostCollision { get; private set; } = null!;
         public Event<CoinCollision> CoinCollision { get; private set; } = null!;
