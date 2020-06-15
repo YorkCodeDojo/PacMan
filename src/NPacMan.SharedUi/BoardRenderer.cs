@@ -32,26 +32,26 @@ namespace NPacMan.SharedUi
             _scoreBoard = new ScoreBoard(_display, _sprites);
             _mapLayout = new MapLayout();
         }
-        
+
         public void RenderStart(Game.Game game)
         {
             // Resize if necessary (required for first tick)
-            _display.Size(game.Width, game.Height+5);
+            _display.Size(game.Width, game.Height + 5);
 
             // Blank the rows outside of the board area
-            foreach(var row in new int[] { 0,1,2, game.Height+3, game.Height+4})
-            ClearRow(row);
+            foreach (var row in new int[] { 0, 1, 2, game.Height + 3, game.Height + 4 })
+                ClearRow(row);
 
             // Build the static background
             RenderScore(game);
 
             _ticks++;
 
-            if(game.Status == GameStatus.AttractMode)
+            if (game.Status == GameStatus.AttractMode)
             {
                 _scoreBoard.PressStart();
             }
-            if(game.Status == GameStatus.ChangingLevel && _ticks % 10 < 5)
+            if (game.Status == GameStatus.ChangingLevel && _ticks % 10 < 5)
             {
                 FlashBoard();
             }
@@ -74,7 +74,7 @@ namespace NPacMan.SharedUi
         {
             for (int x = 0; x < _mapLayout.DisplayWidth; x++)
             {
-                _display.DrawOnBackground(x,row, _sprites.Map(BoardPiece.Blank));
+                _display.DrawOnBackground(x, row, _sprites.Map(BoardPiece.Blank));
             }
         }
 
@@ -84,7 +84,7 @@ namespace NPacMan.SharedUi
             {
                 for (int x = 0; x < _mapLayout.DisplayWidth; x++)
                 {
-                    _display.DrawOnBackground(x, y+_boardY, _sprites.Map(BoardPiece.Blank));
+                    _display.DrawOnBackground(x, y + _boardY, _sprites.Map(BoardPiece.Blank));
                 }
             }
         }
@@ -97,7 +97,7 @@ namespace NPacMan.SharedUi
             {
                 for (int x = 0; x < _mapLayout.DisplayWidth; x++)
                 {
-                    _display.DrawOnBackground(x, y+_boardY, _sprites.Map(_mapLayout.BoardPieceToDisplay(x, y)));
+                    _display.DrawOnBackground(x, y + _boardY, _sprites.Map(_mapLayout.BoardPieceToDisplay(x, y)));
                 }
             }
         }
@@ -108,7 +108,7 @@ namespace NPacMan.SharedUi
 
             foreach (var coin in coins)
             {
-                _display.DrawOnBackground(coin.X,coin.Y+_boardY, _sprites.Coin());
+                _display.DrawOnBackground(coin.X, coin.Y + _boardY, _sprites.Coin());
             }
         }
 
@@ -118,7 +118,7 @@ namespace NPacMan.SharedUi
 
             foreach (var fruit in fruits)
             {
-                _display.AddSprite(fruit.Location.X, fruit.Location.Y+_boardY, _sprites.Bonus[(int)fruit.Type]);
+                _display.AddSprite(fruit.Location.X, fruit.Location.Y + _boardY, _sprites.Bonus[(int)fruit.Type]);
             }
         }
 
@@ -128,10 +128,10 @@ namespace NPacMan.SharedUi
 
             foreach (var powerPill in powerPills)
             {
-                _display.DrawOnBackground(powerPill.X, powerPill.Y+_boardY, _sprites.PowerPill());
+                _display.DrawOnBackground(powerPill.X, powerPill.Y + _boardY, _sprites.PowerPill());
             }
         }
-        
+
         private int _pacManAnimation = 0;
         private int _pacManAnimationDelay = 0;
 
@@ -154,7 +154,7 @@ namespace NPacMan.SharedUi
                 _pacManAnimationDelay = 0;
             }
 
-            _display.AddSprite(x, y+_boardY, _sprites.PacMan(game.PacMan.Direction, _pacManAnimation, game.Status == GameStatus.Dying));
+            _display.AddSprite(x, y + _boardY, _sprites.PacMan(game.PacMan.Direction, _pacManAnimation, game.Status == GameStatus.Dying));
         }
 
         private void RenderGhosts(Game.Game game)
@@ -163,24 +163,38 @@ namespace NPacMan.SharedUi
 
             foreach (var ghost in game.Ghosts.Values)
             {
-                RenderGhost(ghost);
+                RenderGhost(ghost, game);
             }
         }
 
-        private void RenderGhost(Ghost ghost)
+        private void RenderGhost(Ghost ghost, Game.Game game)
         {
-            var ghostColour = (ghost.Name, ghost.Edible) switch
+            SpriteSource sprite;
+            if (ghost.Status == GhostStatus.Score)
             {
-                (GhostNames.Blinky, false) => GhostColour.Red,
-                (GhostNames.Inky, false) => GhostColour.Cyan,
-                (GhostNames.Pinky, false) => GhostColour.Pink,
-                (GhostNames.Clyde, false) => GhostColour.Orange,
-                (_, true) => GhostColour.BlueFlash,
-                _ => GhostColour.Red,
-            };
+                sprite = _sprites.GhostPoints(game.PointsForEatingLastGhost switch
+                {
+                    200 => 0,
+                    400 => 1,
+                    800 => 2,
+                    _ => 3
+                });
+            }
+            else
+            {
+                var ghostColour = (ghost.Name, ghost.Edible) switch
+                {
+                    (GhostNames.Blinky, false) => GhostColour.Red,
+                    (GhostNames.Inky, false) => GhostColour.Cyan,
+                    (GhostNames.Pinky, false) => GhostColour.Pink,
+                    (GhostNames.Clyde, false) => GhostColour.Orange,
+                    (_, true) => GhostColour.BlueFlash,
+                    _ => GhostColour.Red,
+                };
 
-            var sprite = _sprites.Ghost(ghostColour, ghost.Direction, animated);
-            _display.AddSprite(ghost.Location.X, ghost.Location.Y+_boardY, sprite);
+                sprite = _sprites.Ghost(ghostColour, ghost.Direction, animated);
+            }
+            _display.AddSprite(ghost.Location.X, ghost.Location.Y + _boardY, sprite);
         }
 
         private void RenderScore(Game.Game game)

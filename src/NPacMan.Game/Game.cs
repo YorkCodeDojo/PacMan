@@ -87,6 +87,9 @@ namespace NPacMan.Game
 
         public int Level => _gameState.Level;
 
+
+        public int PointsForEatingLastGhost => _gameState.PointsForEatingLastGhost;
+
         public PacMan PacMan => _gameState.PacMan;
 
         public IReadOnlyDictionary<string, Ghost> Ghosts

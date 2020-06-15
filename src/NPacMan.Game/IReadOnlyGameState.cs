@@ -16,6 +16,8 @@ namespace NPacMan.Game
 
         public int TickCounter { get; }
 
+        public int PointsForEatingLastGhost { get; }
+
         public IReadOnlyCollection<CellLocation> RemainingCoins { get; }
 
         public IReadOnlyCollection<CellLocation> RemainingPowerPills { get; }

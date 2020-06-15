@@ -43,6 +43,8 @@ namespace NPacMan.Game
 
         public int Score { get; private set; }
 
+        public int PointsForEatingLastGhost { get; private set; }
+
         public DateTime LastTick { get; private set; }
 
         public int TickCounter => _tickCounter;
@@ -83,6 +85,11 @@ namespace NPacMan.Game
         internal void AddBonusLife()
         {
             Lives++;
+        }
+
+        internal void RecordPointsForEatingLastGhost(int pointsForEatingLastGhost)
+        {
+            PointsForEatingLastGhost = pointsForEatingLastGhost;
         }
 
         internal void RemovePowerPill(CellLocation location)

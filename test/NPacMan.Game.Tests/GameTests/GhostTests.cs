@@ -956,8 +956,11 @@ namespace NPacMan.Game.Tests.GameTests
             WeExpectThat(game.PacMan).IsAt(_gameSettings.PacMan.Location.Left.Left);
 
             var pacManLocation = game.PacMan.Location;
-            var ghostLocations = game.Ghosts.Values.Select(x => new { x.Name, x.Location })
-                                    .ToDictionary(x => x.Name);
+            var ghostLocations = game.Ghosts.Values.Select(x => new {
+                x.Name,
+                x.Location,
+                Status = x.Name == ghost1.Name ? GhostStatus.Score : GhostStatus.Edible
+            }).ToDictionary(x => x.Name);
 
             // Should not move
             await _gameClock.Tick(now);
@@ -1007,8 +1010,11 @@ namespace NPacMan.Game.Tests.GameTests
             WeExpectThat(game.PacMan).IsAt(_gameSettings.PacMan.Location.Left.Left);
 
             var pacManLocation = game.PacMan.Location;
-            var ghostLocations = game.Ghosts.Values.Select(x => new { x.Name, x.Location })
-                                    .ToDictionary(x => x.Name);
+            var ghostLocations = game.Ghosts.Values.Select(x => new {
+                x.Name,
+                x.Location,
+                Status = x.Name == ghost1.Name ? GhostStatus.RunningHome : GhostStatus.Edible
+            }).ToDictionary(x => x.Name);
 
             
             await _gameClock.Tick(now.AddSeconds(1));
@@ -1026,5 +1032,3 @@ namespace NPacMan.Game.Tests.GameTests
         }
     }
 }
-
-

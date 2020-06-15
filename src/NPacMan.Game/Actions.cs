@@ -94,9 +94,8 @@ namespace NPacMan.Game
 
         public static void GhostEaten(IGameSettings gameSettings, GameState gameState, Ghost ghost, Game game, GameNotifications gameNotifications)
         {
-            SendGhostHome(gameState, ghost);
             IncreaseScoreAfterEatingGhost(gameSettings, gameState, game, gameNotifications);
-            MakeGhostNotEdible(gameState, ghost);
+            SendGhostHome(gameState, ghost);
             gameNotifications.Publish(GameNotification.EatGhost);
         }
 
@@ -193,6 +192,7 @@ namespace NPacMan.Game
         {
             var numberOfInEdibleGhosts = game.Ghosts.Values.Count(g => !g.Edible);
             var increaseInScore = (int)Math.Pow(2, numberOfInEdibleGhosts) * 200;
+            gameState.RecordPointsForEatingLastGhost(increaseInScore);
             IncreaseScoreAndCheckForBonusLife(gameSettings, gameState, gameNotifications, increaseInScore);
         }
 
@@ -205,6 +205,7 @@ namespace NPacMan.Game
 
         private static void SendGhostHome(GameState gameState, Ghost ghostToUpdate)
         {
+            gameState.ApplyToGhost(ghost => ghost.SetToScore(), ghostToUpdate);
             gameState.ApplyToGhost(ghost => ghost.SetToHome(), ghostToUpdate);
         }
 

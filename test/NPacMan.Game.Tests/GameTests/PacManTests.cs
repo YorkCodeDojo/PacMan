@@ -332,12 +332,12 @@ namespace NPacMan.Game.Tests.GameTests
         }
 
         [Theory]
-        [InlineData(1, 200)]
-        [InlineData(2, 600)]
-        [InlineData(3, 1400)]
-        [InlineData(4, 3000)]
-        [InlineData(5, 6200)]
-        public async Task ScoreShouldIncreaseExponentiallyAfterEatingEachGhost(int numberOfGhosts, int totalScore)
+        [InlineData(1, 200, 200)]
+        [InlineData(2, 400, 600)]
+        [InlineData(3, 800, 1400)]
+        [InlineData(4, 1600, 3000)]
+        [InlineData(5, 3200, 6200)]
+        public async Task ScoreShouldIncreaseExponentiallyAfterEatingEachGhost(int numberOfGhosts, int ghostScore, int totalScore)
         {
             var ghostStart = _gameSettings.PacMan.Location.Left.Left.Left;
             var ghosts = GhostBuilder.New().WithLocation(ghostStart).WithChaseStrategyRight()
@@ -367,7 +367,11 @@ namespace NPacMan.Game.Tests.GameTests
 
             WeExpectThat(game.PacMan).IsAt(_gameSettings.PacMan.Location.Left.Left);
 
-            game.Score.Should().Be(scoreBeforeGhost + totalScore);
+            game.Should().BeEquivalentTo(new {
+                Score = scoreBeforeGhost + totalScore,
+                PointsForEatingLastGhost = ghostScore
+            });
+            
         }
     }
 }
