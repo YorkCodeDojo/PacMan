@@ -305,8 +305,6 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public async Task AfterGameOverAndStartingNewGameAllStateIsRestored()
         {
-            var now = DateTime.UtcNow;
-            var gameClock = new TestGameClock();
             var ghostHomeLocation = _gameSettings.PacMan.Location.FarAway();
             var ghosts = GhostBuilder.New()
                     .WithChaseStrategyRight()
@@ -323,30 +321,20 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.FruitAppearsAfterCoinsEaten.Add(1);
             _gameSettings.InitialLives = 1;
             
-            var game = new Game(gameClock, _gameSettings);
+            var gameHarness = new GameHarness(_gameSettings);
             
-            game.StartGame();
-            await game.ChangeDirection(Direction.Left);
-            await gameClock.Tick(now); // Eat Coin
-            await gameClock.Tick(now); // Eat pill
-            await gameClock.Tick(now); // Eat ghost
-            await gameClock.Tick(now.AddSeconds(1)); // Wait for pause to complete
-            await gameClock.Tick(now); // Eaten by ghost
-
-            if (game.Status != GameStatus.Dying)
-            {
-                throw new Exception($"Game status should be GameStatus.Dying not {game.Status}");
-            }
-            await gameClock.Tick(now.AddSeconds(4));
-
-            if (game.Status != GameStatus.AttractMode)
-            {
-                throw new Exception($"Game status should be GameStatus.AttractMode not {game.Status}");
-            }
+            gameHarness.Game.StartGame();
+            await gameHarness.ChangeDirection(Direction.Left);
+            await gameHarness.EatCoin(); 
+            await gameHarness.EatPill(); 
+            await gameHarness.EatGhost(); 
+            await gameHarness.WaitForPauseToComplete();
+            await gameHarness.GetEatenByGhost();
+            await gameHarness.WaitAndEnterAttactMode();
             
-            await game.PressStart();
+            await gameHarness.PressStart();
 
-            game.Should().BeEquivalentTo(new {
+            gameHarness.Game.Should().BeEquivalentTo(new {
                 Status = GameStatus.Alive,
                 Score = 0,
                 Level = 1,
