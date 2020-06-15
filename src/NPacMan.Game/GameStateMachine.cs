@@ -6,32 +6,32 @@ namespace NPacMan.Game
     internal class GameStateMachine :
         AutomatonymousStateMachine<GameState>
     {
-        public GameStateMachine(IGameSettings settings, GameNotifications gameNotifications, Game game)
+        public GameStateMachine(Actions actions, IGameSettings settings, Game game)
         {
             InstanceState(x => x.Status);
 
             DuringAny(
                 When(Tick)
-                    .Then(context => Actions.Tick(context.Instance, context.Data.Now, gameNotifications)));
+                    .Then(context => actions.Tick(context.Instance, context.Data.Now)));
 
             Initially(
                 When(Tick)
-                    .Then(context => Actions.Tick(context.Instance, context.Data.Now, gameNotifications))
+                    .Then(context => actions.Tick(context.Instance, context.Data.Now))
                     .TransitionTo(AttractMode));
 
             WhenEnter(AttractMode,
                 binder => binder
-                    .Then(context => Actions.SetupGame(context.Instance, settings)));
+                    .Then(context => actions.SetupGame(context.Instance)));
 
             During(AttractMode,
                 When(PressStart)
-                    .Then(context => gameNotifications.Publish(GameNotification.Beginning))
+                    .Then(context => actions.Start())
                     .TransitionTo(Scatter));
 
             WhenEnter(Scatter,
                        binder => binder
                        .Then(context => context.Instance.ChangeStateIn(settings.InitialScatterTimeInSeconds))
-                       .Then(context => Actions.ScatterGhosts(context.Instance)));
+                       .Then(context => actions.ScatterGhosts(context.Instance)));
 
             During(Scatter,
                 When(Tick, context => context.Data.Now >= context.Instance.TimeToChangeState)
@@ -41,12 +41,12 @@ namespace NPacMan.Game
                 When(Tick, context => context.Data.Now >= context.Instance.TimeToChangeState)
                     .TransitionTo(Scatter));
 
-            WhenLeave(ChangingLevel, binder => binder.Then(context => Actions.GetReadyForNextLevel(context.Instance, settings)));
+            WhenLeave(ChangingLevel, binder => binder.Then(context => actions.GetReadyForNextLevel(context.Instance)));
             
             WhenEnter(GhostChase,
                        binder => binder
                             .Then(context => context.Instance.ChangeStateIn(settings.ChaseTimeInSeconds))
-                            .Then(context => Actions.GhostToChase(context.Instance)));
+                            .Then(context => actions.GhostToChase(context.Instance)));
 
             During(GhostChase,
                 When(Tick, context => context.Data.Now >= context.Instance.TimeToChangeState)
@@ -54,23 +54,23 @@ namespace NPacMan.Game
 
             During(Frightened,
                 When(Tick, context => context.Data.Now >= context.Instance.TimeToChangeState)
-                    .Then(context => Actions.MakeGhostsNotEdible(context.Instance))
+                    .Then(context => actions.MakeGhostsNotEdible(context.Instance))
                     .TransitionTo(Scatter));
 
             During(Scatter, GhostChase, Frightened,
                 When (PlayersWishesToChangeDirection)
-                    .Then(context => Actions.ChangeDirection(game, context.Instance, context.Data.NewDirection)),
+                    .Then(context => actions.ChangeDirection(game, context.Instance, context.Data.NewDirection)),
                 When(Tick)
-                    .ThenAsync(async context => await Actions.MoveGhosts(game, context.Instance, context, this))
-                    .ThenAsync(async context => await Actions.MovePacMan(game, context.Instance, context, this, settings)),
+                    .ThenAsync(async context => await actions.MoveGhosts(game, context.Instance, context, this))
+                    .ThenAsync(async context => await actions.MovePacMan(game, context.Instance, context, this)),
                 When(CoinCollision)
-                    .Then(context => Actions.CoinEaten(game, settings, context.Instance, context.Data.Location, gameNotifications))
+                    .Then(context => actions.CoinEaten(game, context.Instance, context.Data.Location))
                     .If(context => context.Instance.IsLevelComplete(), 
                             binder => binder.TransitionTo(ChangingLevel)),
                 When(FruitCollision)
-                    .Then(context => Actions.FruitEaten(game, settings, context.Instance, context.Data.Location, gameNotifications)),
+                    .Then(context => actions.FruitEaten(game, context.Instance, context.Data.Location)),
                 When(PowerPillCollision)
-                    .Then(context => Actions.PowerPillEaten(settings, context.Instance, context.Data.Location, gameNotifications))
+                    .Then(context => actions.PowerPillEaten(context.Instance, context.Data.Location))
                     .IfElse(context => context.Instance.IsLevelComplete(), 
                             binder => binder.TransitionTo(ChangingLevel),
                         binder =>
@@ -78,9 +78,9 @@ namespace NPacMan.Game
                                 .TransitionTo(Frightened)),
                 When(GhostCollision)
                     .IfElse(x => x.Data.Ghost.Edible,
-                    binder => binder.Then(context => Actions.GhostEaten(settings, context.Instance, context.Data.Ghost, game, gameNotifications))
+                    binder => binder.Then(context => actions.GhostEaten(context.Instance, context.Data.Ghost, game))
                                 .TransitionTo(EatingGhost),
-                    binder => binder.Then(context => Actions.EatenByGhost(context.Instance))
+                    binder => binder.Then(context => actions.EatenByGhost(context.Instance))
                                     .TransitionTo(Dying))); 
 
 
@@ -92,7 +92,7 @@ namespace NPacMan.Game
 
             WhenEnter(Dying,
                        binder => binder
-                                .Then(context => Actions.BeginDying(context.Instance, gameNotifications))
+                                .Then(context => actions.BeginDying(context.Instance))
                                 .Then(context => context.Instance.ChangeStateIn(4)));
 
             During(Dying,
@@ -104,7 +104,7 @@ namespace NPacMan.Game
             WhenEnter(Respawning,
                        binder => binder
                                 .Then(context => context.Instance.ChangeStateIn(4))
-                                .Then(context => Actions.BeginRespawning(gameNotifications)));
+                                .Then(context => actions.BeginRespawning()));
 
             WhenEnter(EatingGhost,
                        binder => binder
@@ -112,18 +112,18 @@ namespace NPacMan.Game
 
             During(EatingGhost,
                 When(Tick, context => context.Data.Now >= context.Instance.TimeToResumeState)
-                    .Then(context => Actions.SendGhostHome1(context.Instance))
+                    .Then(context => actions.SendGhostHome1(context.Instance))
                     .TransitionTo(Frightened),
                 When(GhostCollision)
                     .IfElse(x => x.Data.Ghost.Edible,
-                    binder => binder.Then(context => Actions.GhostEaten(settings, context.Instance, context.Data.Ghost, game, gameNotifications))
+                    binder => binder.Then(context => actions.GhostEaten(context.Instance, context.Data.Ghost, game))
                                 .TransitionTo(EatingGhost),
-                    binder => binder.Then(context => Actions.EatenByGhost(context.Instance))
+                    binder => binder.Then(context => actions.EatenByGhost(context.Instance))
                                     .TransitionTo(Dying))); 
 
             During(Respawning,
                 When(Tick, context => context.Data.Now >= context.Instance.TimeToChangeState)
-                    .Then(context => Actions.CompleteRespawning(context.Instance, settings))
+                    .Then(context => actions.CompleteRespawning(context.Instance))
                     .TransitionTo(Scatter));
 
             During(AttractMode, Ignore(Tick));

@@ -2,6 +2,8 @@
 
 PacMan game in C# using .NET Core 3.1
 
+Tryout our Blazor WASM Version - https://yorkcodedojo.github.io/PacMan/
+
 ![PacMan Game in C#](pacman-1.gif "PacMan Game in C#")
 
 
