@@ -14,6 +14,10 @@ namespace NPacMan.Game.Tests
 
         public Game Game { get; }
 
+        public int Score => Game.Score;
+
+        public Game StartGame() => Game.StartGame();
+
         public GameHarness(IGameSettings gameSettings)
         {
             _gameClock = new TestGameClock();
@@ -50,11 +54,6 @@ namespace NPacMan.Game.Tests
             }
         }
 
-        //public async Task EatGhost()
-        //{
-        //    await _gameClock.Tick(_now);
-        //}
-
         public async Task WaitForPauseToComplete()
         {
             _now = _now.AddSeconds(1);
@@ -79,12 +78,25 @@ namespace NPacMan.Game.Tests
             var pacManLocation = Game.PacMan.Location;
             var ghostLocations = Game.Ghosts.Values.Select(x => x.Location).ToArray();
 
+            var numberOfCoins = Game.Coins.Count;
+            var numberOfPowerPills = Game.PowerPills.Count;
+
             await _gameClock.Tick(_now);
 
             if (Game.PacMan.Location == pacManLocation
                 && ghostLocations.SequenceEqual(Game.Ghosts.Values.Select(x => x.Location)))
             {
                 throw new Exception("Expected PacMan or Ghosts to Move");
+            }
+
+            if (numberOfCoins != Game.Coins.Count)
+            {
+                throw new Exception("A coin was unexpectedly eaten");
+            }
+
+            if (numberOfPowerPills != Game.PowerPills.Count)
+            {
+                throw new Exception("A power pill was unexpectedly eaten");
             }
         }
 
