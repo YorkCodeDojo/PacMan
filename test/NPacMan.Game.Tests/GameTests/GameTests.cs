@@ -327,10 +327,10 @@ namespace NPacMan.Game.Tests.GameTests
             await gameHarness.ChangeDirection(Direction.Left);
             await gameHarness.EatCoin(); 
             await gameHarness.EatPill(); 
-            await gameHarness.EatGhost(); 
+            await gameHarness.EatGhost(killerGhost); 
             await gameHarness.WaitForPauseToComplete();
-            await gameHarness.GetEatenByGhost();
-            await gameHarness.WaitAndEnterAttactMode();
+            await gameHarness.GetEatenByGhost(killerGhost);
+            await gameHarness.WaitAndEnterAttractMode();
             
             await gameHarness.PressStart();
 
