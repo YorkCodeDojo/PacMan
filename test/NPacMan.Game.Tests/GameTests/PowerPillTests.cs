@@ -111,7 +111,6 @@ namespace NPacMan.Game.Tests.GameTests
             gameHarness.Score.Should().Be(score);
         }
 
-
         [Fact]
         public async Task AllGhostsShouldChangetoEdibleWhenPacManEatsPowerPill()
         {

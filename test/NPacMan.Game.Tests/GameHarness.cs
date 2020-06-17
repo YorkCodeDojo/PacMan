@@ -15,6 +15,7 @@ namespace NPacMan.Game.Tests
         public Game Game { get; }
 
         public int Score => Game.Score;
+        public int Lives => Game.Lives;
         public GameStatus Status => Game.Status;
 
         public Game StartGame() => Game.StartGame();
@@ -72,6 +73,42 @@ namespace NPacMan.Game.Tests
             await WaitFourSeconds();
 
             EnsureGameStatus(GameStatus.AttractMode);
+        }
+
+        /// <summary>
+        /// Trigger a tick,  but we don't expect anything to happen.  For example PacMan
+        /// could be in a dying state.
+        /// </summary>
+        /// <returns></returns>
+        public async Task NOP()
+        {
+            var pacManLocation = Game.PacMan.Location;
+            var ghostLocations = Game.Ghosts.Values.Select(x => x.Location).ToArray();
+
+            var numberOfCoins = Game.Coins.Count;
+            var numberOfPowerPills = Game.PowerPills.Count;
+
+            await _gameClock.Tick(_now);
+
+            if (!ghostLocations.SequenceEqual(Game.Ghosts.Values.Select(x => x.Location)))
+            {
+                throw new Exception("A ghost unexpectedly moved");
+            }
+
+            if (Game.PacMan.Location != pacManLocation)
+            {
+                throw new Exception("PacMan unexpectedly moved");
+            }
+
+            if (numberOfCoins != Game.Coins.Count)
+            {
+                throw new Exception("A coin was unexpectedly eaten");
+            }
+
+            if (numberOfPowerPills != Game.PowerPills.Count)
+            {
+                throw new Exception("A power pill was unexpectedly eaten");
+            }
         }
 
         public async Task Move()
