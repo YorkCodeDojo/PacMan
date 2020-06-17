@@ -15,6 +15,7 @@ namespace NPacMan.Game.Tests
         public Game Game { get; }
 
         public int Score => Game.Score;
+        public GameStatus Status => Game.Status;
 
         public Game StartGame() => Game.StartGame();
 
