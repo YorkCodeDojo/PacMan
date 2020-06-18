@@ -16,7 +16,7 @@ namespace NPacMan.Game.Tests.GameTests
         {
             _ghostBuilder = GhostBuilder.New()
                                         .WithChaseStrategy(new DirectToStrategy(new DirectToPacManLocation()));
-            
+
             _gameSettings = new TestGameSettings();
         }
 
@@ -72,7 +72,7 @@ namespace NPacMan.Game.Tests.GameTests
         }
 
         [Fact]
-        public async Task ShouldNotVerticallyWalkInToWalls()
+        public async Task ShouldNotWalkVerticallyInToWalls()
         {
             var wallLocation = _gameSettings.PacMan.Location.Below;
             var ghostStartLocation = _gameSettings.PacMan.Location.Below.Below;
@@ -101,21 +101,26 @@ namespace NPacMan.Game.Tests.GameTests
         public async Task ShouldTurnAtCorner()
         {
             // X X X X 
-            // X ^ ▶ ▶
+            // X ^ ▶ ▶ C
             // X S X X
 
-            var ghost = _ghostBuilder.WithLocation((1, 2))
-                .WithDirection(Direction.Up).Create();
-            var board = new TestGameSettings()
-            {
-                Ghosts = { ghost },
-                PacMan = new PacMan((4, 1), Direction.Right),
-                Walls = { (0, 0), (1, 0), (2, 0), (3, 0),
-                    (0,1), (0,2), (2,2), (3,2)
-                }
-            };
+            var topLeft = new CellLocation();
+            _gameSettings.Walls.Add(topLeft);
+            _gameSettings.Walls.Add(topLeft.Right);
+            _gameSettings.Walls.Add(topLeft.Right.Right);
+            _gameSettings.Walls.Add(topLeft.Right.Right.Right);
+            _gameSettings.Walls.Add(topLeft.Below);
+            _gameSettings.Walls.Add(topLeft.Below.Below);
+            _gameSettings.Walls.Add(topLeft.Below.Below.Right.Right);
+            _gameSettings.Walls.Add(topLeft.Below.Below.Right.Right.Right);
 
-            var gameHarness = new GameHarness(board);
+            var ghost = _ghostBuilder.WithLocation(topLeft.Below.Below.Right)
+                                     .WithDirection(Direction.Up).Create();
+            _gameSettings.Ghosts.Add(ghost);
+
+            _gameSettings.PacMan = new PacMan(topLeft.Below.Right.Right.Right.Right, Direction.Right);
+
+            var gameHarness = new GameHarness(_gameSettings);
             gameHarness.StartGame();
             await gameHarness.Move();
             await gameHarness.Move();
@@ -124,11 +129,7 @@ namespace NPacMan.Game.Tests.GameTests
             using var _ = new AssertionScope();
             gameHarness.Game.Ghosts[ghost.Name].Should().BeEquivalentTo(new
             {
-                Location = new
-                {
-                    X = 3,
-                    Y = 1
-                },
+                Location = topLeft.Below.Right.Right.Right,
                 Direction = Direction.Right
             });
         }
@@ -140,18 +141,21 @@ namespace NPacMan.Game.Tests.GameTests
             //   ^ ▶ ▶ C
             // X S X X
 
-            var ghost = _ghostBuilder.WithLocation((1, 2))
-                .WithDirection(Direction.Up).Create();
-            var board = new TestGameSettings()
-            {
-                Ghosts = { ghost },
-                PacMan = new PacMan((4, 1), Direction.Right),
-                Walls = { (0, 0), (2, 0), (3, 0),
-                   (0,2), (2,2), (3,2)
-                }
-            };
+            var topLeft = new CellLocation();
+            _gameSettings.Walls.Add(topLeft);
+            _gameSettings.Walls.Add(topLeft.Right.Right);
+            _gameSettings.Walls.Add(topLeft.Right.Right.Right);
+            _gameSettings.Walls.Add(topLeft.Below.Below);
+            _gameSettings.Walls.Add(topLeft.Below.Below.Right.Right);
+            _gameSettings.Walls.Add(topLeft.Below.Below.Right.Right.Right);
 
-            var gameHarness = new GameHarness(board);
+            var ghost = _ghostBuilder.WithLocation(topLeft.Below.Below.Right)
+                                        .WithDirection(Direction.Up).Create();
+            _gameSettings.Ghosts.Add(ghost);
+
+            _gameSettings.PacMan = new PacMan(topLeft.Below.Right.Right.Right.Right, Direction.Right);
+
+            var gameHarness = new GameHarness(_gameSettings);
             gameHarness.StartGame();
             await gameHarness.Move();
             await gameHarness.Move();
@@ -160,26 +164,21 @@ namespace NPacMan.Game.Tests.GameTests
             using var _ = new AssertionScope();
             gameHarness.Game.Ghosts[ghost.Name].Should().BeEquivalentTo(new
             {
-                Location = new
-                {
-                    X = 3,
-                    Y = 1
-                },
+                Location = topLeft.Below.Right.Right.Right,
                 Direction = Direction.Right
             });
         }
 
-
         [Fact]
         public void ShouldBeAbleToTargetWherePacManWillBe()
         {
-            var board = new TestGameSettings()
-            {
-                PacMan = new PacMan((4, 1), Direction.Right),
-                Walls = { }
-            };
-            
-            var gameHarness = new GameHarness(board);
+            //var board = new TestGameSettings()
+            //{
+            //    PacMan = new PacMan((4, 1), Direction.Right),
+            //    Walls = { }
+            //};
+
+            var gameHarness = new GameHarness(_gameSettings);
             gameHarness.StartGame();
 
             var directToExpectedPacManLocation = new DirectToExpectedPacManLocation();
@@ -187,8 +186,7 @@ namespace NPacMan.Game.Tests.GameTests
 
             targetLocation.Should().BeEquivalentTo(new
             {
-                X = 8,
-                Y = 1
+                _gameSettings.PacMan.Location.Right.Right.Right.Right.Right
             });
         }
 
