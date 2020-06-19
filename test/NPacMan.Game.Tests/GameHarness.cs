@@ -245,5 +245,16 @@ namespace NPacMan.Game.Tests
 
             await _gameClock.Tick(_now);
         }
+
+        internal void Label(string caption)
+        {
+        }
+
+        internal async Task WaitFor(TimeSpan delay)
+        {
+            _now+= delay;
+
+            await _gameClock.Tick(_now);
+        }
     }
 }
