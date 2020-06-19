@@ -226,5 +226,12 @@ namespace NPacMan.Game.Tests
 
             numberOfNotificationsTriggered.Should().Be(1);
         }
+
+        internal async Task WaitForFrightenedTimeToComplete()
+        {
+            _now = _now.AddSeconds(_gameSettings.FrightenedTimeInSeconds + 1);
+
+            await _gameClock.Tick(_now);
+        }
     }
 }
