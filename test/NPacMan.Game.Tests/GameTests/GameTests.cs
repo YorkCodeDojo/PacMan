@@ -312,7 +312,12 @@ namespace NPacMan.Game.Tests.GameTests
                     .CreateMany(3);
             var killerGhost = GhostBuilder.New()
                     .WithLocation(_gameSettings.PacMan.Location.Left.Left.Left)
+                    .WithDirection(Direction.Left)
+                    .WithScatterTarget(_gameSettings.PacMan.Location.Right)
                     .Create();
+            _gameSettings.DirectionPicker = new TestDirectionPicker(){
+                DefaultDirection = Direction.Left
+            };
             _gameSettings.Coins.Add(_gameSettings.PacMan.Location.Left);
             _gameSettings.Coins.Add(_gameSettings.PacMan.Location.FarAway());
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Left.Left);
@@ -327,10 +332,12 @@ namespace NPacMan.Game.Tests.GameTests
             await gameHarness.ChangeDirection(Direction.Left);
             await gameHarness.EatCoin(); 
             await gameHarness.EatPill(); 
-            await gameHarness.EatGhost(); 
-            await gameHarness.WaitForPauseToComplete();
-            await gameHarness.GetEatenByGhost();
-            await gameHarness.WaitAndEnterAttactMode();
+
+            await gameHarness.ChangeDirection(Direction.Up);
+            await gameHarness.WaitForFrightenedTimeToComplete();
+   
+            await gameHarness.GetEatenByGhost(killerGhost);
+            await gameHarness.WaitAndEnterAttractMode();
             
             await gameHarness.PressStart();
 

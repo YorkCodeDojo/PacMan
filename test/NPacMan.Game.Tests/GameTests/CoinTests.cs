@@ -3,8 +3,6 @@ using FluentAssertions.Execution;
 using Xunit;
 using System;
 using System.Threading.Tasks;
-using NPacMan.Game.Tests.GhostStrategiesForTests;
-using static NPacMan.Game.Tests.Helpers.Ensure;
 using NPacMan.Game.Tests.Helpers;
 
 namespace NPacMan.Game.Tests.GameTests
@@ -12,25 +10,25 @@ namespace NPacMan.Game.Tests.GameTests
     public class CoinTests
     {
         private readonly TestGameSettings _gameSettings;
-        private readonly TestGameClock _gameClock;
 
         public CoinTests()
         {
             _gameSettings = new TestGameSettings();
-            _gameClock = new TestGameClock();
         }
 
         [Fact]
         public async Task ScoreDoesNotChangeWhenNoCoinIsCollected()
         {
-            var game = new Game(_gameClock, _gameSettings);
-            var score = game.Score;
+            var gameHarness = new GameHarness(_gameSettings);
+            gameHarness.StartGame();
 
-            await game.ChangeDirection(Direction.Down);
+            var score = gameHarness.Score;
 
-            await _gameClock.Tick();
+            await gameHarness.ChangeDirection(Direction.Down);
 
-            game.Score.Should().Be(score);
+            await gameHarness.Move();
+
+            gameHarness.Score.Should().Be(score);
         }
 
         [Fact]
@@ -39,14 +37,14 @@ namespace NPacMan.Game.Tests.GameTests
             var pacManStartingLocation = _gameSettings.PacMan.Location;
             _gameSettings.Coins.Add(pacManStartingLocation.Below);
 
-            var game = new Game(_gameClock, _gameSettings);
-            game.StartGame(); 
+            var gameHarness = new GameHarness(_gameSettings);
+            gameHarness.StartGame(); 
 
-            await game.ChangeDirection(Direction.Down);
+            await gameHarness.ChangeDirection(Direction.Down);
 
-            await _gameClock.Tick();
+            await gameHarness.EatCoin();
 
-            game.Score.Should().Be(10);
+            gameHarness.Score.Should().Be(10);
         }
 
         [Fact]
@@ -56,28 +54,20 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Coins.Add(pacManStartingLocation.Below);
             _gameSettings.Coins.Add(pacManStartingLocation.FarAway());
 
-            var game = new Game(_gameClock, _gameSettings);
-            game.StartGame();
+            var gameHarness = new GameHarness(_gameSettings);
+            gameHarness.StartGame();
 
-            await game.ChangeDirection(Direction.Down);
+            await gameHarness.ChangeDirection(Direction.Down);
+            await gameHarness.EatCoin();
 
-            await _gameClock.Tick();
+            await gameHarness.ChangeDirection(Direction.Up);
+            await gameHarness.Move();
 
-            if (game.Score != 10)
-                throw new Exception($"Score should be 10 not {game.Score}");
+            await gameHarness.ChangeDirection(Direction.Down);
+            await gameHarness.Move();
 
-            await game.ChangeDirection(Direction.Up);
-            await _gameClock.Tick();
-
-            if (game.Score != 10)
-                throw new Exception($"Score should still be 10 not {game.Score}");
-
-            await game.ChangeDirection(Direction.Down);
-            await _gameClock.Tick();
-
-            game.Score.Should().Be(10);
+            gameHarness.Score.Should().Be(10);
         }
-
 
         [Fact]
         public async Task IncrementsScoreBy20WhenTwoCoinsAreCollected()
@@ -86,31 +76,30 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Coins.Add(pacManStartingLocation.Below);
             _gameSettings.Coins.Add(pacManStartingLocation.Below.Below);
 
-            var game = new Game(_gameClock, _gameSettings);
-            game.StartGame(); 
+            var gameHarness = new GameHarness(_gameSettings);
+            gameHarness.StartGame();
 
-            await game.ChangeDirection(Direction.Down);
+            await gameHarness.ChangeDirection(Direction.Down);
 
-            await _gameClock.Tick();
-            await _gameClock.Tick();
+            await gameHarness.EatCoin();
+            await gameHarness.EatCoin();
 
-            game.Score.Should().Be(20);
+            gameHarness.Score.Should().Be(20);
         }
 
         [Fact]
         public async Task CoinShouldBeCollected()
         {
-            var game = new Game(_gameClock, _gameSettings);
-            game.StartGame(); 
-            var (x, y) = game.PacMan.Location;
+            var coinLocation = _gameSettings.PacMan.Location.Below;
+            _gameSettings.Coins.Add(coinLocation);
 
-            await game.ChangeDirection(Direction.Down);
+            var gameHarness = new GameHarness(_gameSettings);
+            gameHarness.StartGame();
 
-            _gameSettings.Coins.Add((x, y + 1));
+            await gameHarness.ChangeDirection(Direction.Down);
+            await gameHarness.EatCoin();
 
-            await _gameClock.Tick();
-
-            game.Coins.Should().NotContain((x, y + 1));
+            gameHarness.Game.Coins.Should().NotContain(coinLocation);
         }
 
         [Fact]
@@ -120,34 +109,37 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Coins.Add(pacManStartingLocation.Below);
             _gameSettings.Coins.Add(pacManStartingLocation.Below.Below);
 
-            var game = new Game(_gameClock, _gameSettings);
-            game.StartGame(); 
+            var gameHarness = new GameHarness(_gameSettings);
+            gameHarness.StartGame();
 
-            await game.ChangeDirection(Direction.Down);
+            await gameHarness.ChangeDirection(Direction.Down);
 
-            await _gameClock.Tick();
+            await gameHarness.EatCoin();
 
-            game.Coins.Should().NotContain(pacManStartingLocation.Below);
-            game.Coins.Should().Contain(pacManStartingLocation.Below.Below);
+            gameHarness.Game.Coins.Should().NotContain(pacManStartingLocation.Below);
+            gameHarness.Game.Coins.Should().Contain(pacManStartingLocation.Below.Below);
         }
 
         [Fact]
         public async Task GameContainsAllCoins()
         {
-            var gameBoard = new TestGameSettings();
-            gameBoard.Coins.Add((1, 1));
-            gameBoard.Coins.Add((1, 2));
-            gameBoard.Coins.Add((2, 2));
+            var coin1 = _gameSettings.PacMan.Location.FarAway().Left;
+            var coin2 = _gameSettings.PacMan.Location.FarAway();
+            var coin3 = _gameSettings.PacMan.Location.FarAway().Right;
 
-            var gameClock = new TestGameClock();
-            var game = new Game(gameClock, gameBoard);
-            game.StartGame();
-            await gameClock.Tick();
+            _gameSettings.Coins.Add(coin1);
+            _gameSettings.Coins.Add(coin2);
+            _gameSettings.Coins.Add(coin3);
 
-            game.Coins.Should().BeEquivalentTo(
-                new CellLocation(1, 1),
-                new CellLocation(1, 2),
-                new CellLocation(2, 2)
+            var gameHarness = new GameHarness(_gameSettings);
+            gameHarness.StartGame();
+
+            await gameHarness.Move();
+
+            gameHarness.Game.Coins.Should().BeEquivalentTo(
+                coin1,
+                coin2,
+                coin3
             );
         }
 
@@ -163,16 +155,16 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Ghosts.Add(ghost);
             _gameSettings.Coins.Add(ghostAndCoinLocation);
 
-            var game = new Game(_gameClock, _gameSettings);
-            game.StartGame(); 
-            var score = game.Score;
+            var gameHarness = new GameHarness(_gameSettings);
+            gameHarness.StartGame();
+            var score = gameHarness.Score;
 
-            await game.ChangeDirection(Direction.Right);
-            await _gameClock.Tick();
+            await gameHarness.ChangeDirection(Direction.Right);
+            await gameHarness.GetEatenByGhost(ghost);
 
             using var _ = new AssertionScope();
-            game.Coins.Should().ContainEquivalentOf(ghostAndCoinLocation);
-            game.Score.Should().Be(score);
+            gameHarness.Game.Coins.Should().ContainEquivalentOf(ghostAndCoinLocation);
+            gameHarness.Score.Should().Be(score);
         }
 
         [Fact]
@@ -183,13 +175,13 @@ namespace NPacMan.Game.Tests.GameTests
 
             var numberOfNotificationsTriggered = 0;
 
-            var game = new Game(_gameClock, _gameSettings);
-            game.Subscribe(GameNotification.EatCoin, () => numberOfNotificationsTriggered++);
-            game.StartGame(); 
+            var gameHarness = new GameHarness(_gameSettings);
+            gameHarness.Game.Subscribe(GameNotification.EatCoin, () => numberOfNotificationsTriggered++);
+            gameHarness.StartGame(); 
 
-            await game.ChangeDirection(Direction.Down);
+            await gameHarness.ChangeDirection(Direction.Down);
 
-            await _gameClock.Tick();
+            await gameHarness.EatCoin();
 
             numberOfNotificationsTriggered.Should().Be(1);
         }

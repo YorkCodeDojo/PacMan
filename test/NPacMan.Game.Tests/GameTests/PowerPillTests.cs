@@ -1,9 +1,7 @@
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Xunit;
-using System;
 using System.Threading.Tasks;
-using NPacMan.Game.Tests.GhostStrategiesForTests;
 using System.Collections.Generic;
 using NPacMan.Game.Tests.Helpers;
 
@@ -12,38 +10,37 @@ namespace NPacMan.Game.Tests.GameTests
     public class PowerPillTests
     {
         private readonly TestGameSettings _gameSettings;
-        private readonly TestGameClock _gameClock;
 
         public PowerPillTests()
         {
             _gameSettings = new TestGameSettings();
-            _gameClock = new TestGameClock();
         }
 
         [Fact]
         public async Task IncrementsScoreBy50WhenPowerPillCollected()
         {
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Below);
-            var game = new Game(_gameClock, _gameSettings);
+            var gameHarness = new GameHarness(_gameSettings);
 
-            game.StartGame();
-            await game.ChangeDirection(Direction.Down);
-            await _gameClock.Tick();
+            gameHarness.StartGame();
+            await gameHarness.ChangeDirection(Direction.Down);
+            await gameHarness.EatPill();
 
-            game.Score.Should().Be(50);
+            gameHarness.Score.Should().Be(50);
         }
 
         [Fact]
         public async Task GameStateStaysAlivewhenPillCollected()
         {
-            var game = new Game(_gameClock, _gameSettings);
-            _gameSettings.PowerPills.Add(game.PacMan.Location.Below);
+            _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Below);
+            _gameSettings.Coins.Add(_gameSettings.PacMan.Location.FarAway());
+            var gameHarness = new GameHarness(_gameSettings);
+            gameHarness.StartGame();
 
-            game.StartGame();
-            await game.ChangeDirection(Direction.Down);
-            await _gameClock.Tick();
+            await gameHarness.ChangeDirection(Direction.Down);
+            await gameHarness.EatPill();
 
-            game.Status.Should().Be(GameStatus.Alive);
+            gameHarness.Status.Should().Be(GameStatus.Alive);
         }
 
         [Fact]
@@ -51,44 +48,41 @@ namespace NPacMan.Game.Tests.GameTests
         {
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.FarAway());
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Below);
-            var game = new Game(_gameClock, _gameSettings);
-            game.StartGame();
+            var gameHarness = new GameHarness(_gameSettings);
+            gameHarness.StartGame();
 
-            await game.ChangeDirection(Direction.Down);
-            await _gameClock.Tick();
+            await gameHarness.ChangeDirection(Direction.Down);
+            await gameHarness.EatPill();
 
-            if (game.Score != 50)
-                throw new Exception($"Score should be 50 not {game.Score}");
+            await gameHarness.ChangeDirection(Direction.Up);
+            await gameHarness.Move();
 
-            await game.ChangeDirection(Direction.Up);
-            await _gameClock.Tick();
+            await gameHarness.ChangeDirection(Direction.Down);
+            await gameHarness.Move();
 
-            if (game.Score != 50)
-                throw new Exception($"Score should still be 50 not {game.Score}");
-
-            await game.ChangeDirection(Direction.Down);
-            await _gameClock.Tick();
-
-            game.Score.Should().Be(50);
+            gameHarness.Score.Should().Be(50);
         }
 
         [Fact]
         public async Task GameContainsAllPowerPills()
         {
-            var gameBoard = new TestGameSettings();
-            gameBoard.PowerPills.Add((1, 1));
-            gameBoard.PowerPills.Add((1, 2));
-            gameBoard.PowerPills.Add((2, 2));
+            var powerPill1 = _gameSettings.PacMan.Location.FarAway().Left;
+            var powerPill2 = _gameSettings.PacMan.Location.FarAway();
+            var powerPill3 = _gameSettings.PacMan.Location.FarAway().Right;
 
-            var gameClock = new TestGameClock();
-            var game = new Game(gameClock, gameBoard);
-            game.StartGame();
-            await gameClock.Tick();
+            _gameSettings.PowerPills.Add(powerPill1);
+            _gameSettings.PowerPills.Add(powerPill2);
+            _gameSettings.PowerPills.Add(powerPill3);
 
-            game.PowerPills.Should().BeEquivalentTo(
-                new CellLocation(1, 1),
-                new CellLocation(1, 2),
-                new CellLocation(2, 2)
+            var gameHarness = new GameHarness(_gameSettings);
+            gameHarness.StartGame();
+
+            await gameHarness.Move();
+
+            gameHarness.Game.PowerPills.Should().BeEquivalentTo(
+                powerPill1,
+                powerPill2,
+                powerPill3
             );
         }
 
@@ -104,18 +98,18 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Ghosts.Add(ghost);
             _gameSettings.PowerPills.Add(pillAndGhostLocation);
 
-            var game = new Game(_gameClock, _gameSettings);
-            game.StartGame();
-            var score = game.Score;
+            var gameHarness = new GameHarness(_gameSettings);
+            gameHarness.StartGame();
 
-            await game.ChangeDirection(Direction.Right);
-            await _gameClock.Tick();
+            var score = gameHarness.Score;
+
+            await gameHarness.ChangeDirection(Direction.Right);
+            await gameHarness.GetEatenByGhost(ghost);
 
             using var _ = new AssertionScope();
-            game.PowerPills.Should().ContainEquivalentOf(pillAndGhostLocation);
-            game.Score.Should().Be(score);
+            gameHarness.Game.PowerPills.Should().ContainEquivalentOf(pillAndGhostLocation);
+            gameHarness.Score.Should().Be(score);
         }
-
 
         [Fact]
         public async Task AllGhostsShouldChangetoEdibleWhenPacManEatsPowerPill()
@@ -127,13 +121,13 @@ namespace NPacMan.Game.Tests.GameTests
 
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Right);
 
-            var game = new Game(_gameClock, _gameSettings);
-            game.StartGame();
+            var gameHarness = new GameHarness(_gameSettings);
+            gameHarness.StartGame();
 
-            await game.ChangeDirection(Direction.Right);
-            await _gameClock.Tick();
+            await gameHarness.ChangeDirection(Direction.Right);
+            await gameHarness.EatPill();
 
-            game.Ghosts.Values.Should().AllBeEquivalentTo(new
+            gameHarness.Game.Ghosts.Values.Should().AllBeEquivalentTo(new
             {
                 Edible = true
             });
@@ -163,13 +157,13 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.FarAway());
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Right);
 
-            var game = new Game(_gameClock, _gameSettings);
-            game.StartGame();
+            var gameHarness = new GameHarness(_gameSettings);
+            gameHarness.StartGame();
 
-            await game.ChangeDirection(Direction.Right);
-            await _gameClock.Tick();
+            await gameHarness.ChangeDirection(Direction.Right);
+            await gameHarness.EatPill();
 
-            game.Ghosts.Should().BeEquivalentTo(new Dictionary<string, object>
+            gameHarness.Game.Ghosts.Should().BeEquivalentTo(new Dictionary<string, object>
             {
                 [ghost1.Name] = new
                 {
@@ -196,13 +190,14 @@ namespace NPacMan.Game.Tests.GameTests
             var numberOfNotificationsTriggered = 0;
 
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Below);
-            var game = new Game(_gameClock, _gameSettings);
-            game.Subscribe(GameNotification.EatPowerPill, () => numberOfNotificationsTriggered++);
-            game.StartGame();
 
-            await game.ChangeDirection(Direction.Down);
+            var gameHarness = new GameHarness(_gameSettings);
+            gameHarness.Game.Subscribe(GameNotification.EatPowerPill, () => numberOfNotificationsTriggered++);
+            gameHarness.StartGame();
 
-            await _gameClock.Tick();
+            await gameHarness.ChangeDirection(Direction.Down);
+
+            await gameHarness.EatPill();
 
             numberOfNotificationsTriggered.Should().Be(1);
         }
