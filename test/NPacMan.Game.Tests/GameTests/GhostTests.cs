@@ -964,7 +964,7 @@ namespace NPacMan.Game.Tests.GameTests
 
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Below);
 
-            var gameHarness = new GameHarness(_gameSettings);
+            var gameHarness = new GameHarness(_gameSettings, @"c:\temp\debug.txt");
             gameHarness.Game.StartGame();
 
             await gameHarness.ChangeDirection(Direction.Down);
