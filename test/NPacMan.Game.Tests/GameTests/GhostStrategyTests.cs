@@ -26,7 +26,6 @@ namespace NPacMan.Game.Tests.GameTests
         [InlineData(5, 10, 5, 6)]
         public async Task ShouldMoveTowardsPacMan(int pacManX, int pacManY, int expectedGhostPositionX, int expectedGhostPositionY)
         {
-            //pacManX: 10, pacManY: 5, expectedGhostPositionX: 6, expectedGhostPositionY: 5)
             var ghost = _ghostBuilder.WithLocation((5, 5)).Create();
             _gameSettings.Ghosts.Add(ghost);
             _gameSettings.PacMan = new PacMan((pacManX, pacManY), Direction.Left);
@@ -172,12 +171,6 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public void ShouldBeAbleToTargetWherePacManWillBe()
         {
-            //var board = new TestGameSettings()
-            //{
-            //    PacMan = new PacMan((4, 1), Direction.Right),
-            //    Walls = { }
-            //};
-
             var gameHarness = new GameHarness(_gameSettings);
             gameHarness.StartGame();
 

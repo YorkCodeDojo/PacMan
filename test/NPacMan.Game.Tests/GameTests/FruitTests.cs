@@ -1,40 +1,33 @@
 using FluentAssertions;
-using FluentAssertions.Execution;
 using Xunit;
 using System.Linq;
 using NPacMan.Game.Tests.Helpers;
 using System.Threading.Tasks;
 using System;
-using static NPacMan.Game.Tests.Helpers.Ensure;
 
 namespace NPacMan.Game.Tests.GameTests
 {
     public class FruitTests
     {
-        private readonly DateTime _now;
         private readonly TestGameSettings _gameSettings;
-        private readonly TestGameClock _gameClock;
 
         public FruitTests()
         {
-            _now = DateTime.UtcNow;
-
             _gameSettings = new TestGameSettings();
-            _gameClock = new TestGameClock();
         }
-
 
         [Fact]
         public void FruitShouldNotBeVisibleWhenStartingGame()
         {
             var fruitLocation = _gameSettings.PacMan.Location.FarAway();
             _gameSettings.Fruit = fruitLocation;
-            var game = new Game(_gameClock, _gameSettings);
-            game.StartGame();
 
-            game.Fruits.Should().BeEmpty();            
+            var gameHarness = new GameHarness(_gameSettings);
+            gameHarness.StartGame();
+
+            gameHarness.Game.Fruits.Should().BeEmpty();
         }
-        
+
         [Fact]
         public async Task FruitShouldFirstAppearAfterSetNumberOfPills()
         {
@@ -43,37 +36,41 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.FruitAppearsAfterCoinsEaten.Add(5);
 
             _gameSettings.Coins.Add(_gameSettings.PacMan.Location.Left);
-            for(var i =1; i<=5; i++)
-            {
-                _gameSettings.Coins.Add(_gameSettings.Coins[i - 1].Left);
-            }
-            var game = new Game(_gameClock, _gameSettings);
-            game.StartGame();
-            await game.ChangeDirection(Direction.Left);
-            await _gameClock.Tick();
-            await _gameClock.Tick();
-            await _gameClock.Tick();
-            await _gameClock.Tick();
-            await _gameClock.Tick();
+            _gameSettings.Coins.Add(_gameSettings.PacMan.Location.Left.Left);
+            _gameSettings.Coins.Add(_gameSettings.PacMan.Location.Left.Left.Left);
+            _gameSettings.Coins.Add(_gameSettings.PacMan.Location.Left.Left.Left.Left);
+            _gameSettings.Coins.Add(_gameSettings.PacMan.Location.Left.Left.Left.Left.Left);
 
-            game.Fruits.Should().BeEquivalentTo(new {
+            var gameHarness = new GameHarness(_gameSettings);
+            gameHarness.StartGame();
+
+            await gameHarness.ChangeDirection(Direction.Left);
+            await gameHarness.EatCoin();
+            await gameHarness.EatCoin();
+            await gameHarness.EatCoin();
+            await gameHarness.EatCoin();
+            await gameHarness.EatCoin();
+
+            gameHarness.Game.Fruits.Should().BeEquivalentTo(new
+            {
                 Location = _gameSettings.Fruit,
                 Type = FruitType.Cherry
             });
         }
-        
+
         [Fact]
         public async Task FruitShouldDisappearAfterAConfiguredAmountOfTime()
         {
             var fruitLocation = _gameSettings.PacMan.Location.FarAway();
-            var game = await PlayGameUntilFruitAppears(fruitLocation);
+            var gameHarness = await PlayGameUntilFruitAppears(fruitLocation);
 
-            await _gameClock.Tick(_now.AddSeconds(_gameSettings.FruitVisibleForSeconds).AddSeconds(1));
+            await gameHarness.WaitForFruitToDisappear();
 
-            game.Fruits.Should().BeEmpty();
+            gameHarness.Game.Fruits.Should().BeEmpty();
         }
 
-        private async Task<Game> PlayGameUntilFruitAppears(CellLocation fruitLocation){
+        private async Task<GameHarness> PlayGameUntilFruitAppears(CellLocation fruitLocation)
+        {
             _gameSettings.Fruit = fruitLocation;
             _gameSettings.FruitAppearsAfterCoinsEaten.Add(2);
 
@@ -81,50 +78,45 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Coins.Add(_gameSettings.PacMan.Location.Left.Left);
             _gameSettings.Coins.Add(_gameSettings.PacMan.Location.FarAway());
 
-            var game = new Game(_gameClock, _gameSettings);
-            game.StartGame();
-            await game.ChangeDirection(Direction.Left);
-            await _gameClock.Tick(_now);
-            await _gameClock.Tick(_now);
+            var gameHarness = new GameHarness(_gameSettings);
+            gameHarness.StartGame();
+            await gameHarness.ChangeDirection(Direction.Left);
+            await gameHarness.EatCoin();
+            await gameHarness.EatCoin();
 
-            if (!game.Fruits.Any())
+            if (!gameHarness.Game.Fruits.Any())
             {
                 throw new Exception("Fruit should be visible");
             }
 
-            return game;
+            return gameHarness;
         }
+
         [Fact]
         public async Task PacManCanEatAFruit()
         {
-             var fruitLocation = _gameSettings.PacMan.Location.Left.Left.Left;
-            var game = await PlayGameUntilFruitAppears(fruitLocation);
+            var fruitLocation = _gameSettings.PacMan.Location.Left.Left.Left;
+            var gameHarness = await PlayGameUntilFruitAppears(fruitLocation);
 
-            var score = game.Score;
-            await _gameClock.Tick();
-            
-            game.Should().BeEquivalentTo(new {
+            var score = gameHarness.Score;
+            await gameHarness.EatFruit();
+
+            gameHarness.Game.Should().BeEquivalentTo(new
+            {
                 Fruits = new Fruit[0],
                 Score = score + 100
             });
         }
 
-
         [Fact]
         public async Task NotificationsAreRaisedWhenFruitsAreEaten()
         {
-            var game = await PlayGameUntilFruitAppears(_gameSettings.PacMan.Location.Left.Left.Left);
-            var numberOfNotificationsTriggered = 0;
-            game.Subscribe(GameNotification.EatFruit, () => numberOfNotificationsTriggered++);
-            
-             if (numberOfNotificationsTriggered != 0)
+            var gameHarness = await PlayGameUntilFruitAppears(_gameSettings.PacMan.Location.Left.Left.Left);
+
+            await gameHarness.AssertSingleNotificationFires(GameNotification.EatFruit, async () =>
             {
-                throw new Exception("No EatFruit notifications should have been triggered yet.");
-            }
-            
-            await _gameClock.Tick();
-            
-            numberOfNotificationsTriggered.Should().Be(1);
+                await gameHarness.EatFruit();
+            });
         }
 
         [Theory]
@@ -146,50 +138,45 @@ namespace NPacMan.Game.Tests.GameTests
         [InlineData(256, FruitType.Key)]
         public async Task FruitAppearsOnNextLevel(int levelNumber, FruitType expectedFruit)
         {
-            var now = DateTime.UtcNow;
-            var gameClock = new TestGameClock();
             _gameSettings.Coins.Add(_gameSettings.PacMan.Location.Left);
             _gameSettings.Coins.Add(_gameSettings.PacMan.Location.Left.Left);
             _gameSettings.FruitAppearsAfterCoinsEaten.Add(1);
-            
-            var game = new Game(gameClock, _gameSettings);
-            
-            game.StartGame();
 
-            for (var level=0; level<levelNumber-1;level++)
+            var gameHarness = new GameHarness(_gameSettings);
+            gameHarness.StartGame();
+
+            for (var level = 0; level < levelNumber - 1; level++)
             {
-                await game.ChangeDirection(Direction.Left);
-                await gameClock.Tick(now);  //Fruit appears
-                
-                await gameClock.Tick(now);  //Level completed
+                await gameHarness.ChangeDirection(Direction.Left);
+                await gameHarness.EatCoin();  //Fruit appears
 
-                if (game.Status != GameStatus.ChangingLevel)
-                {
-                    throw new Exception($"Game status should be GameStatus.ChangingLevel not {game.Status}");
-                }
+                await gameHarness.EatCoin();  //Level completed
 
-                WeExpectThat(game.PacMan).IsAt(_gameSettings.PacMan.Location.Left.Left);
+                gameHarness.EnsureGameStatus(GameStatus.ChangingLevel);
 
-                await gameClock.Tick(now.AddSeconds(7));  //Screen flashes
-                
-                WeExpectThat(game.PacMan).IsAt(_gameSettings.PacMan.Location);  
+                gameHarness.WeExpectThatPacMan().IsAt(_gameSettings.PacMan.Location.Left.Left);
+
+                await gameHarness.WaitForEndOfLevelFlashingToComplete();
+
+                gameHarness.WeExpectThatPacMan().IsAt(_gameSettings.PacMan.Location);
             }
 
-            await game.ChangeDirection(Direction.Left);
+            await gameHarness.ChangeDirection(Direction.Left);
 
-            await gameClock.Tick(now.AddSeconds(7)); // Eat coin, fruit appears
+            await gameHarness.EatCoin(); // Eat coin, fruit appears
 
-            WeExpectThat(game.PacMan).IsAt(_gameSettings.PacMan.Location.Left);
+            gameHarness.WeExpectThatPacMan().IsAt(_gameSettings.PacMan.Location.Left);
 
-            game.Should().BeEquivalentTo(new {
+            gameHarness.Game.Should().BeEquivalentTo(new
+            {
                 Level = levelNumber,
-                Fruits = new []{
+                Fruits = new[]{
                     new Fruit(_gameSettings.Fruit, expectedFruit)
                 }
             });
         }
 
-         [Theory]
+        [Theory]
         [InlineData(1, 100)]
         [InlineData(2, 300)]
         [InlineData(3, 500)]
@@ -208,48 +195,44 @@ namespace NPacMan.Game.Tests.GameTests
         [InlineData(256, 5000)]
         public async Task EatingFruitOnEveryLevel(int levelNumber, int scoreIncrement)
         {
-            var now = DateTime.UtcNow;
-            var gameClock = new TestGameClock();
             _gameSettings.Coins.Add(_gameSettings.PacMan.Location.Left);
             _gameSettings.Coins.Add(_gameSettings.PacMan.Location.Left.Left);
             _gameSettings.Fruit = _gameSettings.PacMan.Location.Left.Above;
             _gameSettings.FruitAppearsAfterCoinsEaten.Add(1);
-            
-            var game = new Game(gameClock, _gameSettings);
-            
-            game.StartGame();
 
-            for (var level=0; level<levelNumber-1;level++)
+            var gameHarness = new GameHarness(_gameSettings);
+            gameHarness.StartGame();
+
+            for (var level = 0; level < levelNumber - 1; level++)
             {
-                await game.ChangeDirection(Direction.Left);
-                await gameClock.Tick(now);  //Fruit appears
-                await gameClock.Tick(now);  //Level completed
+                await gameHarness.ChangeDirection(Direction.Left);
+                await gameHarness.EatCoin();  //Fruit appears
 
-                if (game.Status != GameStatus.ChangingLevel)
-                {
-                    throw new Exception($"Game status should be GameStatus.ChangingLevel not {game.Status}");
-                }
+                await gameHarness.EatCoin();  //Level completed
 
-                WeExpectThat(game.PacMan).IsAt(_gameSettings.PacMan.Location.Left.Left);
+                gameHarness.EnsureGameStatus(GameStatus.ChangingLevel);
 
-                await gameClock.Tick(now.AddSeconds(7));  //Screen flashes
-                
-                WeExpectThat(game.PacMan).IsAt(_gameSettings.PacMan.Location);  
+                gameHarness.WeExpectThatPacMan().IsAt(_gameSettings.PacMan.Location.Left.Left);
+
+                await gameHarness.WaitForEndOfLevelFlashingToComplete();
+
+                gameHarness.WeExpectThatPacMan().IsAt(_gameSettings.PacMan.Location);
             }
 
-            await game.ChangeDirection(Direction.Left);
+            await gameHarness.ChangeDirection(Direction.Left);
 
-            await gameClock.Tick(now.AddSeconds(7)); // Eat coin, fruit appears
+            await gameHarness.EatCoin(); // Fruit appears
 
-            WeExpectThat(game.PacMan).IsAt(_gameSettings.PacMan.Location.Left);
+            gameHarness.WeExpectThatPacMan().IsAt(_gameSettings.PacMan.Location.Left);
 
-            await game.ChangeDirection(Direction.Up);
+            await gameHarness.ChangeDirection(Direction.Up);
 
-            var score = game.Score;
+            var score = gameHarness.Score;
 
-            await gameClock.Tick(); // Eat coin, fruit appears
-            
-            game.Should().BeEquivalentTo(new {
+            await gameHarness.EatFruit();
+
+            gameHarness.Game.Should().BeEquivalentTo(new
+            {
                 Level = levelNumber,
                 Score = score + scoreIncrement
             });

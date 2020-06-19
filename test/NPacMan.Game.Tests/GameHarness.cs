@@ -1,3 +1,4 @@
+using FluentAssertions;
 using NPacMan.Game.Tests.Helpers;
 using System;
 using System.Linq;
@@ -56,15 +57,38 @@ namespace NPacMan.Game.Tests
             }
         }
 
+        public async Task EatFruit()
+        {
+            var numberOfVisibleFruits = Game.Fruits.Length;
+
+            await _gameClock.Tick(_now);
+
+            if (numberOfVisibleFruits == Game.Fruits.Length)
+            {
+                throw new Exception("Did not fruit");
+            }
+        }
+
         public async Task WaitForPauseToComplete()
         {
             _now = _now.AddSeconds(1);
             await _gameClock.Tick(_now);
         }
 
+        public async Task WaitForFruitToDisappear()
+        {
+            _now = _now.AddSeconds(_gameSettings.FruitVisibleForSeconds + 1);
+            await _gameClock.Tick(_now);
+        }
+
         public async Task WaitFourSeconds()
         {
             _now = _now.AddSeconds(4);
+            await _gameClock.Tick(_now);
+        }
+        public async Task WaitForEndOfLevelFlashingToComplete()
+        {
+            _now = _now.AddSeconds(7);
             await _gameClock.Tick(_now);
         }
 
@@ -186,6 +210,21 @@ namespace NPacMan.Game.Tests
             {
                 throw new Exception($"Game status should be {expectedStatus} not {Game.Status}");
             }
+        }
+
+        public async Task AssertSingleNotificationFires(GameNotification gameNotification, Func<Task> action)
+        {
+            var numberOfNotificationsTriggered = 0;
+            Game.Subscribe(gameNotification, () => numberOfNotificationsTriggered++);
+
+            await action();
+
+            //if (numberOfNotificationsTriggered != 1)
+            //{
+            //    throw new Exception($"A single {gameNotification} notifications should have been triggered but {numberOfNotificationsTriggered} were.");
+            //}
+
+            numberOfNotificationsTriggered.Should().Be(1);
         }
     }
 }
