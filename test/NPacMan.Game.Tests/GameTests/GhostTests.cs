@@ -657,6 +657,8 @@ namespace NPacMan.Game.Tests.GameTests
         {
             //     G
             // > .   #       G
+            //     -
+            //     H
             var ghost1 = GhostBuilder.New()
                 .WithLocation(_gameSettings.PacMan.Location.Right.Right.Above)
                 .Create();
@@ -669,59 +671,44 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Ghosts.Add(ghost2);
             _gameSettings.Walls.Add(_gameSettings.PacMan.Location.Right.Right.Right);
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Right);
+            _gameSettings.Doors.Add(ghost1.Location.Below.Below);
+            _gameSettings.GhostHouse.Add(_gameSettings.Doors.First().Below);
 
             var now = DateTime.UtcNow;
-            var game = new Game(_gameClock, _gameSettings);
-            game.StartGame();
+            var gameHarness = new GameHarness(_gameSettings);
+            gameHarness.StartGame();
+            await gameHarness.ChangeDirection(Direction.Right);
 
-            // Eat PowerPill
-            await _gameClock.Tick(now);
+            await gameHarness.EatPill();
 
-            WeExpectThat(game.Ghosts[ghost1.Name]).IsEdible();
-            WeExpectThat(game.Ghosts[ghost2.Name]).IsEdible();
+            gameHarness.WeExpectThatGhost(ghost1).IsEdible();
+            gameHarness.WeExpectThatGhost(ghost2).IsEdible();
 
-            var score = game.Score;
+            await gameHarness.EatGhost(ghost1);
 
-            await _gameClock.Tick(now);
-            await _gameClock.Tick(now);  //We eat ghost
+            gameHarness.WeExpectThatGhost(ghost1).IsNotEdible();
+            gameHarness.WeExpectThatGhost(ghost2).IsEdible();
 
+            await gameHarness.WaitForPauseToComplete();
 
-            WeExpectThat(game.Ghosts[ghost1.Name]).IsAt(_gameSettings.PacMan.Location.Right.Right.Above);
+            // Move to Ghost House
+            await gameHarness.Move();
+            await gameHarness.Move();
 
-            if (score == game.Score)
-            {
-                throw new Exception("Score should increase as ghost is eaten");
-            }
-
-            WeExpectThat(game.Ghosts[ghost1.Name]).IsNotEdible();
-            WeExpectThat(game.Ghosts[ghost2.Name]).IsEdible();
-
-            await _gameClock.Tick(now.AddSeconds(1)); //In pause
-            await game.ChangeDirection(Direction.Up);
-            if(game.PacMan.Direction != Direction.Up)
-            {
-                throw new Exception($"Direction should be Up not '{game.PacMan.Direction}'");
-            }
-
-            WeExpectThat(game.Ghosts[ghost1.Name]).IsAt(_gameSettings.PacMan.Location.Right.Right.Above);
-
-            await _gameClock.Tick(now.AddSeconds(1)); //We can move,  and go up into the ghost who is back home
+            await gameHarness.Move();
+            await gameHarness.GetEatenByGhost(ghost1);
          
+            gameHarness.EnsureGameStatus(GameStatus.Dying);
 
-            if (game.Status != GameStatus.Dying)
-                throw new Exception($"Invalid Game State {game.Status:G} Should be Dying");
+            await gameHarness.WaitToFinishDying();
+ 
+            gameHarness.EnsureGameStatus(GameStatus.Respawning);
 
-            await _gameClock.Tick(now.AddSeconds(5));
+            await gameHarness.WaitToRespawn();
 
-            if (game.Status != GameStatus.Respawning)
-                throw new Exception($"Invalid Game State {game.Status:G} Should be Respawning");
+            gameHarness.EnsureGameStatus(GameStatus.Alive);
 
-            await _gameClock.Tick(now.AddSeconds(9));
-
-            if (game.Status != GameStatus.Alive)
-                throw new Exception($"Invalid Game State {game.Status:G} Should be Alive");
-
-            game.Ghosts.Values.Should().AllBeEquivalentTo(new
+            gameHarness.Game.Ghosts.Values.Should().AllBeEquivalentTo(new
             {
                 Edible = false
             });

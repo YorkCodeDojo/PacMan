@@ -81,6 +81,18 @@ namespace NPacMan.Game.Tests
             await _gameClock.Tick(_now);
         }
 
+        public async Task WaitToFinishDying()
+        {
+            _now = _now.AddSeconds(4);
+            await _gameClock.Tick(_now);
+        }
+
+        public async Task WaitToRespawn()
+        {
+            _now = _now.AddSeconds(4);
+            await _gameClock.Tick(_now);
+        }
+
         public async Task WaitFourSeconds()
         {
             _now = _now.AddSeconds(4);
