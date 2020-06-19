@@ -6,14 +6,22 @@ namespace NPacMan.Game.GhostStrategies
     public class DirectToStrategy : IGhostStrategy
     {
         private readonly IDirectToLocation _directToLocation;
-        public DirectToStrategy(IDirectToLocation directToLocation)
+        private readonly bool _canWalkDoors;
+
+        public DirectToStrategy(IDirectToLocation directToLocation, bool canWalkDoors = false)
         {
             _directToLocation = directToLocation;
+            _canWalkDoors = canWalkDoors;
         }
         
         public Direction? GetNextDirection(Ghost ghost, Game game)
         {
-            var availableMoves = GetAvailableMovesForLocation(ghost.Location, game.Walls);
+            var placesCannotMove = game.Walls.AsEnumerable();
+            if(_canWalkDoors)
+            {
+                placesCannotMove = placesCannotMove.Except(game.Doors);
+            }
+            var availableMoves = GetAvailableMovesForLocation(ghost.Location, placesCannotMove);
                 
             availableMoves.Remove(ghost.Direction.Opposite());
 
@@ -29,7 +37,7 @@ namespace NPacMan.Game.GhostStrategies
 
         }
 
-        private List<Direction> GetAvailableMovesForLocation(CellLocation location, IReadOnlyCollection<CellLocation> walls)
+        private List<Direction> GetAvailableMovesForLocation(CellLocation location, IEnumerable<CellLocation> walls)
         {
             var result = new List<Direction>(4);
 

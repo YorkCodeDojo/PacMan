@@ -77,10 +77,11 @@ namespace NPacMan.Game
                             binder.Then(context => context.Instance.ChangeStateIn(settings.FrightenedTimeInSeconds))
                                 .TransitionTo(Frightened)),
                 When(GhostCollision)
-                    .IfElse(x => x.Data.Ghost.Edible,
-                    binder => binder.Then(context => actions.GhostEaten(context.Instance, context.Data.Ghost, game))
-                                .TransitionTo(EatingGhost),
-                    binder => binder.Then(context => actions.EatenByGhost(context.Instance))
+                    .If(x => x.Data.Ghost.Edible,
+                        binder => binder.Then(context => actions.GhostEaten(context.Instance, context.Data.Ghost, game))
+                                .TransitionTo(EatingGhost))
+                    .If(x => x.Data.Ghost.Status == GhostStatus.Alive,
+                        binder => binder.Then(context => actions.EatenByGhost(context.Instance))
                                     .TransitionTo(Dying))); 
 
 

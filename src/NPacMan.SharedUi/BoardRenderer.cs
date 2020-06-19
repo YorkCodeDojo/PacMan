@@ -182,13 +182,14 @@ namespace NPacMan.SharedUi
             }
             else
             {
-                var ghostColour = (ghost.Name, ghost.Edible) switch
+                var ghostColour = (ghost.Name, ghost.Status) switch
                 {
-                    (GhostNames.Blinky, false) => GhostColour.Red,
-                    (GhostNames.Inky, false) => GhostColour.Cyan,
-                    (GhostNames.Pinky, false) => GhostColour.Pink,
-                    (GhostNames.Clyde, false) => GhostColour.Orange,
-                    (_, true) => GhostColour.BlueFlash,
+                    (_, GhostStatus.RunningHome) => GhostColour.Eyes,
+                    (_, GhostStatus.Edible) => GhostColour.BlueFlash,
+                    (GhostNames.Blinky, _) => GhostColour.Red,
+                    (GhostNames.Inky, _) => GhostColour.Cyan,
+                    (GhostNames.Pinky, _) => GhostColour.Pink,
+                    (GhostNames.Clyde, _) => GhostColour.Orange,
                     _ => GhostColour.Red,
                 };
 

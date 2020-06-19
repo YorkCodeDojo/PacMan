@@ -46,12 +46,15 @@ namespace NPacMan.Game
             Status = ghostStatus;
             NumberOfCoinsRequiredToExitHouse = numberOfCoinsRequiredToExitHouse;
         }
-
+        private bool GhostWalkingOutOfGhostHouse(Game game)
+        {
+            return Status == GhostStatus.Alive && (game.GhostHouse.Contains(Location) || game.Doors.Contains(Location));
+        }
         internal Ghost Move(Game game, IReadOnlyGameState gameState)
         {
             if (Edible && gameState.TickCounter % 2 == 1) return this;
 
-            if (game.GhostHouse.Contains(Location) || game.Doors.Contains(Location))
+            if (GhostWalkingOutOfGhostHouse(game))
             {
                 if (game.StartingCoins.Count - game.Coins.Count >= NumberOfCoinsRequiredToExitHouse)
                 {
@@ -83,6 +86,10 @@ namespace NPacMan.Game
                 {
                     newGhostLocation = otherEndOfThePortal + newDirection;
                 }
+                if(game.GhostHouse.Contains(newGhostLocation)){
+                    return WithNewLocationAndDirection(newGhostLocation, newDirection)
+                        .WithNewStatusAndStrategy(GhostStatus.Alive, ChaseStrategy);
+                }
                 return WithNewLocationAndDirection(newGhostLocation, newDirection);
             }
             else
@@ -102,7 +109,7 @@ namespace NPacMan.Game
 
         internal Ghost SetToHome() => WithNewLocation(Home);
 
-        internal Ghost SendHome() => WithNewStatusAndStrategy(GhostStatus.RunningHome, CurrentStrategy);
+        internal Ghost SendHome() => WithNewStatusAndStrategy(GhostStatus.RunningHome, new DirectToStrategy(new DirectToGhostHouseLocation(), true));
 
         internal Ghost SetToEdible(IDirectionPicker directionPicker)
         {
@@ -110,7 +117,7 @@ namespace NPacMan.Game
             return WithNewEdibleAndDirectionAndStrategy(GhostStatus.Edible, Direction.Opposite(), strategy);
         }
 
-        internal Ghost SetToNotEdible() => WithNewEdibleAndDirectionAndStrategy(GhostStatus.Alive, Direction, ChaseStrategy);
+        internal Ghost  SetToNotEdible() => WithNewEdibleAndDirectionAndStrategy(GhostStatus.Alive, Direction, ChaseStrategy);
 
         internal Ghost SetToScore() => WithNewStatusAndStrategy(GhostStatus.Score, ChaseStrategy);
 

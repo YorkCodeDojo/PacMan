@@ -104,7 +104,7 @@ namespace NPacMan.Game
         internal void GhostEaten(GameState gameState, Ghost ghost, Game game)
         {
             IncreaseScoreAfterEatingGhost(gameState, game);
-            SendGhostHome(gameState, ghost);
+            gameState.ApplyToGhost(ghost => ghost.SetToScore(), ghost);
             _gameNotifications.Publish(GameNotification.EatGhost);
         }
 
@@ -212,11 +212,6 @@ namespace NPacMan.Game
 
         private void MovePacManHome(GameState gameState) => gameState.ReplacePacMan(_gameSettings.PacMan);
 
-        private void SendGhostHome(GameState gameState, Ghost ghostToUpdate)
-        {
-            gameState.ApplyToGhost(ghost => ghost.SetToScore(), ghostToUpdate);
-            gameState.ApplyToGhost(ghost => ghost.SetToHome(), ghostToUpdate);
-        }
 
         public void SendGhostHome1(GameState gameState)
         {
