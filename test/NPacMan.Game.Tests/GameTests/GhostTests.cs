@@ -578,68 +578,6 @@ namespace NPacMan.Game.Tests.GameTests
 
 
         [Fact]
-        public async Task TheEdibleGhostReturnsToStrategyAfterBeingEaten()
-        {
-            var ghostStart1 = _gameSettings.PacMan.Location.Above.Above.Left;
-            var ghost1 = GhostBuilder.New()
-                .WithLocation(ghostStart1)
-                .Create();
-            _gameSettings.Ghosts.Add(ghost1);
-
-            _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Above);
-
-            // . . .
-            // . G .
-            // . . *
-            // . . V
-
-            var game = new Game(_gameClock, _gameSettings);
-            game.StartGame();
-
-            await game.ChangeDirection(Direction.Up);
-
-            var now = DateTime.UtcNow;
-            await _gameClock.Tick(now);
-
-            // . . .
-            // . G .
-            // . . V
-
-            WeExpectThat(game.PacMan).IsAt(_gameSettings.PacMan.Location.Above);
-            WeExpectThat(game.Ghosts[ghost1.Name]).IsAt(ghostStart1);
-
-            await _gameClock.Tick(now);
-
-            // . . .
-            // . . GV
-
-            // Perhaps . G V ????
-
-            WeExpectThat(game.PacMan).IsAt(_gameSettings.PacMan.Location.Above.Above);
-            WeExpectThat(game.Ghosts[ghost1.Name]).IsAt(ghostStart1);
-
-            await _gameClock.Tick(now.AddSeconds(1));
-            
-            WeExpectThat(game.PacMan).IsAt(_gameSettings.PacMan.Location.Above.Above);
-            WeExpectThat(game.Ghosts[ghost1.Name]).IsAt(ghostStart1);
-            
-            await _gameClock.Tick(now.AddSeconds(1));
-
-            // . . V
-            // . G .
-            // . . .
-
-            WeExpectThat(game.PacMan).IsAt(_gameSettings.PacMan.Location.Above.Above.Above);
-
-            using var _ = new AssertionScope();
-            game.Ghosts[ghost1.Name].Should().BeEquivalentTo(new
-            {
-                Location = ghostStart1
-            });
-        }
-
-
-        [Fact]
         public async Task GhostsShouldStandStillInGhostHouse()
         {
             var ghostStart1 = _gameSettings.PacMan.Location.FarAway();
