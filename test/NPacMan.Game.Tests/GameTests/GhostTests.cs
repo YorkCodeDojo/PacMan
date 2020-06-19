@@ -436,57 +436,6 @@ namespace NPacMan.Game.Tests.GameTests
         }
 
         [Fact]
-        public async Task GhostsGoHomeAfterCollidesWithPacManAfterEatingPowerPill()
-        {
-            var ghostStart1and3 = _gameSettings.PacMan.Location.Left.Left.Left;
-            var ghostStart2 = ghostStart1and3.Below;
-            var haunt1 = GhostBuilder.New()
-                .WithLocation(ghostStart1and3)
-                .WithChaseStrategyRight()
-                .CreateMany(2);
-            var haunt2 = GhostBuilder.New()
-                .WithLocation(ghostStart2)
-                .WithChaseStrategyRight()
-                .CreateMany(1);
-
-            _gameSettings.Ghosts.AddRange(haunt1.Concat(haunt2));
-
-            _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Left);
-
-            var game = new Game(_gameClock, _gameSettings);
-            game.StartGame();
-
-            await game.ChangeDirection(Direction.Left);
-
-            var now = DateTime.UtcNow;
-            await _gameClock.Tick(now);
-
-            WeExpectThat(game.PacMan).IsAt(_gameSettings.PacMan.Location.Left);
-            foreach (var g in haunt1)
-            {
-                WeExpectThat(game.Ghosts[g.Name]).IsAt(ghostStart1and3.Right);
-            }
-
-            await _gameClock.Tick(now);
-            WeExpectThat(game.PacMan).IsAt(_gameSettings.PacMan.Location.Left.Left);
-
-            game.Ghosts[haunt1[0].Name].Should().BeEquivalentTo(new
-            {
-                Location = ghostStart1and3
-            });
-
-            game.Ghosts[haunt2.First().Name].Should().NotBeEquivalentTo(new
-            {
-                Location = ghostStart2
-            });
-
-            game.Ghosts[haunt1[1].Name].Should().BeEquivalentTo(new
-            {
-                Location = ghostStart1and3
-            });
-        }
-
-        [Fact]
         public async Task TheEdibleGhostBecomesNonEdibleAfterBeingEaten()
         {
             var ghostStart1 = _gameSettings.PacMan.Location.Left.Left.Left;
