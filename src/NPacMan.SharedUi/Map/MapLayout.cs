@@ -72,7 +72,7 @@ namespace NPacMan.SharedUi.Map
         {
             // Populate the map matrix from the given list of walls
             
-            foreach (var item in game.Walls)
+            foreach (var item in game.WallsAndDoors)
             {
                 var x = item.X + 1;
                 var y = item.Y + 1;

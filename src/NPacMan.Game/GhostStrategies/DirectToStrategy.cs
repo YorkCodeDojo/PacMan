@@ -16,7 +16,7 @@ namespace NPacMan.Game.GhostStrategies
         
         public Direction? GetNextDirection(Ghost ghost, Game game)
         {
-            var placesCannotMove = game.Walls.AsEnumerable();
+            var placesCannotMove = game.WallsAndDoors.AsEnumerable();
             if(_canWalkDoors)
             {
                 placesCannotMove = placesCannotMove.Except(game.Doors);

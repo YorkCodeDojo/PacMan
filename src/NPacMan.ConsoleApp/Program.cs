@@ -132,7 +132,7 @@ namespace NPacMan.ConsoleApp
                 return;
             
             Console.ForegroundColor = ConsoleColor.Blue;
-            foreach (var wall in game.Walls)
+            foreach (var wall in game.WallsAndDoors)
             {
                 Console.SetCursorPosition(wall.X, wall.Y);
                 Console.Write("#");

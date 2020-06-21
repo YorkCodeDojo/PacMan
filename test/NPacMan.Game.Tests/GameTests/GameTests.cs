@@ -67,7 +67,7 @@ namespace NPacMan.Game.Tests.GameTests
 
             var game = new Game(_gameClock, _gameSettings);
 
-            game.Walls.Should().BeEquivalentTo(new CellLocation[] {
+            game.WallsAndDoors.Should().BeEquivalentTo(new CellLocation[] {
                 (1,1),
                 (1,2),
                 (1,3),
