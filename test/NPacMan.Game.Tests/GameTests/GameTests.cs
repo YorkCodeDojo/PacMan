@@ -76,6 +76,22 @@ namespace NPacMan.Game.Tests.GameTests
         }
 
         [Fact]
+        public void WallsShouldNotContainDoors()
+        {
+            _gameSettings.Doors.Add((1, 1));
+            _gameSettings.Doors.Add((1, 2));
+            _gameSettings.Walls.Add((1, 3));
+            _gameSettings.Walls.Add((1, 4));
+
+            var game = new Game(_gameClock, _gameSettings);
+
+            game.Walls.Should().BeEquivalentTo(new CellLocation[] {
+                (1,3),
+                (1,4)
+            });
+        }
+
+        [Fact]
         public async Task BeforeATickIfProcessedTheGameNotificationShouldFire()
         {
             var numberOfNotificationsTriggered = 0;
