@@ -356,14 +356,14 @@ namespace NPacMan.Game.Tests
         {
             if (_createDebugFile)
             {
-                File.AppendAllText(_debugFilePath, $"PacMan : {Game.PacMan.Location} facing {Game.PacMan.Direction}" + System.Environment.NewLine);
+                File.AppendAllText(_debugFilePath, $"PacMan is at {Game.PacMan.Location} facing {Game.PacMan.Direction}" + System.Environment.NewLine);
 
                 foreach (var ghost in Game.Ghosts.Values)
                 {
-                    File.AppendAllText(_debugFilePath, $"{ghost.Name} : {ghost.Location} facing {ghost.Direction} with status {ghost.Status}" + System.Environment.NewLine);
+                    File.AppendAllText(_debugFilePath, $"{ghost.Name} is at {ghost.Location} facing {ghost.Direction} with status {ghost.Status}" + System.Environment.NewLine);
                 }
 
-                File.AppendAllText(_debugFilePath, "".PadLeft(50, '-') + System.Environment.NewLine + System.Environment.NewLine);
+                File.AppendAllText(_debugFilePath,System.Environment.NewLine + "".PadLeft(50, '-') +  System.Environment.NewLine);
             }
         }
     }
