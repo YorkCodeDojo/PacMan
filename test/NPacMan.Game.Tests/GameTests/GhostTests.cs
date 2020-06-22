@@ -964,7 +964,7 @@ namespace NPacMan.Game.Tests.GameTests
             await gameHarness.WaitForPauseToComplete();
             await gameHarness.Move();
             await gameHarness.Move();
-            await gameHarness.WaitForFrightenedTimeToComplete();
+            await gameHarness.Move();
             await gameHarness.Move();
             await gameHarness.Move();
             await gameHarness.Move();
@@ -977,9 +977,52 @@ namespace NPacMan.Game.Tests.GameTests
             gameHarness.Game.Ghosts[ghost1.Name].Location.Should().Be(ghostHouse);
         }
 
+        [Fact]
+        public async Task GhostShouldStillGetToTheHouseAfterTransitions()
+        {
+            //     P     
+            //   . *   
+            // G . . . . . .
+            //             H
+            var ghostStart1 = _gameSettings.PacMan.Location.Below.Below.Left.Left;
+            var ghost1 = GhostBuilder.New()
+                .WithLocation(ghostStart1)
+                .WithChaseStrategyRight()
+                .Create();
+
+            var ghostHouse = ghostStart1.Right.Right.Right.Right.Right.Right.Below;
+            _gameSettings.GhostHouse.Add(ghostHouse);
+
+            _gameSettings.Ghosts.Add(ghost1);
+
+            _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Below);
+
+            var gameHarness = new GameHarness(_gameSettings);
+            gameHarness.Game.StartGame();
+
+            await gameHarness.ChangeDirection(Direction.Down);
+            await gameHarness.EatPill();
+
+            gameHarness.WeExpectThatPacMan().IsAt(_gameSettings.PacMan.Location.Below);
+            gameHarness.WeExpectThatGhost(ghost1).IsAt(ghostStart1.Right);
+
+            await gameHarness.EatGhost(ghost1);
+            gameHarness.WeExpectThatPacMan().IsAt(_gameSettings.PacMan.Location.Below.Below);
+
+            await gameHarness.WaitForPauseToComplete();
+            await gameHarness.Move();
+            await gameHarness.WaitForFrightenedTimeToComplete();
+            await gameHarness.WaitForScatterToComplete();
+            await gameHarness.Move();
+            await gameHarness.Move();
+
+            using var _ = new AssertionScope();
+            gameHarness.Game.Ghosts[ghost1.Name].Status.Should().Be(GhostStatus.Alive);
+            gameHarness.Game.Ghosts[ghost1.Name].Location.Should().Be(ghostHouse);
+        }
 
         [Fact]
-        public async Task GhostShouldNotTransitionWhenInRunningHome()
+        public async Task GhostShouldNotTransitionToEdibleWhenInRunningHome()
         {
             //      P     
             //   .  *          
@@ -998,7 +1041,7 @@ namespace NPacMan.Game.Tests.GameTests
 
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Below);
 
-            var gameHarness = new GameHarness(_gameSettings, @"c:\temp\GhostShouldNotTransitionWhenInRunningHome.txt");
+            var gameHarness = new GameHarness(_gameSettings);
             gameHarness.Game.StartGame();
 
             await gameHarness.ChangeDirection(Direction.Down);

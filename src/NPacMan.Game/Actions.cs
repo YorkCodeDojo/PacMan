@@ -138,7 +138,8 @@ namespace NPacMan.Game
 
         internal void GhostToChase(GameState gameState)
         {
-            gameState.ApplyToGhosts(ghost => ghost.Chase());
+            var ghostsToChase = gameState.Ghosts.Values.Where(x => x.Status == GhostStatus.Alive);
+            gameState.ApplyToGhosts(ghost => ghost.Chase(), ghostsToChase);
         }
 
         internal void MakeGhostsNotEdible(GameState gameState)
