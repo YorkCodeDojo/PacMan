@@ -173,6 +173,28 @@ namespace NPacMan.Game.Tests
             WriteBoard();
         }
 
+        internal async Task WaitForScatterToComplete()
+        {
+            WriteHeading("WaitForScatterToComplete");
+
+            _now = _now.AddSeconds(_gameSettings.InitialScatterTimeInSeconds + 1);
+
+            await _gameClock.Tick(_now);
+
+            WriteBoard();
+        }
+
+        internal async Task WaitForChaseToComplete()
+        {
+            WriteHeading("WaitForChaseToComplete");
+
+            _now = _now.AddSeconds(_gameSettings.ChaseTimeInSeconds + 1);
+
+            await _gameClock.Tick(_now);
+
+            WriteBoard();
+        }
+
         internal async Task WaitFor(TimeSpan delay)
         {
             WriteHeading("WaitFor");
@@ -295,6 +317,8 @@ namespace NPacMan.Game.Tests
                 WriteAndThrowException($"Direction not changed to {newDirection} it's {Game.PacMan.Direction}");
             }
         }
+
+
 
         public async Task PressStart()
         {
