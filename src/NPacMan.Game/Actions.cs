@@ -39,7 +39,7 @@ namespace NPacMan.Game
         {
             MovePacManHome(gameState);
             MoveGhostsHome(gameState);
-            MakeGhostsNotEdible(gameState);
+            ResetAllGhosts(gameState);
             gameState.ShowGhosts();
             gameState.ReplaceCoins(_gameSettings.Coins);
             gameState.ReplacePowerPills(_gameSettings.PowerPills);
@@ -53,7 +53,7 @@ namespace NPacMan.Game
 
         internal void CompleteRespawning(GameState gameState)
         {
-            MakeGhostsNotEdible(gameState);
+            ResetAllGhosts(gameState);
             MoveGhostsHome(gameState);
             MovePacManHome(gameState);
             gameState.ShowGhosts();
@@ -142,10 +142,16 @@ namespace NPacMan.Game
             gameState.ApplyToGhosts(ghost => ghost.Chase(), ghostsToChase);
         }
 
-        internal void MakeGhostsNotEdible(GameState gameState)
+        internal void ResetAllGhosts(GameState gameState)
         {
-            var edibleGhosts = gameState.Ghosts.Values.Where(g => g.Edible);
-            gameState.ApplyToGhosts(ghost => ghost.SetToNotEdible(), edibleGhosts);
+            var edibleGhosts = gameState.Ghosts.Values.Where(x => x.Status == GhostStatus.Edible);
+            gameState.ApplyToGhosts(ghost => ghost.SetToAlive(), edibleGhosts);
+        }
+
+        internal void MakeGhostsNotFrightened(GameState gameState)
+        {
+            var edibleGhosts = gameState.Ghosts.Values.Where(x => x.Status == GhostStatus.Edible);
+            gameState.ApplyToGhosts(ghost => ghost.SetToAlive(), edibleGhosts);
         }
 
         internal async Task MovePacMan(Game game, GameState gameState, BehaviorContext<GameState, Tick> context, GameStateMachine gameStateMachine)
@@ -206,11 +212,6 @@ namespace NPacMan.Game
             var increaseInScore = (int)Math.Pow(2, numberOfInEdibleGhosts) * 200;
             gameState.RecordPointsForEatingLastGhost(increaseInScore);
             IncreaseScoreAndCheckForBonusLife(gameState, increaseInScore);
-        }
-
-        private void MakeGhostNotEdible(GameState gameState, Ghost ghostToUpdate)
-        {
-            gameState.ApplyToGhost(ghost => ghost.SetToNotEdible(), ghostToUpdate);
         }
 
         private void MovePacManHome(GameState gameState) => gameState.ReplacePacMan(_gameSettings.PacMan);

@@ -54,7 +54,7 @@ namespace NPacMan.Game
 
             During(Frightened,
                 When(Tick, context => context.Data.Now >= context.Instance.TimeToChangeState)
-                    .Then(context => actions.MakeGhostsNotEdible(context.Instance))
+                    .Then(context => actions.MakeGhostsNotFrightened(context.Instance))
                     .TransitionTo(Scatter));
 
             During(Scatter, GhostChase, Frightened,

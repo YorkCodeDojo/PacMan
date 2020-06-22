@@ -117,7 +117,7 @@ namespace NPacMan.Game
             return WithNewEdibleAndDirectionAndStrategy(GhostStatus.Edible, Direction.Opposite(), strategy);
         }
 
-        internal Ghost  SetToNotEdible() => WithNewEdibleAndDirectionAndStrategy(GhostStatus.Alive, Direction, ChaseStrategy);
+        internal Ghost  SetToAlive() => WithNewEdibleAndDirectionAndStrategy(GhostStatus.Alive, Direction, ChaseStrategy);
 
         internal Ghost SetToScore() => WithNewStatusAndStrategy(GhostStatus.Score, ChaseStrategy);
 
