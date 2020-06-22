@@ -144,8 +144,7 @@ namespace NPacMan.Game
 
         internal void ResetAllGhosts(GameState gameState)
         {
-            var edibleGhosts = gameState.Ghosts.Values.Where(x => x.Status == GhostStatus.Edible);
-            gameState.ApplyToGhosts(ghost => ghost.SetToAlive(), edibleGhosts);
+            gameState.ApplyToGhosts(ghost => ghost.SetToAlive());
         }
 
         internal void MakeGhostsNotFrightened(GameState gameState)

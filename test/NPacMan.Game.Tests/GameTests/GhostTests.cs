@@ -1060,5 +1060,59 @@ namespace NPacMan.Game.Tests.GameTests
             using var _ = new AssertionScope();
             gameHarness.Game.Ghosts[ghost1.Name].Status.Should().Be(GhostStatus.RunningHome);
         }
+
+         [Fact]
+        public async Task GhostNotBeRunningHomeAfterPacManDiesAndGameResets()
+        {
+            //       P     
+            //     . *          
+            // G G . .                H  
+            //                 
+            var ghostStart1 = _gameSettings.PacMan.Location.Below.Below.Left.Left;
+            var ghost1 = GhostBuilder.New()
+                .WithLocation(ghostStart1)
+                .WithChaseStrategyRight()
+                .Create();
+            var killerGhost = GhostBuilder.New()
+                .WithLocation(ghostStart1.Left)
+                .WithChaseStrategyRight()
+                .WithScatterTarget(ghostStart1.Right.Right.Right)
+                .WithDirection(Direction.Right)
+                .Create();
+
+            _gameSettings.Walls.Add(_gameSettings.PacMan.Location.Below.Below.Below);
+
+            _gameSettings.GhostHouse.Add(_gameSettings.PacMan.Location.FarAway());
+
+            _gameSettings.Ghosts.Add(ghost1);
+            _gameSettings.Ghosts.Add(killerGhost);
+
+            _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Below);
+
+            var gameHarness = new GameHarness(_gameSettings, @"c:\temp\GhostNotBeRunningHomeAfterPacManDiesAndGameResets.txt");
+            gameHarness.Game.StartGame();
+
+            await gameHarness.ChangeDirection(Direction.Down);
+            await gameHarness.EatPill();
+
+            gameHarness.WeExpectThatPacMan().IsAt(_gameSettings.PacMan.Location.Below);
+            gameHarness.WeExpectThatGhost(ghost1).IsAt(ghostStart1.Right);
+
+            await gameHarness.EatGhost(ghost1);
+            gameHarness.WeExpectThatPacMan().IsAt(_gameSettings.PacMan.Location.Below.Below);
+
+            await gameHarness.WaitForPauseToComplete();
+            await gameHarness.WaitForFrightenedTimeToComplete();
+            await gameHarness.Move();
+            await gameHarness.GetEatenByGhost(killerGhost);
+
+            await gameHarness.WaitToFinishDying();
+            await gameHarness.WaitToRespawn();
+
+            using var _ = new AssertionScope();
+            gameHarness.Game.Ghosts.Values
+                .Select(x => x.Status)
+                .Should().AllBeEquivalentTo(GhostStatus.Alive);
+        }
     }
 }
