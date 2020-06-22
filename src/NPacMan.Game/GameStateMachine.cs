@@ -127,8 +127,6 @@ namespace NPacMan.Game
                     .Then(context => actions.CompleteRespawning(context.Instance))
                     .TransitionTo(Scatter));
 
-            During(AttractMode, Ignore(Tick));
-
             During(EatingGhost,
                     Ignore(PlayersWishesToChangeDirection),
                     Ignore(CoinCollision),

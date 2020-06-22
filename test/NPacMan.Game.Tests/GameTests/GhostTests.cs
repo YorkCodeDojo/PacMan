@@ -181,7 +181,8 @@ namespace NPacMan.Game.Tests.GameTests
             var gameHarness = new GameHarness(_gameSettings);
             gameHarness.Game.StartGame();
 
-            await gameHarness.NOP();            // TODO: THIS DOESN'T SEEM CORRECT!
+            // We need to set the last tick because we've forced AttractMode.
+            await gameHarness.NOP();
             await gameHarness.PressStart();
 
             await gameHarness.Move();
@@ -220,7 +221,9 @@ namespace NPacMan.Game.Tests.GameTests
 
             var gameHarness = new GameHarness(_gameSettings);
             gameHarness.Game.StartGame();
-            await gameHarness.NOP();               // TODO: THIS DOESN'T SEEM CORRECT!
+             
+            // We need to set the last tick because we've forced AttractMode.
+            await gameHarness.NOP();
             await gameHarness.PressStart();
 
             gameHarness.WeExpectThatGhost(ghost).IsAt(startingLocation);
