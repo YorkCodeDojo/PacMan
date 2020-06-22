@@ -964,10 +964,11 @@ namespace NPacMan.Game.Tests.GameTests
             await gameHarness.WaitForPauseToComplete();
             await gameHarness.Move();
             await gameHarness.Move();
+            await gameHarness.WaitForFrightenedTimeToComplete();
             await gameHarness.Move();
             await gameHarness.Move();
             await gameHarness.Move();
-            await gameHarness.Move();
+
             gameHarness.WeExpectThatGhost(ghost1).IsAt(topLeftWall.Right);
             await gameHarness.Move();
 

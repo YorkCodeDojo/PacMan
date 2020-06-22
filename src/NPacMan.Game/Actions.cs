@@ -132,7 +132,8 @@ namespace NPacMan.Game
 
         internal void ScatterGhosts(GameState gameState)
         {
-            gameState.ApplyToGhosts(ghost => ghost.Scatter());
+            var ghostsToScatter = gameState.Ghosts.Values.Where(x => x.Status == GhostStatus.Alive);
+            gameState.ApplyToGhosts(ghost => ghost.Scatter(), ghostsToScatter);
         }
 
         internal void GhostToChase(GameState gameState)
