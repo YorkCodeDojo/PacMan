@@ -145,7 +145,7 @@ namespace NPacMan.Game.Tests.GameTests
             var gameHarness = new GameHarness(_gameSettings);
             gameHarness.Game.StartGame();
 
-            await gameHarness.NOP();            // TODO: THIS DOESN'T SEEM CORRECT!
+            await gameHarness.WaitAndEnterAttractMode();
 
             await gameHarness.PressStart();
             await gameHarness.Move();
