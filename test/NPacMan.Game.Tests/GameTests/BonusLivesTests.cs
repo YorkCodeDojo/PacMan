@@ -9,14 +9,12 @@ namespace NPacMan.Game.Tests.GameTests
 {
     public class BonusLivesTests
     {
-        private readonly DateTime _now;
         private readonly TestGameClock _gameClock;
         
         private int _numberOfNotificationsTriggered;
 
         public BonusLivesTests()
         {
-            _now = DateTime.UtcNow;
             _gameClock = new TestGameClock();
             _numberOfNotificationsTriggered = 0;
         }
