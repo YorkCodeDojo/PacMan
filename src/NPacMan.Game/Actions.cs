@@ -142,7 +142,8 @@ namespace NPacMan.Game
 
         internal void MakeGhostsNotEdible(GameState gameState)
         {
-            gameState.ApplyToGhosts(ghost => ghost.SetToNotEdible());
+            var edibleGhosts = gameState.Ghosts.Values.Where(g => g.Edible);
+            gameState.ApplyToGhosts(ghost => ghost.SetToNotEdible(), edibleGhosts);
         }
 
         internal async Task MovePacMan(Game game, GameState gameState, BehaviorContext<GameState, Tick> context, GameStateMachine gameStateMachine)

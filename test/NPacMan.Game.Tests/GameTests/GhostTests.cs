@@ -949,7 +949,7 @@ namespace NPacMan.Game.Tests.GameTests
 
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Below);
 
-            var gameHarness = new GameHarness(_gameSettings, @"c:\temp\debug.txt");
+            var gameHarness = new GameHarness(_gameSettings);
             gameHarness.Game.StartGame();
 
             await gameHarness.ChangeDirection(Direction.Down);
@@ -974,6 +974,47 @@ namespace NPacMan.Game.Tests.GameTests
             using var _ = new AssertionScope();
             gameHarness.Game.Ghosts[ghost1.Name].Status.Should().Be(GhostStatus.Alive);
             gameHarness.Game.Ghosts[ghost1.Name].Location.Should().Be(ghostHouse);
+        }
+
+
+        [Fact]
+        public async Task GhostShouldNotTransitionWhenInRunningHome()
+        {
+            //      P     
+            //   .  *          
+            // G .  .                H  
+            //                 
+            var ghostStart1 = _gameSettings.PacMan.Location.Below.Below.Left.Left;
+            var ghost1 = GhostBuilder.New()
+                .WithLocation(ghostStart1)
+                .WithChaseStrategyRight()
+                .Create();
+
+
+            _gameSettings.GhostHouse.Add(_gameSettings.PacMan.Location.FarAway());
+
+            _gameSettings.Ghosts.Add(ghost1);
+
+            _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Below);
+
+            var gameHarness = new GameHarness(_gameSettings, @"c:\temp\GhostShouldNotTransitionWhenInRunningHome.txt");
+            gameHarness.Game.StartGame();
+
+            await gameHarness.ChangeDirection(Direction.Down);
+            await gameHarness.EatPill();
+
+            gameHarness.WeExpectThatPacMan().IsAt(_gameSettings.PacMan.Location.Below);
+            gameHarness.WeExpectThatGhost(ghost1).IsAt(ghostStart1.Right);
+
+            await gameHarness.EatGhost(ghost1);
+            gameHarness.WeExpectThatPacMan().IsAt(_gameSettings.PacMan.Location.Below.Below);
+
+            await gameHarness.WaitForPauseToComplete();
+            await gameHarness.Move();
+            await gameHarness.WaitForFrightenedTimeToComplete();
+
+            using var _ = new AssertionScope();
+            gameHarness.Game.Ghosts[ghost1.Name].Status.Should().Be(GhostStatus.RunningHome);
         }
     }
 }
