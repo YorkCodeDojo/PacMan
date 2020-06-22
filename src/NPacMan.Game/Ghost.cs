@@ -86,7 +86,7 @@ namespace NPacMan.Game
                 {
                     newGhostLocation = otherEndOfThePortal + newDirection;
                 }
-                if(game.GhostHouse.Contains(newGhostLocation)){
+                if(game.GhostHouseMiddle == newGhostLocation) {
                     return WithNewLocationAndDirection(newGhostLocation, newDirection)
                         .WithNewStatusAndStrategy(GhostStatus.Alive, ChaseStrategy);
                 }

@@ -34,6 +34,15 @@ namespace NPacMan.Game
             WallsAndDoors = _settings.Walls.Union(_settings.Doors).ToList().AsReadOnly();
             Walls= _settings.Walls;
             _fruitForLevel = new[] { new Fruit(_settings.Fruit, FruitType.Cherry) };
+            GhostHouseMiddle = CalculateMiddleOfGhostHouse(settings.GhostHouse);
+        }
+
+        private CellLocation CalculateMiddleOfGhostHouse(IReadOnlyCollection<CellLocation> ghostHouse)
+        {
+            var middleX = (int)ghostHouse.Average(x => x.X);
+            var middleY = (int)ghostHouse.Average(x => x.Y);
+            
+            return (middleX, middleY);
         }
 
         public Game StartGame()
@@ -78,6 +87,8 @@ namespace NPacMan.Game
 
         public IReadOnlyCollection<CellLocation> GhostHouse
             => _settings.GhostHouse;
+
+        internal CellLocation GhostHouseMiddle { get; }
 
         public int Width
             => _settings.Width;

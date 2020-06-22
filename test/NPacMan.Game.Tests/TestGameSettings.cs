@@ -38,7 +38,7 @@ namespace NPacMan.Game.Tests
 
 
         public List<CellLocation> GhostHouse { get; set; }
-            = new List<CellLocation>();
+            = new List<CellLocation>(){new CellLocation(100, 100)};
             
         IReadOnlyCollection<CellLocation> IGameSettings.GhostHouse
             => this.GhostHouse;

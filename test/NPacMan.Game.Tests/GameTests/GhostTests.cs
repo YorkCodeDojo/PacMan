@@ -649,6 +649,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Walls.Add(_gameSettings.PacMan.Location.Right.Right.Right);
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Right);
             _gameSettings.Doors.Add(ghost1.Location.Below.Below);
+            _gameSettings.GhostHouse.Clear();
             _gameSettings.GhostHouse.Add(_gameSettings.Doors.First().Below);
 
             var now = DateTime.UtcNow;
@@ -942,6 +943,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Doors.Add(topLeftWall.Right.Right);
 
             var ghostHouse = topLeftWall.Below.Right;
+            _gameSettings.GhostHouse.Clear();
             _gameSettings.GhostHouse.Add(ghostHouse);
             _gameSettings.GhostHouse.Add(topLeftWall.Below.Right.Right);
 
@@ -976,6 +978,91 @@ namespace NPacMan.Game.Tests.GameTests
             gameHarness.Game.Ghosts[ghost1.Name].Status.Should().Be(GhostStatus.Alive);
             gameHarness.Game.Ghosts[ghost1.Name].Location.Should().Be(ghostHouse);
         }
+        
+        private void CreateRow(string definition, CellLocation startingFrom)
+        {
+            var currentCell = startingFrom;
+            foreach (var c in definition)
+            {
+                switch (c)
+                {
+                    case '#':
+                        _gameSettings.Walls.Add(currentCell);
+                        break;
+                    case '-':
+                        _gameSettings.Doors.Add(currentCell);
+                        break;                        
+                    case 'H':
+                        _gameSettings.GhostHouse.Add(currentCell);
+                        break;                                                
+                }
+                currentCell=currentCell.Right;
+            }
+        }
+
+        [Fact]
+        public async Task GhostShouldBeInMiddleOfHouseAfterBeingEatingAndWaitingForElapsedTime()
+        {
+            //      P        
+            //   .  *   # # - - # #
+            // G .  .   # H H H H #
+            //          # H H H H #
+            //          # H H H H #
+            //          # # # # # #
+            var ghostStart1 = _gameSettings.PacMan.Location.Below.Below.Left.Left;
+            var ghost1 = GhostBuilder.New()
+                .WithLocation(ghostStart1)
+                .WithChaseStrategyRight()
+                .Create();
+
+            var ghostHouse = _gameSettings.PacMan.Location.Right.Right.Below;
+            _gameSettings.GhostHouse.Clear();
+            CreateRow("##--##", ghostHouse);
+            CreateRow("#HHHH#", ghostHouse.Below);
+            CreateRow("#HHHH#", ghostHouse.Below.Below);
+            CreateRow("#HHHH#", ghostHouse.Below.Below.Below);
+            CreateRow("######", ghostHouse.Below.Below.Below.Below);
+                      
+            _gameSettings.Ghosts.Add(ghost1);
+
+            _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Below);
+
+            var gameHarness = new GameHarness(_gameSettings, @"c:\temp\GhostShouldBeInTheHouseAfterBeingEatingAndWaitingForElapsedTime2.txt");
+            gameHarness.Game.StartGame();
+
+            await gameHarness.ChangeDirection(Direction.Down);
+            await gameHarness.EatPill();
+
+            gameHarness.WeExpectThatPacMan().IsAt(_gameSettings.PacMan.Location.Below);
+            gameHarness.WeExpectThatGhost(ghost1).IsAt(ghostStart1.Right);
+
+            await gameHarness.EatGhost(ghost1);
+            gameHarness.WeExpectThatPacMan().IsAt(_gameSettings.PacMan.Location.Below.Below);
+
+            await gameHarness.WaitForPauseToComplete();
+            await gameHarness.Move();
+            await gameHarness.Move();
+            await gameHarness.Move();
+            await gameHarness.Move();
+            await gameHarness.Move();
+            await gameHarness.Move();
+            await gameHarness.Move();
+
+            gameHarness.WeExpectThatGhost(ghost1).IsAt(ghostHouse.Right.Right);
+            await gameHarness.Move();
+            await gameHarness.Move();
+
+            using var _ = new AssertionScope();
+            gameHarness.Game.Ghosts[ghost1.Name].Status.Should().Be(GhostStatus.Alive);
+
+            var possibleGhostLocations = new [] {
+                ghostHouse.Right.Right.Below.Below,
+                ghostHouse.Right.Right.Below.Below.Right
+            };
+
+            gameHarness.Game.Ghosts.Values.Select(x => x.Location)
+                .Should().BeSubsetOf(possibleGhostLocations);
+        }
 
         [Fact]
         public async Task GhostShouldStillGetToTheHouseAfterTransitions()
@@ -991,6 +1078,7 @@ namespace NPacMan.Game.Tests.GameTests
                 .Create();
 
             var ghostHouse = ghostStart1.Right.Right.Right.Right.Right.Right.Below;
+            _gameSettings.GhostHouse.Clear();
             _gameSettings.GhostHouse.Add(ghostHouse);
 
             _gameSettings.Ghosts.Add(ghost1);
