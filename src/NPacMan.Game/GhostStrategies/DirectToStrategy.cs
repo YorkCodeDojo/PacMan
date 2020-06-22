@@ -6,33 +6,31 @@ namespace NPacMan.Game.GhostStrategies
     public class DirectToStrategy : IGhostStrategy
     {
         private readonly IDirectToLocation _directToLocation;
-        private readonly bool _canWalkDoors;
+        private readonly bool _allowGhostsToWalkThroughDoors;
 
-        public DirectToStrategy(IDirectToLocation directToLocation, bool canWalkDoors = false)
+        public DirectToStrategy(IDirectToLocation directToLocation, bool allowGhostsToWalkThroughDoors = false)
         {
             _directToLocation = directToLocation;
-            _canWalkDoors = canWalkDoors;
+            _allowGhostsToWalkThroughDoors = allowGhostsToWalkThroughDoors;
         }
-        
+
         public Direction? GetNextDirection(Ghost ghost, Game game)
         {
-            var placesCannotMove = game.Walls.AsEnumerable();
-            if(_canWalkDoors)
-            {
-                placesCannotMove = placesCannotMove.Except(game.Doors);
-            }
-            var availableMoves = GetAvailableMovesForLocation(ghost.Location, placesCannotMove);
-                
+            var placesGhostsCannotMove = _allowGhostsToWalkThroughDoors
+                                          ? game.Walls : game.WallsAndDoors;
+
+            var availableMoves = GetAvailableMovesForLocation(ghost.Location, placesGhostsCannotMove);
+
             availableMoves.Remove(ghost.Direction.Opposite());
 
             if (availableMoves.Count() == 1)
                 return availableMoves.First();
-            
+
             var target = _directToLocation.GetLocation(game);
 
             return availableMoves
                 .OrderBy(possibleDirection => (ghost.Location + possibleDirection) - target)
-                .ThenBy(p => (int) p)
+                .ThenBy(p => (int)p)
                 .First();
 
         }
@@ -53,7 +51,7 @@ namespace NPacMan.Game.GhostStrategies
             if (!walls.Contains(location.Right))
                 result.Add(Direction.Right);
 
-            return result;                                             
+            return result;
         }
 
     }

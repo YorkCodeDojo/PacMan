@@ -109,7 +109,7 @@ namespace NPacMan.Game
 
         internal Ghost SetToHome() => WithNewLocation(Home);
 
-        internal Ghost SendHome() => WithNewStatusAndStrategy(GhostStatus.RunningHome, new DirectToStrategy(new DirectToGhostHouseLocation(), true));
+        internal Ghost SendHome() => WithNewStatusAndStrategy(GhostStatus.RunningHome, new DirectToStrategy(new DirectToGhostHouseLocation(), allowGhostsToWalkThroughDoors: true));
 
         internal Ghost SetToEdible(IDirectionPicker directionPicker)
         {

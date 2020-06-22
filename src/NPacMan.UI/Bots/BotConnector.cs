@@ -24,7 +24,7 @@ namespace NPacMan.UI.Bots
                 Portals = _game.Portals.Select(kv => new BotPortal { Entry = new BotLocation(kv.Key), Exit = new BotLocation(kv.Value) }),
                 Height = _game.Height,
                 Width = _game.Width,
-                Walls = _game.Walls.Select(l => new BotLocation(l)),
+                Walls = _game.WallsAndDoors.Select(l => new BotLocation(l)),
             };
             var json = JsonSerializer.Serialize(board);
             var payload = $"initialise:{json}";
@@ -60,7 +60,7 @@ namespace NPacMan.UI.Bots
                     Portals = _game.Portals.Select(kv => new BotPortal { Entry = new BotLocation(kv.Key), Exit = new BotLocation(kv.Value) }),
                     Height = _game.Height,
                     Width = _game.Width,
-                    Walls = _game.Walls.Select(l => new BotLocation(l)),
+                    Walls = _game.WallsAndDoors.Select(l => new BotLocation(l)),
                 }
             };
 

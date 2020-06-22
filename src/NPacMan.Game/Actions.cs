@@ -124,7 +124,7 @@ namespace NPacMan.Game
         internal void ChangeDirection(Game game, GameState gameState, Direction direction)
         {
             var nextSpace = gameState.PacMan.Location + direction;
-            if (!game.Walls.Contains(nextSpace))
+            if (!game.WallsAndDoors.Contains(nextSpace))
             {
                 gameState.ChangeDirectionOfPacMan(direction);
             }
@@ -154,7 +154,7 @@ namespace NPacMan.Game
                 newPacManLocation = otherEndOfThePortal + gameState.PacMan.Direction;
             }
 
-            if (!game.Walls.Contains(newPacManLocation))
+            if (!game.WallsAndDoors.Contains(newPacManLocation))
             {
                 gameState.MovePacManTo(newPacManLocation);
             }

@@ -31,7 +31,8 @@ namespace NPacMan.Game
             var gameState = new GameState(settings);
             _gameState = gameState;
             _gameStateMachineInstance = _gameStateMachine.CreateInstanceLift(gameState);
-            Walls = _settings.Walls.Union(_settings.Doors).ToList().AsReadOnly();
+            WallsAndDoors = _settings.Walls.Union(_settings.Doors).ToList().AsReadOnly();
+            Walls= _settings.Walls;
             _fruitForLevel = new[] { new Fruit(_settings.Fruit, FruitType.Cherry) };
         }
 
@@ -64,6 +65,8 @@ namespace NPacMan.Game
 
         public IReadOnlyCollection<CellLocation> PowerPills
             => _gameState.RemainingPowerPills;
+
+        public IReadOnlyCollection<CellLocation> WallsAndDoors { get; }
 
         public IReadOnlyCollection<CellLocation> Walls { get; }
 

@@ -12,7 +12,7 @@ namespace NPacMan.Game.GhostStrategies
         }
         public Direction? GetNextDirection(Ghost ghost, Game game)
         {
-            var availableMoves = GetAvailableMovesForLocation(ghost.Location, game.Walls);
+            var availableMoves = GetAvailableMovesForLocation(ghost.Location, game.WallsAndDoors);
                 
             availableMoves.Remove(ghost.Direction.Opposite());
 
