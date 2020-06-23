@@ -14,7 +14,7 @@ namespace NPacMan.Game.Tests
         private string? _debugFilePath;
         private readonly TestGameClock _gameClock;
 
-        private readonly IGameSettings _gameSettings;
+        private readonly TestGameSettings _gameSettings;
 
         public Game Game { get; }
 
@@ -24,7 +24,7 @@ namespace NPacMan.Game.Tests
 
         public Game StartGame() => Game.StartGame();
 
-        public GameHarness(IGameSettings gameSettings, string? debugFilePath = null)
+        public GameHarness(TestGameSettings gameSettings, string? debugFilePath = null)
         {
             _gameClock = new TestGameClock();
             _gameSettings = gameSettings;
@@ -389,6 +389,11 @@ namespace NPacMan.Game.Tests
 
                 File.AppendAllText(_debugFilePath,System.Environment.NewLine + "".PadLeft(50, '-') +  System.Environment.NewLine);
             }
+        }
+
+        internal void AssertBoard(params string[] rows)
+        {
+            _gameSettings.AssertBoard(Game, rows);
         }
     }
 }

@@ -978,27 +978,7 @@ namespace NPacMan.Game.Tests.GameTests
             gameHarness.Game.Ghosts[ghost1.Name].Status.Should().Be(GhostStatus.Alive);
             gameHarness.Game.Ghosts[ghost1.Name].Location.Should().Be(ghostHouse);
         }
-        
-        private void CreateRow(string definition, CellLocation startingFrom)
-        {
-            var currentCell = startingFrom;
-            foreach (var c in definition)
-            {
-                switch (c)
-                {
-                    case '#':
-                        _gameSettings.Walls.Add(currentCell);
-                        break;
-                    case '-':
-                        _gameSettings.Doors.Add(currentCell);
-                        break;                        
-                    case 'H':
-                        _gameSettings.GhostHouse.Add(currentCell);
-                        break;                                                
-                }
-                currentCell=currentCell.Right;
-            }
-        }
+       
 
         [Fact]
         public async Task GhostShouldBeInMiddleOfHouseAfterBeingEatingAndWaitingForElapsedTime()
@@ -1016,27 +996,39 @@ namespace NPacMan.Game.Tests.GameTests
                 .Create();
 
             var ghostHouse = _gameSettings.PacMan.Location.Right.Right.Below;
-            _gameSettings.GhostHouse.Clear();
-            CreateRow("##--##", ghostHouse);
-            CreateRow("#HHHH#", ghostHouse.Below);
-            CreateRow("#HHHH#", ghostHouse.Below.Below);
-            CreateRow("#HHHH#", ghostHouse.Below.Below.Below);
-            CreateRow("######", ghostHouse.Below.Below.Below.Below);
-                      
+
             _gameSettings.Ghosts.Add(ghost1);
 
-            _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Below);
+            _gameSettings.CreateBoard("    P              ",
+                                      "  . *   # # - - # #",
+                                      "G . .   # H H H H #",
+                                      "        # H H H H #",
+                                      "        # H H H H #",
+                                      "        # # # # # #");
 
-            var gameHarness = new GameHarness(_gameSettings, @"c:\temp\GhostShouldBeInTheHouseAfterBeingEatingAndWaitingForElapsedTime2.txt");
+            var gameHarness = new GameHarness(_gameSettings);
             gameHarness.Game.StartGame();
 
             await gameHarness.ChangeDirection(Direction.Down);
             await gameHarness.EatPill();
 
-            gameHarness.WeExpectThatPacMan().IsAt(_gameSettings.PacMan.Location.Below);
-            gameHarness.WeExpectThatGhost(ghost1).IsAt(ghostStart1.Right);
+            gameHarness.AssertBoard("                   ",
+                                    "  . P   # # - - # #",
+                                    "  G .   # H H H H #",
+                                    "        # H H H H #",
+                                    "        # H H H H #",
+                                    "        # # # # # #");
 
             await gameHarness.EatGhost(ghost1);
+
+            gameHarness.AssertBoard("                   ",
+                                    "  .     # # - - # #",
+                                    "    P   # H H H H #",
+                                    "        # H H H H #",
+                                    "        # H H H H #",
+                                    "        # # # # # #");
+
+
             gameHarness.WeExpectThatPacMan().IsAt(_gameSettings.PacMan.Location.Below.Below);
 
             await gameHarness.WaitForPauseToComplete();
