@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace NPacMan.Game.Tests.GameTests
+namespace NPacMan.Game.Tests
 {
     public class TestDirectionPicker : IDirectionPicker
     {

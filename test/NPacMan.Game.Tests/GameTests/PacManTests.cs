@@ -21,36 +21,37 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public void PacManStartsInInitialPosition()
         {
-            _gameSettings.PacMan = new PacMan((5, 6), Direction.Right);
-            var game = new Game(_gameClock, _gameSettings);
-            game.StartGame();
-            game.PacMan.Should().BeEquivalentTo(new
+            var initialPosition = _gameSettings.PacMan.Location;
+            
+            var gameHarness = new GameHarness(_gameSettings);
+            gameHarness.StartGame();
+
+            gameHarness.Game.PacMan.Should().BeEquivalentTo(new
             {
-                Location = new CellLocation(5, 6),
+                Location = initialPosition,
                 Direction = Direction.Right
             });
         }
 
-
         [Theory]
-        [InlineData(Direction.Up, 0, -1)]
-        [InlineData(Direction.Down, 0, +1)]
-        [InlineData(Direction.Left, -1, 0)]
-        [InlineData(Direction.Right, +1, 0)]
-        public async Task PacManWalksInFacingDirection(Direction directionToFace, int changeInX, int changeInY)
+        [InlineData(Direction.Up)]
+        [InlineData(Direction.Down)]
+        [InlineData(Direction.Left)]
+        [InlineData(Direction.Right)]
+        public async Task PacManWalksInFacingDirection(Direction directionToFace)
         {
-            var game = new Game(_gameClock, _gameSettings);
-            game.StartGame();
+            var initialPosition = _gameSettings.PacMan.Location;
 
-            var (x, y) = game.PacMan.Location;
+            var gameHarness = new GameHarness(_gameSettings);
+            gameHarness.StartGame();
 
-            await game.ChangeDirection(directionToFace);
+            await gameHarness.ChangeDirection(directionToFace);
 
-            await _gameClock.Tick();
+            await gameHarness.Move();
 
-            game.PacMan.Should().BeEquivalentTo(new
+            gameHarness.Game.PacMan.Should().BeEquivalentTo(new
             {
-                Location = new CellLocation(x + changeInX, y + changeInY),
+                Location = initialPosition + directionToFace,
                 Direction = directionToFace
             });
         }
@@ -62,18 +63,18 @@ namespace NPacMan.Game.Tests.GameTests
         [InlineData(Direction.Right)]
         public async Task PacManCannotMoveIntoWalls(Direction directionToFace)
         {
-            var location = _gameSettings.PacMan.Location;
-            _gameSettings.PacMan = new PacMan(location, directionToFace);
-            _gameSettings.Walls.Add(location + directionToFace);
+            var initialPosition = _gameSettings.PacMan.Location;
+            _gameSettings.PacMan = new PacMan(initialPosition, directionToFace);
+            _gameSettings.Walls.Add(initialPosition + directionToFace);
 
-            var game = new Game(_gameClock, _gameSettings);
-            game.StartGame();
+            var gameHarness = new GameHarness(_gameSettings);
+            gameHarness.StartGame();
 
-            await _gameClock.Tick();
+            await gameHarness.NOP();
 
-            game.PacMan.Should().BeEquivalentTo(new
+            gameHarness.Game.PacMan.Should().BeEquivalentTo(new
             {
-                Location = location,
+                Location = initialPosition,
                 Direction = directionToFace
             });
         }
@@ -85,18 +86,18 @@ namespace NPacMan.Game.Tests.GameTests
         [InlineData(Direction.Right)]
         public async Task PacManCannotMoveIntoDoors(Direction directionToFace)
         {
-            var location = _gameSettings.PacMan.Location;
-            _gameSettings.PacMan = new PacMan(location, directionToFace);
-            _gameSettings.Doors.Add(location + directionToFace);
+            var initialPosition = _gameSettings.PacMan.Location;
+            _gameSettings.PacMan = new PacMan(initialPosition, directionToFace);
+            _gameSettings.Doors.Add(initialPosition + directionToFace);
 
-            var game = new Game(_gameClock, _gameSettings);
-            game.StartGame();
+            var gameHarness = new GameHarness(_gameSettings);
+            gameHarness.StartGame();
 
-            await _gameClock.Tick();
+            await gameHarness.NOP();
 
-            game.PacMan.Should().BeEquivalentTo(new
+            gameHarness.Game.PacMan.Should().BeEquivalentTo(new
             {
-                Location = location,
+                Location = initialPosition,
                 Direction = directionToFace
             });
         }
@@ -104,51 +105,46 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public async Task PacManIsTeleportedWhenYouWalkIntoAPortal()
         {
-            var game = new Game(_gameClock, _gameSettings);
-            game.StartGame();
-            var x = game.PacMan.Location.X;
-            var y = game.PacMan.Location.Y;
-            var score = game.Score;
+            var initialPosition = _gameSettings.PacMan.Location;
 
-            _gameSettings.Portals.Add((x - 1, y), (15, 15));
+            var farEndOfPortal = new CellLocation(14, 15);
+            var portalExit = farEndOfPortal.Left;
 
-            await game.ChangeDirection(Direction.Left);
+            _gameSettings.Portals.Add(initialPosition.Left, farEndOfPortal);
 
-            await _gameClock.Tick();
+            var gameHarness = new GameHarness(_gameSettings);
+            gameHarness.StartGame();
 
-            game.PacMan.Should().BeEquivalentTo(new
+            await gameHarness.ChangeDirection(Direction.Left);
+
+            await gameHarness.Move();
+
+            gameHarness.Game.PacMan.Should().BeEquivalentTo(new
             {
-                Location = new CellLocation(14, 15),
+                Location = portalExit,
                 Direction = Direction.Left
             });
-
-            game.Score.Should().Be(score);
         }
 
         [Theory]
         [InlineData(GameStatus.Dead)]
         [InlineData(GameStatus.Dying)]
-        [InlineData(GameStatus.Respawning)]
+        [InlineData(GameStatus.Respawning)]   //TODO: Are there more states we could test for here?
         public async Task PacManShouldNotMoveInCertainStates(GameStatus state)
         {
-            var x = 1;
-            var y = 1;
+            var initialPosition = _gameSettings.PacMan.Location;
 
             _gameSettings.InitialGameStatus = state;
-            _gameSettings.PacMan = new PacMan((x, y), Direction.Down);
 
-            var game = new Game(_gameClock, _gameSettings);
-            game.StartGame();
-            await _gameClock.Tick();
+            var gameHarness = new GameHarness(_gameSettings);
+            gameHarness.StartGame();
 
-            game.PacMan
+            await gameHarness.NOP();
+
+            gameHarness.Game.PacMan
                 .Should().BeEquivalentTo(new
                 {
-                    Location = new
-                    {
-                        X = x,
-                        Y = y
-                    }
+                    Location = initialPosition
                 });
         }
 
