@@ -1,6 +1,7 @@
 using FluentAssertions;
 using NPacMan.Game.Tests.Helpers;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -299,6 +300,20 @@ namespace NPacMan.Game.Tests
             if (Game.Ghosts[ghost.Name].Status != GhostStatus.Score)
             {
                 WriteAndThrowException($"Expected ghost ({ghost.Name}) status to be {GhostStatus.Score} but was {actualGhostStatus} ");
+            }
+        }
+
+        public async Task EatGhosts(IEnumerable<Ghost> ghosts)
+        {
+            await Move("EatGhosts");
+
+            foreach (var ghost in ghosts)
+            {
+                var actualGhostStatus = Game.Ghosts[ghost.Name].Status;
+                if (Game.Ghosts[ghost.Name].Status != GhostStatus.Score)
+                {
+                    WriteAndThrowException($"Expected ghost ({ghost.Name}) status to be {GhostStatus.Score} but was {actualGhostStatus} ");
+                }
             }
         }
 
