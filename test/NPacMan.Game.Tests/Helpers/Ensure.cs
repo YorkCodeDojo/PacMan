@@ -6,6 +6,6 @@ namespace NPacMan.Game.Tests.Helpers
     {
         public static EnsureThatGhost WeExpectThat(Ghost ghost) => new EnsureThatGhost(ghost);
         public static EnsureThatGhosts WeExpectThat(IEnumerable<Ghost> ghosts) => new EnsureThatGhosts(ghosts);
-        public static EnsureThatPacMan WeExpectThat(PacMan pacMan) => new EnsureThatPacMan(pacMan);
+        public static EnsureThatPacMan WeExpectThat(Game game, PacMan pacMan) => new EnsureThatPacMan(game, pacMan);
     }
 }

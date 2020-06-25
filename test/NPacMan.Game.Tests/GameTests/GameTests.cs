@@ -247,7 +247,7 @@ namespace NPacMan.Game.Tests.GameTests
                 throw new Exception($"Game status should be GameStatus.ChangingLevel not {game.Status}");
             }
 
-            WeExpectThat(game.PacMan).IsAt(_gameSettings.PacMan.Location.Left.Left);
+            WeExpectThat(game, game.PacMan).IsAt(_gameSettings.PacMan.Location.Left.Left);
 
             await gameClock.Tick(now.AddSeconds(4));
 

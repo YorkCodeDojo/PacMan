@@ -1,230 +1,231 @@
 using FluentAssertions;
-using Xunit;
+using FluentAssertions.Execution;
 using NPacMan.Game.Tests.Helpers;
 using System.Threading.Tasks;
-using System;
-using FluentAssertions.Execution;
+using Xunit;
 
 namespace NPacMan.Game.Tests.GameTests
 {
     public class BonusLivesTests
     {
-        private readonly TestGameClock _gameClock;
-        
-        private int _numberOfNotificationsTriggered;
-
-        public BonusLivesTests()
+        private static class PointsFor
         {
-            _gameClock = new TestGameClock();
-            _numberOfNotificationsTriggered = 0;
-        }
-
-        private Game CreateInitialGameSettings(Action<TestGameSettings> configure)
-        {
-            var gameSettings = new TestGameSettings
-            {
-                PointsNeededForBonusLife = 5
-            };
-            
-            configure(gameSettings);
-
-            return new Game(_gameClock, gameSettings)
-                        .Subscribe(GameNotification.ExtraPac, () => _numberOfNotificationsTriggered++);    
-        }
-
-        private async Task PlayUntilBonusLife(Game game)
-        {
-            game.StartGame();
-
-            await game.ChangeDirection(Direction.Down);
-
-            await _gameClock.Tick();
+            public const int EatingCoin = 10;
+            public const int EatingPowerPill = 50;
+            public const int EatingFirstFruit = 100;
+            public const int EatingFirstGhost = 200;
         }
 
         [Fact]
         public async Task WeGetAnExtraLifeWhenScoreReachesBonusLifePointAfterEatingCoin()
         {
-            var game = CreateInitialGameSettings(gameSettings =>
-                {
-                    gameSettings.Coins.Add(gameSettings.PacMan.Location.Below);
-                    gameSettings.Coins.Add(gameSettings.PacMan.Location.FarAway());
-                });
-            game.StartGame();
+            var gameSettings = new TestGameSettings();
+            gameSettings.Coins.Add(gameSettings.PacMan.Location.Below);
+            gameSettings.Coins.Add(gameSettings.PacMan.Location.FarAway());
+            gameSettings.PointsNeededForBonusLife = PointsFor.EatingCoin;
 
-            await game.ChangeDirection(Direction.Down);
+            var gameHarness = new GameHarness(gameSettings);
+            gameHarness.StartGame();
 
-            var previousLives = game.Lives;
+            await gameHarness.ChangeDirection(Direction.Down);
 
-            await _gameClock.Tick();
-            
+            var previousLives = gameHarness.Lives;
+
             using var _ = new AssertionScope();
-            game.Lives.Should().Be(previousLives + 1);
-            _numberOfNotificationsTriggered.Should().Be(1);
+            await gameHarness.AssertSingleNotificationFires(GameNotification.ExtraPac, async () =>
+            {
+                await gameHarness.EatCoin();
+
+            });
+            gameHarness.Game.Lives.Should().Be(previousLives + 1);
         }
-
-
 
         [Fact]
         public async Task WeGetAnExtraLifeWhenScoreReachesBonusLifePointAfterEatingCoinThatCompletesLevel()
         {
-            var game = CreateInitialGameSettings(gameSettings =>
-                        gameSettings.Coins.Add(gameSettings.PacMan.Location.Below));
+            var gameSettings = new TestGameSettings();
+            gameSettings.Coins.Add(gameSettings.PacMan.Location.Below);
+            gameSettings.PointsNeededForBonusLife = PointsFor.EatingCoin;
 
-            var previousLives = game.Lives;
+            var gameHarness = new GameHarness(gameSettings);
+            gameHarness.StartGame();
 
-            await PlayUntilBonusLife(game);
+            var previousLives = gameHarness.Lives;
+
+            await gameHarness.ChangeDirection(Direction.Down);
 
             using var _ = new AssertionScope();
-            game.Lives.Should().Be(previousLives + 1);
-            _numberOfNotificationsTriggered.Should().Be(1);
-        }
+            await gameHarness.AssertSingleNotificationFires(GameNotification.ExtraPac, async () =>
+            {
+                await gameHarness.EatCoin();
 
+            });
+            gameHarness.Game.Lives.Should().Be(previousLives + 1);
+        }
 
         [Fact]
         public async Task WeGetAnExtraLifeOnceWhenScoreReachesBonusLifePointAfterScoreIncreasesFromEatingFurtherCoins()
         {
-            var game = CreateInitialGameSettings(gameSettings =>
-            {
-                gameSettings.Coins.Add(gameSettings.PacMan.Location.Below);
-                gameSettings.Coins.Add(gameSettings.PacMan.Location.Below.Below);
-                gameSettings.Coins.Add(gameSettings.PacMan.Location.FarAway());
-            });
-            var previousLives = game.Lives;
-            await PlayUntilBonusLife(game);
+            var gameSettings = new TestGameSettings();
+            gameSettings.Coins.Add(gameSettings.PacMan.Location.Below);
+            gameSettings.Coins.Add(gameSettings.PacMan.Location.Below.Below);
+            gameSettings.Coins.Add(gameSettings.PacMan.Location.FarAway());
+            gameSettings.PointsNeededForBonusLife = PointsFor.EatingCoin + 1;
 
-            await _gameClock.Tick();
+            var gameHarness = new GameHarness(gameSettings);
+            gameHarness.StartGame();
+
+            var previousLives = gameHarness.Lives;
+
+            await gameHarness.ChangeDirection(Direction.Down);
+
+            await gameHarness.EatCoin();
 
             using var _ = new AssertionScope();
-            game.Lives.Should().Be(previousLives + 1);
-            _numberOfNotificationsTriggered.Should().Be(1);
+            await gameHarness.AssertSingleNotificationFires(GameNotification.ExtraPac, async () =>
+            {
+                await gameHarness.EatCoin();
+
+            });
+            gameHarness.Game.Lives.Should().Be(previousLives + 1);
         }
 
         [Fact]
         public async Task WeGetAnExtraLifeWhenScoreReachesBonusLifePointAfterEatingPowerPill()
         {
-            var game = CreateInitialGameSettings(gameSettings =>
-                {
-                    gameSettings.PowerPills.Add(gameSettings.PacMan.Location.Below);
-                    gameSettings.PowerPills.Add(gameSettings.PacMan.Location.FarAway());
-                });
-            game.StartGame();
+            var gameSettings = new TestGameSettings();
+            gameSettings.PowerPills.Add(gameSettings.PacMan.Location.Below);
+            gameSettings.PowerPills.Add(gameSettings.PacMan.Location.FarAway());
+            gameSettings.PointsNeededForBonusLife = PointsFor.EatingPowerPill;
 
-            await game.ChangeDirection(Direction.Down);
+            var gameHarness = new GameHarness(gameSettings);
+            gameHarness.StartGame();
 
-            var previousLives = game.Lives;
+            await gameHarness.ChangeDirection(Direction.Down);
 
-            await _gameClock.Tick();
+            var previousLives = gameHarness.Lives;
 
-              using var _ = new AssertionScope();
-            
-            game.Lives.Should().Be(previousLives + 1);
+            using var _ = new AssertionScope();
+            await gameHarness.AssertSingleNotificationFires(GameNotification.ExtraPac, async () =>
+            {
+                await gameHarness.EatPill();
+            });
 
-            _numberOfNotificationsTriggered.Should().Be(1);
+            gameHarness.Game.Lives.Should().Be(previousLives + 1);
         }
 
         [Fact]
         public async Task WeGetAnExtraLifeWhenScoreReachesBonusLifePointAfterEatingPowerPillThatCompletesLevel()
         {
-            var game = CreateInitialGameSettings(gameSettings =>
-                        gameSettings.PowerPills.Add(gameSettings.PacMan.Location.Below));
+            var gameSettings = new TestGameSettings();
+            gameSettings.PowerPills.Add(gameSettings.PacMan.Location.Below);
+            gameSettings.PointsNeededForBonusLife = PointsFor.EatingPowerPill;
 
-            var previousLives = game.Lives;
+            var gameHarness = new GameHarness(gameSettings);
+            gameHarness.StartGame();
 
-            await PlayUntilBonusLife(game);
+            var previousLives = gameHarness.Lives;
+
+            await gameHarness.ChangeDirection(Direction.Down);
 
             using var _ = new AssertionScope();
-            
-            game.Lives.Should().Be(previousLives + 1);
+            await gameHarness.AssertSingleNotificationFires(GameNotification.ExtraPac, async () =>
+            {
+                await gameHarness.EatPill();
+            });
 
-            _numberOfNotificationsTriggered.Should().Be(1);
+            gameHarness.Game.Lives.Should().Be(previousLives + 1);
         }
 
         [Fact(DisplayName = "We get an extra life once when score reaches bonus life point after score increases from eating further power pills")]
         public async Task WeGetAnExtraLifeOnceWhenScoreReachesBonusLifePointAfterScoreIncreasesFromEatingFurtherPowerPills()
         {
-            var game = CreateInitialGameSettings(gameSettings =>
-            {
-                gameSettings.PowerPills.Add(gameSettings.PacMan.Location.Below);
-                gameSettings.PowerPills.Add(gameSettings.PacMan.Location.Below.Below);
-                gameSettings.PowerPills.Add(gameSettings.PacMan.Location.FarAway());
-            });
-            var previousLives = game.Lives;
-            await PlayUntilBonusLife(game);
+            var gameSettings = new TestGameSettings();
+            gameSettings.PowerPills.Add(gameSettings.PacMan.Location.Below);
+            gameSettings.PowerPills.Add(gameSettings.PacMan.Location.Below.Below);
+            gameSettings.PowerPills.Add(gameSettings.PacMan.Location.FarAway());
+            gameSettings.PointsNeededForBonusLife = PointsFor.EatingPowerPill + 1;
 
-            await _gameClock.Tick();
-            
+            var gameHarness = new GameHarness(gameSettings);
+            gameHarness.StartGame();
+
+            var previousLives = gameHarness.Lives;
+
+            await gameHarness.ChangeDirection(Direction.Down);
+
+            await gameHarness.EatPill();
+
             using var _ = new AssertionScope();
-            
-            game.Lives.Should().Be(previousLives + 1);
+            await gameHarness.AssertSingleNotificationFires(GameNotification.ExtraPac, async () =>
+            {
+                await gameHarness.EatPill();
+            });
 
-            _numberOfNotificationsTriggered.Should().Be(1);
+            gameHarness.Game.Lives.Should().Be(previousLives + 1);
         }
 
         [Fact]
         public async Task WeGetAnExtraLifeWhenScoreReachesBonusLifePointAfterEatingFruit()
         {
-            var game = CreateInitialGameSettings(gameSettings =>
-                {
-                    gameSettings.Coins.Add(gameSettings.PacMan.Location.Below);
-                    gameSettings.Coins.Add(gameSettings.PacMan.Location.FarAway());
-                    gameSettings.Fruit = gameSettings.PacMan.Location.Below.Below;
-                    gameSettings.FruitAppearsAfterCoinsEaten.Add(1);
-                    gameSettings.PointsNeededForBonusLife = 100;
-                });
+            var gameSettings = new TestGameSettings();
+            gameSettings.Coins.Add(gameSettings.PacMan.Location.Below);
+            gameSettings.Coins.Add(gameSettings.PacMan.Location.FarAway());
+            gameSettings.Fruit = gameSettings.PacMan.Location.Below.Below;
+            gameSettings.FruitAppearsAfterCoinsEaten.Add(1);
+            gameSettings.PointsNeededForBonusLife = PointsFor.EatingFirstFruit;
 
-            game.StartGame();
+            var gameHarness = new GameHarness(gameSettings);
+            gameHarness.StartGame();
 
-            await game.ChangeDirection(Direction.Down);
+            await gameHarness.ChangeDirection(Direction.Down);
 
-            var previousLives = game.Lives;
+            var previousLives = gameHarness.Lives;
 
-            await _gameClock.Tick(); // eats coin
+            await gameHarness.EatCoin();
 
-            if (game.Lives !=previousLives)
-            {
-                throw new Exception($"Lives should be {previousLives} not {game.Lives}.");
-            }
-
-            await _gameClock.Tick(); // eats fruit
+            gameHarness.WeExpectThatPacMan().HasLives(previousLives);
 
             using var _ = new AssertionScope();
-            
-            game.Lives.Should().Be(previousLives + 1);
+            await gameHarness.AssertSingleNotificationFires(GameNotification.ExtraPac, async () =>
+            {
+                await gameHarness.EatFruit();
+            });
 
-            _numberOfNotificationsTriggered.Should().Be(1);
+            gameHarness.Game.Lives.Should().Be(previousLives + 1);
         }
-        
+
         [Fact]
         public async Task WeGetAnExtraLifeWhenScoreReachesBonusLifePointAfterEatingAGhost()
         {
-            var game = CreateInitialGameSettings(gameSettings =>
-                {
-                    var ghostStart = gameSettings.PacMan.Location.Left.Left.Left;
-                    var ghosts = GhostBuilder.New().WithLocation(ghostStart).WithChaseStrategyRight()
-                        .Create();
-                    
-                    gameSettings.Ghosts.Add(ghosts);
-                    
-                    gameSettings.PowerPills.Add(gameSettings.PacMan.Location.FarAway());
-                    gameSettings.PowerPills.Add(gameSettings.PacMan.Location.Left);
-                    gameSettings.PointsNeededForBonusLife = 200;
-                });
-            game.StartGame();
+            var gameSettings = new TestGameSettings();
 
-            await game.ChangeDirection(Direction.Left);
+            var ghostStart = gameSettings.PacMan.Location.Left.Left.Left;
+            var ghost = GhostBuilder.New()
+                                    .WithLocation(ghostStart)
+                                    .WithChaseStrategyRight()
+                                    .Create();
 
-            await _gameClock.Tick();
+            gameSettings.Ghosts.Add(ghost);
+            gameSettings.PowerPills.Add(gameSettings.PacMan.Location.FarAway());
+            gameSettings.PowerPills.Add(gameSettings.PacMan.Location.Left);
+            gameSettings.PointsNeededForBonusLife = PointsFor.EatingFirstGhost;
 
-            var previousLives = game.Lives;
-            
-            await _gameClock.Tick();
+            var gameHarness = new GameHarness(gameSettings);
+            gameHarness.StartGame();
 
+            await gameHarness.ChangeDirection(Direction.Left);
+
+            await gameHarness.EatPill();
+
+            var previousLives = gameHarness.Lives;
 
             using var _ = new AssertionScope();
-            
-            game.Lives.Should().Be(previousLives + 1);
+            await gameHarness.AssertSingleNotificationFires(GameNotification.ExtraPac, async () =>
+            {
+                await gameHarness.EatGhost(ghost);
+            });
 
-            _numberOfNotificationsTriggered.Should().Be(1);
+            gameHarness.Game.Lives.Should().Be(previousLives + 1);
         }
     }
 }

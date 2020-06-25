@@ -317,7 +317,7 @@ namespace NPacMan.Game.Tests
             }
         }
 
-        public EnsureThatPacMan WeExpectThatPacMan() => new EnsureThatPacMan(Game.PacMan);
+        public EnsureThatPacMan WeExpectThatPacMan() => new EnsureThatPacMan(Game, Game.PacMan);
 
         public EnsureThatGhost WeExpectThatGhost(Ghost ghost) => new EnsureThatGhost(Game.Ghosts[ghost.Name]);
 
@@ -357,14 +357,8 @@ namespace NPacMan.Game.Tests
 
             await action();
 
-            //if (numberOfNotificationsTriggered != 1)
-            //{
-            //    WriteAndThrowException($"A single {gameNotification} notifications should have been triggered but {numberOfNotificationsTriggered} were.");
-            //}
-
             numberOfNotificationsTriggered.Should().Be(1);
         }
-
 
         internal void Label(string caption)
         {
