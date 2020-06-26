@@ -100,7 +100,9 @@ namespace NPacMan.Game
                 When(Tick, context => context.Data.Now >= context.Instance.TimeToChangeState)
                     .IfElse(context => context.Instance.Lives > 0,
                         binder => binder.TransitionTo(Respawning),
-                        binder => binder.TransitionTo(AttractMode)));
+                        binder => binder
+                                .Then(context => actions.EndGame(context.Instance))
+                                .TransitionTo(AttractMode)));
 
             WhenEnter(Respawning,
                        binder => binder

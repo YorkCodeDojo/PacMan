@@ -147,6 +147,11 @@ namespace NPacMan.Game
             gameState.ApplyToGhosts(ghost => ghost.Chase(), ghostsToChase);
         }
 
+        internal void EndGame(GameState instance)
+        {
+            _gameSettings.HighScoreStorage.SetHighScore(instance.HighScore);
+        }
+
         internal void ResetAllGhosts(GameState gameState)
         {
             gameState.ApplyToGhosts(ghost => ghost.SetToAlive());
