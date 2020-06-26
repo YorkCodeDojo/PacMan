@@ -23,6 +23,12 @@ namespace NPacMan.Game
             gameState.RecordLastTick(now);
         }
 
+        internal async Task ReloadHighScore(GameState gameState)
+        {
+            var previousHighScore = await _gameSettings.HighScoreStorage.GetHighScore();
+            gameState.UpdateHighScore(previousHighScore);
+        }
+
         internal void BeginDying(GameState gameState)
         {
             gameState.HideGhosts();
@@ -147,9 +153,9 @@ namespace NPacMan.Game
             gameState.ApplyToGhosts(ghost => ghost.Chase(), ghostsToChase);
         }
 
-        internal void EndGame(GameState instance)
+        internal async Task EndGame(GameState instance)
         {
-            _gameSettings.HighScoreStorage.SetHighScore(instance.HighScore);
+            await _gameSettings.HighScoreStorage.SetHighScore(instance.HighScore);
         }
 
         internal void ResetAllGhosts(GameState gameState)

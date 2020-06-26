@@ -28,7 +28,6 @@ namespace NPacMan.Game
             RemainingPowerPills = new List<CellLocation>(settings.PowerPills);
             PacMan = settings.PacMan;
             Ghosts = settings.Ghosts.ToDictionary(x => x.Name, x => x);
-            HighScore = settings.HighScoreStorage.GetHighScore();
         }
 
         public string Status { get; set; }

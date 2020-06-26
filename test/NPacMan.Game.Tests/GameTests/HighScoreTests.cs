@@ -100,13 +100,17 @@ namespace NPacMan.Game.Tests.GameTests
         {
             const int initialHighScore = 1000;
             _highScore = initialHighScore;
-            var gameSettings = new TestGameSettings();
+            var gameSettings = new TestGameSettings{
+                InitialGameStatus = GameStatus.Initial
+            };
             gameSettings.HighScoreStorage = this;
             gameSettings.Coins.Add(gameSettings.PacMan.Location.Below);
             gameSettings.Coins.Add(gameSettings.PacMan.Location.FarAway());
 
             var gameHarness = new GameHarness(gameSettings);
             gameHarness.StartGame();
+            await gameHarness.NOP();
+            await gameHarness.PressStart();
 
             await gameHarness.ChangeDirection(Direction.Down);
 
@@ -138,6 +142,7 @@ namespace NPacMan.Game.Tests.GameTests
             gameSettings.Coins.Add(gameSettings.PacMan.Location.Left);
 
             var gameHarness = new GameHarness(gameSettings);
+
             gameHarness.StartGame();
 
             await gameHarness.ChangeDirection(Direction.Left);
@@ -167,11 +172,14 @@ namespace NPacMan.Game.Tests.GameTests
 
         private int _highScore = 0;
         private List<int> _highScoresSet = new List<int>();
-        int IHighScoreStorage.GetHighScore() => _highScore;
+        Task<int> IHighScoreStorage.GetHighScore()
+            => Task.FromResult(_highScore);
 
-        void IHighScoreStorage.SetHighScore(int highScore)
+        Task IHighScoreStorage.SetHighScore(int highScore)
         {
             _highScoresSet.Add(highScore);
+
+            return Task.CompletedTask;
         }
     }
 }

@@ -17,6 +17,7 @@ namespace NPacMan.Game
             Initially(
                 When(Tick)
                     .Then(context => actions.Tick(context.Instance, context.Data.Now))
+                    .ThenAsync(async context => await actions.ReloadHighScore(context.Instance))
                     .TransitionTo(AttractMode));
 
             WhenEnter(AttractMode,
@@ -101,7 +102,7 @@ namespace NPacMan.Game
                     .IfElse(context => context.Instance.Lives > 0,
                         binder => binder.TransitionTo(Respawning),
                         binder => binder
-                                .Then(context => actions.EndGame(context.Instance))
+                                .ThenAsync(async context => await actions.EndGame(context.Instance))
                                 .TransitionTo(AttractMode)));
 
             WhenEnter(Respawning,
