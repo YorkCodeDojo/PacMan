@@ -2,19 +2,11 @@
 
 html, body {
     height  : 100%;
-    position: relative;
+    position: fixed;
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     overscroll-behavior: contain;
     user-select: none;
     background-color: #000;
-}
-
-html {
-    overflow: hidden;
-}
-
-body {
-    overflow: auto;
 }
 
 a, .btn-link {
@@ -28,7 +20,7 @@ a, .btn-link {
 }
 
 app {
-    position: relative;
+    position: fixed;
     display: flex;
     flex-direction: column;
 }
