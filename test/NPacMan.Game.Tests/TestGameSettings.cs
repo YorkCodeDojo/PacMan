@@ -71,6 +71,7 @@ namespace NPacMan.Game.Tests
         public IDirectionPicker DirectionPicker { get; internal set; } = new TestDirectionPicker();
         public int FruitVisibleForSeconds { get; set; } = 7;
         public int PointsNeededForBonusLife { get; internal set; } = int.MaxValue;
+        public IHighScoreStorage HighScoreStorage { get; internal set; } = new InMemoryHighScoreStorage();
 
         private readonly AsciiTestSettingBuilder _builder;
 

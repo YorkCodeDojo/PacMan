@@ -73,6 +73,11 @@ namespace NPacMan.Game
 
             gameState.IncreaseScore(amount);
 
+            if (gameState.Score > gameState.HighScore)
+            {
+                gameState.UpdateHighScore(gameState.Score);
+            }
+
             if(!bonusLifeAlreadyAwarded && gameState.Score >= _gameSettings.PointsNeededForBonusLife)
             {
                 gameState.AddBonusLife();

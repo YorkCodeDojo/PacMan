@@ -101,7 +101,7 @@ namespace NPacMan.Game
 
         public int Score => _gameState.Score;
 
-        public int HighScore => Score;
+        public int HighScore => _gameState.HighScore;
 
         public int Level => _gameState.Level;
 

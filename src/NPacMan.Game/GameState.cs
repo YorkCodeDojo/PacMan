@@ -28,6 +28,7 @@ namespace NPacMan.Game
             RemainingPowerPills = new List<CellLocation>(settings.PowerPills);
             PacMan = settings.PacMan;
             Ghosts = settings.Ghosts.ToDictionary(x => x.Name, x => x);
+            HighScore = settings.HighScoreStorage.GetHighScore();
         }
 
         public string Status { get; set; }
@@ -38,6 +39,8 @@ namespace NPacMan.Game
         public int Lives { get; private set; }
 
         public int Level { get; private set; }
+
+        public int HighScore { get; private set; }
 
         public bool GhostsVisible { get; private set; }
 
@@ -121,6 +124,11 @@ namespace NPacMan.Game
         internal void IncreaseScore(int amount)
         {
             Score += amount;
+        }
+
+        internal void UpdateHighScore(int newHighestScore)
+        {
+            HighScore = newHighestScore;
         }
 
         internal void DecreaseLives()

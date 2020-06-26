@@ -2,6 +2,7 @@
 
 namespace NPacMan.Game
 {
+
     public class GameSettings : IGameSettings
     {
         public GameSettings(
@@ -59,5 +60,7 @@ namespace NPacMan.Game
         public int FruitVisibleForSeconds { get; } = 9;
 
         public int PointsNeededForBonusLife { get; } = 10000;
+
+        public IHighScoreStorage HighScoreStorage => throw new System.NotImplementedException();
     }
 }

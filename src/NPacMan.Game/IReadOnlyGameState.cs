@@ -12,6 +12,8 @@ namespace NPacMan.Game
 
         public int Score { get; }
 
+        public int HighScore { get; }
+
         public int Level { get; }
 
         public int TickCounter { get; }

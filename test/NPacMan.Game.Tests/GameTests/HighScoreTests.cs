@@ -9,15 +9,8 @@ using Xunit;
 
 namespace NPacMan.Game.Tests.GameTests
 {
-    public class HighScoreTests
+    public class HighScoreTests : IHighScoreStorage
     {
-        private readonly TestGameSettings _gameSettings;
-
-        public HighScoreTests()
-        {
-            _gameSettings = new TestGameSettings();
-        }
-        
         [Fact]
         public async Task TheHighScoreAlwaysIncrementsAfterEatingACoinDuringTheFirstGame()
         {
@@ -100,5 +93,32 @@ namespace NPacMan.Game.Tests.GameTests
              gameHarness.Game.HighScore.Should().Be(gameHarness.Score);
         }
 
+
+        [Fact]
+        public async Task TheHighScoreDoesNotIncrementAfterEatingACoinIfTheScoreIsNotHigherThanTheCurrentHighScore()
+        {
+            const int initialHighScore = 1000;
+            HighScore = initialHighScore;
+            var gameSettings = new TestGameSettings();
+            gameSettings.HighScoreStorage = this;
+            gameSettings.Coins.Add(gameSettings.PacMan.Location.Below);
+            gameSettings.Coins.Add(gameSettings.PacMan.Location.FarAway());
+
+            var gameHarness = new GameHarness(gameSettings);
+            gameHarness.StartGame();
+
+            await gameHarness.ChangeDirection(Direction.Down);
+
+            if (gameHarness.Game.HighScore != initialHighScore)
+            {
+                throw new Exception($"The current high score should be {initialHighScore} not {gameHarness.Game.HighScore}.");
+            }
+
+            await gameHarness.EatCoin();
+      
+            gameHarness.Game.HighScore.Should().Be(initialHighScore);
+        }
+        private int HighScore = 0;
+        public int GetHighScore() => HighScore;
     }
 }
