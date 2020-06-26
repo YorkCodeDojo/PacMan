@@ -101,6 +101,8 @@ namespace NPacMan.Game
 
         public int Score => _gameState.Score;
 
+        public int HighScore => Score;
+
         public int Level => _gameState.Level;
 
 
@@ -146,6 +148,7 @@ namespace NPacMan.Game
                 }                 
             }
         }
+
 
         private readonly Fruit[] _fruitForLevel;
 

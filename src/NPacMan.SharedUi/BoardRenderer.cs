@@ -201,7 +201,7 @@ namespace NPacMan.SharedUi
         private void RenderScore(Game.Game game)
         {
             _scoreBoard.RenderStatic();
-            _scoreBoard.RenderScores(game.Score, 0, 1000);
+            _scoreBoard.RenderScores(game.Score, 0, game.HighScore);
         }
 
         private void RenderLives(Game.Game game)
