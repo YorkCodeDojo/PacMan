@@ -3,14 +3,6 @@ using NPacMan.Game.GhostStrategies;
 
 namespace NPacMan.Game
 {
-    public enum GhostStatus
-    {
-        Alive,
-        Edible,
-        Flash,
-        Score,
-        RunningHome,
-    }
     public class Ghost
     {
         public string Name { get; }
