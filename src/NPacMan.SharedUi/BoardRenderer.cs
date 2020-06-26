@@ -167,6 +167,8 @@ namespace NPacMan.SharedUi
             }
         }
 
+        private bool _flash;
+
         private void RenderGhost(Ghost ghost, Game.Game game)
         {
             SpriteSource sprite;
@@ -182,10 +184,21 @@ namespace NPacMan.SharedUi
             }
             else
             {
+                if(animated)
+                {
+                    _flash=!_flash;
+                }
+                
+                GhostColour GetCurrentFlashGhost()
+                {
+                    return _flash ? GhostColour.BlueFlash : GhostColour.WhiteFlash;
+                }
+
                 var ghostColour = (ghost.Name, ghost.Status) switch
                 {
                     (_, GhostStatus.RunningHome) => GhostColour.Eyes,
                     (_, GhostStatus.Edible) => GhostColour.BlueFlash,
+                    (_, GhostStatus.Flash) => GetCurrentFlashGhost(),
                     (GhostNames.Blinky, _) => GhostColour.Red,
                     (GhostNames.Inky, _) => GhostColour.Cyan,
                     (GhostNames.Pinky, _) => GhostColour.Pink,
