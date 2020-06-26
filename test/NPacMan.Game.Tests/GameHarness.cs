@@ -1,6 +1,7 @@
 using FluentAssertions;
 using NPacMan.Game.Tests.Helpers;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -302,7 +303,21 @@ namespace NPacMan.Game.Tests
             }
         }
 
-        public EnsureThatPacMan WeExpectThatPacMan() => new EnsureThatPacMan(Game.PacMan);
+        public async Task EatGhosts(IEnumerable<Ghost> ghosts)
+        {
+            await Move("EatGhosts");
+
+            foreach (var ghost in ghosts)
+            {
+                var actualGhostStatus = Game.Ghosts[ghost.Name].Status;
+                if (Game.Ghosts[ghost.Name].Status != GhostStatus.Score)
+                {
+                    WriteAndThrowException($"Expected ghost ({ghost.Name}) status to be {GhostStatus.Score} but was {actualGhostStatus} ");
+                }
+            }
+        }
+
+        public EnsureThatPacMan WeExpectThatPacMan() => new EnsureThatPacMan(Game, Game.PacMan);
 
         public EnsureThatGhost WeExpectThatGhost(Ghost ghost) => new EnsureThatGhost(Game.Ghosts[ghost.Name]);
 
@@ -342,14 +357,8 @@ namespace NPacMan.Game.Tests
 
             await action();
 
-            //if (numberOfNotificationsTriggered != 1)
-            //{
-            //    WriteAndThrowException($"A single {gameNotification} notifications should have been triggered but {numberOfNotificationsTriggered} were.");
-            //}
-
             numberOfNotificationsTriggered.Should().Be(1);
         }
-
 
         internal void Label(string caption)
         {
