@@ -1,11 +1,11 @@
-using System;
-using System.Collections.Generic;
 using NPacMan.Game.Tests.GameTests;
+using System.Collections.Generic;
 
 namespace NPacMan.Game.Tests
 {
     public class TestGameSettings : IGameSettings
     {
+
         public List<CellLocation> Walls { get; set; }
             = new List<CellLocation>();
 
@@ -23,7 +23,7 @@ namespace NPacMan.Game.Tests
 
         IReadOnlyCollection<CellLocation> IGameSettings.PowerPills
             => this.PowerPills;
-            
+
         public List<CellLocation> Doors { get; set; }
             = new List<CellLocation>();
 
@@ -38,8 +38,8 @@ namespace NPacMan.Game.Tests
 
 
         public List<CellLocation> GhostHouse { get; set; }
-            = new List<CellLocation>(){new CellLocation(100, 100)};
-            
+            = new List<CellLocation>() { new CellLocation(100, 100) };
+
         IReadOnlyCollection<CellLocation> IGameSettings.GhostHouse
             => this.GhostHouse;
 
@@ -71,5 +71,22 @@ namespace NPacMan.Game.Tests
         public IDirectionPicker DirectionPicker { get; internal set; } = new TestDirectionPicker();
         public int FruitVisibleForSeconds { get; set; } = 7;
         public int PointsNeededForBonusLife { get; internal set; } = int.MaxValue;
+
+        private readonly AsciiTestSettingBuilder _builder;
+
+        public TestGameSettings()
+        {
+            _builder = new AsciiTestSettingBuilder(this);
+        }
+
+        internal void CreateBoard(params string[] rows)
+        {
+            _builder.CreateBoard(rows);
+        }
+
+        internal void AssertBoard(Game game, params string[] rows)
+        {
+            _builder.AssertBoard(game, rows);
+        }
     }
 }
