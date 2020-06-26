@@ -62,5 +62,7 @@ namespace NPacMan.Game
         public int PointsNeededForBonusLife { get; } = 10000;
 
         public IHighScoreStorage HighScoreStorage { get; } = new InMemoryHighScoreStorage();
+
+        public int FrightenedFlashTimeInSeconds { get; } = 2;
     }
 }

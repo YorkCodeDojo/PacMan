@@ -72,6 +72,7 @@ namespace NPacMan.Game.Tests
         public int FruitVisibleForSeconds { get; set; } = 7;
         public int PointsNeededForBonusLife { get; internal set; } = int.MaxValue;
         public IHighScoreStorage HighScoreStorage { get; internal set; } = new InMemoryHighScoreStorage();
+        public int FrightenedFlashTimeInSeconds { get; internal set; } = 2;
 
         private readonly AsciiTestSettingBuilder _builder;
 

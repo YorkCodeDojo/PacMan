@@ -31,5 +31,7 @@ namespace NPacMan.Game
         int FruitVisibleForSeconds { get; }
 
         int PointsNeededForBonusLife { get; }
+
+        int FrightenedFlashTimeInSeconds { get; }
     }
 }

@@ -7,8 +7,9 @@ namespace NPacMan.Game
     {
         Alive,
         Edible,
+        Flash,
         Score,
-        RunningHome
+        RunningHome,
     }
     public class Ghost
     {
@@ -25,7 +26,7 @@ namespace NPacMan.Game
 
         public GhostStatus Status { get; }
 
-        public bool Edible => Status == GhostStatus.Edible;
+        public bool Edible => Status == GhostStatus.Edible || Status == GhostStatus.Flash;
 
         public int NumberOfCoinsRequiredToExitHouse { get; }
 
@@ -96,6 +97,11 @@ namespace NPacMan.Game
                 return this;
         }
 
+        internal Ghost SetToFlash()
+        {
+            return WithNewStatus(GhostStatus.Flash);
+        }
+
         internal Ghost Chase()
         {
             return WithNewCurrentStrategyAndDirection(ChaseStrategy, Direction.Opposite());
@@ -136,5 +142,7 @@ namespace NPacMan.Game
         private Ghost WithNewLocationAndDirection(CellLocation newLocation, Direction newDirection)
             => new Ghost(Name, Home, newLocation, newDirection, ScatterTarget, ChaseStrategy, CurrentStrategy, Status, NumberOfCoinsRequiredToExitHouse);
 
+        private Ghost WithNewStatus(GhostStatus newGhostStatus)
+            => new Ghost(Name, Home, Location, Direction, ScatterTarget, ChaseStrategy, CurrentStrategy, newGhostStatus, NumberOfCoinsRequiredToExitHouse);
     }
 }

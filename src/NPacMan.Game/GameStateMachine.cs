@@ -54,9 +54,12 @@ namespace NPacMan.Game
                     .TransitionTo(Scatter));
 
             During(Frightened,
-                When(Tick, context => context.Data.Now >= context.Instance.TimeToChangeState)
-                    .Then(context => actions.MakeGhostsNotFrightened(context.Instance))
-                    .TransitionTo(Scatter));
+                When(Tick)
+                    .If(context => context.Data.Now >= context.Instance.TimeToChangeState, 
+                        binder => binder.Then(context => actions.MakeGhostsNotFrightened(context.Instance))
+                        .TransitionTo(Scatter))
+                    .If(context => context.Data.Now < context.Instance.TimeToChangeState && context.Data.Now >= context.Instance.TimeToChangeState - TimeSpan.FromSeconds(settings.FrightenedFlashTimeInSeconds),
+                        binder => binder.Then(context => actions.MakeGhostsFlash(context.Instance))));
 
             During(Scatter, GhostChase, Frightened,
                 When (PlayersWishesToChangeDirection)

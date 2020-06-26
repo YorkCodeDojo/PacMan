@@ -1192,5 +1192,36 @@ namespace NPacMan.Game.Tests.GameTests
                 .Select(x => x.Status)
                 .Should().AllBeEquivalentTo(GhostStatus.Alive);
         }
+
+        [Fact]
+        public async Task GhostsShouldFlashJustBeforeAlive()
+        {
+            var ghosts = GhostBuilder.New()
+                .WithLocation(_gameSettings.PacMan.Location.FarAway())
+                .CreateMany(3);
+            _gameSettings.Ghosts.AddRange(ghosts);
+
+            _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Right);
+
+            var gameHarness = new GameHarness(_gameSettings);
+            gameHarness.StartGame();
+
+            await gameHarness.ChangeDirection(Direction.Right);
+            await gameHarness.EatPill();
+
+            gameHarness.EnsureAllGhostsAreEdible();
+
+            await gameHarness.Move();
+
+            gameHarness.EnsureAllGhostsAreEdible();
+
+            await gameHarness.WaitForGhostFlash();
+
+            gameHarness.Game.Ghosts.Values.Should().AllBeEquivalentTo(new
+            {
+                Status = GhostStatus.Flash,
+                Edible = true
+            });
+        }
     }
 }

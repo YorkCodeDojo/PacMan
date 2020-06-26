@@ -206,7 +206,7 @@ namespace NPacMan.Game.Tests
 
             WriteBoard();
         }
-
+        
         /// <summary>
         /// Trigger a tick,  but we don't expect anything to happen.  For example PacMan
         /// could be in a dying state.
@@ -403,6 +403,27 @@ namespace NPacMan.Game.Tests
         internal void AssertBoard(params string[] rows)
         {
             _gameSettings.AssertBoard(Game, rows);
+        }
+
+        internal void EnsureAllGhostsAreEdible()
+        {
+            if(!Game.Ghosts.Values.All(x => x.Edible))
+            {
+                throw new Exception("All ghosts should be edible");
+            }
+        }
+
+        internal async Task WaitForGhostFlash()
+        {
+            var delay = TimeSpan.FromSeconds(_gameSettings.FrightenedTimeInSeconds - _gameSettings.FrightenedFlashTimeInSeconds);
+
+            WriteHeading("WaitForGhostFlash");
+
+            _now += delay;
+
+            await _gameClock.Tick(_now);
+
+            WriteBoard();
         }
     }
 }

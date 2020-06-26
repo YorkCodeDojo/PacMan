@@ -91,6 +91,13 @@ namespace NPacMan.Game
             }
         }
 
+        internal void MakeGhostsFlash(GameState gameState)
+        {
+            var edibleGhosts = gameState.Ghosts.Values.Where(x => x.Status == GhostStatus.Edible);
+
+            gameState.ApplyToGhosts(ghost => ghost.SetToFlash(), edibleGhosts);
+        }
+
         internal void CoinEaten(Game game, GameState gameState, CellLocation coinLocation)
         {
             gameState.RemoveCoin(coinLocation);
@@ -165,7 +172,7 @@ namespace NPacMan.Game
 
         internal void MakeGhostsNotFrightened(GameState gameState)
         {
-            var edibleGhosts = gameState.Ghosts.Values.Where(x => x.Status == GhostStatus.Edible);
+            var edibleGhosts = gameState.Ghosts.Values.Where(x => x.Edible);
             gameState.ApplyToGhosts(ghost => ghost.SetToAlive(), edibleGhosts);
         }
 
