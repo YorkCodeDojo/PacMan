@@ -61,6 +61,6 @@ namespace NPacMan.Game
 
         public int PointsNeededForBonusLife { get; } = 10000;
 
-        public IHighScoreStorage HighScoreStorage => throw new System.NotImplementedException();
+        public IHighScoreStorage HighScoreStorage { get; } = new InMemoryHighScoreStorage();
     }
 }
