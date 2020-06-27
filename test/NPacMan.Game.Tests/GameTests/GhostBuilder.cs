@@ -75,7 +75,7 @@ namespace NPacMan.Game.Tests.GameTests
             var next = Interlocked.Increment(ref ghostNumber);
             var name = $"Ghost{next}";
 
-            return new Ghost(name, _location, _direction, _scatterTarget, _chaseStrategy, _scatterStrategy, _numberOfCoinsRequiredToExitHouse);
+            return new Ghost(name, _location, _direction, _chaseStrategy, _scatterStrategy, _numberOfCoinsRequiredToExitHouse);
         }
 
         public IList<Ghost> CreateMany(int count)
@@ -83,9 +83,6 @@ namespace NPacMan.Game.Tests.GameTests
 
         public GhostBuilder WithChaseStrategyRight()
             => WithChaseStrategy(new GhostGoesRightStrategy());
-
-        public GhostBuilder WithScatterStrategyLeft()
-            => WithScatterStrategy(new GhostGoesLeftStrategy());
 
         public GhostBuilder WithScatterStrategyRight()
             => WithScatterStrategy(new GhostGoesRightStrategy());

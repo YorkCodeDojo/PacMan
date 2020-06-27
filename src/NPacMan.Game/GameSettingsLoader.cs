@@ -39,7 +39,6 @@ namespace NPacMan.Game
                                             return new Ghost(data.Name,
                                                      new CellLocation(data.StartingLocation.X, data.StartingLocation.Y),
                                                      Direction.Left,
-                                                     scatterTarget,
                                                      data.Name switch
                                                      {
                                                          GhostNames.Blinky => new DirectToStrategy(new DirectToPacManLocation()),
