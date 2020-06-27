@@ -2,8 +2,14 @@ using NPacMan.Game.GhostStrategies;
 
 namespace NPacMan.Game.Tests.GhostStrategiesForTests
 {
-    public class GhostGoesRightStrategy : IGhostStrategy
+    public class GhostGoesInDirectionStrategy : IGhostStrategy
     {
-        public Direction? GetNextDirection(Ghost ghost, Game game) => Direction.Right;
+        private readonly Direction _direction;
+
+        public GhostGoesInDirectionStrategy(Direction direction)
+        {
+            _direction = direction;
+        }
+        public Direction? GetNextDirection(Ghost ghost, Game game) => _direction;
     }
 }

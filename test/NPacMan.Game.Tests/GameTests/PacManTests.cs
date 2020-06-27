@@ -16,12 +16,12 @@ namespace NPacMan.Game.Tests.GameTests
         }
 
         [Fact]
-        public void PacManStartsInInitialPosition()
+        public async Task PacManStartsInInitialPosition()
         {
             var initialPosition = _gameSettings.PacMan.Location;
             
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
 
             gameHarness.Game.PacMan.Should().BeEquivalentTo(new
             {
@@ -40,7 +40,7 @@ namespace NPacMan.Game.Tests.GameTests
             var initialPosition = _gameSettings.PacMan.Location;
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
 
             await gameHarness.ChangeDirection(directionToFace);
 
@@ -65,7 +65,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Walls.Add(initialPosition + directionToFace);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
 
             await gameHarness.NOP();
 
@@ -88,7 +88,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Doors.Add(initialPosition + directionToFace);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
 
             await gameHarness.NOP();
 
@@ -110,7 +110,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Portals.Add(initialPosition.Left, farEndOfPortal);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
 
             await gameHarness.ChangeDirection(Direction.Left);
 
@@ -154,7 +154,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Ghosts.Add(ghost);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
 
             await gameHarness.ChangeDirection(Direction.Down);
 
@@ -178,7 +178,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Ghosts.Add(ghost);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
 
             await gameHarness.ChangeDirection(Direction.Down);
 
@@ -197,7 +197,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Ghosts.Add(ghost);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
 
             await gameHarness.ChangeDirection(Direction.Down);
             await gameHarness.GetEatenByGhost(ghost);
@@ -215,12 +215,13 @@ namespace NPacMan.Game.Tests.GameTests
 
             var ghost = GhostBuilder.New()
                                     .WithLocation(initialPosition.Left.Left.Left.Left)
+                                    .WithScatterStrategyRight()
                                     .WithChaseStrategyRight()
                                     .Create();
             _gameSettings.Ghosts.Add(ghost);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
 
             await gameHarness.ChangeDirection(Direction.Left);
 
@@ -244,12 +245,13 @@ namespace NPacMan.Game.Tests.GameTests
 
             var ghost = GhostBuilder.New()
                                     .WithLocation(initialPosition.Left.Left.Left.Left)
+                                    .WithScatterStrategyRight()
                                     .WithChaseStrategyRight()
                                     .Create();
             _gameSettings.Ghosts.Add(ghost);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
 
             await gameHarness.ChangeDirection(Direction.Left);
 
@@ -287,7 +289,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Walls.Add(pacManLocation + direction);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
 
             // Have to use Game.ChangeDirection not gameHarness.ChangeDirection here as 
             // we are expecting the call to ChangeDirection to have no effect.
@@ -314,7 +316,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Doors.Add(pacManLocation + direction);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
 
             // Have to use Game.ChangeDirection not gameHarness.ChangeDirection here as 
             // we are expecting the call to ChangeDirection to have no effect.
@@ -336,8 +338,11 @@ namespace NPacMan.Game.Tests.GameTests
         public async Task ScoreShouldIncreaseExponentiallyAfterEatingEachGhost(int numberOfGhosts, int ghostScore, int totalScore)
         {
             var ghostStart = _gameSettings.PacMan.Location.Left.Left.Left;
-            var ghosts = GhostBuilder.New().WithLocation(ghostStart).WithChaseStrategyRight()
-                .CreateMany(numberOfGhosts);
+            var ghosts = GhostBuilder.New()
+                                     .WithLocation(ghostStart)
+                                     .WithChaseStrategyRight()
+                                     .WithScatterStrategyRight()
+                                     .CreateMany(numberOfGhosts);
             
             _gameSettings.Ghosts.AddRange(ghosts);
             
@@ -345,7 +350,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Left);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
 
             await gameHarness.ChangeDirection(Direction.Left);
 

@@ -4,6 +4,7 @@ using Xunit;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using NPacMan.Game.Tests.Helpers;
+using NPacMan.Game.Tests.GhostStrategiesForTests;
 
 namespace NPacMan.Game.Tests.GameTests
 {
@@ -22,7 +23,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Below);
             var gameHarness = new GameHarness(_gameSettings);
 
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
             await gameHarness.ChangeDirection(Direction.Down);
             await gameHarness.EatPill();
 
@@ -35,7 +36,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Below);
             _gameSettings.Coins.Add(_gameSettings.PacMan.Location.FarAway());
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
 
             await gameHarness.ChangeDirection(Direction.Down);
             await gameHarness.EatPill();
@@ -49,7 +50,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.FarAway());
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Below);
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
 
             await gameHarness.ChangeDirection(Direction.Down);
             await gameHarness.EatPill();
@@ -75,7 +76,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.PowerPills.Add(powerPill3);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
 
             await gameHarness.Move();
 
@@ -93,13 +94,14 @@ namespace NPacMan.Game.Tests.GameTests
 
             var ghost = GhostBuilder.New()
                 .WithLocation(pillAndGhostLocation)
+                .WithScatterStrategy(new StandingStillGhostStrategy())
                 .Create();
 
             _gameSettings.Ghosts.Add(ghost);
             _gameSettings.PowerPills.Add(pillAndGhostLocation);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
 
             var score = gameHarness.Score;
 
@@ -122,7 +124,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Right);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
 
             await gameHarness.ChangeDirection(Direction.Right);
             await gameHarness.EatPill();
@@ -138,19 +140,19 @@ namespace NPacMan.Game.Tests.GameTests
         {
             var ghost1 = GhostBuilder.New()
                 .WithLocation(_gameSettings.PacMan.Location.FarAway())
-                .WithDirection(Direction.Up)
+                .WithScatterFixedStrategy(Direction.Up)
                 .Create();
             var ghost2 = GhostBuilder.New()
                 .WithLocation(_gameSettings.PacMan.Location.FarAway())
-                .WithDirection(Direction.Down)
+                .WithScatterFixedStrategy(Direction.Down)
                 .Create();
             var ghost3 = GhostBuilder.New()
                 .WithLocation(_gameSettings.PacMan.Location.FarAway())
-                .WithDirection(Direction.Left)
+                .WithScatterFixedStrategy(Direction.Left)
                 .Create();
             var ghost4 = GhostBuilder.New()
                 .WithLocation(_gameSettings.PacMan.Location.FarAway())
-                .WithDirection(Direction.Right)
+                .WithScatterFixedStrategy(Direction.Right)
                 .Create();
             _gameSettings.Ghosts.AddRange(new[] { ghost1, ghost2, ghost3, ghost4 });
 
@@ -158,7 +160,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Right);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
 
             await gameHarness.ChangeDirection(Direction.Right);
             await gameHarness.EatPill();
@@ -167,19 +169,19 @@ namespace NPacMan.Game.Tests.GameTests
             {
                 [ghost1.Name] = new
                 {
-                    Direction = ghost1.Direction.Opposite()
+                    Direction = Direction.Down
                 },
                 [ghost2.Name] = new
                 {
-                    Direction = ghost2.Direction.Opposite()
+                    Direction = Direction.Up
                 },
                 [ghost3.Name] = new
                 {
-                    Direction = ghost3.Direction.Opposite()
+                    Direction = Direction.Right
                 },
                 [ghost4.Name] = new
                 {
-                    Direction = ghost4.Direction.Opposite()
+                    Direction = Direction.Left
                 },
             });
         }
@@ -193,7 +195,7 @@ namespace NPacMan.Game.Tests.GameTests
 
             var gameHarness = new GameHarness(_gameSettings);
             gameHarness.Game.Subscribe(GameNotification.EatPowerPill, () => numberOfNotificationsTriggered++);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
 
             await gameHarness.ChangeDirection(Direction.Down);
 

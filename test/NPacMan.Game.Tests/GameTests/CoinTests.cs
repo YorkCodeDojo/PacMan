@@ -4,6 +4,7 @@ using Xunit;
 using System;
 using System.Threading.Tasks;
 using NPacMan.Game.Tests.Helpers;
+using NPacMan.Game.Tests.GhostStrategiesForTests;
 
 namespace NPacMan.Game.Tests.GameTests
 {
@@ -20,7 +21,7 @@ namespace NPacMan.Game.Tests.GameTests
         public async Task ScoreDoesNotChangeWhenNoCoinIsCollected()
         {
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
 
             var score = gameHarness.Score;
 
@@ -38,7 +39,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Coins.Add(pacManStartingLocation.Below);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.StartGame(); 
+            await gameHarness.PlayGame();
 
             await gameHarness.ChangeDirection(Direction.Down);
 
@@ -55,7 +56,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Coins.Add(pacManStartingLocation.FarAway());
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
 
             await gameHarness.ChangeDirection(Direction.Down);
             await gameHarness.EatCoin();
@@ -77,7 +78,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Coins.Add(pacManStartingLocation.Below.Below);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
 
             await gameHarness.ChangeDirection(Direction.Down);
 
@@ -94,7 +95,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Coins.Add(coinLocation);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
 
             await gameHarness.ChangeDirection(Direction.Down);
             await gameHarness.EatCoin();
@@ -110,7 +111,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Coins.Add(pacManStartingLocation.Below.Below);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
 
             await gameHarness.ChangeDirection(Direction.Down);
 
@@ -132,7 +133,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Coins.Add(coin3);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
 
             await gameHarness.Move();
 
@@ -150,13 +151,14 @@ namespace NPacMan.Game.Tests.GameTests
 
             var ghost = GhostBuilder.New()
                 .WithLocation(ghostAndCoinLocation)
+                .WithScatterStrategy(new StandingStillGhostStrategy())
                 .Create();
 
             _gameSettings.Ghosts.Add(ghost);
             _gameSettings.Coins.Add(ghostAndCoinLocation);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
             var score = gameHarness.Score;
 
             await gameHarness.ChangeDirection(Direction.Right);
@@ -177,7 +179,7 @@ namespace NPacMan.Game.Tests.GameTests
 
             var gameHarness = new GameHarness(_gameSettings);
             gameHarness.Game.Subscribe(GameNotification.EatCoin, () => numberOfNotificationsTriggered++);
-            gameHarness.StartGame(); 
+            await gameHarness.PlayGame();
 
             await gameHarness.ChangeDirection(Direction.Down);
 

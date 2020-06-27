@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using FluentAssertions;
+using NPacMan.Game.Tests.GhostStrategiesForTests;
 using Xunit;
 
 namespace NPacMan.Game.Tests.GameTests
@@ -16,11 +17,14 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public async Task LivesStayTheSameWhenNotCollidingWithAGhost()
         {
-            var ghost = GhostBuilder.New().WithLocation(_gameSettings.PacMan.Location.Right).Create();
+            var ghost = GhostBuilder.New()
+                                    .WithLocation(_gameSettings.PacMan.Location.Right)
+                                    .WithScatterStrategy(new StandingStillGhostStrategy())
+                                    .Create();
             _gameSettings.Ghosts.Add(ghost);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
             var currentLives = gameHarness.Lives;
 
             await gameHarness.ChangeDirection(Direction.Left);
@@ -32,11 +36,14 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public async Task LivesDecreaseByOneWhenCollidesWithGhost()
         {
-            var ghost = GhostBuilder.New().WithLocation(_gameSettings.PacMan.Location.Right).Create();
+            var ghost = GhostBuilder.New()
+                                    .WithLocation(_gameSettings.PacMan.Location.Right)
+                                    .WithScatterStrategy(new StandingStillGhostStrategy())
+                                    .Create();
             _gameSettings.Ghosts.Add(ghost);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
             var currentLives = gameHarness.Lives;
 
             await gameHarness.ChangeDirection(Direction.Right);
@@ -55,12 +62,14 @@ namespace NPacMan.Game.Tests.GameTests
             // . . PG . .
             var ghost = GhostBuilder.New()
                 .WithLocation(_gameSettings.PacMan.Location.Left.Left.Left.Left)
-                .WithChaseStrategyRight().Create();
+                .WithChaseStrategyRight()
+                .WithScatterStrategyRight()
+                .Create();
 
             _gameSettings.Ghosts.Add(ghost);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
             var currentLives = gameHarness.Lives;
 
             await gameHarness.ChangeDirection(Direction.Left);
@@ -77,11 +86,13 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Walls.Add(_gameSettings.PacMan.Location.Above);
             var ghost = GhostBuilder.New()
                 .WithLocation(_gameSettings.PacMan.Location.Left)
-                .WithChaseStrategyRight().Create();
+                .WithChaseStrategyRight()
+                .WithScatterStrategyRight()
+                .Create();
             _gameSettings.Ghosts.Add(ghost);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
             var currentLives = gameHarness.Lives;
 
             await gameHarness.GetEatenByGhost(ghost);
@@ -92,22 +103,34 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public async Task ShouldNotLoseLifeWhenAlreadyIsDying()
         {
-            var expectedLife = 1;
-
-            _gameSettings.InitialGameStatus = GameStatus.Dying;
-            _gameSettings.InitialLives = expectedLife;
-            _gameSettings.PacMan = _gameSettings.PacMan.WithNewDirection(Direction.Down);
-
             var ghost = GhostBuilder.New()
-                .WithLocation(_gameSettings.PacMan.Location)
+                .WithLocation(_gameSettings.PacMan.Location.Left)
+                .WithScatterStrategyRight()
                 .Create();
             _gameSettings.Ghosts.Add(ghost);
 
+            var ghost2 = GhostBuilder.New()
+                .WithLocation(_gameSettings.PacMan.Location.Left.Left)
+                .WithScatterStrategyRight()
+                .Create();
+            _gameSettings.Ghosts.Add(ghost2);
+
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
+
+            await gameHarness.ChangeDirection(Direction.Left);
+
+            await gameHarness.GetEatenByGhost(ghost);
+
+            gameHarness.WeExpectThatPacMan().HasLives(_gameSettings.InitialLives - 1);
+
+            gameHarness.EnsureGameStatus(GameStatus.Dying);
+
             await gameHarness.NOP();
 
-            gameHarness.Lives.Should().Be(expectedLife);
+            gameHarness.EnsureGameStatus(GameStatus.Dying);
+
+            gameHarness.Lives.Should().Be(_gameSettings.InitialLives - 1);
         }
     }
 }

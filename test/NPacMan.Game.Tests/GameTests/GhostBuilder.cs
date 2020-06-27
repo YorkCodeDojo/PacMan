@@ -51,6 +51,8 @@ namespace NPacMan.Game.Tests.GameTests
         {
             _scatterTarget = scatterTarget;
 
+            _scatterStrategy = new DirectToStrategy(new DirectToGhostScatterTarget(_scatterTarget));
+
             return this;
         }
 
@@ -82,9 +84,12 @@ namespace NPacMan.Game.Tests.GameTests
             => Enumerable.Range(0, count).Select(x => Create()).ToList();
 
         public GhostBuilder WithChaseStrategyRight()
-            => WithChaseStrategy(new GhostGoesRightStrategy());
+            => WithChaseStrategy(new GhostGoesInDirectionStrategy(Direction.Right));
 
         public GhostBuilder WithScatterStrategyRight()
-            => WithScatterStrategy(new GhostGoesRightStrategy());
+            => WithScatterStrategy(new GhostGoesInDirectionStrategy(Direction.Right));
+
+        public GhostBuilder WithScatterFixedStrategy(Direction direction)
+            => WithScatterStrategy(new GhostGoesInDirectionStrategy(direction));
     }
 }

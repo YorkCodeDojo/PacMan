@@ -77,7 +77,7 @@ namespace NPacMan.Game.Tests.GameTests
             var ghost = GhostBuilder.New()
                                     .WithLocation(ghostStart)
                                     .WithChaseStrategyRight()
-                                    .WithScatterStrategyRight()
+                                    .WithScatterFixedStrategy(Direction.Right)
                                     .Create();
 
             gameSettings.Ghosts.Add(ghost);
@@ -141,7 +141,7 @@ namespace NPacMan.Game.Tests.GameTests
             var ghost = GhostBuilder.New()
                                     .WithLocation(ghostStart)
                                     .WithChaseStrategyRight()
-                                    .WithScatterStrategyRight()
+                                    .WithScatterFixedStrategy(Direction.Right)
                                     .Create();
 
             gameSettings.Ghosts.Add(ghost);

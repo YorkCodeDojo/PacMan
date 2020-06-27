@@ -29,7 +29,6 @@ namespace NPacMan.Game.Tests
         {
             StartGame();
             await WaitAndEnterAttractMode();
-            await NOP();
             await PressStart();
         }
 
@@ -296,6 +295,11 @@ namespace NPacMan.Game.Tests
             }
 
             await Move("GetEatenByGhost");
+
+            if (Game.Status != GameStatus.Dying && Game.Ghosts[ghost.Name].Location != Game.PacMan.Location)
+            {
+                WriteAndThrowException($"{ghost.Name} cannot eat PacMan because the ghost is at {Game.Ghosts[ghost.Name].Location} and PacMan is at {Game.PacMan.Location}.");
+            }
 
             EnsureGameStatus(GameStatus.Dying);
         }
