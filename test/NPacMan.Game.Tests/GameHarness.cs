@@ -25,6 +25,14 @@ namespace NPacMan.Game.Tests
 
         public Game StartGame() => Game.StartGame();
 
+        public async Task PlayGame()
+        {
+            StartGame();
+            await WaitAndEnterAttractMode();
+            await NOP();
+            await PressStart();
+        }
+
         public GameHarness(TestGameSettings gameSettings, string? debugFilePath = null)
         {
             _gameClock = new TestGameClock();

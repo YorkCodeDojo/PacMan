@@ -3,9 +3,9 @@
     public class DirectToGhostScatterTarget : IDirectToLocation
     {
         private readonly CellLocation _home;
-        public DirectToGhostScatterTarget(Ghost ghost)
+        public DirectToGhostScatterTarget(CellLocation scatterTarget)
         {
-            _home = ghost.ScatterTarget;
+            _home = scatterTarget;
         }
 
         public CellLocation GetLocation(Game game)

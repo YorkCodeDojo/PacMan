@@ -13,6 +13,7 @@ namespace NPacMan.Game
         public Direction Direction { get; }
 
         public CellLocation Home { get; }
+        private IGhostStrategy ScatterStrategy { get; }
         private IGhostStrategy ChaseStrategy { get; }
         private IGhostStrategy CurrentStrategy { get; }
 
@@ -22,18 +23,19 @@ namespace NPacMan.Game
 
         public int NumberOfCoinsRequiredToExitHouse { get; }
 
-        public Ghost(string name, CellLocation location, Direction direction, CellLocation scatterTarget, IGhostStrategy chaseStrategy, int numberOfCoinsRequiredToExitHouse = 0)
-        : this(name, location, location, direction, scatterTarget, chaseStrategy, chaseStrategy, GhostStatus.Alive, numberOfCoinsRequiredToExitHouse)
+        public Ghost(string name, CellLocation location, Direction direction, CellLocation scatterTarget, IGhostStrategy chaseStrategy, IGhostStrategy scatterStrategy, int numberOfCoinsRequiredToExitHouse = 0)
+        : this(name, location, location, direction, scatterTarget, chaseStrategy, scatterStrategy, chaseStrategy, GhostStatus.Alive, numberOfCoinsRequiredToExitHouse)
         {
         }
 
-        private Ghost(string name, CellLocation homeLocation, CellLocation currentLocation, Direction direction, CellLocation scatterTarget, IGhostStrategy chaseStrategy, IGhostStrategy currentStrategy, GhostStatus ghostStatus, int numberOfCoinsRequiredToExitHouse)
+        private Ghost(string name, CellLocation homeLocation, CellLocation currentLocation, Direction direction, CellLocation scatterTarget, IGhostStrategy chaseStrategy, IGhostStrategy scatterStrategy, IGhostStrategy currentStrategy, GhostStatus ghostStatus, int numberOfCoinsRequiredToExitHouse)
         {
             Name = name;
             Home = homeLocation;
             Location = currentLocation;
             Direction = direction;
             ChaseStrategy = chaseStrategy;
+            ScatterStrategy = scatterStrategy;
             CurrentStrategy = currentStrategy;
             ScatterTarget = scatterTarget;
             Status = ghostStatus;
@@ -101,8 +103,7 @@ namespace NPacMan.Game
 
         internal Ghost Scatter()
         {
-            var strategy = new DirectToStrategy(new DirectToGhostScatterTarget(this));
-            return WithNewCurrentStrategyAndDirection(strategy, Direction.Opposite());
+            return WithNewCurrentStrategyAndDirection(ScatterStrategy, Direction.Opposite());
         }
 
         internal Ghost SetToHome() => WithNewLocation(Home);
@@ -120,21 +121,21 @@ namespace NPacMan.Game
         internal Ghost SetToScore() => WithNewStatusAndStrategy(GhostStatus.Score, ChaseStrategy);
 
         private Ghost WithNewStatusAndStrategy(GhostStatus newGhostStatus,  IGhostStrategy newCurrentStrategy)
-            => new Ghost(Name, Home, Location, Direction, ScatterTarget, ChaseStrategy, newCurrentStrategy, newGhostStatus, NumberOfCoinsRequiredToExitHouse);
+            => new Ghost(Name, Home, Location, Direction, ScatterTarget, ChaseStrategy, ScatterStrategy, newCurrentStrategy, newGhostStatus, NumberOfCoinsRequiredToExitHouse);
 
         private Ghost WithNewEdibleAndDirectionAndStrategy(GhostStatus newGhostStatus, Direction newDirection, IGhostStrategy newCurrentStrategy)
-            => new Ghost(Name, Home, Location, newDirection, ScatterTarget, ChaseStrategy, newCurrentStrategy, newGhostStatus, NumberOfCoinsRequiredToExitHouse);
+            => new Ghost(Name, Home, Location, newDirection, ScatterTarget, ChaseStrategy, ScatterStrategy, newCurrentStrategy, newGhostStatus, NumberOfCoinsRequiredToExitHouse);
 
         private Ghost WithNewCurrentStrategyAndDirection(IGhostStrategy newCurrentStrategy, Direction newDirection)
-            => new Ghost(Name, Home, Location, newDirection, ScatterTarget, ChaseStrategy, newCurrentStrategy, Status, NumberOfCoinsRequiredToExitHouse);
+            => new Ghost(Name, Home, Location, newDirection, ScatterTarget, ChaseStrategy, ScatterStrategy, newCurrentStrategy, Status, NumberOfCoinsRequiredToExitHouse);
 
         private Ghost WithNewLocation(CellLocation newLocation)
-            => new Ghost(Name, Home, newLocation, Direction, ScatterTarget, ChaseStrategy, CurrentStrategy, Status, NumberOfCoinsRequiredToExitHouse);
+            => new Ghost(Name, Home, newLocation, Direction, ScatterTarget, ChaseStrategy, ScatterStrategy, CurrentStrategy, Status, NumberOfCoinsRequiredToExitHouse);
 
         private Ghost WithNewLocationAndDirection(CellLocation newLocation, Direction newDirection)
-            => new Ghost(Name, Home, newLocation, newDirection, ScatterTarget, ChaseStrategy, CurrentStrategy, Status, NumberOfCoinsRequiredToExitHouse);
+            => new Ghost(Name, Home, newLocation, newDirection, ScatterTarget, ChaseStrategy, ScatterStrategy, CurrentStrategy, Status, NumberOfCoinsRequiredToExitHouse);
 
         private Ghost WithNewStatus(GhostStatus newGhostStatus)
-            => new Ghost(Name, Home, Location, Direction, ScatterTarget, ChaseStrategy, CurrentStrategy, newGhostStatus, NumberOfCoinsRequiredToExitHouse);
+            => new Ghost(Name, Home, Location, Direction, ScatterTarget, ChaseStrategy, ScatterStrategy, CurrentStrategy, newGhostStatus, NumberOfCoinsRequiredToExitHouse);
     }
 }

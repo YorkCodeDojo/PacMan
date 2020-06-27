@@ -10,6 +10,7 @@ namespace NPacMan.Game.Tests.GameTests
     {
         private int _numberOfCoinsRequiredToExitHouse = 0;
         private IGhostStrategy _chaseStrategy = new StandingStillGhostStrategy();
+        private IGhostStrategy _scatterStrategy = new DirectToStrategy(new DirectToGhostScatterTarget(CellLocation.TopLeft));
         private CellLocation _scatterTarget = CellLocation.TopLeft;
         private Direction _direction = Direction.Left;
         private CellLocation _location = new CellLocation(0, 0);
@@ -34,6 +35,13 @@ namespace NPacMan.Game.Tests.GameTests
         public GhostBuilder WithChaseStrategy(IGhostStrategy ghostStrategy)
         {
             _chaseStrategy = ghostStrategy;
+
+            return this;
+        }
+
+        public GhostBuilder WithScatterStrategy(IGhostStrategy ghostStrategy)
+        {
+            _scatterStrategy = ghostStrategy;
 
             return this;
         }
@@ -67,8 +75,7 @@ namespace NPacMan.Game.Tests.GameTests
             var next = Interlocked.Increment(ref ghostNumber);
             var name = $"Ghost{next}";
 
-            return new Ghost(name, _location, _direction, _scatterTarget, _chaseStrategy,
-                _numberOfCoinsRequiredToExitHouse);
+            return new Ghost(name, _location, _direction, _scatterTarget, _chaseStrategy, _scatterStrategy, _numberOfCoinsRequiredToExitHouse);
         }
 
         public IList<Ghost> CreateMany(int count)
@@ -76,5 +83,11 @@ namespace NPacMan.Game.Tests.GameTests
 
         public GhostBuilder WithChaseStrategyRight()
             => WithChaseStrategy(new GhostGoesRightStrategy());
+
+        public GhostBuilder WithScatterStrategyLeft()
+            => WithScatterStrategy(new GhostGoesLeftStrategy());
+
+        public GhostBuilder WithScatterStrategyRight()
+            => WithScatterStrategy(new GhostGoesRightStrategy());
     }
 }

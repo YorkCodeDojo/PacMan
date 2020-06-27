@@ -1,8 +1,8 @@
-﻿using System;
+﻿using NPacMan.Game.GhostStrategies;
+using NPacMan.Game.Properties;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using NPacMan.Game.GhostStrategies;
-using NPacMan.Game.Properties;
 using System.Text.Json;
 
 namespace NPacMan.Game
@@ -32,21 +32,25 @@ namespace NPacMan.Game
 
             var ghostSetup = FindHomeLocations(instructions);
 
-            var ghosts = ghostSetup.Select(data => 
+            var ghosts = ghostSetup.Select(data =>
+                                        {
+                                            var scatterTarget = new CellLocation(data.ScatterTarget.X, data.ScatterTarget.Y);
 
-                                        new Ghost(data.Name,
-                                                 new CellLocation(data.StartingLocation.X, data.StartingLocation.Y),
-                                                 Direction.Left,
-                                                 new CellLocation(data.ScatterTarget.X, data.ScatterTarget.Y),
-                                                 data.Name switch 
-                                                 {
-                                                     GhostNames.Blinky => new DirectToStrategy(new DirectToPacManLocation()),
-                                                     GhostNames.Clyde => new DirectToStrategy(new StaysCloseToPacManLocation(GhostNames.Clyde)),
-                                                     GhostNames.Inky => new DirectToStrategy(new InterceptPacManLocation(GhostNames.Blinky)),
-                                                     GhostNames.Pinky => new DirectToStrategy(new DirectToExpectedPacManLocation()),
-                                                     _ => new DirectToStrategy(new DirectToPacManLocation())
-                                                 },
-                                                 data.PillsToLeave)).ToList();
+                                            return new Ghost(data.Name,
+                                                     new CellLocation(data.StartingLocation.X, data.StartingLocation.Y),
+                                                     Direction.Left,
+                                                     scatterTarget,
+                                                     data.Name switch
+                                                     {
+                                                         GhostNames.Blinky => new DirectToStrategy(new DirectToPacManLocation()),
+                                                         GhostNames.Clyde => new DirectToStrategy(new StaysCloseToPacManLocation(GhostNames.Clyde, scatterTarget)),
+                                                         GhostNames.Inky => new DirectToStrategy(new InterceptPacManLocation(GhostNames.Blinky)),
+                                                         GhostNames.Pinky => new DirectToStrategy(new DirectToExpectedPacManLocation()),
+                                                         _ => new DirectToStrategy(new DirectToPacManLocation())
+                                                     },
+                                                    new DirectToStrategy(new DirectToGhostScatterTarget(scatterTarget)),
+                                                    data.PillsToLeave);
+                                        }).ToList();
 
             var coins = new List<CellLocation>();
             var powerPills = new List<CellLocation>();
@@ -93,10 +97,10 @@ namespace NPacMan.Game
                             break;
                         case 'H':
                             ghostHouse.Add(location);
-                            break;             
+                            break;
                         case 'F':
                             fruit = location;
-                            break;              
+                            break;
                         default:
                             break;
                     }

@@ -229,7 +229,7 @@ namespace NPacMan.Game.Tests.GameTests
             var gameHarness = new GameHarness(board);
             gameHarness.StartGame();
 
-            var staysCloseToPacManLocation = new StaysCloseToPacManLocation(ghost.Name);
+            var staysCloseToPacManLocation = new StaysCloseToPacManLocation(ghost.Name, CellLocation.TopLeft);
             var targetLocation = staysCloseToPacManLocation.GetLocation(gameHarness.Game);
 
             targetLocation.Should().BeEquivalentTo(new
@@ -256,7 +256,7 @@ namespace NPacMan.Game.Tests.GameTests
             var gameHarness = new GameHarness(board);
             gameHarness.StartGame();
 
-            var staysCloseToPacManLocation = new StaysCloseToPacManLocation(ghost.Name);
+            var staysCloseToPacManLocation = new StaysCloseToPacManLocation(ghost.Name, CellLocation.TopLeft);
             var targetLocation = staysCloseToPacManLocation.GetLocation(gameHarness.Game);
 
             targetLocation.Should().BeEquivalentTo(new
