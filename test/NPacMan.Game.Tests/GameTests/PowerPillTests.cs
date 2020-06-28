@@ -140,19 +140,19 @@ namespace NPacMan.Game.Tests.GameTests
         {
             var ghost1 = GhostBuilder.New()
                 .WithLocation(_gameSettings.PacMan.Location.FarAway())
-                .WithScatterFixedStrategy(Direction.Up)
+                .WithScatterStrategyUp()
                 .Create();
             var ghost2 = GhostBuilder.New()
                 .WithLocation(_gameSettings.PacMan.Location.FarAway())
-                .WithScatterFixedStrategy(Direction.Down)
+                .WithScatterStrategyDown()
                 .Create();
             var ghost3 = GhostBuilder.New()
                 .WithLocation(_gameSettings.PacMan.Location.FarAway())
-                .WithScatterFixedStrategy(Direction.Left)
+                .WithScatterStrategyLeft()
                 .Create();
             var ghost4 = GhostBuilder.New()
                 .WithLocation(_gameSettings.PacMan.Location.FarAway())
-                .WithScatterFixedStrategy(Direction.Right)
+                .WithScatterStrategyRight()
                 .Create();
             _gameSettings.Ghosts.AddRange(new[] { ghost1, ghost2, ghost3, ghost4 });
 

@@ -77,7 +77,7 @@ namespace NPacMan.Game.Tests.GameTests
             var ghost = GhostBuilder.New()
                                     .WithLocation(ghostStart)
                                     .WithChaseStrategyRight()
-                                    .WithScatterFixedStrategy(Direction.Right)
+                                    .WithScatterStrategyRight()
                                     .Create();
 
             gameSettings.Ghosts.Add(ghost);
@@ -108,9 +108,7 @@ namespace NPacMan.Game.Tests.GameTests
         {
             const int initialHighScore = 1000;
             _highScore = initialHighScore;
-            var gameSettings = new TestGameSettings{
-                InitialGameStatus = GameStatus.Initial
-            };
+            var gameSettings = new TestGameSettings();
             gameSettings.HighScoreStorage = this;
             gameSettings.Coins.Add(gameSettings.PacMan.Location.Below);
             gameSettings.Coins.Add(gameSettings.PacMan.Location.FarAway());
@@ -141,7 +139,7 @@ namespace NPacMan.Game.Tests.GameTests
             var ghost = GhostBuilder.New()
                                     .WithLocation(ghostStart)
                                     .WithChaseStrategyRight()
-                                    .WithScatterFixedStrategy(Direction.Right)
+                                    .WithScatterStrategyRight()
                                     .Create();
 
             gameSettings.Ghosts.Add(ghost);

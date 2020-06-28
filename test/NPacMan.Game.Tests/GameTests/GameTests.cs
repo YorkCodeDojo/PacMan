@@ -273,7 +273,6 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public async Task GameMovesStraightIntoAttactMode()
         {
-            _gameSettings.InitialGameStatus = GameStatus.Initial;
             var gameHarness = new GameHarness(_gameSettings);
             gameHarness.StartGame();
 
@@ -285,7 +284,6 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public async Task GameMovesToAliveWhenUserPressesStart()
         {
-            _gameSettings.InitialGameStatus = GameStatus.Initial;
             var gameHarness = new GameHarness(_gameSettings);
             gameHarness.StartGame();
             await gameHarness.WaitAndEnterAttractMode();
@@ -326,17 +324,15 @@ namespace NPacMan.Game.Tests.GameTests
                     .WithScatterStrategyRight()
                     .WithChaseStrategyRight()
                     .WithLocation(ghostHomeLocation)
-                    .WithFrightenedStrategy(new GhostGoesInDirectionStrategy(Direction.Left))
+                    .WithFrightenedStrategyLeft()
                     .CreateMany(3);
             _gameSettings.Ghosts.AddRange(ghosts);
 
-            var killerGhostController = new ManuallyControlGhostStrategy(Direction.Right);
+            var killerGhostController = new GhostGoesInDirectionStrategy(Direction.Right);
 
             var killerGhost = GhostBuilder.New()
                     .WithLocation(_gameSettings.PacMan.Location.Left.Left.Left.Left.Left.Left)
-                    .WithChaseStrategy(killerGhostController)
-                    .WithScatterStrategy(killerGhostController)
-                    .WithFrightenedStrategy(killerGhostController)
+                    .WithManualControllerStrategy(killerGhostController)
                     .Create();
             _gameSettings.Ghosts.Add(killerGhost);
 
@@ -448,8 +444,6 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public async Task BeginningGameNotificationIsPublishedWhenGameMovesToAliveWhenUserPressesStart()
         {
-            _gameSettings.InitialGameStatus = GameStatus.Initial;
-
             var gameHarness = new GameHarness(_gameSettings);
             gameHarness.StartGame();
 

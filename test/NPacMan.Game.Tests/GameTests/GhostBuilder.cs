@@ -18,7 +18,7 @@ namespace NPacMan.Game.Tests.GameTests
 
         private GhostBuilder()
         {
-            
+
         }
 
         public static GhostBuilder New()
@@ -90,16 +90,48 @@ namespace NPacMan.Game.Tests.GameTests
         public IList<Ghost> CreateMany(int count)
             => Enumerable.Range(0, count).Select(x => Create()).ToList();
 
+        public GhostBuilder WithChaseStrategyStill()
+            => WithChaseStrategy(new StandingStillGhostStrategy());
+        public GhostBuilder WithChaseStrategyLeft()
+            => WithChaseStrategy(new GhostGoesInDirectionStrategy(Direction.Left));
         public GhostBuilder WithChaseStrategyRight()
             => WithChaseStrategy(new GhostGoesInDirectionStrategy(Direction.Right));
+        public GhostBuilder WithChaseStrategyDown()
+            => WithChaseStrategy(new GhostGoesInDirectionStrategy(Direction.Down));
+        public GhostBuilder WithChaseStrategyUp()
+            => WithChaseStrategy(new GhostGoesInDirectionStrategy(Direction.Up));
 
+
+        public GhostBuilder WithScatterStrategyStill()
+            => WithScatterStrategy(new StandingStillGhostStrategy());
+        public GhostBuilder WithScatterStrategyLeft()
+            => WithScatterStrategy(new GhostGoesInDirectionStrategy(Direction.Left));
         public GhostBuilder WithScatterStrategyRight()
             => WithScatterStrategy(new GhostGoesInDirectionStrategy(Direction.Right));
+        public GhostBuilder WithScatterStrategyDown()
+            => WithScatterStrategy(new GhostGoesInDirectionStrategy(Direction.Down));
+        public GhostBuilder WithScatterStrategyUp()
+            => WithScatterStrategy(new GhostGoesInDirectionStrategy(Direction.Up));
 
+        public GhostBuilder WithFrightenedStrategyStill()
+            => WithFrightenedStrategy(new StandingStillGhostStrategy());
+        public GhostBuilder WithFrightenedStrategyLeft()
+            => WithFrightenedStrategy(new GhostGoesInDirectionStrategy(Direction.Left));
         public GhostBuilder WithFrightenedStrategyRight()
             => WithFrightenedStrategy(new GhostGoesInDirectionStrategy(Direction.Right));
-        
-        public GhostBuilder WithScatterFixedStrategy(Direction direction)
-            => WithScatterStrategy(new GhostGoesInDirectionStrategy(direction));
+        public GhostBuilder WithFrightenedStrategyDown()
+            => WithFrightenedStrategy(new GhostGoesInDirectionStrategy(Direction.Down));
+        public GhostBuilder WithFrightenedStrategyUp()
+            => WithFrightenedStrategy(new GhostGoesInDirectionStrategy(Direction.Up));
+
+
+        public GhostBuilder WithManualControllerStrategy(GhostGoesInDirectionStrategy controller)
+        {
+            WithChaseStrategy(controller);
+            WithScatterStrategy(controller);
+            WithFrightenedStrategy(controller);
+
+            return this;
+        }
     }
 }

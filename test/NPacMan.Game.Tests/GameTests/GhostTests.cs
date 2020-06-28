@@ -177,7 +177,7 @@ namespace NPacMan.Game.Tests.GameTests
 
             var ghost = GhostBuilder.New()
                 .WithLocation(startingLocation)
-                .WithScatterFixedStrategy(Direction.Up)
+                .WithScatterStrategyUp()
                 .WithChaseStrategyRight()
                 .Create();
             _gameSettings.Ghosts.Add(ghost);
@@ -497,7 +497,7 @@ namespace NPacMan.Game.Tests.GameTests
                 .WithLocation(ghostStart1)
                 .WithScatterStrategy(new StandingStillGhostStrategy())
                 .WithDirection(Direction.Right)
-                .WithFrightenedStrategy(new GhostGoesInDirectionStrategy(Direction.Right))
+                .WithFrightenedStrategyRight()
                 .Create();
             _gameSettings.Ghosts.Add(ghost1);
 
@@ -632,14 +632,14 @@ namespace NPacMan.Game.Tests.GameTests
             var ghost1 = GhostBuilder.New()
                 .WithLocation(_gameSettings.PacMan.Location.Right.Above.Above)
                 .WithScatterStrategy(new StandingStillGhostStrategy())
-                .WithFrightenedStrategy(new GhostGoesInDirectionStrategy(Direction.Down))
+                .WithFrightenedStrategyDown()
                 .Create();
             _gameSettings.Ghosts.Add(ghost1);
 
             var ghost2 = GhostBuilder.New()
                 .WithLocation(_gameSettings.PacMan.Location.FarAway())
                 .WithScatterStrategy(new StandingStillGhostStrategy())
-                .WithFrightenedStrategy(new GhostGoesInDirectionStrategy(Direction.Down))
+                .WithFrightenedStrategyDown()
                 .Create();
             _gameSettings.Ghosts.Add(ghost2);
 
@@ -742,9 +742,9 @@ namespace NPacMan.Game.Tests.GameTests
             // > .       
             var ghost = GhostBuilder.New()
                 .WithLocation(_gameSettings.PacMan.Location.Right.Above.Above)
-                .WithChaseStrategy(new GhostGoesInDirectionStrategy(Direction.Left))
-                .WithFrightenedStrategy(new GhostGoesInDirectionStrategy(Direction.Right))
-                .WithScatterStrategy(new GhostGoesInDirectionStrategy(Direction.Down))
+                .WithChaseStrategyLeft()
+                .WithFrightenedStrategyRight()
+                .WithScatterStrategyDown()
                 .Create();
             _gameSettings.Ghosts.Add(ghost);
 
@@ -954,7 +954,7 @@ namespace NPacMan.Game.Tests.GameTests
                 .WithLocation(ghostStart1)
                 .WithChaseStrategyRight()
                 .WithScatterStrategyRight()
-                .WithFrightenedStrategy(new GhostGoesInDirectionStrategy(null))
+                .WithFrightenedStrategy(new StandingStillGhostStrategy())
                 .Create();
 
             _gameSettings.Ghosts.Add(ghost1);
@@ -1191,13 +1191,13 @@ namespace NPacMan.Game.Tests.GameTests
                 .WithLocation(ghostStart1)
                 .WithChaseStrategyRight()
                 .WithScatterStrategyRight()
-                .WithFrightenedStrategy(new GhostGoesInDirectionStrategy(null))
+                .WithFrightenedStrategy(new StandingStillGhostStrategy())
                 .Create();
             var killerGhost = GhostBuilder.New()
                 .WithLocation(ghostStart1.Left)
                 .WithChaseStrategyRight()
                 .WithScatterTarget(ghostStart1.Right.Right.Right)
-                .WithFrightenedStrategy(new GhostGoesInDirectionStrategy(null))
+                .WithFrightenedStrategy(new StandingStillGhostStrategy())
                 .WithDirection(Direction.Right)
                 .Create();
 
