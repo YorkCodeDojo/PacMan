@@ -311,7 +311,14 @@ namespace NPacMan.Game.Tests
             var actualGhostStatus = Game.Ghosts[ghost.Name].Status;
             if (Game.Ghosts[ghost.Name].Status != GhostStatus.Score)
             {
-                WriteAndThrowException($"Expected ghost ({ghost.Name}) status to be {GhostStatus.Score} but was {actualGhostStatus} ");
+                if (Game.Ghosts[ghost.Name].Location != Game.PacMan.Location)
+                {
+                    WriteAndThrowException($"{ghost.Name} was not eaten by PacMan because the ghost is at {Game.Ghosts[ghost.Name].Location} and PacMan is at {Game.PacMan.Location}.");
+                }
+                else
+                {
+                    WriteAndThrowException($"Expected ghost ({ghost.Name}) status to be {GhostStatus.Score} but was {actualGhostStatus} ");
+                }
             }
         }
 

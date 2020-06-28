@@ -51,8 +51,6 @@ namespace NPacMan.Game
 
         public int FrightenedTimeInSeconds { get; } = 7;
 
-        public IDirectionPicker DirectionPicker {get;} = new RandomDirectionPicker();
-
         public IReadOnlyCollection<int> FruitAppearsAfterCoinsEaten {get;}= new []{
             70, 170
         };

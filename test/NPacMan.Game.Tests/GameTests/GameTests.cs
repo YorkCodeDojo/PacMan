@@ -320,26 +320,27 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public async Task AfterGameOverAndStartingNewGameAllStateIsRestored()
         {
+            var killerGhostController = new ManuallyControlGhostStrategy(Direction.Right);
+
             var ghostHomeLocation = _gameSettings.PacMan.Location.FarAway();
             var ghosts = GhostBuilder.New()
                     .WithScatterStrategyRight()
                     .WithChaseStrategyRight()
                     .WithLocation(ghostHomeLocation)
+                    .WithFrightenedStrategy(new GhostGoesInDirectionStrategy(Direction.Left))
                     .CreateMany(3);
+            _gameSettings.Ghosts.AddRange(ghosts);
+
             var killerGhost = GhostBuilder.New()
                     .WithLocation(_gameSettings.PacMan.Location.Left.Left.Left.Left.Left.Left)
-                    .WithDirection(Direction.Left)
-                    .WithScatterTarget(_gameSettings.PacMan.Location.Right)
+                    .WithChaseStrategy(killerGhostController)
+                    .WithScatterStrategy(killerGhostController)
+                    .WithFrightenedStrategy(killerGhostController)
                     .Create();
-            _gameSettings.DirectionPicker = new TestDirectionPicker()
-            {
-                DefaultDirection = Direction.Left
-            };
-            _gameSettings.Coins.Add(_gameSettings.PacMan.Location.Left);
-            _gameSettings.Coins.Add(_gameSettings.PacMan.Location.FarAway());
-            _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Left.Left);
-            _gameSettings.Ghosts.AddRange(ghosts);
             _gameSettings.Ghosts.Add(killerGhost);
+
+            _gameSettings.CreateBoard("G . . . * . P . H");
+            
             _gameSettings.FruitAppearsAfterCoinsEaten.Add(1);
             _gameSettings.InitialLives = 1;
 
@@ -347,10 +348,12 @@ namespace NPacMan.Game.Tests.GameTests
             await gameHarness.PlayGame();
 
             await gameHarness.ChangeDirection(Direction.Left);
+            killerGhostController.NextDirection = Direction.Right;
+
             await gameHarness.EatCoin();
             await gameHarness.EatPill();
 
-            await gameHarness.ChangeDirection(Direction.Up);
+            killerGhostController.NextDirection = null;
             await gameHarness.WaitForFrightenedTimeToComplete();
 
             await gameHarness.GetEatenByGhost(killerGhost);

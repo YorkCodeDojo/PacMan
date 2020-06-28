@@ -68,7 +68,6 @@ namespace NPacMan.Game.Tests
         public int InitialScatterTimeInSeconds { get; set; } = 7;
         public int ChaseTimeInSeconds { get; set; } = 7;
         public int FrightenedTimeInSeconds { get; set; } = 7;
-        public IDirectionPicker DirectionPicker { get; internal set; } = new TestDirectionPicker();
         public int FruitVisibleForSeconds { get; set; } = 7;
         public int PointsNeededForBonusLife { get; internal set; } = int.MaxValue;
         public IHighScoreStorage HighScoreStorage { get; internal set; } = new InMemoryHighScoreStorage();

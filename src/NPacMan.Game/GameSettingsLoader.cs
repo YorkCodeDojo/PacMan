@@ -36,6 +36,8 @@ namespace NPacMan.Game
                                         {
                                             var scatterTarget = new CellLocation(data.ScatterTarget.X, data.ScatterTarget.Y);
 
+                                            var frightenedStrategy = new RandomStrategy(new RandomDirectionPicker());
+
                                             return new Ghost(data.Name,
                                                      new CellLocation(data.StartingLocation.X, data.StartingLocation.Y),
                                                      Direction.Left,
@@ -48,6 +50,7 @@ namespace NPacMan.Game
                                                          _ => new DirectToStrategy(new DirectToPacManLocation())
                                                      },
                                                     new DirectToStrategy(new DirectToGhostScatterTarget(scatterTarget)),
+                                                    frightenedStrategy,
                                                     data.PillsToLeave);
                                         }).ToList();
 
