@@ -263,6 +263,7 @@ namespace NPacMan.Game.Tests
 
             var numberOfCoins = Game.Coins.Count;
             var numberOfPowerPills = Game.PowerPills.Count;
+            var score = Game.Score;
 
             await _gameClock.Tick(_now);
 
@@ -282,6 +283,11 @@ namespace NPacMan.Game.Tests
             if (numberOfPowerPills != Game.PowerPills.Count)
             {
                 WriteAndThrowException("A power pill was unexpectedly eaten");
+            }
+
+            if (score != Game.Score)
+            {
+                WriteAndThrowException("The score unexpectedly increased");
             }
         }
 
@@ -306,7 +312,24 @@ namespace NPacMan.Game.Tests
 
         public async Task EatGhost(Ghost ghost)
         {
-            await Move("EatGhost");
+            WriteHeading("EatGhost");
+
+            var pacManLocation = Game.PacMan.Location;
+            var ghostLocations = Game.Ghosts.Values.Select(x => x.Location).ToArray();
+
+            var numberOfCoins = Game.Coins.Count;
+            var numberOfPowerPills = Game.PowerPills.Count;
+            var score = Game.Score;
+
+            await _gameClock.Tick(_now);
+
+            WriteBoard();
+
+            if (Game.PacMan.Location == pacManLocation
+                && ghostLocations.SequenceEqual(Game.Ghosts.Values.Select(x => x.Location)))
+            {
+                WriteAndThrowException("Expected PacMan or Ghosts to Move");
+            }
 
             var actualGhostStatus = Game.Ghosts[ghost.Name].Status;
             if (Game.Ghosts[ghost.Name].Status != GhostStatus.Score)
@@ -324,7 +347,24 @@ namespace NPacMan.Game.Tests
 
         public async Task EatGhosts(IEnumerable<Ghost> ghosts)
         {
-            await Move("EatGhosts");
+            WriteHeading("EatGhosts");
+
+            var pacManLocation = Game.PacMan.Location;
+            var ghostLocations = Game.Ghosts.Values.Select(x => x.Location).ToArray();
+
+            var numberOfCoins = Game.Coins.Count;
+            var numberOfPowerPills = Game.PowerPills.Count;
+            var score = Game.Score;
+
+            await _gameClock.Tick(_now);
+
+            WriteBoard();
+
+            if (Game.PacMan.Location == pacManLocation
+                && ghostLocations.SequenceEqual(Game.Ghosts.Values.Select(x => x.Location)))
+            {
+                WriteAndThrowException("Expected PacMan or Ghosts to Move");
+            }
 
             foreach (var ghost in ghosts)
             {

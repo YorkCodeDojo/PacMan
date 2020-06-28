@@ -320,7 +320,6 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public async Task AfterGameOverAndStartingNewGameAllStateIsRestored()
         {
-            var killerGhostController = new ManuallyControlGhostStrategy(Direction.Right);
 
             var ghostHomeLocation = _gameSettings.PacMan.Location.FarAway();
             var ghosts = GhostBuilder.New()
@@ -330,6 +329,8 @@ namespace NPacMan.Game.Tests.GameTests
                     .WithFrightenedStrategy(new GhostGoesInDirectionStrategy(Direction.Left))
                     .CreateMany(3);
             _gameSettings.Ghosts.AddRange(ghosts);
+
+            var killerGhostController = new ManuallyControlGhostStrategy(Direction.Right);
 
             var killerGhost = GhostBuilder.New()
                     .WithLocation(_gameSettings.PacMan.Location.Left.Left.Left.Left.Left.Left)

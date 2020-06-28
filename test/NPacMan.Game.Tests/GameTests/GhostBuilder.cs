@@ -96,6 +96,9 @@ namespace NPacMan.Game.Tests.GameTests
         public GhostBuilder WithScatterStrategyRight()
             => WithScatterStrategy(new GhostGoesInDirectionStrategy(Direction.Right));
 
+        public GhostBuilder WithFrightenedStrategyRight()
+            => WithFrightenedStrategy(new GhostGoesInDirectionStrategy(Direction.Right));
+        
         public GhostBuilder WithScatterFixedStrategy(Direction direction)
             => WithScatterStrategy(new GhostGoesInDirectionStrategy(direction));
     }
