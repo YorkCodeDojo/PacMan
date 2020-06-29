@@ -1,4 +1,5 @@
 using NPacMan.Game.Tests.GameTests;
+using System;
 using System.Collections.Generic;
 
 namespace NPacMan.Game.Tests
@@ -73,6 +74,8 @@ namespace NPacMan.Game.Tests
         public IHighScoreStorage HighScoreStorage { get; internal set; } = new InMemoryHighScoreStorage();
         public int FrightenedFlashTimeInSeconds { get; internal set; } = 2;
 
+        public IMoveClock MoveClock { get; internal set; } = new TestMoveClock();
+
         private readonly AsciiTestSettingBuilder _builder;
 
         public TestGameSettings()
@@ -89,5 +92,19 @@ namespace NPacMan.Game.Tests
         {
             _builder.AssertBoard(game, rows);
         }
+    }
+
+    public class TestMoveClock : IMoveClock
+    {
+        private int _counter=0;
+        public bool ShouldGhostMove(Ghost ghost)
+            => !ghost.Edible || _counter % 2 == 1;
+
+        public bool ShouldPacManMove()
+            => true;
+
+        public void UpdateTime(TimeSpan deltaTime) {
+            _counter++;
+         }
     }
 }

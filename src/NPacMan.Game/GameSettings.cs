@@ -62,5 +62,7 @@ namespace NPacMan.Game
         public IHighScoreStorage HighScoreStorage { get; } = new InMemoryHighScoreStorage();
 
         public int FrightenedFlashTimeInSeconds { get; } = 2;
+
+        public IMoveClock MoveClock { get; } = new MoveClock();
     }
 }

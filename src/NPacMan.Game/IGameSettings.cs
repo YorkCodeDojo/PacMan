@@ -31,5 +31,7 @@ namespace NPacMan.Game
         int PointsNeededForBonusLife { get; }
 
         int FrightenedFlashTimeInSeconds { get; }
+
+        IMoveClock MoveClock { get; }
     }
 }

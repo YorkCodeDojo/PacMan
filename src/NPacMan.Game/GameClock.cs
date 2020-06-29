@@ -11,7 +11,7 @@ namespace NPacMan.Game
 
         public GameClock()
         {
-            _timer = new Timer((state) => _action?.Invoke(DateTime.UtcNow), null, 0, 150);
+            _timer = new Timer((state) => _action?.Invoke(DateTime.UtcNow), null, 0, 13);
         }
 
         public void Subscribe(Func<DateTime, Task> action)

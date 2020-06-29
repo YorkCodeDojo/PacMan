@@ -81,6 +81,7 @@ namespace NPacMan.Game
                 When (PlayersWishesToChangeDirection)
                     .Then(context => actions.ChangeDirection(game, context.Instance, context.Data.NewDirection)),
                 When(Tick)
+                    .Then(context => actions.UpdateMoveClock(context.Instance))
                     .ThenAsync(async context => await actions.MoveGhosts(game, context.Instance, context, this))
                     .ThenAsync(async context => await actions.MovePacMan(game, context.Instance, context, this)),
                 handleCoinCollision,

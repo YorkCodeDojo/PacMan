@@ -1,8 +1,84 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using NPacMan.Game.GhostStrategies;
 
 namespace NPacMan.Game
 {
+    public interface IMoveClock
+    {
+        bool ShouldGhostMove(Ghost ghost);
+        bool ShouldPacManMove();
+        void UpdateTime(TimeSpan deltaTime);
+    }
+
+    public class MoveClock : IMoveClock
+    {
+        private IDictionary<string, DateTime> _ghostsLastMoves
+                = new Dictionary<string, DateTime>();
+        private DateTime _pacManLastMoved;
+        private DateTime _internalClock;
+
+        public void UpdateTime(TimeSpan deltaTime)
+        {
+            _internalClock = _internalClock.Add(deltaTime);
+        }
+
+        public bool ShouldGhostMove(Ghost ghost)
+        {
+            if (!_ghostsLastMoves.TryGetValue(ghost.Name, out var ghostLastMoved))
+            {
+                ghostLastMoved = _internalClock;
+                _ghostsLastMoves[ghost.Name] = ghostLastMoved;
+                return true;
+            }
+
+            var movingAtFullSpeed = PercentageToTime(75);
+            var movingAtFrightenedSpeed = PercentageToTime(50);
+
+            if (ghost.Edible)
+            {
+                if ((ghostLastMoved + movingAtFrightenedSpeed) < _internalClock)
+                {
+                    _ghostsLastMoves[ghost.Name] = ghostLastMoved + movingAtFrightenedSpeed;
+                    return true;
+                }
+            }
+            else
+            {
+                if ((ghostLastMoved + movingAtFullSpeed) < _internalClock)
+                {
+                    _ghostsLastMoves[ghost.Name] = ghostLastMoved + movingAtFullSpeed;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public bool ShouldPacManMove()
+        {
+            var movingAtFullSpeed = PercentageToTime(80);
+
+            if (_pacManLastMoved == DateTime.MinValue)
+            {
+                _pacManLastMoved = _internalClock;
+                return true;
+            }
+
+            if ((_pacManLastMoved + movingAtFullSpeed) < _internalClock)
+            {
+                _pacManLastMoved = _pacManLastMoved + movingAtFullSpeed;
+                return true;
+            }
+
+            return false;
+        }
+
+        private TimeSpan PercentageToTime(int percent) => TimeSpan.FromMilliseconds(100 / (percent / 100f));
+    }
+
+
     public class Ghost
     {
         public string Name { get; }
@@ -61,8 +137,6 @@ namespace NPacMan.Game
         }
         internal Ghost Move(Game game, IReadOnlyGameState gameState)
         {
-            if (Edible && gameState.TickCounter % 2 == 1) return this;
-
             if (GhostWalkingOutOfGhostHouse(game))
             {
                 if (game.StartingCoins.Count - game.Coins.Count >= NumberOfCoinsRequiredToExitHouse)

@@ -46,7 +46,7 @@ namespace NPacMan.Game
         public int Score { get; private set; }
 
         public int PointsForEatingLastGhost { get; private set; }
-
+        public TimeSpan Delta { get; private set; }
         public DateTime LastTick { get; private set; }
 
         public int TickCounter => _tickCounter;
@@ -155,6 +155,7 @@ namespace NPacMan.Game
         {
             Interlocked.Increment(ref _tickCounter);
 
+            Delta = now-LastTick;
             LastTick = now;
         }
 

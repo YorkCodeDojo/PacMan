@@ -126,6 +126,11 @@ namespace NPacMan.Game
             _gameNotifications.Publish(GameNotification.EatGhost);
         }
 
+        internal void UpdateMoveClock(GameState instance)
+        {
+            _gameSettings.MoveClock.UpdateTime(instance.Delta);
+        }
+
         internal void FruitEaten(Game game, GameState gameState, CellLocation location)
         {
             var scoreIncrement = Fruits.FruitForLevel(gameState.Level).Score;
@@ -178,6 +183,11 @@ namespace NPacMan.Game
 
         internal async Task MovePacMan(Game game, GameState gameState, BehaviorContext<GameState, Tick> context, GameStateMachine gameStateMachine)
         {
+            if(!_gameSettings.MoveClock.ShouldPacManMove())
+            {
+                return;
+            }
+
             var newPacManLocation = gameState.PacMan.Location + gameState.PacMan.Direction;
 
             if (game.Portals.TryGetValue(newPacManLocation, out var otherEndOfThePortal))
@@ -214,7 +224,9 @@ namespace NPacMan.Game
 
         internal async Task MoveGhosts(Game game, GameState gameState, BehaviorContext<GameState, Tick> context, GameStateMachine gameStateMachine)
         {
-            gameState.ApplyToGhosts(ghost => ghost.Move(game, gameState));
+            var ghostsToMove = game.Ghosts.Values.Where(x => _gameSettings.MoveClock.ShouldGhostMove(x));
+                                
+            gameState.ApplyToGhosts(ghost => ghost.Move(game, gameState), ghostsToMove);
 
             var ghosts = GhostsCollidedWithPacMan(gameState);
             foreach (var ghost in ghosts)
