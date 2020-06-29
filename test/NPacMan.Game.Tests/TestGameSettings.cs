@@ -1,5 +1,4 @@
 using NPacMan.Game.Tests.GameTests;
-using System;
 using System.Collections.Generic;
 
 namespace NPacMan.Game.Tests
@@ -92,19 +91,5 @@ namespace NPacMan.Game.Tests
         {
             _builder.AssertBoard(game, rows);
         }
-    }
-
-    public class TestMoveClock : IMoveClock
-    {
-        private int _counter=0;
-        public bool ShouldGhostMove(Ghost ghost)
-            => !ghost.Edible || _counter % 2 == 1;
-
-        public bool ShouldPacManMove(int gameLevel, bool isFrightened)
-            => true;
-
-        public void UpdateTime(TimeSpan deltaTime) {
-            _counter++;
-         }
     }
 }
