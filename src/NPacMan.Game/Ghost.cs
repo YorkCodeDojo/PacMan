@@ -8,7 +8,7 @@ namespace NPacMan.Game
     public interface IMoveClock
     {
         bool ShouldGhostMove(Ghost ghost);
-        bool ShouldPacManMove();
+        bool ShouldPacManMove(int gameLevel);
         void UpdateTime(TimeSpan deltaTime);
     }
 
@@ -38,7 +38,7 @@ namespace NPacMan.Game
 
             if (ghost.Edible)
             {
-                if ((ghostLastMoved + movingAtFrightenedSpeed) < _internalClock)
+                if ((ghostLastMoved + movingAtFrightenedSpeed) <= _internalClock)
                 {
                     _ghostsLastMoves[ghost.Name] = ghostLastMoved + movingAtFrightenedSpeed;
                     return true;
@@ -46,7 +46,7 @@ namespace NPacMan.Game
             }
             else
             {
-                if ((ghostLastMoved + movingAtFullSpeed) < _internalClock)
+                if ((ghostLastMoved + movingAtFullSpeed) <= _internalClock)
                 {
                     _ghostsLastMoves[ghost.Name] = ghostLastMoved + movingAtFullSpeed;
                     return true;
@@ -56,7 +56,7 @@ namespace NPacMan.Game
             return false;
         }
 
-        public bool ShouldPacManMove()
+        public bool ShouldPacManMove(int gameLevel)
         {
             var movingAtFullSpeed = PercentageToTime(80);
 
@@ -66,7 +66,7 @@ namespace NPacMan.Game
                 return true;
             }
 
-            if ((_pacManLastMoved + movingAtFullSpeed) < _internalClock)
+            if ((_pacManLastMoved + movingAtFullSpeed) <= _internalClock)
             {
                 _pacManLastMoved = _pacManLastMoved + movingAtFullSpeed;
                 return true;
