@@ -53,6 +53,11 @@ namespace NPacMan.Game
                 When(Tick, context => context.Data.Now >= context.Instance.TimeToChangeState)
                     .TransitionTo(Scatter));
 
+            var handleCoinCollision = When(CoinCollision)
+                    .Then(context => actions.CoinEaten(game, context.Instance, context.Data.Location))
+                    .If(context => context.Instance.IsLevelComplete(), 
+                            binder => binder.TransitionTo(ChangingLevel));
+
             During(Frightened,
                 When(Tick)
                     .If(context => context.Data.Now >= context.Instance.TimeToChangeState, 
@@ -61,25 +66,24 @@ namespace NPacMan.Game
                     .If(context => context.Data.Now < context.Instance.TimeToChangeState && context.Data.Now >= context.Instance.TimeToChangeState - TimeSpan.FromSeconds(settings.FrightenedFlashTimeInSeconds),
                         binder => binder.Then(context => actions.MakeGhostsFlash(context.Instance))));
 
+            var handlePowerPillCollision = When(PowerPillCollision)
+                    .Then(context => actions.PowerPillEaten(context.Instance, context.Data.Location))
+                    .IfElse(context => context.Instance.IsLevelComplete(), 
+                            binder => binder.TransitionTo(ChangingLevel),
+                        binder =>
+                            binder.Then(context => context.Instance.ChangeStateIn(settings.FrightenedTimeInSeconds))
+                                .TransitionTo(Frightened));
+            
             During(Scatter, GhostChase, Frightened,
                 When (PlayersWishesToChangeDirection)
                     .Then(context => actions.ChangeDirection(game, context.Instance, context.Data.NewDirection)),
                 When(Tick)
                     .ThenAsync(async context => await actions.MoveGhosts(game, context.Instance, context, this))
                     .ThenAsync(async context => await actions.MovePacMan(game, context.Instance, context, this)),
-                When(CoinCollision)
-                    .Then(context => actions.CoinEaten(game, context.Instance, context.Data.Location))
-                    .If(context => context.Instance.IsLevelComplete(), 
-                            binder => binder.TransitionTo(ChangingLevel)),
+                handleCoinCollision,
                 When(FruitCollision)
                     .Then(context => actions.FruitEaten(game, context.Instance, context.Data.Location)),
-                When(PowerPillCollision)
-                    .Then(context => actions.PowerPillEaten(context.Instance, context.Data.Location))
-                    .IfElse(context => context.Instance.IsLevelComplete(), 
-                            binder => binder.TransitionTo(ChangingLevel),
-                        binder =>
-                            binder.Then(context => context.Instance.ChangeStateIn(settings.FrightenedTimeInSeconds))
-                                .TransitionTo(Frightened)),
+                handlePowerPillCollision,
                 When(GhostCollision)
                     .If(x => x.Data.Ghost.Edible,
                         binder => binder.Then(context => actions.GhostEaten(context.Instance, context.Data.Ghost, game))
@@ -121,6 +125,8 @@ namespace NPacMan.Game
                 When(Tick, context => context.Data.Now >= context.Instance.TimeToResumeState)
                     .Then(context => actions.SendGhostHome1(context.Instance))
                     .TransitionTo(Frightened),
+                handleCoinCollision,
+                handlePowerPillCollision,
                 When(GhostCollision)
                     .IfElse(x => x.Data.Ghost.Edible,
                     binder => binder.Then(context => actions.GhostEaten(context.Instance, context.Data.Ghost, game))
@@ -134,9 +140,7 @@ namespace NPacMan.Game
                     .TransitionTo(Scatter));
 
             During(EatingGhost,
-                    Ignore(PlayersWishesToChangeDirection),
-                    Ignore(CoinCollision),
-                    Ignore(PowerPillCollision));
+                    Ignore(PlayersWishesToChangeDirection));
 
             During(new [] {Dying, Respawning, AttractMode, ChangingLevel},
                     Ignore(PlayersWishesToChangeDirection),

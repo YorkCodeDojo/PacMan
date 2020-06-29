@@ -144,7 +144,7 @@ T*▲*T
         }
 
         [Fact]
-        public void ShouldHaveGhostsWithCorrectHomeLocations()
+        public void ShouldHaveGhostsWithCorrectScatterTargetLocations()
         {
             var board = @" XXF 
  BIP 

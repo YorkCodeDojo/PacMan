@@ -253,7 +253,8 @@ namespace NPacMan.Game
 
         private void MakeGhostsEdible(GameState gameState)
         {
-            gameState.ApplyToGhosts(ghost => ghost.SetToEdible());
+            var ghosts = gameState.Ghosts.Values.Where(x => x.Status == GhostStatus.Alive);
+            gameState.ApplyToGhosts(ghost => ghost.SetToEdible(), ghosts);
         }
 
         public void Start()

@@ -1269,5 +1269,69 @@ namespace NPacMan.Game.Tests.GameTests
                 Edible = true
             });
         }
+
+        [Fact]
+        public async Task CanEatGhostAndCoinOnSameLocation()
+        {
+            var ghost = GhostBuilder.New()
+                .WithLocation(_gameSettings.PacMan.Location.Right.Right)
+                .WithScatterStrategyStill()
+                .WithFrightenedStrategyStill()
+                .WithChaseStrategyStill()
+                .Create();
+
+            _gameSettings.Ghosts.Add(ghost);
+            _gameSettings.CreateBoard("P * .",
+                                      ".    ",
+                                      "H    ");
+
+            var gameHarness = new GameHarness(_gameSettings);
+            
+            await gameHarness.PlayGame();
+
+            await gameHarness.ChangeDirection(Direction.Right);
+            await gameHarness.EatPill();
+
+            if (gameHarness.Game.Coins.Count != 2)
+            {
+                throw new Exception($"There should be 2 coins not {gameHarness.Game.Coins.Count} coins.");
+            }
+
+            await gameHarness.EatGhost(ghost);
+            
+            gameHarness.Game.Coins.Should().HaveCount(1);
+        }
+
+        [Fact]
+        public async Task CanEatGhostAndPowerPillOnSameLocation()
+        {
+            var ghost = GhostBuilder.New()
+                .WithLocation(_gameSettings.PacMan.Location.Right.Right)
+                .WithScatterStrategyStill()
+                .WithFrightenedStrategyStill()
+                .WithChaseStrategyStill()
+                .Create();
+
+            _gameSettings.Ghosts.Add(ghost);
+            _gameSettings.CreateBoard("P * *",
+                                      ".    ",
+                                      "H    ");
+
+            var gameHarness = new GameHarness(_gameSettings);
+            
+            await gameHarness.PlayGame();
+
+            await gameHarness.ChangeDirection(Direction.Right);
+            await gameHarness.EatPill();
+
+            if (gameHarness.Game.PowerPills.Count != 2)
+            {
+                throw new Exception($"There should be 2 pills not {gameHarness.Game.PowerPills.Count} pills.");
+            }
+
+            await gameHarness.EatGhost(ghost);
+            
+            gameHarness.Game.PowerPills.Should().HaveCount(1);
+        }
     }
 }
