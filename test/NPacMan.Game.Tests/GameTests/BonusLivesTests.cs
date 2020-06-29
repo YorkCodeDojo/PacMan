@@ -25,7 +25,7 @@ namespace NPacMan.Game.Tests.GameTests
             gameSettings.PointsNeededForBonusLife = PointsFor.EatingCoin;
 
             var gameHarness = new GameHarness(gameSettings);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
 
             await gameHarness.ChangeDirection(Direction.Down);
 
@@ -48,7 +48,7 @@ namespace NPacMan.Game.Tests.GameTests
             gameSettings.PointsNeededForBonusLife = PointsFor.EatingCoin;
 
             var gameHarness = new GameHarness(gameSettings);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
 
             var previousLives = gameHarness.Lives;
 
@@ -73,7 +73,7 @@ namespace NPacMan.Game.Tests.GameTests
             gameSettings.PointsNeededForBonusLife = PointsFor.EatingCoin + 1;
 
             var gameHarness = new GameHarness(gameSettings);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
 
             var previousLives = gameHarness.Lives;
 
@@ -99,7 +99,7 @@ namespace NPacMan.Game.Tests.GameTests
             gameSettings.PointsNeededForBonusLife = PointsFor.EatingPowerPill;
 
             var gameHarness = new GameHarness(gameSettings);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
 
             await gameHarness.ChangeDirection(Direction.Down);
 
@@ -122,7 +122,7 @@ namespace NPacMan.Game.Tests.GameTests
             gameSettings.PointsNeededForBonusLife = PointsFor.EatingPowerPill;
 
             var gameHarness = new GameHarness(gameSettings);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
 
             var previousLives = gameHarness.Lives;
 
@@ -147,7 +147,7 @@ namespace NPacMan.Game.Tests.GameTests
             gameSettings.PointsNeededForBonusLife = PointsFor.EatingPowerPill + 1;
 
             var gameHarness = new GameHarness(gameSettings);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
 
             var previousLives = gameHarness.Lives;
 
@@ -175,7 +175,7 @@ namespace NPacMan.Game.Tests.GameTests
             gameSettings.PointsNeededForBonusLife = PointsFor.EatingFirstFruit;
 
             var gameHarness = new GameHarness(gameSettings);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
 
             await gameHarness.ChangeDirection(Direction.Down);
 
@@ -203,6 +203,7 @@ namespace NPacMan.Game.Tests.GameTests
             var ghost = GhostBuilder.New()
                                     .WithLocation(ghostStart)
                                     .WithChaseStrategyRight()
+                                    .WithScatterStrategyRight()
                                     .Create();
 
             gameSettings.Ghosts.Add(ghost);
@@ -211,7 +212,7 @@ namespace NPacMan.Game.Tests.GameTests
             gameSettings.PointsNeededForBonusLife = PointsFor.EatingFirstGhost;
 
             var gameHarness = new GameHarness(gameSettings);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
 
             await gameHarness.ChangeDirection(Direction.Left);
 

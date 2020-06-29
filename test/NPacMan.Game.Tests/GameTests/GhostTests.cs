@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using FluentAssertions.Execution;
 using NPacMan.Game.GhostStrategies;
+using NPacMan.Game.Tests.GhostStrategiesForTests;
 using NPacMan.Game.Tests.Helpers;
 using System;
 using System.Linq;
@@ -26,11 +27,12 @@ namespace NPacMan.Game.Tests.GameTests
         {
             var ghost = GhostBuilder.New()
                 .WithChaseStrategyRight()
+                .WithScatterStrategyRight()
                 .Create();
             _gameSettings.Ghosts.Add(ghost);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.Game.StartGame();
+            await gameHarness.PlayGame();
 
             await gameHarness.Move();
             gameHarness.Game.Ghosts[ghost.Name].Should().BeEquivalentTo(new
@@ -44,49 +46,58 @@ namespace NPacMan.Game.Tests.GameTests
         }
 
         [Fact]
-        public void GhostShouldNotMoveWhenPacManIsDying()
+        public async Task GhostShouldNotMoveWhenPacManIsDying()
         {
-            var x = 1;
-            var y = 1;
-            _gameSettings.InitialGameStatus = GameStatus.Dying;
+            var homeLocation = _gameSettings.PacMan.Location.Left.Left;
             var ghost = GhostBuilder.New()
-                    .WithLocation((x, y))
-                    .WithChaseStrategy(new DirectToStrategy(new DirectToPacManLocation()))
-                    .Create();
+                .WithLocation(homeLocation)
+                .WithDirection(Direction.Right)
+                .WithChaseStrategy(new DirectToStrategy(new DirectToPacManLocation()))
+                .WithScatterStrategy(new StandingStillGhostStrategy())
+                .Create();
+
             _gameSettings.Ghosts.Add(ghost);
-            _gameSettings.PacMan = new PacMan((3, 3), Direction.Down);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.Game.StartGame();
+            await gameHarness.PlayGame();
+            await gameHarness.ChangeDirection(Direction.Left);
+
+            await gameHarness.Move();
+            await gameHarness.GetEatenByGhost(ghost);
+
+            var ghostLocation = ghost.Location;
+
+            await gameHarness.NOP();
+
+            await gameHarness.WaitToFinishDying();
+            await gameHarness.WaitToRespawn();
 
             using var _ = new AssertionScope();
             gameHarness.Game.Ghosts[ghost.Name]
                 .Should().BeEquivalentTo(new
                 {
-                    Location = new
-                    {
-                        X = x,
-                        Y = y
-                    }
+                    Location = ghostLocation
                 });
         }
 
         [Fact]
         public async Task GhostShouldBeHiddenWhenPacManIsReSpawning()
         {
-            _gameSettings.PacMan = new PacMan((3, 2), Direction.Left);
-            var homeLocation = new CellLocation(1, 2);
+            var homeLocation = _gameSettings.PacMan.Location.Left.Left;
             var ghost = GhostBuilder.New()
                 .WithLocation(homeLocation)
                 .WithDirection(Direction.Right)
                 .WithChaseStrategy(new DirectToStrategy(new DirectToPacManLocation()))
+                .WithScatterStrategy(new StandingStillGhostStrategy())
                 .Create();
 
             _gameSettings.Ghosts.Add(ghost);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.Game.StartGame();
+            await gameHarness.PlayGame();
+            await gameHarness.ChangeDirection(Direction.Left);
 
+            await gameHarness.Move();
             await gameHarness.GetEatenByGhost(ghost);
             await gameHarness.WaitToFinishDying();
 
@@ -104,12 +115,13 @@ namespace NPacMan.Game.Tests.GameTests
                 .WithLocation(homeLocation)
                 .WithDirection(Direction.Right)
                 .WithChaseStrategyRight()
+                .WithScatterStrategyRight()
                 .Create();
 
             _gameSettings.Ghosts.Add(ghost);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.Game.StartGame();
+            await gameHarness.PlayGame();
 
             await gameHarness.GetEatenByGhost(ghost);
             await gameHarness.WaitToFinishDying();
@@ -129,7 +141,6 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public async Task GhostShouldScatterToStartWith()
         {
-            _gameSettings.InitialGameStatus = GameStatus.Initial;
             _gameSettings.PacMan = new PacMan((10, 10), Direction.Left);
             var startingLocation = new CellLocation(3, 1);
             var scatterLocation = new CellLocation(1, 1);
@@ -143,11 +154,8 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Ghosts.Add(ghost);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.Game.StartGame();
+            await gameHarness.PlayGame();
 
-            await gameHarness.WaitAndEnterAttractMode();
-
-            await gameHarness.PressStart();
             await gameHarness.Move();
             await gameHarness.Move();
 
@@ -165,48 +173,38 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public async Task GhostShouldChaseAfter7Seconds()
         {
-            _gameSettings.InitialGameStatus = GameStatus.AttractMode;
-            _gameSettings.PacMan = new PacMan((29, 10), Direction.Left);
-            var startingLocation = new CellLocation(30, 1);
-            var scatterLocation = new CellLocation(1, 1);
+            var startingLocation = _gameSettings.PacMan.Location.Right;
 
             var ghost = GhostBuilder.New()
                 .WithLocation(startingLocation)
-                .WithScatterTarget(scatterLocation)
-                .WithDirection(Direction.Right)
+                .WithScatterStrategyUp()
                 .WithChaseStrategyRight()
                 .Create();
             _gameSettings.Ghosts.Add(ghost);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.Game.StartGame();
+            await gameHarness.PlayGame();
+            await gameHarness.ChangeDirection(Direction.Left);
 
-            // We need to set the last tick because we've forced AttractMode.
-            await gameHarness.NOP();
-            await gameHarness.PressStart();
-
+            // Ghost starts by moving Up in scatter mode.
             await gameHarness.Move();
+            gameHarness.WeExpectThatGhost(ghost).IsAt(startingLocation.Above);
 
-            gameHarness.WeExpectThatGhost(ghost).IsAt(startingLocation.Left);
-
+            // Ghost then moves right in Chase mode.
             await gameHarness.WaitForScatterToComplete();
+            gameHarness.WeExpectThatGhost(ghost).IsAt(startingLocation.Above.Right);
             await gameHarness.Move();
 
             gameHarness.Game.Ghosts[ghost.Name]
                 .Should().BeEquivalentTo(new
                 {
-                    Location = new
-                    {
-                        X = 31,
-                        Y = scatterLocation.Y
-                    }
+                    Location = startingLocation.Above.Right.Right
                 });
         }
 
         [Fact]
         public async Task GhostShouldScatter7SecondsAfterChase()
         {
-            _gameSettings.InitialGameStatus = GameStatus.AttractMode;
             _gameSettings.PacMan = new PacMan((29, 10), Direction.Left);
             var startingLocation = new CellLocation(30, 1);
             var scatterLocation = new CellLocation(1, 1);
@@ -220,11 +218,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Ghosts.Add(ghost);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.Game.StartGame();
-
-            // We need to set the last tick because we've forced AttractMode.
-            await gameHarness.NOP();
-            await gameHarness.PressStart();
+            await gameHarness.PlayGame();
 
             gameHarness.WeExpectThatGhost(ghost).IsAt(startingLocation);
 
@@ -263,7 +257,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Ghosts.AddRange(ghosts);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.Game.StartGame();
+            await gameHarness.PlayGame();
 
             await gameHarness.Move();
 
@@ -288,7 +282,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Right);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.Game.StartGame();
+            await gameHarness.PlayGame();
 
             await gameHarness.ChangeDirection(Direction.Right);
 
@@ -326,7 +320,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Right.Right.Right);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.Game.StartGame();
+            await gameHarness.PlayGame();
 
             await gameHarness.ChangeDirection(Direction.Right);
 
@@ -356,13 +350,14 @@ namespace NPacMan.Game.Tests.GameTests
             var ghostStart = _gameSettings.PacMan.Location.Below.Right;
             var ghosts = GhostBuilder.New()
                 .WithLocation(ghostStart)
+                .WithScatterStrategy(new StandingStillGhostStrategy())
                 .CreateMany(3);
             _gameSettings.Ghosts.AddRange(ghosts);
 
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Right);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.Game.StartGame();
+            await gameHarness.PlayGame();
 
             await gameHarness.ChangeDirection(Direction.Right);
 
@@ -384,6 +379,7 @@ namespace NPacMan.Game.Tests.GameTests
             var ghosts = GhostBuilder.New()
                 .WithLocation(ghostStart)
                 .WithChaseStrategyRight()
+                .WithScatterStrategyRight()
                 .CreateMany(3);
 
             _gameSettings.Ghosts.AddRange(ghosts);
@@ -391,7 +387,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Right);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.Game.StartGame();
+            await gameHarness.PlayGame();
 
             await gameHarness.ChangeDirection(Direction.Right);
 
@@ -424,9 +420,11 @@ namespace NPacMan.Game.Tests.GameTests
             var ghost1 = GhostBuilder.New()
                 .WithLocation(ghostStart1)
                 .WithChaseStrategyRight()
+                .WithScatterStrategyRight()
                 .Create();
             var ghost2 = GhostBuilder.New()
                 .WithLocation(ghostStart2)
+                .WithScatterStrategyRight()
                 .WithChaseStrategyRight()
                 .Create();
             _gameSettings.Ghosts.Add(ghost1);
@@ -435,7 +433,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Left);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.Game.StartGame();
+            await gameHarness.PlayGame();
 
             await gameHarness.ChangeDirection(Direction.Left);
 
@@ -466,13 +464,14 @@ namespace NPacMan.Game.Tests.GameTests
             var ghost1 = GhostBuilder.New()
                 .WithLocation(ghostStart1)
                 .WithChaseStrategyRight()
+                .WithScatterStrategyRight()
                 .Create();
             _gameSettings.Ghosts.Add(ghost1);
 
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Left);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.Game.StartGame();
+            await gameHarness.PlayGame();
 
             await gameHarness.ChangeDirection(Direction.Left);
             await gameHarness.EatPill();
@@ -493,22 +492,19 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public async Task GhostMovesRandomlyWhileFrightened()
         {
-            var testDirectionPicker = new TestDirectionPicker();
-            testDirectionPicker.DefaultDirection = Direction.Up;
-            var allDirections = new[] { Direction.Down, Direction.Up, Direction.Right };
-            testDirectionPicker.Returns(allDirections, Direction.Right);
-
-            _gameSettings.DirectionPicker = testDirectionPicker;
             var ghostStart1 = _gameSettings.PacMan.Location.FarAway();
             var ghost1 = GhostBuilder.New()
                 .WithLocation(ghostStart1)
+                .WithScatterStrategy(new StandingStillGhostStrategy())
+                .WithDirection(Direction.Right)
+                .WithFrightenedStrategyRight()
                 .Create();
             _gameSettings.Ghosts.Add(ghost1);
 
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Left);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.Game.StartGame();
+            await gameHarness.PlayGame();
 
             await gameHarness.ChangeDirection(Direction.Left);
             await gameHarness.EatPill();
@@ -535,13 +531,14 @@ namespace NPacMan.Game.Tests.GameTests
             var ghost1 = GhostBuilder.New()
                 .WithLocation(portalEntrance.Left)
                 .WithChaseStrategyRight()
+                .WithScatterStrategyRight()
                 .Create();
 
             _gameSettings.Ghosts.Add(ghost1);
             _gameSettings.Portals.Add(portalEntrance, portalExit);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.Game.StartGame();
+            await gameHarness.PlayGame();
 
             await gameHarness.Move();
 
@@ -566,7 +563,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Ghosts.AddRange(ghosts);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.Game.StartGame();
+            await gameHarness.PlayGame();
 
             await gameHarness.Move();
             await gameHarness.Move();
@@ -603,7 +600,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Coins.Add(_gameSettings.PacMan.Location.Left);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.Game.StartGame();
+            await gameHarness.PlayGame();
 
             await gameHarness.ChangeDirection(Direction.Left);
 
@@ -632,35 +629,52 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public async Task GhostsShouldBeNotEdibleAfterPacManComesBackToLife()
         {
-            //     G
-            // > .   #       G
-            //     -
-            //     H
             var ghost1 = GhostBuilder.New()
-                .WithLocation(_gameSettings.PacMan.Location.Right.Right.Above)
+                .WithLocation(_gameSettings.PacMan.Location.Right.Above.Above)
+                .WithScatterStrategy(new StandingStillGhostStrategy())
+                .WithFrightenedStrategyDown()
                 .Create();
+            _gameSettings.Ghosts.Add(ghost1);
+
             var ghost2 = GhostBuilder.New()
                 .WithLocation(_gameSettings.PacMan.Location.FarAway())
+                .WithScatterStrategy(new StandingStillGhostStrategy())
+                .WithFrightenedStrategyDown()
                 .Create();
-            var directionPicker = new TestDirectionPicker() { DefaultDirection = Direction.Down };
-            _gameSettings.DirectionPicker = directionPicker;
-            _gameSettings.Ghosts.Add(ghost1);
             _gameSettings.Ghosts.Add(ghost2);
-            _gameSettings.Walls.Add(_gameSettings.PacMan.Location.Right.Right.Right);
-            _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Right);
-            _gameSettings.Doors.Add(ghost1.Location.Below.Below);
-            _gameSettings.GhostHouse.Clear();
-            _gameSettings.GhostHouse.Add(_gameSettings.Doors.First().Below);
 
-            var now = DateTime.UtcNow;
+            _gameSettings.CreateBoard("  G             ",
+                                      "                ",
+                                      "P * #           ",
+                                      "  -             ",
+                                      "  H             ");
+
+
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.StartGame();
-            await gameHarness.ChangeDirection(Direction.Right);
+            await gameHarness.PlayGame();
 
+            await gameHarness.ChangeDirection(Direction.Right);
             await gameHarness.EatPill();
+
+            gameHarness.AssertBoard("  G             ",
+                                    "                ",
+                                    "  P #           ",
+                                    "  -             ",
+                                    "  H             ");
+
 
             gameHarness.WeExpectThatGhost(ghost1).IsEdible();
             gameHarness.WeExpectThatGhost(ghost2).IsEdible();
+
+            await gameHarness.ChangeDirection(Direction.Up);
+            await gameHarness.Move();
+
+
+            gameHarness.AssertBoard("  G             ",
+                                    "  P             ",
+                                    "    #           ",
+                                    "  -             ",
+                                    "  H             ");
 
             await gameHarness.EatGhost(ghost1);
 
@@ -668,11 +682,13 @@ namespace NPacMan.Game.Tests.GameTests
             gameHarness.WeExpectThatGhost(ghost2).IsEdible();
 
             await gameHarness.WaitForPauseToComplete();
+            await gameHarness.ChangeDirection(Direction.Down);
 
             // Move to Ghost House
             await gameHarness.Move();
             await gameHarness.Move();
 
+            await gameHarness.Move();
             await gameHarness.Move();
             await gameHarness.GetEatenByGhost(ghost1);
 
@@ -686,24 +702,23 @@ namespace NPacMan.Game.Tests.GameTests
 
             gameHarness.EnsureGameStatus(GameStatus.Alive);
 
-            gameHarness.Game.Ghosts.Values.Should().AllBeEquivalentTo(new
-            {
-                Edible = false
-            });
         }
 
         [Fact]
         public async Task EatenGhostNotificationShouldBeFiredAfterEatingAGhost()
         {
             var ghostStart = _gameSettings.PacMan.Location.Left.Left.Left;
-            var ghost1 = GhostBuilder.New().WithLocation(ghostStart).WithChaseStrategyRight()
-                .Create();
+            var ghost1 = GhostBuilder.New()
+                                     .WithLocation(ghostStart)
+                                     .WithChaseStrategyRight()
+                                     .WithScatterStrategyRight()
+                                     .Create();
 
             _gameSettings.Ghosts.Add(ghost1);
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Left);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.Game.StartGame();
+            await gameHarness.PlayGame();
 
             await gameHarness.ChangeDirection(Direction.Left);
 
@@ -723,18 +738,18 @@ namespace NPacMan.Game.Tests.GameTests
         public async Task GhostsShouldBeInScatterModeAfterPacManComesBackToLife()
         {
             //   G         
+            //
             // > .       
             var ghost = GhostBuilder.New()
-                .WithLocation(_gameSettings.PacMan.Location.Right.Above)
-                .WithScatterTarget(_gameSettings.PacMan.Location.Right.Above.Above)
+                .WithLocation(_gameSettings.PacMan.Location.Right.Above.Above)
+                .WithChaseStrategyLeft()
+                .WithFrightenedStrategyRight()
+                .WithScatterStrategyDown()
                 .Create();
-
-            var directionPicker = new TestDirectionPicker() { DefaultDirection = Direction.Down };
-            _gameSettings.DirectionPicker = directionPicker;
             _gameSettings.Ghosts.Add(ghost);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.Game.StartGame();
+            await gameHarness.PlayGame();
 
             await gameHarness.ChangeDirection(Direction.Right);
             await gameHarness.Move();
@@ -757,7 +772,7 @@ namespace NPacMan.Game.Tests.GameTests
             gameHarness.Game.Ghosts.Values.Should().AllBeEquivalentTo(new
             {
                 Edible = false,
-                Location = _gameSettings.PacMan.Location.Right.Above.Above
+                Location = _gameSettings.PacMan.Location.Right.Above
             });
         }
 
@@ -768,10 +783,12 @@ namespace NPacMan.Game.Tests.GameTests
             var ghost1 = GhostBuilder.New()
                 .WithLocation(ghostStart1)
                 .WithChaseStrategyRight()
+                .WithScatterStrategyRight()
                 .Create();
             var ghost2 = GhostBuilder.New()
                 .WithLocation(_gameSettings.PacMan.Location.FarAway())
                 .WithChaseStrategyRight()
+                .WithScatterStrategyRight()
                 .Create();
             _gameSettings.Ghosts.Add(ghost1);
             _gameSettings.Ghosts.Add(ghost2);
@@ -779,7 +796,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Left);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.Game.StartGame();
+            await gameHarness.PlayGame();
 
             await gameHarness.ChangeDirection(Direction.Left);
 
@@ -825,10 +842,13 @@ namespace NPacMan.Game.Tests.GameTests
             var ghost1 = GhostBuilder.New()
                 .WithLocation(ghostStart1)
                 .WithChaseStrategyRight()
+                .WithScatterStrategyRight()
+                .WithFrightenedStrategyRight()
                 .Create();
             var ghost2 = GhostBuilder.New()
                 .WithLocation(_gameSettings.PacMan.Location.FarAway())
                 .WithChaseStrategyRight()
+                .WithScatterStrategyRight()
                 .Create();
             _gameSettings.Ghosts.Add(ghost1);
             _gameSettings.Ghosts.Add(ghost2);
@@ -837,7 +857,7 @@ namespace NPacMan.Game.Tests.GameTests
 
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.Game.StartGame();
+            await gameHarness.PlayGame();
 
             await gameHarness.ChangeDirection(Direction.Down);
             await gameHarness.EatPill();
@@ -845,8 +865,10 @@ namespace NPacMan.Game.Tests.GameTests
             gameHarness.WeExpectThatPacMan().IsAt(_gameSettings.PacMan.Location.Below);
             gameHarness.WeExpectThatGhost(ghost1).IsAt(ghostStart1.Right);
 
+            await gameHarness.Move();
+
             await gameHarness.EatGhost(ghost1);
-            gameHarness.WeExpectThatPacMan().IsAt(_gameSettings.PacMan.Location.Below.Below);
+            gameHarness.WeExpectThatPacMan().IsAt(_gameSettings.PacMan.Location.Below.Below.Below);
 
             var pacManLocation = gameHarness.Game.PacMan.Location;
             var ghostLocations = gameHarness.Game.Ghosts.Values.Select(x => new
@@ -878,10 +900,13 @@ namespace NPacMan.Game.Tests.GameTests
             var ghost1 = GhostBuilder.New()
                 .WithLocation(ghostStart1)
                 .WithChaseStrategyRight()
+                .WithScatterStrategyRight()
+                .WithFrightenedStrategyRight()
                 .Create();
             var ghost2 = GhostBuilder.New()
                 .WithLocation(_gameSettings.PacMan.Location.FarAway())
                 .WithChaseStrategyRight()
+                .WithScatterStrategyRight()
                 .Create();
             _gameSettings.Ghosts.Add(ghost1);
             _gameSettings.Ghosts.Add(ghost2);
@@ -890,7 +915,7 @@ namespace NPacMan.Game.Tests.GameTests
 
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.Game.StartGame();
+            await gameHarness.PlayGame();
 
             await gameHarness.ChangeDirection(Direction.Down);
             await gameHarness.EatPill();
@@ -898,8 +923,10 @@ namespace NPacMan.Game.Tests.GameTests
             gameHarness.WeExpectThatPacMan().IsAt(_gameSettings.PacMan.Location.Below);
             gameHarness.WeExpectThatGhost(ghost1).IsAt(ghostStart1.Right);
 
+            await gameHarness.Move();
+
             await gameHarness.EatGhost(ghost1);
-            gameHarness.WeExpectThatPacMan().IsAt(_gameSettings.PacMan.Location.Below.Below);
+            gameHarness.WeExpectThatPacMan().IsAt(_gameSettings.PacMan.Location.Below.Below.Below);
 
             var pacManLocation = gameHarness.Game.PacMan.Location;
             var ghostLocations = gameHarness.Game.Ghosts.Values.Select(x => new
@@ -919,39 +946,49 @@ namespace NPacMan.Game.Tests.GameTests
         [Fact]
         public async Task GhostShouldBeInTheHouseAfterBeingEatingAndWaitingForElapsedTime()
         {
-            var ghostStart1 = _gameSettings.PacMan.Location.Below.Below.Left.Left;
-            var topLeftWall = _gameSettings.PacMan.Location.Right.Right.Below;
+            var ghostStart1 = _gameSettings.PacMan.Location.Below.Below.Left;
+            var topLeftWall = _gameSettings.PacMan.Location.Right.Right.Right.Below;
             var ghostHouse = topLeftWall.Below.Right;
 
             var ghost1 = GhostBuilder.New()
                 .WithLocation(ghostStart1)
                 .WithChaseStrategyRight()
+                .WithScatterStrategyRight()
+                .WithFrightenedStrategy(new StandingStillGhostStrategy())
                 .Create();
 
             _gameSettings.Ghosts.Add(ghost1);
 
-            _gameSettings.CreateBoard("      P           ",
-                                      "   .  *   # - - # ",
-                                      " G .  .   # H H # ",
-                                      "          # # # # ");
+            _gameSettings.CreateBoard("  P             ",
+                                      "  . *   # - - # ",
+                                      "G . .   # H H # ",
+                                      "        # # # # ");
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.Game.StartGame();
+            await gameHarness.PlayGame();
+
+            await gameHarness.ChangeDirection(Direction.Right);
+            await gameHarness.Move();
+
+            gameHarness.AssertBoard("    P           ",
+                                    "  . *   # - - # ",
+                                    "  G .   # H H # ",
+                                    "        # # # # ");
 
             await gameHarness.ChangeDirection(Direction.Down);
             await gameHarness.EatPill();
 
-            gameHarness.AssertBoard("                  ",
-                                    "   .  P   # - - # ",
-                                    "   G  .   # H H # ",
-                                    "          # # # # ");
+            gameHarness.AssertBoard("                ",
+                                    "  . P   # - - # ",
+                                    "    G   # H H # ",
+                                    "        # # # # ");
 
             await gameHarness.EatGhost(ghost1);
 
-            gameHarness.AssertBoard("                  ",
-                                    "   .      # - - # ",
-                                    "      P   # H H # ",
-                                    "          # # # # ");
+            gameHarness.AssertBoard("                ",
+                                    "  .     # - - # ",
+                                    "    P   # H H # ",
+                                    "        # # # # ");
 
             await gameHarness.WaitForPauseToComplete();
             await gameHarness.Move();
@@ -961,20 +998,20 @@ namespace NPacMan.Game.Tests.GameTests
             await gameHarness.Move();
             await gameHarness.Move();
 
-            gameHarness.AssertBoard("                  ",
-                                    "   .      # G - # ",
-                                    "          # H H # ",
-                                    "          # # # # ",
-                                    "                  ",
-                                    "                  ",
-                                    "                  ",
-                                    "                  ",
-                                    "      P           ");
+            gameHarness.AssertBoard("                 ",
+                                    "  .      # G - # ",
+                                    "         # H H # ",
+                                    "         # # # # ",
+                                    "                 ",
+                                    "                 ",
+                                    "                 ",
+                                    "                 ",
+                                    "     P           ");
 
-            gameHarness.AssertBoard("                  ",  // NOTE: This is the same example assertion but without P for PacMan
-                                    "   .      # G - # ",
-                                    "          # H H # ",
-                                    "          # # # # ");
+            gameHarness.AssertBoard("                 ",  // NOTE: This is the same example assertion but without P for PacMan
+                                    "  .      # G - # ",
+                                    "         # H H # ",
+                                    "         # # # # ");
 
             await gameHarness.Move();
 
@@ -991,41 +1028,42 @@ namespace NPacMan.Game.Tests.GameTests
             var ghost1 = GhostBuilder.New()
                                      .WithLocation(ghostStart1)
                                      .WithChaseStrategyRight()
+                                     .WithScatterStrategyRight()
+                                     .WithFrightenedStrategyRight()
                                      .Create();
 
             _gameSettings.Ghosts.Add(ghost1);
 
             _gameSettings.CreateBoard("    P              ",
                                       "  . *   # # - - # #",
-                                      "G . .   # H H H H #",
+                                      "G .     # H H H H #",
                                       "        # H H H H #",
                                       "        # H H H H #",
                                       "        # # # # # #");
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.Game.StartGame();
+            await gameHarness.PlayGame();
 
             await gameHarness.ChangeDirection(Direction.Down);
             await gameHarness.EatPill();
 
             gameHarness.AssertBoard("                   ",
                                     "  . P   # # - - # #",
-                                    "  G .   # H H H H #",
+                                    "  G     # H H H H #",
                                     "        # H H H H #",
                                     "        # H H H H #",
                                     "        # # # # # #");
+
+            await gameHarness.Move();
 
             await gameHarness.EatGhost(ghost1);
 
             gameHarness.AssertBoard("                   ",
                                     "  .     # # - - # #",
-                                    "    P   # H H H H #",
                                     "        # H H H H #",
+                                    "   P    # H H H H #",
                                     "        # H H H H #",
                                     "        # # # # # #");
-
-
-            gameHarness.WeExpectThatPacMan().IsAt(_gameSettings.PacMan.Location.Below.Below);
 
             await gameHarness.WaitForPauseToComplete();
             await gameHarness.Move();
@@ -1065,6 +1103,7 @@ namespace NPacMan.Game.Tests.GameTests
             var ghost1 = GhostBuilder.New()
                 .WithLocation(ghostStart1)
                 .WithChaseStrategyRight()
+                .WithScatterStrategyRight()
                 .Create();
 
             var ghostHouse = ghostStart1.Right.Right.Right.Right.Right.Right.Below;
@@ -1076,7 +1115,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Below);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.Game.StartGame();
+            await gameHarness.PlayGame();
 
             await gameHarness.ChangeDirection(Direction.Down);
             await gameHarness.EatPill();
@@ -1084,8 +1123,8 @@ namespace NPacMan.Game.Tests.GameTests
             gameHarness.WeExpectThatPacMan().IsAt(_gameSettings.PacMan.Location.Below);
             gameHarness.WeExpectThatGhost(ghost1).IsAt(ghostStart1.Right);
 
+            await gameHarness.Move();
             await gameHarness.EatGhost(ghost1);
-            gameHarness.WeExpectThatPacMan().IsAt(_gameSettings.PacMan.Location.Below.Below);
 
             await gameHarness.WaitForPauseToComplete();
             await gameHarness.Move();
@@ -1104,14 +1143,15 @@ namespace NPacMan.Game.Tests.GameTests
         {
             //      P     
             //   .  *          
-            // G .  .                H  
+            //      G                H  
             //                 
-            var ghostStart1 = _gameSettings.PacMan.Location.Below.Below.Left.Left;
+            var ghostStart1 = _gameSettings.PacMan.Location.Below.Below;
             var ghost1 = GhostBuilder.New()
                 .WithLocation(ghostStart1)
                 .WithChaseStrategyRight()
+                .WithScatterStrategy(new StandingStillGhostStrategy())
+                .WithDirection(Direction.Left)
                 .Create();
-
 
             _gameSettings.GhostHouse.Add(_gameSettings.PacMan.Location.FarAway());
 
@@ -1120,13 +1160,12 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Below);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.Game.StartGame();
+            await gameHarness.PlayGame();
 
             await gameHarness.ChangeDirection(Direction.Down);
             await gameHarness.EatPill();
 
             gameHarness.WeExpectThatPacMan().IsAt(_gameSettings.PacMan.Location.Below);
-            gameHarness.WeExpectThatGhost(ghost1).IsAt(ghostStart1.Right);
 
             await gameHarness.EatGhost(ghost1);
             gameHarness.WeExpectThatPacMan().IsAt(_gameSettings.PacMan.Location.Below.Below);
@@ -1143,41 +1182,47 @@ namespace NPacMan.Game.Tests.GameTests
         public async Task GhostNotBeRunningHomeAfterPacManDiesAndGameResets()
         {
             //       P     
+            //             
             //     . *          
             // G G . .                H  
             //                 
-            var ghostStart1 = _gameSettings.PacMan.Location.Below.Below.Left.Left;
+            var ghostStart1 = _gameSettings.PacMan.Location.Below.Below.Below.Left.Left;
             var ghost1 = GhostBuilder.New()
                 .WithLocation(ghostStart1)
                 .WithChaseStrategyRight()
+                .WithScatterStrategyRight()
+                .WithFrightenedStrategy(new StandingStillGhostStrategy())
                 .Create();
             var killerGhost = GhostBuilder.New()
                 .WithLocation(ghostStart1.Left)
                 .WithChaseStrategyRight()
                 .WithScatterTarget(ghostStart1.Right.Right.Right)
+                .WithFrightenedStrategy(new StandingStillGhostStrategy())
                 .WithDirection(Direction.Right)
                 .Create();
 
-            _gameSettings.Walls.Add(_gameSettings.PacMan.Location.Below.Below.Below);
+            _gameSettings.Walls.Add(_gameSettings.PacMan.Location.Below.Below.Below.Below);
 
             _gameSettings.GhostHouse.Add(_gameSettings.PacMan.Location.FarAway());
 
             _gameSettings.Ghosts.Add(ghost1);
             _gameSettings.Ghosts.Add(killerGhost);
 
-            _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Below);
+            _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Below.Below);
 
-            var gameHarness = new GameHarness(_gameSettings, @"c:\temp\GhostNotBeRunningHomeAfterPacManDiesAndGameResets.txt");
-            gameHarness.Game.StartGame();
+            var gameHarness = new GameHarness(_gameSettings);
+            await gameHarness.PlayGame();
 
             await gameHarness.ChangeDirection(Direction.Down);
+            await gameHarness.Move();
+
             await gameHarness.EatPill();
 
-            gameHarness.WeExpectThatPacMan().IsAt(_gameSettings.PacMan.Location.Below);
-            gameHarness.WeExpectThatGhost(ghost1).IsAt(ghostStart1.Right);
+            gameHarness.WeExpectThatPacMan().IsAt(_gameSettings.PacMan.Location.Below.Below);
+            gameHarness.WeExpectThatGhost(ghost1).IsAt(ghostStart1.Right.Right);
 
             await gameHarness.EatGhost(ghost1);
-            gameHarness.WeExpectThatPacMan().IsAt(_gameSettings.PacMan.Location.Below.Below);
+            gameHarness.WeExpectThatPacMan().IsAt(_gameSettings.PacMan.Location.Below.Below.Below);
 
             await gameHarness.WaitForPauseToComplete();
             await gameHarness.WaitForFrightenedTimeToComplete();
@@ -1198,13 +1243,14 @@ namespace NPacMan.Game.Tests.GameTests
         {
             var ghosts = GhostBuilder.New()
                 .WithLocation(_gameSettings.PacMan.Location.FarAway())
+                .WithScatterStrategy(new StandingStillGhostStrategy())
                 .CreateMany(3);
             _gameSettings.Ghosts.AddRange(ghosts);
 
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Right);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
 
             await gameHarness.ChangeDirection(Direction.Right);
             await gameHarness.EatPill();

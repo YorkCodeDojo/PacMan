@@ -17,13 +17,13 @@ namespace NPacMan.Game.Tests.GameTests
         }
 
         [Fact]
-        public void FruitShouldNotBeVisibleWhenStartingGame()
+        public async Task FruitShouldNotBeVisibleWhenStartingGame()
         {
             var fruitLocation = _gameSettings.PacMan.Location.FarAway();
             _gameSettings.Fruit = fruitLocation;
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
 
             gameHarness.Game.Fruits.Should().BeEmpty();
         }
@@ -42,7 +42,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Coins.Add(_gameSettings.PacMan.Location.Left.Left.Left.Left.Left);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
 
             await gameHarness.ChangeDirection(Direction.Left);
             await gameHarness.EatCoin();
@@ -79,7 +79,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Coins.Add(_gameSettings.PacMan.Location.FarAway());
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
             await gameHarness.ChangeDirection(Direction.Left);
             await gameHarness.EatCoin();
             await gameHarness.EatCoin();
@@ -143,7 +143,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.FruitAppearsAfterCoinsEaten.Add(1);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
 
             for (var level = 0; level < levelNumber - 1; level++)
             {
@@ -201,7 +201,7 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.FruitAppearsAfterCoinsEaten.Add(1);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
 
             for (var level = 0; level < levelNumber - 1; level++)
             {

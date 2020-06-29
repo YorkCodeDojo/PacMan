@@ -25,6 +25,13 @@ namespace NPacMan.Game.Tests
 
         public Game StartGame() => Game.StartGame();
 
+        public async Task PlayGame()
+        {
+            StartGame();
+            await WaitAndEnterAttractMode();
+            await PressStart();
+        }
+
         public GameHarness(TestGameSettings gameSettings, string? debugFilePath = null)
         {
             _gameClock = new TestGameClock();
@@ -256,6 +263,7 @@ namespace NPacMan.Game.Tests
 
             var numberOfCoins = Game.Coins.Count;
             var numberOfPowerPills = Game.PowerPills.Count;
+            var score = Game.Score;
 
             await _gameClock.Tick(_now);
 
@@ -276,6 +284,11 @@ namespace NPacMan.Game.Tests
             {
                 WriteAndThrowException("A power pill was unexpectedly eaten");
             }
+
+            if (score != Game.Score)
+            {
+                WriteAndThrowException("The score unexpectedly increased");
+            }
         }
 
         public async Task GetEatenByGhost(Ghost ghost)
@@ -289,23 +302,69 @@ namespace NPacMan.Game.Tests
 
             await Move("GetEatenByGhost");
 
+            if (Game.Status != GameStatus.Dying && Game.Ghosts[ghost.Name].Location != Game.PacMan.Location)
+            {
+                WriteAndThrowException($"{ghost.Name} cannot eat PacMan because the ghost is at {Game.Ghosts[ghost.Name].Location} and PacMan is at {Game.PacMan.Location}.");
+            }
+
             EnsureGameStatus(GameStatus.Dying);
         }
 
         public async Task EatGhost(Ghost ghost)
         {
-            await Move("EatGhost");
+            WriteHeading("EatGhost");
+
+            var pacManLocation = Game.PacMan.Location;
+            var ghostLocations = Game.Ghosts.Values.Select(x => x.Location).ToArray();
+
+            var numberOfCoins = Game.Coins.Count;
+            var numberOfPowerPills = Game.PowerPills.Count;
+            var score = Game.Score;
+
+            await _gameClock.Tick(_now);
+
+            WriteBoard();
+
+            if (Game.PacMan.Location == pacManLocation
+                && ghostLocations.SequenceEqual(Game.Ghosts.Values.Select(x => x.Location)))
+            {
+                WriteAndThrowException("Expected PacMan or Ghosts to Move");
+            }
 
             var actualGhostStatus = Game.Ghosts[ghost.Name].Status;
             if (Game.Ghosts[ghost.Name].Status != GhostStatus.Score)
             {
-                WriteAndThrowException($"Expected ghost ({ghost.Name}) status to be {GhostStatus.Score} but was {actualGhostStatus} ");
+                if (Game.Ghosts[ghost.Name].Location != Game.PacMan.Location)
+                {
+                    WriteAndThrowException($"{ghost.Name} was not eaten by PacMan because the ghost is at {Game.Ghosts[ghost.Name].Location} and PacMan is at {Game.PacMan.Location}.");
+                }
+                else
+                {
+                    WriteAndThrowException($"Expected ghost ({ghost.Name}) status to be {GhostStatus.Score} but was {actualGhostStatus} ");
+                }
             }
         }
 
         public async Task EatGhosts(IEnumerable<Ghost> ghosts)
         {
-            await Move("EatGhosts");
+            WriteHeading("EatGhosts");
+
+            var pacManLocation = Game.PacMan.Location;
+            var ghostLocations = Game.Ghosts.Values.Select(x => x.Location).ToArray();
+
+            var numberOfCoins = Game.Coins.Count;
+            var numberOfPowerPills = Game.PowerPills.Count;
+            var score = Game.Score;
+
+            await _gameClock.Tick(_now);
+
+            WriteBoard();
+
+            if (Game.PacMan.Location == pacManLocation
+                && ghostLocations.SequenceEqual(Game.Ghosts.Values.Select(x => x.Location)))
+            {
+                WriteAndThrowException("Expected PacMan or Ghosts to Move");
+            }
 
             foreach (var ghost in ghosts)
             {

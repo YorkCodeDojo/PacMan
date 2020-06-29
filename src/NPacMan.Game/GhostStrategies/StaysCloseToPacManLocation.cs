@@ -3,9 +3,12 @@ namespace NPacMan.Game.GhostStrategies
     public class StaysCloseToPacManLocation : IDirectToLocation
     {
         private readonly string _ghostName;
-        public StaysCloseToPacManLocation(string ghostName)
+        private readonly CellLocation _scatterTarget;
+
+        public StaysCloseToPacManLocation(string ghostName, CellLocation scatterTarget)
         {
             _ghostName = ghostName;
+            _scatterTarget = scatterTarget;
         }
         public CellLocation GetLocation(Game game)
         {
@@ -24,7 +27,7 @@ namespace NPacMan.Game.GhostStrategies
                 return new DirectToPacManLocation();
             }
 
-            return new DirectToGhostScatterTarget(ghost);
+            return new DirectToGhostScatterTarget(_scatterTarget);
         }
     }
 }

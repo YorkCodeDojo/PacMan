@@ -63,12 +63,11 @@ namespace NPacMan.Game.Tests
         public CellLocation Fruit { get; set; }
 
         public PacMan PacMan { get; set; } = new PacMan(new CellLocation(10, 10), Direction.Right);
-        public GameStatus InitialGameStatus { get; set; } = GameStatus.Alive;
+        public GameStatus InitialGameStatus { get; set; } = GameStatus.Initial;
         public int InitialLives { get; set; } = 3;
         public int InitialScatterTimeInSeconds { get; set; } = 7;
         public int ChaseTimeInSeconds { get; set; } = 7;
         public int FrightenedTimeInSeconds { get; set; } = 7;
-        public IDirectionPicker DirectionPicker { get; internal set; } = new TestDirectionPicker();
         public int FruitVisibleForSeconds { get; set; } = 7;
         public int PointsNeededForBonusLife { get; internal set; } = int.MaxValue;
         public IHighScoreStorage HighScoreStorage { get; internal set; } = new InMemoryHighScoreStorage();

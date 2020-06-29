@@ -253,7 +253,7 @@ namespace NPacMan.Game
 
         private void MakeGhostsEdible(GameState gameState)
         {
-            gameState.ApplyToGhosts(ghost => ghost.SetToEdible(_gameSettings.DirectionPicker));
+            gameState.ApplyToGhosts(ghost => ghost.SetToEdible());
         }
 
         public void Start()

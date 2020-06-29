@@ -5,12 +5,12 @@ namespace NPacMan.Game.GhostStrategies
 {
     public class DirectToStrategy : IGhostStrategy
     {
-        private readonly IDirectToLocation _directToLocation;
+        public IDirectToLocation DirectToLocation { get; }
         private readonly bool _allowGhostsToWalkThroughDoors;
 
         public DirectToStrategy(IDirectToLocation directToLocation, bool allowGhostsToWalkThroughDoors = false)
         {
-            _directToLocation = directToLocation;
+            DirectToLocation = directToLocation;
             _allowGhostsToWalkThroughDoors = allowGhostsToWalkThroughDoors;
         }
 
@@ -26,7 +26,7 @@ namespace NPacMan.Game.GhostStrategies
             if (availableMoves.Count() == 1)
                 return availableMoves.First();
 
-            var target = _directToLocation.GetLocation(game);
+            var target = DirectToLocation.GetLocation(game);
 
             return availableMoves
                 .OrderBy(possibleDirection => (ghost.Location + possibleDirection) - target)

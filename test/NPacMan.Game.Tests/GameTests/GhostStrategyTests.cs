@@ -15,6 +15,7 @@ namespace NPacMan.Game.Tests.GameTests
         public GhostStrategyTests()
         {
             _ghostBuilder = GhostBuilder.New()
+                                        .WithScatterStrategy(new StandingStillGhostStrategy())
                                         .WithChaseStrategy(new DirectToStrategy(new DirectToPacManLocation()));
 
             _gameSettings = new TestGameSettings();
@@ -31,8 +32,8 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.PacMan = new PacMan((pacManX, pacManY), Direction.Left);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.StartGame();
-            await gameHarness.Move();
+            await gameHarness.PlayGame();
+            await gameHarness.WaitForScatterToComplete();
 
             gameHarness.Game.Ghosts[ghost.Name].Should().BeEquivalentTo(new
             {
@@ -55,8 +56,8 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Ghosts.Add(ghost);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.StartGame();
-            await gameHarness.Move();
+            await gameHarness.PlayGame();
+            await gameHarness.WaitForScatterToComplete();
 
             using var _ = new AssertionScope();
             gameHarness.Game.Ghosts[ghost.Name].Should().NotBeEquivalentTo(new
@@ -81,8 +82,8 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.Ghosts.Add(ghost);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.StartGame();
-            await gameHarness.Move();
+            await gameHarness.PlayGame();
+            await gameHarness.WaitForScatterToComplete();
 
             using var _ = new AssertionScope();
             gameHarness.Game.Ghosts[ghost.Name].Should().NotBeEquivalentTo(new
@@ -120,8 +121,8 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.PacMan = new PacMan(topLeft.Below.Right.Right.Right.Right, Direction.Right);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.StartGame();
-            await gameHarness.Move();
+            await gameHarness.PlayGame();
+            await gameHarness.WaitForScatterToComplete();
             await gameHarness.Move();
             await gameHarness.Move();
 
@@ -155,8 +156,9 @@ namespace NPacMan.Game.Tests.GameTests
             _gameSettings.PacMan = new PacMan(topLeft.Below.Right.Right.Right.Right, Direction.Right);
 
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.StartGame();
-            await gameHarness.Move();
+            await gameHarness.PlayGame();
+
+            await gameHarness.WaitForScatterToComplete();
             await gameHarness.Move();
             await gameHarness.Move();
 
@@ -169,10 +171,10 @@ namespace NPacMan.Game.Tests.GameTests
         }
 
         [Fact]
-        public void ShouldBeAbleToTargetWherePacManWillBe()
+        public async Task ShouldBeAbleToTargetWherePacManWillBe()
         {
             var gameHarness = new GameHarness(_gameSettings);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
 
             var directToExpectedPacManLocation = new DirectToExpectedPacManLocation();
             var targetLocation = directToExpectedPacManLocation.GetLocation(gameHarness.Game);
@@ -184,7 +186,7 @@ namespace NPacMan.Game.Tests.GameTests
         }
 
         [Fact]
-        public void ShouldBeAbleInterceptPacMan()
+        public async Task ShouldBeAbleInterceptPacMan()
         {
             // ghost = 1,2
             // pacman (+2) will be at= 6,1
@@ -202,7 +204,7 @@ namespace NPacMan.Game.Tests.GameTests
             };
 
             var gameHarness = new GameHarness(board);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
 
             var inkyTargetCell = new InterceptPacManLocation(ghost.Name);
             var targetLocation = inkyTargetCell.GetLocation(gameHarness.Game);
@@ -215,7 +217,7 @@ namespace NPacMan.Game.Tests.GameTests
         }
 
         [Fact]
-        public void StayCloseToPacManMovesTowardsHimWhileOutsideOf8Cells()
+        public async Task StayCloseToPacManMovesTowardsHimWhileOutsideOf8Cells()
         {
             var ghost = _ghostBuilder.WithLocation((1, 2))
                 .WithChaseStrategy(new NullGhostStrategy()).Create();
@@ -227,9 +229,9 @@ namespace NPacMan.Game.Tests.GameTests
             };
 
             var gameHarness = new GameHarness(board);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
 
-            var staysCloseToPacManLocation = new StaysCloseToPacManLocation(ghost.Name);
+            var staysCloseToPacManLocation = new StaysCloseToPacManLocation(ghost.Name, CellLocation.TopLeft);
             var targetLocation = staysCloseToPacManLocation.GetLocation(gameHarness.Game);
 
             targetLocation.Should().BeEquivalentTo(new
@@ -240,11 +242,12 @@ namespace NPacMan.Game.Tests.GameTests
         }
 
         [Fact]
-        public void StayCloseToPacManScattersWhileInsideOf8Cells()
+        public async Task StayCloseToPacManScattersWhileInsideOf8Cells()
         {
+            var scatterTarget = (11, 12);
             var ghost = _ghostBuilder.WithLocation((1, 2))
                 .WithChaseStrategy(new NullGhostStrategy())
-                .WithScatterTarget((11, 12))
+                .WithScatterTarget(scatterTarget)
                 .Create();
             var board = new TestGameSettings()
             {
@@ -254,9 +257,9 @@ namespace NPacMan.Game.Tests.GameTests
             };
 
             var gameHarness = new GameHarness(board);
-            gameHarness.StartGame();
+            await gameHarness.PlayGame();
 
-            var staysCloseToPacManLocation = new StaysCloseToPacManLocation(ghost.Name);
+            var staysCloseToPacManLocation = new StaysCloseToPacManLocation(ghost.Name, scatterTarget);
             var targetLocation = staysCloseToPacManLocation.GetLocation(gameHarness.Game);
 
             targetLocation.Should().BeEquivalentTo(new
