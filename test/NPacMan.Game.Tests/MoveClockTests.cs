@@ -8,7 +8,10 @@ namespace NPacMan.Game.Tests
     public class MoveClockTests
     {
         [Theory]
-        [InlineData(1, 125)]
+        [InlineData(1, 125)]  // 80%
+        [InlineData(2, 111)]  // 90%
+        [InlineData(5, 100)]  // 100%
+        [InlineData(21, 111)]  // 90%
         public void PacManShouldTravelAt80PercentAtLevelZero(int level, int moveSpeedMilliseconds)
         {
             var moveClock = new MoveClock();

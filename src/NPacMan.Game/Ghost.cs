@@ -55,10 +55,16 @@ namespace NPacMan.Game
 
             return false;
         }
-
+        
         public bool ShouldPacManMove(int gameLevel)
         {
-            var movingAtFullSpeed = PercentageToTime(80);
+            int GetPercentage()
+            {
+                if (gameLevel == 1) return 80;
+                if (gameLevel >= 5 && gameLevel <= 20) return 100;
+                return 90;;
+            }
+            var movingAtFullSpeed = PercentageToTime(GetPercentage());
 
             if (_pacManLastMoved == DateTime.MinValue)
             {
@@ -75,7 +81,7 @@ namespace NPacMan.Game
             return false;
         }
 
-        private TimeSpan PercentageToTime(int percent) => TimeSpan.FromMilliseconds(100 / (percent / 100f));
+        private TimeSpan PercentageToTime(int percent) => TimeSpan.FromMilliseconds((int)(100 / (percent / 100f)));
     }
 
 
