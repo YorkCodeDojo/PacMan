@@ -183,7 +183,7 @@ namespace NPacMan.Game
 
         internal async Task MovePacMan(Game game, GameState gameState, BehaviorContext<GameState, Tick> context, GameStateMachine gameStateMachine)
         {
-            if(!_gameSettings.MoveClock.ShouldPacManMove(game.Level))
+            if(!_gameSettings.MoveClock.ShouldPacManMove(game.Level, gameState.Status == gameStateMachine.Frightened.Name))
             {
                 return;
             }

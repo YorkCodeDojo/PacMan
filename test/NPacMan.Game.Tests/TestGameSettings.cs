@@ -100,7 +100,7 @@ namespace NPacMan.Game.Tests
         public bool ShouldGhostMove(Ghost ghost)
             => !ghost.Edible || _counter % 2 == 1;
 
-        public bool ShouldPacManMove(int gameLevel)
+        public bool ShouldPacManMove(int gameLevel, bool isFrightened)
             => true;
 
         public void UpdateTime(TimeSpan deltaTime) {

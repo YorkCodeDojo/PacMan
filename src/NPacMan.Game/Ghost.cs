@@ -8,7 +8,7 @@ namespace NPacMan.Game
     public interface IMoveClock
     {
         bool ShouldGhostMove(Ghost ghost);
-        bool ShouldPacManMove(int gameLevel);
+        bool ShouldPacManMove(int gameLevel, bool isFrightened);
         void UpdateTime(TimeSpan deltaTime);
     }
 
@@ -56,15 +56,21 @@ namespace NPacMan.Game
             return false;
         }
         
-        public bool ShouldPacManMove(int gameLevel)
+        public bool ShouldPacManMove(int gameLevel, bool isFrightened)
         {
-            int GetPercentage()
+            int GetPercentageNormal()
             {
                 if (gameLevel == 1) return 80;
                 if (gameLevel >= 5 && gameLevel <= 20) return 100;
-                return 90;;
+                return 90;
             }
-            var movingAtFullSpeed = PercentageToTime(GetPercentage());
+            int GetPercentageFrightened()
+            {
+                if (gameLevel == 1) return 90;
+                if (gameLevel >= 5 && gameLevel <= 20) return 100;
+                return 95;
+            }
+            var time = PercentageToTime(isFrightened ? GetPercentageFrightened() : GetPercentageNormal());
 
             if (_pacManLastMoved == DateTime.MinValue)
             {
@@ -72,9 +78,9 @@ namespace NPacMan.Game
                 return true;
             }
 
-            if ((_pacManLastMoved + movingAtFullSpeed) <= _internalClock)
+            if ((_pacManLastMoved + time) <= _internalClock)
             {
-                _pacManLastMoved = _pacManLastMoved + movingAtFullSpeed;
+                _pacManLastMoved = _pacManLastMoved + time;
                 return true;
             }
 
