@@ -2,15 +2,16 @@
 {
     public class DirectToGhostScatterTarget : IDirectToLocation
     {
-        private readonly CellLocation _home;
+        public CellLocation ScatterTarget { get; }
+        
         public DirectToGhostScatterTarget(CellLocation scatterTarget)
         {
-            _home = scatterTarget;
+            ScatterTarget = scatterTarget;
         }
 
         public CellLocation GetLocation(Game game)
         {
-            return _home;
+            return ScatterTarget;
         }
     }
 }

@@ -143,7 +143,7 @@ T*▲*T
             });
         }
 
-        [Fact(Skip = "We no longer have ScatterTarget on Ghosts,  may be assert against Ghost.ScatterStrategy.ScatterTarget")]
+        [Fact]
         public void ShouldHaveGhostsWithCorrectHomeLocations()
         {
             var board = @" XXF 
@@ -159,22 +159,38 @@ T*▲*T
             loadedBoard.Ghosts.Should().BeEquivalentTo(
             new
             {
-                ScatterTarget = new { X = -10, Y = -3 },
+                ScatterStrategy = new {
+                    DirectToLocation = new {
+                        ScatterTarget = new { X = -10, Y = -3 }
+                    }
+                },
                 Name = "Blinky",
             },
             new
             {
-                ScatterTarget = new { X = 1, Y = 3 },
+                ScatterStrategy = new {
+                    DirectToLocation = new {
+                        ScatterTarget = new { X = 1, Y = 3 }
+                    }
+                },
                 Name = "Inky",
             },
             new
             {
-                ScatterTarget = new { X = 2, Y = 3 },
+                ScatterStrategy = new {
+                    DirectToLocation = new {
+                        ScatterTarget = new { X = 2, Y = 3 }
+                    }
+                },
                 Name = "Pinky",
             },
             new
             {
-                ScatterTarget = new { X = 20, Y = 33 },
+                ScatterStrategy = new {
+                    DirectToLocation = new {
+                        ScatterTarget = new {  X = 20, Y = 33 }
+                    }
+                },
                 Name = "Clyde",
             });
         }
