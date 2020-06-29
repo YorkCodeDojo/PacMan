@@ -29,6 +29,40 @@ namespace NPacMan.Game.Tests.GameTests
         }
 
         [Fact]
+        public async Task ShouldBeAbleToEatFruitAndGhostAtSameTime()
+        {
+            var fruitLocation = _gameSettings.PacMan.Location.Right.Right.Right;
+            _gameSettings.Fruit = fruitLocation;
+            _gameSettings.FruitAppearsAfterCoinsEaten.Add(1);
+
+            var ghost = GhostBuilder.New()
+                .WithLocation(fruitLocation)
+                .WithScatterStrategyStill()
+                .WithFrightenedStrategyStill()
+                .WithChaseStrategyStill()
+                .Create();
+
+            _gameSettings.Ghosts.Add(ghost);
+            _gameSettings.CreateBoard("P * . F",
+                                      ".     ",
+                                      "H     ");
+
+            var gameHarness = new GameHarness(_gameSettings);
+            
+            await gameHarness.PlayGame();
+
+            await gameHarness.ChangeDirection(Direction.Right);
+            await gameHarness.EatPill();
+            await gameHarness.EatCoin();
+
+            var score = gameHarness.Game.Score;
+            await gameHarness.EatGhost(ghost);
+            
+            var scoreForGhost = 200;
+            gameHarness.Game.Score.Should().BeGreaterThan(score + scoreForGhost);
+        }
+
+        [Fact]
         public async Task FruitShouldFirstAppearAfterSetNumberOfPills()
         {
             var fruitLocation = _gameSettings.PacMan.Location.FarAway();

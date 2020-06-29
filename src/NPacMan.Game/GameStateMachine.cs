@@ -58,6 +58,9 @@ namespace NPacMan.Game
                     .If(context => context.Instance.IsLevelComplete(), 
                             binder => binder.TransitionTo(ChangingLevel));
 
+            var handleFruitCollision = When(FruitCollision)
+                    .Then(context => actions.FruitEaten(game, context.Instance, context.Data.Location));
+
             During(Frightened,
                 When(Tick)
                     .If(context => context.Data.Now >= context.Instance.TimeToChangeState, 
@@ -81,8 +84,7 @@ namespace NPacMan.Game
                     .ThenAsync(async context => await actions.MoveGhosts(game, context.Instance, context, this))
                     .ThenAsync(async context => await actions.MovePacMan(game, context.Instance, context, this)),
                 handleCoinCollision,
-                When(FruitCollision)
-                    .Then(context => actions.FruitEaten(game, context.Instance, context.Data.Location)),
+                handleFruitCollision,
                 handlePowerPillCollision,
                 When(GhostCollision)
                     .If(x => x.Data.Ghost.Edible,
@@ -127,6 +129,7 @@ namespace NPacMan.Game
                     .TransitionTo(Frightened),
                 handleCoinCollision,
                 handlePowerPillCollision,
+                handleFruitCollision,
                 When(GhostCollision)
                     .IfElse(x => x.Data.Ghost.Edible,
                     binder => binder.Then(context => actions.GhostEaten(context.Instance, context.Data.Ghost, game))
