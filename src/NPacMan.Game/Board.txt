@@ -12,7 +12,7 @@
       X.XX          XX.X     
       X.XX XXX--XXX XX.X     
  XXXXXX.XX XHHHHHHX XX.XXXXXX
-P      .   XHHHHHHX   .      P
+PTTTTTT.   XHHHHHHX   .TTTTTTP
  XXXXXX.XX XHHHHHHX XX.XXXXXX
       X.XX XXXXXXXX XX.X     
       X.XX    F     XX.X     
