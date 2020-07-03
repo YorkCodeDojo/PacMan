@@ -224,7 +224,9 @@ namespace NPacMan.Game
 
         internal async Task MoveGhosts(Game game, GameState gameState, BehaviorContext<GameState, Tick> context, GameStateMachine gameStateMachine)
         {
-            var ghostsToMove = game.Ghosts.Values.Where(ghost => _gameSettings.MoveClock.ShouldGhostMove(game.Level, ghost.Name, ghost.Status));
+            var coinsRemaining = game.Coins.Count;
+
+            var ghostsToMove = game.Ghosts.Values.Where(ghost => _gameSettings.MoveClock.ShouldGhostMove(game.Level, coinsRemaining, ghost.Name, ghost.Status));
                                 
             gameState.ApplyToGhosts(ghost => ghost.Move(game, gameState), ghostsToMove);
 

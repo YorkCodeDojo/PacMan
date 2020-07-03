@@ -19,6 +19,7 @@ namespace NPacMan.Game.Tests
             public const int Percent90 = 111;
             public const int Percent95 = 105;
             public const int Percent100 = 100;
+            public const int Percent105 = 95;
             public const int Percent160 = 62;
         }
 
@@ -55,8 +56,9 @@ namespace NPacMan.Game.Tests
         public void GhostShouldTravelAtDifferentSpeedsForDifferentLevelsWhenFrightened(int level, int moveSpeedMilliseconds, GhostStatus ghostStatus)
         {
             var ghostName = Guid.NewGuid().ToString();
+
             TestMoveClock(moveSpeedMilliseconds,
-                   moveClock => moveClock.ShouldGhostMove(level, ghostName, ghostStatus) );            
+                   moveClock => moveClock.ShouldGhostMove(level, coinsRemaining: int.MaxValue, ghostName, ghostStatus) );            
         }
 
         [Theory]
@@ -66,8 +68,9 @@ namespace NPacMan.Game.Tests
         public void GhostShouldTravelAtDifferentSpeedsForDifferentLevelsWhenAlive(int level, int moveSpeedMilliseconds)
         {
             var ghostName = Guid.NewGuid().ToString();
+
             TestMoveClock(moveSpeedMilliseconds,
-                   moveClock => moveClock.ShouldGhostMove(level, ghostName, GhostStatus.Alive) );
+                   moveClock => moveClock.ShouldGhostMove(level, coinsRemaining: int.MaxValue, ghostName, GhostStatus.Alive) );
         }
 
         [Theory]
@@ -77,8 +80,38 @@ namespace NPacMan.Game.Tests
         public void GhostShouldTravelAtDifferentSpeedsForDifferentLevelsWhenRunningHome(int level, int moveSpeedMilliseconds)
         {
             var ghostName = Guid.NewGuid().ToString();
+            
             TestMoveClock(moveSpeedMilliseconds,
-                   moveClock => moveClock.ShouldGhostMove(level, ghostName, GhostStatus.RunningHome) );
+                   moveClock => moveClock.ShouldGhostMove(level, coinsRemaining: int.MaxValue, ghostName, GhostStatus.RunningHome) );
+        }
+
+        [Theory]
+        [InlineData(1, 20, PercentagesInMilliseconds.Percent75)]
+        [InlineData(1, 19, PercentagesInMilliseconds.Percent80)]
+        [InlineData(1, 11, PercentagesInMilliseconds.Percent80)]
+        [InlineData(1, 10, PercentagesInMilliseconds.Percent85)]
+
+        [InlineData(2, 30, PercentagesInMilliseconds.Percent85)]
+        [InlineData(2, 29, PercentagesInMilliseconds.Percent90)]
+        [InlineData(2, 16, PercentagesInMilliseconds.Percent90)]
+        [InlineData(2, 15, PercentagesInMilliseconds.Percent95)]
+
+        // [InlineData(4, 20, PercentagesInMilliseconds.Percent85)]
+        // [InlineData(4, 19, PercentagesInMilliseconds.Percent90)]
+        // [InlineData(4, 11, PercentagesInMilliseconds.Percent90)]
+        // [InlineData(4, 10, PercentagesInMilliseconds.Percent95)]
+
+        // [InlineData(5, 20, PercentagesInMilliseconds.Percent95)]
+        // [InlineData(5, 19, PercentagesInMilliseconds.Percent100)]
+        // [InlineData(5, 11, PercentagesInMilliseconds.Percent100)]
+        // [InlineData(5, 10, PercentagesInMilliseconds.Percent105)]
+        //[InlineData(4, PercentagesInMilliseconds.Percent160)]
+        //[InlineData(5, PercentagesInMilliseconds.Percent160)]
+        public void BlinkyShouldTravelAtDifferentSpeedsDuringCruiseElroy(int level, int coinsLeft, int moveSpeedMilliseconds)
+        {
+            var ghostName = GhostNames.Blinky;
+            TestMoveClock(moveSpeedMilliseconds,
+                   moveClock => moveClock.ShouldGhostMove(level, coinsLeft, ghostName, GhostStatus.Alive) );
         }
 
         private void TestMoveClock(int moveSpeedMilliseconds, Func<MoveClock, bool> action)
