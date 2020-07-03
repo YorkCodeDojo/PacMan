@@ -57,6 +57,12 @@ namespace NPacMan.Game
         
         public bool ShouldPacManMove(int gameLevel, bool isFrightened)
         {
+            if (_pacManLastMoved == DateTime.MinValue)
+            {
+                _pacManLastMoved = _internalClock;
+                return true;
+            }
+
             int GetPercentageNormal()
             {
                 if (gameLevel == 1) return 80;
@@ -69,13 +75,8 @@ namespace NPacMan.Game
                 if (gameLevel >= 5 && gameLevel <= 20) return 100;
                 return 95;
             }
-            var time = PercentageToTime(isFrightened ? GetPercentageFrightened() : GetPercentageNormal());
 
-            if (_pacManLastMoved == DateTime.MinValue)
-            {
-                _pacManLastMoved = _internalClock;
-                return true;
-            }
+            var time = PercentageToTime(isFrightened ? GetPercentageFrightened() : GetPercentageNormal());
 
             if ((_pacManLastMoved + time) <= _internalClock)
             {
