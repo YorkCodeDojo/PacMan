@@ -15,31 +15,39 @@ namespace NPacMan.Game
             _internalClock = _internalClock.Add(deltaTime);
         }
 
-        public bool ShouldGhostMove(Ghost ghost)
+        public bool ShouldGhostMove(int gameLevel, string ghostName, GhostStatus ghostStatus)
         {
-            if (!_ghostsLastMoves.TryGetValue(ghost.Name, out var ghostLastMoved))
+            if (!_ghostsLastMoves.TryGetValue(ghostName, out var ghostLastMoved))
             {
                 ghostLastMoved = _internalClock;
-                _ghostsLastMoves[ghost.Name] = ghostLastMoved;
+                _ghostsLastMoves[ghostName] = ghostLastMoved;
                 return true;
             }
 
-            var movingAtFullSpeed = PercentageToTime(75);
-            var movingAtFrightenedSpeed = PercentageToTime(50);
-
-            if (ghost.Edible)
+            int GetPercentageFrightened()
             {
+                if (gameLevel == 1) return 50;
+                if (gameLevel < 5) return 55;
+                return 60;
+            }
+
+            if (ghostStatus == GhostStatus.Edible || ghostStatus == GhostStatus.Flash)
+            {
+                var movingAtFrightenedSpeed = PercentageToTime(GetPercentageFrightened());
+
                 if ((ghostLastMoved + movingAtFrightenedSpeed) <= _internalClock)
                 {
-                    _ghostsLastMoves[ghost.Name] = ghostLastMoved + movingAtFrightenedSpeed;
+                    _ghostsLastMoves[ghostName] = ghostLastMoved + movingAtFrightenedSpeed;
                     return true;
                 }
             }
             else
             {
+                var movingAtFullSpeed = PercentageToTime(75);
+
                 if ((ghostLastMoved + movingAtFullSpeed) <= _internalClock)
                 {
-                    _ghostsLastMoves[ghost.Name] = ghostLastMoved + movingAtFullSpeed;
+                    _ghostsLastMoves[ghostName] = ghostLastMoved + movingAtFullSpeed;
                     return true;
                 }
             }
