@@ -38,35 +38,18 @@ namespace NPacMan.Game
                 return 95;
             }
 
-            if (ghostStatus == GhostStatus.RunningHome)
+            var speed = ghostStatus switch
             {
-                var movingAtRunningSpeed = PercentageToTime(160);
+                GhostStatus.RunningHome => PercentageToTime(160),
+                GhostStatus.Edible => PercentageToTime(GetPercentageFrightened()),
+                GhostStatus.Flash => PercentageToTime(GetPercentageFrightened()),
+                _ => PercentageToTime(GetPercentageAlive())
+            };
 
-                if ((ghostLastMoved + movingAtRunningSpeed) <= _internalClock)
-                {
-                    _ghostsLastMoves[ghostName] = ghostLastMoved + movingAtRunningSpeed;
-                    return true;
-                }
-            } 
-            else if (ghostStatus == GhostStatus.Edible || ghostStatus == GhostStatus.Flash)
+            if ((ghostLastMoved + speed) <= _internalClock)
             {
-                var movingAtFrightenedSpeed = PercentageToTime(GetPercentageFrightened());
-
-                if ((ghostLastMoved + movingAtFrightenedSpeed) <= _internalClock)
-                {
-                    _ghostsLastMoves[ghostName] = ghostLastMoved + movingAtFrightenedSpeed;
-                    return true;
-                }
-            }
-            else
-            {
-                var movingAtFullSpeed = PercentageToTime(GetPercentageAlive());
-
-                if ((ghostLastMoved + movingAtFullSpeed) <= _internalClock)
-                {
-                    _ghostsLastMoves[ghostName] = ghostLastMoved + movingAtFullSpeed;
-                    return true;
-                }
+                _ghostsLastMoves[ghostName] = ghostLastMoved + speed;
+                return true;
             }
 
             return false;
