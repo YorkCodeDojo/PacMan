@@ -35,10 +35,11 @@ namespace NPacMan.Game.Tests
             var board = @" XXX 
  X.X 
  XX. 
-T*▲*T
+P*▲*P
  --- 
  HHH 
-  F  ";
+  F 
+ TTT ";
             var gameBoard = GameSettingsLoader.Load(board);
 
             gameBoard.Should().BeEquivalentTo(new
@@ -49,12 +50,13 @@ T*▲*T
                 Doors = new CellLocation[] { new CellLocation(0, 4), new CellLocation(1, 4), new CellLocation(2, 4) },
                 GhostHouse = new CellLocation[] { new CellLocation(0, 5), new CellLocation(1, 5), new CellLocation(2, 5) },
                 Width = 3,
-                Height = 7,
+                Height = 8,
                 Fruit = new CellLocation(1, 6),
                 Portals = new Dictionary<CellLocation, CellLocation>
                 {
                     {(-1,3), (3,3) },{(3,3), (-1,3) }
-                }
+                },
+                Tunnels = new [] {new CellLocation(0, 7), new CellLocation(1, 7), new CellLocation(2, 7)  }
             });
 
         }
@@ -147,8 +149,8 @@ T*▲*T
         public void ShouldHaveGhostsWithCorrectScatterTargetLocations()
         {
             var board = @" XXF 
- BIP 
- ▲XC 
+     
+ ▲X  
  ....
 {""type"": ""Ghost"", ""name"": ""Pinky"", ""startingLocation"": {""x"":16,""y"":14}, ""scatterTarget"": {""x"":2, ""y"":3}, ""pillsToLeave"": 0 }
 {""type"": ""Ghost"", ""name"": ""Blinky"", ""startingLocation"": {""x"":13,""y"":11}, ""scatterTarget"": {""x"":-10, ""y"":-3}, ""pillsToLeave"": 0 }

@@ -11,6 +11,7 @@ namespace NPacMan.Game
         IReadOnlyCollection<CellLocation> Coins { get; }
         IReadOnlyCollection<CellLocation> PowerPills { get; }
         IReadOnlyDictionary<CellLocation, CellLocation> Portals { get; }
+        IReadOnlyCollection<CellLocation> Tunnels { get; }
         int Width { get; }
         int Height { get; }
         IReadOnlyCollection<Ghost> Ghosts { get; }

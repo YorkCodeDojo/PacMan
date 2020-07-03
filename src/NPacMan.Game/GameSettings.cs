@@ -12,6 +12,7 @@ namespace NPacMan.Game
             IReadOnlyCollection<CellLocation> coins,
             IReadOnlyCollection<CellLocation> powerPills,
             IReadOnlyDictionary<CellLocation, CellLocation> portals,
+            IReadOnlyCollection<CellLocation> tunnels,
             PacMan pacMan,
             IReadOnlyCollection<Ghost> ghosts,
             IReadOnlyCollection<CellLocation> doors,
@@ -21,6 +22,7 @@ namespace NPacMan.Game
             Width = width;
             Height = height;
             Portals = portals;
+            Tunnels = tunnels;
             PacMan = pacMan;
             Ghosts = ghosts;
             Walls = walls;
@@ -36,6 +38,7 @@ namespace NPacMan.Game
         public IReadOnlyCollection<CellLocation> Coins { get; }
         public IReadOnlyCollection<CellLocation> PowerPills { get; }
         public IReadOnlyDictionary<CellLocation, CellLocation> Portals { get; }
+        public IReadOnlyCollection<CellLocation> Tunnels { get; }
         public int Width { get; }
         public int Height { get; }
         public IReadOnlyCollection<Ghost> Ghosts { get; }

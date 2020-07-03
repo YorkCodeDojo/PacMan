@@ -75,6 +75,13 @@ namespace NPacMan.Game.Tests
 
         public IMoveClock MoveClock { get; internal set; } = new TestMoveClock();
 
+
+        public List<CellLocation> Tunnels { get; set; }
+            = new List<CellLocation>();
+
+        IReadOnlyCollection<CellLocation> IGameSettings.Tunnels
+            => this.Tunnels;
+
         private readonly AsciiTestSettingBuilder _builder;
 
         public TestGameSettings()
