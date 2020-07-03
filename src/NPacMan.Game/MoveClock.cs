@@ -141,6 +141,6 @@ namespace NPacMan.Game
             return false;
         }
 
-        private TimeSpan PercentageToTime(int percent) => TimeSpan.FromMilliseconds((int)(100 / (percent / 100f)));
+        private TimeSpan PercentageToTime(int percent) => TimeSpan.FromMilliseconds((int)(107 / (percent / 100f)));
     }
 }

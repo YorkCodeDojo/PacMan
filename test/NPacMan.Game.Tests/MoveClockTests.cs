@@ -26,7 +26,7 @@ namespace NPacMan.Game.Tests
                 yield return CreateTestData(level, PercentagesInMilliseconds.Percent100);
             }
 
-            for (var level = 21; level <= 256; level++)
+            for (var level = 21; level <= MoveClockTests.MaxLevel; level++)
             {
                 yield return CreateTestData(level, PercentagesInMilliseconds.Percent90);
             }
@@ -55,7 +55,7 @@ namespace NPacMan.Game.Tests
                 yield return CreateTestData(level, PercentagesInMilliseconds.Percent100);
             }
 
-            for (var level = 21; level <= 256; level++)
+            for (var level = 21; level <= MoveClockTests.MaxLevel; level++)
             {
                 yield return CreateTestData(level, PercentagesInMilliseconds.Percent95);
             }
@@ -80,7 +80,7 @@ namespace NPacMan.Game.Tests
                 yield return CreateTestData(level, PercentagesInMilliseconds.Percent55, GhostStatus.Flash);
             }
 
-            for (var level = 5; level <= 256; level++)
+            for (var level = 5; level <= MoveClockTests.MaxLevel; level++)
             {
                 yield return CreateTestData(level, PercentagesInMilliseconds.Percent60, GhostStatus.Edible);
                 yield return CreateTestData(level, PercentagesInMilliseconds.Percent60, GhostStatus.Flash);
@@ -104,7 +104,7 @@ namespace NPacMan.Game.Tests
                 yield return CreateTestData(level, PercentagesInMilliseconds.Percent85);
             }
 
-            for (var level = 5; level <= 256; level++)
+            for (var level = 5; level <= MoveClockTests.MaxLevel; level++)
             {
                 yield return CreateTestData(level, PercentagesInMilliseconds.Percent95);
             }
@@ -120,7 +120,7 @@ namespace NPacMan.Game.Tests
         }
         public IEnumerator<object[]> GetEnumerator()
         {
-            for (var level = 1; level <= 256; level++)
+            for (var level = 1; level <= MoveClockTests.MaxLevel; level++)
             {
                 yield return CreateTestData(level, PercentagesInMilliseconds.Percent160);
             }
@@ -142,7 +142,7 @@ namespace NPacMan.Game.Tests
             {
                 yield return (i, midMilliseconds);
             }
-            for (var i = elroyPoint; i < 150; i++)
+            for (var i = elroyPoint; i < MoveClockTests.MaxCoins; i++)
             {
                 yield return (i, upperMilliseconds);
             }
@@ -212,7 +212,7 @@ namespace NPacMan.Game.Tests
                 }
             }
 
-            for (var level = 19; level <= 256; level++)
+            for (var level = 19; level <= MoveClockTests.MaxLevel; level++)
             {
                 foreach (var (coinsLeft, milliseconds) in CreateCoins(120, PercentagesInMilliseconds.Percent105, PercentagesInMilliseconds.Percent100, PercentagesInMilliseconds.Percent95))
                 {
@@ -227,21 +227,24 @@ namespace NPacMan.Game.Tests
     public static class PercentagesInMilliseconds
     {
         // Percent => Milliseconds : m = 100 (should be 107) / (p / 100)
-        public const int Percent50 = 200; // 214
-        public const int Percent55 = 181; // 194
-        public const int Percent60 = 166; // 178
-        public const int Percent75 = 133; // 142
-        public const int Percent80 = 125; // 133
-        public const int Percent85 = 117; // 125
-        public const int Percent90 = 111; // 118
-        public const int Percent95 = 105; // 112
-        public const int Percent100 = 100; // 107
-        public const int Percent105 = 95; // 101
-        public const int Percent160 = 62; // 66
+        public const int Percent50 = 214; // 214
+        public const int Percent55 = 194; // 194
+        public const int Percent60 = 178; // 178
+        public const int Percent75 = 142; // 142
+        public const int Percent80 = 133; // 133
+        public const int Percent85 = 125; // 125
+        public const int Percent90 = 118; // 118
+        public const int Percent95 = 112; // 112
+        public const int Percent100 = 107; // 107
+        public const int Percent105 = 101; // 101
+        public const int Percent160 = 66; // 66
     }
 
     public class MoveClockTests
     {
+        public const int MaxLevel = 25;
+        public const int MaxCoins = 150;
+
         [Theory]
         [ClassData(typeof(PacMPacManShouldTravelAtDifferentSpeedsForDifferentLevelsWhenNotFrightenedTestData))]
         public void PacManShouldTravelAtDifferentSpeedsForDifferentLevelsWhenNotFrightened(int level, int moveSpeedMilliseconds)
