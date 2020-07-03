@@ -128,6 +128,91 @@ namespace NPacMan.Game.Tests
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 
+    public class BlinkyShouldTravelAtDifferentSpeedsDuringCruiseElroyTestData : IEnumerable<object[]>
+    {
+        private IEnumerable<(int coinsLeft, int milliseconds)> CreateCoins(
+            int elroyPoint, int lowerMilliseconds, int midMilliseconds, int upperMilliseconds)
+        {
+            var halfElroyPoint = elroyPoint / 2;
+            for (var i = 1; i <= halfElroyPoint; i++)
+            {
+                yield return (i, lowerMilliseconds);
+            }
+            for (var i = halfElroyPoint + 1; i < elroyPoint; i++)
+            {
+                yield return (i, midMilliseconds);
+            }
+            for (var i = elroyPoint; i < 150; i++)
+            {
+                yield return (i, upperMilliseconds);
+            }
+        }
+        private object[] CreateTestData(int level, int coinsLeft, int milliseconds)
+        {
+            return new object[] { level, coinsLeft, milliseconds };
+        }
+
+        public IEnumerator<object[]> GetEnumerator()
+        {
+            // Level 1
+            foreach (var (coinsLeft, milliseconds) in CreateCoins(20, PercentagesInMilliseconds.Percent85, PercentagesInMilliseconds.Percent80, PercentagesInMilliseconds.Percent75))
+            {
+                yield return CreateTestData(1, coinsLeft, milliseconds);
+            }
+
+            // Level 2
+            foreach (var (coinsLeft, milliseconds) in CreateCoins(30, PercentagesInMilliseconds.Percent95, PercentagesInMilliseconds.Percent90, PercentagesInMilliseconds.Percent85))
+            {
+                yield return CreateTestData(2, coinsLeft, milliseconds);
+            }
+
+
+            // for (var level = 3; level <= 4; level++)
+            // {
+            //     yield return CreateTestData(level, PercentagesInMilliseconds.Percent160);
+            // }
+
+            // yield return CreateTestData(5, PercentagesInMilliseconds.Percent160);
+
+            // for (var level = 6; level <= 8; level++)
+            // {
+            //     yield return CreateTestData(level, PercentagesInMilliseconds.Percent160);
+            // }
+
+            // for (var level = 9; level <= 11; level++)
+            // {
+            //     yield return CreateTestData(level, PercentagesInMilliseconds.Percent160);
+            // }
+
+            // for (var level = 12; level <= 14; level++)
+            // {
+            //     yield return CreateTestData(level, PercentagesInMilliseconds.Percent160);
+            // }
+
+            // for (var level = 15; level <= 18; level++)
+            // {
+            //     yield return CreateTestData(level, PercentagesInMilliseconds.Percent160);
+            // }
+
+            // for (var level = 19; level <= 256; level++)
+            // {
+            //     yield return CreateTestData(level, PercentagesInMilliseconds.Percent160);
+            // }
+
+        }
+        /*
+                [InlineData(1, 20, PercentagesInMilliseconds.Percent75)]
+        [InlineData(1, 19, PercentagesInMilliseconds.Percent80)]
+        [InlineData(1, 11, PercentagesInMilliseconds.Percent80)]
+        [InlineData(1, 10, PercentagesInMilliseconds.Percent85)]
+
+        [InlineData(2, 30, PercentagesInMilliseconds.Percent85)]
+        [InlineData(2, 29, PercentagesInMilliseconds.Percent90)]
+        [InlineData(2, 16, PercentagesInMilliseconds.Percent90)]
+        [InlineData(2, 15, PercentagesInMilliseconds.Percent95)]*/
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    }
+
     public static class PercentagesInMilliseconds
     {
         // Percent => Milliseconds : m = 100 (should be 107) / (p / 100)
@@ -193,16 +278,6 @@ namespace NPacMan.Game.Tests
         }
 
         [Theory]
-        [InlineData(1, 20, PercentagesInMilliseconds.Percent75)]
-        [InlineData(1, 19, PercentagesInMilliseconds.Percent80)]
-        [InlineData(1, 11, PercentagesInMilliseconds.Percent80)]
-        [InlineData(1, 10, PercentagesInMilliseconds.Percent85)]
-
-        [InlineData(2, 30, PercentagesInMilliseconds.Percent85)]
-        [InlineData(2, 29, PercentagesInMilliseconds.Percent90)]
-        [InlineData(2, 16, PercentagesInMilliseconds.Percent90)]
-        [InlineData(2, 15, PercentagesInMilliseconds.Percent95)]
-
         // [InlineData(4, 20, PercentagesInMilliseconds.Percent85)]
         // [InlineData(4, 19, PercentagesInMilliseconds.Percent90)]
         // [InlineData(4, 11, PercentagesInMilliseconds.Percent90)]
@@ -214,6 +289,7 @@ namespace NPacMan.Game.Tests
         // [InlineData(5, 10, PercentagesInMilliseconds.Percent105)]
         //[InlineData(4, PercentagesInMilliseconds.Percent160)]
         //[InlineData(5, PercentagesInMilliseconds.Percent160)]
+        [ClassData(typeof(BlinkyShouldTravelAtDifferentSpeedsDuringCruiseElroyTestData))]
         public void BlinkyShouldTravelAtDifferentSpeedsDuringCruiseElroy(int level, int coinsLeft, int moveSpeedMilliseconds)
         {
             var ghostName = GhostNames.Blinky;
