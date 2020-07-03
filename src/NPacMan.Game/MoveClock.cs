@@ -31,6 +31,13 @@ namespace NPacMan.Game
                 return 60;
             }
 
+            int GetPercentageAlive()
+            {
+                if (gameLevel == 1) return 75;
+                if (gameLevel < 5) return 85;
+                return 95;
+            }
+
             if (ghostStatus == GhostStatus.Edible || ghostStatus == GhostStatus.Flash)
             {
                 var movingAtFrightenedSpeed = PercentageToTime(GetPercentageFrightened());
@@ -43,7 +50,7 @@ namespace NPacMan.Game
             }
             else
             {
-                var movingAtFullSpeed = PercentageToTime(75);
+                var movingAtFullSpeed = PercentageToTime(GetPercentageAlive());
 
                 if ((ghostLastMoved + movingAtFullSpeed) <= _internalClock)
                 {

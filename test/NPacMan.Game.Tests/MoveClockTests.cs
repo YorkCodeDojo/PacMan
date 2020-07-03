@@ -83,13 +83,12 @@ namespace NPacMan.Game.Tests
         [InlineData(5, 166, GhostStatus.Flash)]  //  60%
         public void GhostShouldTravelAtDifferentSpeedsForDifferentLevelsWhenFrightened(int level, int moveSpeedMilliseconds, GhostStatus ghostStatus)
         {
-            var level2 = level;
             var moveClock = new MoveClock();
             var ghostName = "ghost1";
             moveClock.UpdateTime(TimeSpan.FromMinutes(1));
             if(!moveClock.ShouldGhostMove(level, ghostName, ghostStatus))
             {
-                throw new Exception("PacMan Should always move on first move");
+                throw new Exception("Ghost Should always move on first move");
             }
 
             for (var j =0; j < 3; j++)
@@ -99,7 +98,7 @@ namespace NPacMan.Game.Tests
                     moveClock.UpdateTime(TimeSpan.FromMilliseconds(1));
                     if(moveClock.ShouldGhostMove(level, ghostName, ghostStatus))
                     {
-                        throw new Exception($"PacMan moved early after just {i} milliseconds");
+                        throw new Exception($"Ghost moved early after just {i} milliseconds");
                     }
                 }
 
@@ -107,6 +106,38 @@ namespace NPacMan.Game.Tests
 
                 moveClock.ShouldGhostMove(level, ghostName, ghostStatus).Should().BeTrue();
                 moveClock.ShouldGhostMove(level, ghostName, ghostStatus).Should().BeFalse();
+            }
+        }
+
+        [Theory]
+        [InlineData(1, 133)]  //  75%
+        [InlineData(4, 117)]  //  85%
+        [InlineData(5, 105)]  //  95%
+        public void GhostShouldTravelAtDifferentSpeedsForDifferentLevelsWhenAlive(int level, int moveSpeedMilliseconds)
+        {
+            var moveClock = new MoveClock();
+            var ghostName = "ghost1";
+            moveClock.UpdateTime(TimeSpan.FromMinutes(1));
+            if(!moveClock.ShouldGhostMove(level, ghostName, GhostStatus.Alive))
+            {
+                throw new Exception("Ghost Should always move on first move");
+            }
+
+            for (var j =0; j < 3; j++)
+            {
+                for (var i = 0; i < moveSpeedMilliseconds-1; i++)
+                {
+                    moveClock.UpdateTime(TimeSpan.FromMilliseconds(1));
+                    if(moveClock.ShouldGhostMove(level, ghostName, GhostStatus.Alive))
+                    {
+                        throw new Exception($"Ghost moved early after just {i} milliseconds");
+                    }
+                }
+
+                moveClock.UpdateTime(TimeSpan.FromMilliseconds(1));
+
+                moveClock.ShouldGhostMove(level, ghostName, GhostStatus.Alive).Should().BeTrue();
+                moveClock.ShouldGhostMove(level, ghostName, GhostStatus.Alive).Should().BeFalse();
             }
         }
     }
