@@ -52,8 +52,6 @@ namespace NPacMan.Game
 
         public int ChaseTimeInSeconds { get; } = 20;
 
-        public int FrightenedTimeInSeconds { get; } = 7;
-
         public IReadOnlyCollection<int> FruitAppearsAfterCoinsEaten {get;}= new []{
             70, 170
         };

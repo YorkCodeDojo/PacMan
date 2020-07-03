@@ -169,12 +169,12 @@ namespace NPacMan.Game.Tests
 
             EnsureGameStatus(GameStatus.AttractMode);
         }
-
+        public const int LevelOneFrightenedTimeInSeconds = 6;
         internal async Task WaitForFrightenedTimeToComplete()
         {
             WriteHeading("WaitForFrightenedTimeToComplete");
 
-            _now = _now.AddSeconds(_gameSettings.FrightenedTimeInSeconds + 1);
+            _now = _now.AddSeconds(LevelOneFrightenedTimeInSeconds + 1);
 
             await _gameClock.Tick(_now);
 
@@ -474,7 +474,7 @@ namespace NPacMan.Game.Tests
 
         internal async Task WaitForGhostFlash()
         {
-            var delay = TimeSpan.FromSeconds(_gameSettings.FrightenedTimeInSeconds - _gameSettings.FrightenedFlashTimeInSeconds);
+            var delay = TimeSpan.FromSeconds(LevelOneFrightenedTimeInSeconds - _gameSettings.FrightenedFlashTimeInSeconds);
 
             WriteHeading("WaitForGhostFlash");
 

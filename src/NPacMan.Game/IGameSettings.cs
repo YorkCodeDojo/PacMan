@@ -24,7 +24,6 @@ namespace NPacMan.Game
 
         int ChaseTimeInSeconds { get; }
 
-        int FrightenedTimeInSeconds { get; }
         IHighScoreStorage HighScoreStorage { get; }
         IReadOnlyCollection<int> FruitAppearsAfterCoinsEaten { get; }
         int FruitVisibleForSeconds { get; }

@@ -74,7 +74,7 @@ namespace NPacMan.Game
                     .IfElse(context => context.Instance.IsLevelComplete(), 
                             binder => binder.TransitionTo(ChangingLevel),
                         binder =>
-                            binder.Then(context => context.Instance.ChangeStateIn(settings.FrightenedTimeInSeconds))
+                            binder.Then(context => actions.StartFrightened(context.Instance))
                                 .TransitionTo(Frightened));
             
             During(Scatter, GhostChase, Frightened,

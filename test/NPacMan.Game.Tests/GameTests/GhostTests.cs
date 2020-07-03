@@ -4,6 +4,7 @@ using NPacMan.Game.GhostStrategies;
 using NPacMan.Game.Tests.GhostStrategiesForTests;
 using NPacMan.Game.Tests.Helpers;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
@@ -267,22 +268,70 @@ namespace NPacMan.Game.Tests.GameTests
             });
         }
 
-        [Theory]
-        [InlineData(5)]
-        [InlineData(7)]
-        [InlineData(10)]
-        public async Task AllGhostsShouldReturnToNonEdibleAfterGivenAmountOfSeconds(int seconds)
+        public static IEnumerable<object[]> GetAllGhostsShouldReturnToNonEdibleAfterGivenAmountOfSecondsTestData()
         {
-            _gameSettings.FrightenedTimeInSeconds = seconds;
+            object[] CreateTestData(int level, int seconds)
+            {
+                return new object[]{level, seconds};
+            }
+
+            yield return CreateTestData(1, 6);
+            yield return CreateTestData(2, 5);
+            yield return CreateTestData(3, 4);
+            yield return CreateTestData(4, 3);
+            yield return CreateTestData(5, 2);
+            yield return CreateTestData(6, 5);
+            yield return CreateTestData(7, 2);
+            yield return CreateTestData(8, 2);
+            yield return CreateTestData(9, 1);
+            yield return CreateTestData(10, 5);
+            yield return CreateTestData(11, 2);
+            yield return CreateTestData(12, 1);
+            yield return CreateTestData(13, 1);
+            yield return CreateTestData(14, 3);
+            yield return CreateTestData(15, 1);
+            yield return CreateTestData(16, 1);
+            yield return CreateTestData(17, 0);
+            yield return CreateTestData(18, 1);
+
+            for(var i = 19; i <= 25; i++)
+            {
+                yield return CreateTestData(i, 0);
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(GetAllGhostsShouldReturnToNonEdibleAfterGivenAmountOfSecondsTestData))]
+        public async Task AllGhostsShouldReturnToNonEdibleAfterGivenAmountOfSeconds(int level, int seconds)
+        {
             var ghosts = GhostBuilder.New()
                 .WithLocation(_gameSettings.PacMan.Location.FarAway())
                 .CreateMany(3);
             _gameSettings.Ghosts.AddRange(ghosts);
 
+            _gameSettings.PowerPills.Clear();
             _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Right);
+            _gameSettings.PowerPills.Add(_gameSettings.PacMan.Location.Right.Right.Right);
 
             var gameHarness = new GameHarness(_gameSettings);
             await gameHarness.PlayGame();
+
+            // Complete previous levels
+            
+            for ( var currentLevel = 1; currentLevel < level; currentLevel ++)
+            {
+                await gameHarness.ChangeDirection(Direction.Right);
+
+                await gameHarness.EatPill();
+
+                await gameHarness.Move();
+
+                await gameHarness.EatPill();
+
+                await gameHarness.WaitForEndOfLevelFlashingToComplete();
+            }
+
+            // Actual level to test
 
             await gameHarness.ChangeDirection(Direction.Right);
 
@@ -304,13 +353,9 @@ namespace NPacMan.Game.Tests.GameTests
             });
         }
 
-        [Theory]
-        [InlineData(5)]
-        [InlineData(7)]
-        [InlineData(10)]
-        public async Task GhostShouldReturnToNonEdibleAfterGivenAmountSecondsWhenEatingSecondPowerPills(int seconds)
+        [Fact]
+        public async Task GhostShouldReturnToNonEdibleAfterGivenAmountSecondsWhenEatingSecondPowerPills()
         {
-            _gameSettings.FrightenedTimeInSeconds = seconds;
             var ghosts = GhostBuilder.New()
                 .WithLocation(_gameSettings.PacMan.Location.FarAway())
                 .CreateMany(3);
@@ -331,7 +376,7 @@ namespace NPacMan.Game.Tests.GameTests
             if (!gameHarness.Game.Ghosts.Values.All(g => g.Edible))
                 throw new Exception("All ghosts are meant to be edible.");
 
-            await gameHarness.WaitFor(TimeSpan.FromSeconds(seconds).Subtract(TimeSpan.FromMilliseconds(100)));
+            await gameHarness.WaitFor(TimeSpan.FromSeconds(GameHarness.LevelOneFrightenedTimeInSeconds).Subtract(TimeSpan.FromMilliseconds(100)));
 
             if (!gameHarness.Game.Ghosts.Values.All(g => g.Edible))
                 throw new Exception("All ghosts are meant to be edible.");

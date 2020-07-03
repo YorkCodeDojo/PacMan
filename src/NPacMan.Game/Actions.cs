@@ -111,6 +111,14 @@ namespace NPacMan.Game
             _gameNotifications.Publish(GameNotification.EatCoin);
         }
 
+            
+        private readonly static int[] FrightenedTimesInSeconds = new int[] {6, 5, 4, 3, 2, 5, 2, 2, 1, 5, 2, 1, 1, 3, 1, 1, 0, 1, 0};
+        internal void StartFrightened(GameState instance)
+        {
+            var frightenedTimeInSeconds = FrightenedTimesInSeconds[Math.Min(instance.Level -1, FrightenedTimesInSeconds.Length -1)];
+            instance.ChangeStateIn(frightenedTimeInSeconds);
+        }
+
         internal void PowerPillEaten(GameState gameState, CellLocation powerPillLocation)
         {
             IncreaseScoreAndCheckForBonusLife(gameState, 50);
