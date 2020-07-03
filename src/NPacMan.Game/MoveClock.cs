@@ -15,7 +15,7 @@ namespace NPacMan.Game
             _internalClock = _internalClock.Add(deltaTime);
         }
 
-        public bool ShouldGhostMove(int gameLevel, int coinsRemaining, string ghostName, GhostStatus ghostStatus)
+        public bool ShouldGhostMove(int gameLevel, int coinsRemaining, string ghostName, GhostStatus ghostStatus, bool inTunnel)
         {
             if (!_ghostsLastMoves.TryGetValue(ghostName, out var ghostLastMoved))
             {
@@ -36,6 +36,12 @@ namespace NPacMan.Game
                 if (gameLevel == 1) return 75;
                 if (gameLevel < 5) return 85;
                 return 95;
+            }
+            int GetPercentageInTunnel()
+            {
+                if (gameLevel == 1) return 40;
+                if (gameLevel < 5) return 45;
+                return 50;
             }
 
             int GetPercentageCruiseElroy()
@@ -91,12 +97,13 @@ namespace NPacMan.Game
                 return GetPercentageAlive();
             }
 
-            var speed = (ghostStatus, ghostName) switch
+            var speed = (inTunnel, ghostStatus, ghostName) switch
             {
-                (GhostStatus.RunningHome, _) => PercentageToTime(160),
-                (GhostStatus.Edible, _) => PercentageToTime(GetPercentageFrightened()),
-                (GhostStatus.Flash, _) => PercentageToTime(GetPercentageFrightened()),
-                (_, GhostNames.Blinky) => PercentageToTime(GetPercentageCruiseElroy()),
+                (true, _, _) => PercentageToTime(GetPercentageInTunnel()),
+                (_, GhostStatus.RunningHome, _) => PercentageToTime(160),
+                (_, GhostStatus.Edible, _) => PercentageToTime(GetPercentageFrightened()),
+                (_, GhostStatus.Flash, _) => PercentageToTime(GetPercentageFrightened()),
+                (_, _, GhostNames.Blinky) => PercentageToTime(GetPercentageCruiseElroy()),
                 _ => PercentageToTime(GetPercentageAlive())
             };
 

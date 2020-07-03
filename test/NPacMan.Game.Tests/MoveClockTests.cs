@@ -2,6 +2,7 @@ using FluentAssertions;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace NPacMan.Game.Tests
@@ -112,6 +113,38 @@ namespace NPacMan.Game.Tests
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 
+    public class GhostShouldTravelAtDifferentSpeedsWhenInTheTunnelTestData : IEnumerable<object[]>
+    {
+        private IEnumerable<object[]> GetDataForStatus(GhostStatus status)
+        {
+            yield return CreateTestData(1, PercentagesInMilliseconds.Percent40, status);
+
+            for (var level = 2; level <= 4; level++)
+            {
+                yield return CreateTestData(level, PercentagesInMilliseconds.Percent45, status);
+            }
+
+            for (var level = 5; level <= MoveClockTests.MaxLevel; level++)
+            {
+                yield return CreateTestData(level, PercentagesInMilliseconds.Percent50, status);
+            }
+        }
+        private object[] CreateTestData(int level, int milliseconds, GhostStatus status)
+        {
+            return new object[] { level, milliseconds, status };
+        }
+        public IEnumerator<object[]> GetEnumerator()
+        {
+            foreach (var status in Enum.GetValues(typeof(GhostStatus)).Cast<GhostStatus>())
+            {
+                foreach (var testData in GetDataForStatus(status))
+                {
+                    yield return testData;
+                }
+            }
+        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    }
     public class GhostShouldTravelAtDifferentSpeedsForDifferentLevelsWhenRunningHomeTestData : IEnumerable<object[]>
     {
         private object[] CreateTestData(int level, int milliseconds)
@@ -226,7 +259,10 @@ namespace NPacMan.Game.Tests
 
     public static class PercentagesInMilliseconds
     {
-        // Percent => Milliseconds : m = 100 (should be 107) / (p / 100)
+        // Percent => Milliseconds : m = 107 / (p / 100)
+        // 107 is 1000/60 (FPS) * 8 as we move one cell (8 pixels) at a time
+        public const int Percent40 = 267;
+        public const int Percent45 = 237;
         public const int Percent50 = 214; // 214
         public const int Percent55 = 194; // 194
         public const int Percent60 = 178; // 178
@@ -268,7 +304,7 @@ namespace NPacMan.Game.Tests
             var ghostName = Guid.NewGuid().ToString();
 
             TestMoveClock(moveSpeedMilliseconds,
-                   moveClock => moveClock.ShouldGhostMove(level, coinsRemaining: int.MaxValue, ghostName, ghostStatus));
+                   moveClock => moveClock.ShouldGhostMove(level, coinsRemaining: int.MaxValue, ghostName, ghostStatus, false));
         }
 
         [Theory]
@@ -278,7 +314,7 @@ namespace NPacMan.Game.Tests
             var ghostName = Guid.NewGuid().ToString();
 
             TestMoveClock(moveSpeedMilliseconds,
-                   moveClock => moveClock.ShouldGhostMove(level, coinsRemaining: int.MaxValue, ghostName, GhostStatus.Alive));
+                   moveClock => moveClock.ShouldGhostMove(level, coinsRemaining: int.MaxValue, ghostName, GhostStatus.Alive, false));
         }
 
         [Theory]
@@ -288,27 +324,26 @@ namespace NPacMan.Game.Tests
             var ghostName = Guid.NewGuid().ToString();
 
             TestMoveClock(moveSpeedMilliseconds,
-                   moveClock => moveClock.ShouldGhostMove(level, coinsRemaining: int.MaxValue, ghostName, GhostStatus.RunningHome));
+                   moveClock => moveClock.ShouldGhostMove(level, coinsRemaining: int.MaxValue, ghostName, GhostStatus.RunningHome, false));
         }
 
         [Theory]
-        // [InlineData(4, 20, PercentagesInMilliseconds.Percent85)]
-        // [InlineData(4, 19, PercentagesInMilliseconds.Percent90)]
-        // [InlineData(4, 11, PercentagesInMilliseconds.Percent90)]
-        // [InlineData(4, 10, PercentagesInMilliseconds.Percent95)]
-
-        // [InlineData(5, 20, PercentagesInMilliseconds.Percent95)]
-        // [InlineData(5, 19, PercentagesInMilliseconds.Percent100)]
-        // [InlineData(5, 11, PercentagesInMilliseconds.Percent100)]
-        // [InlineData(5, 10, PercentagesInMilliseconds.Percent105)]
-        //[InlineData(4, PercentagesInMilliseconds.Percent160)]
-        //[InlineData(5, PercentagesInMilliseconds.Percent160)]
         [ClassData(typeof(BlinkyShouldTravelAtDifferentSpeedsDuringCruiseElroyTestData))]
         public void BlinkyShouldTravelAtDifferentSpeedsDuringCruiseElroy(int level, int coinsLeft, int moveSpeedMilliseconds)
         {
             var ghostName = GhostNames.Blinky;
             TestMoveClock(moveSpeedMilliseconds,
-                   moveClock => moveClock.ShouldGhostMove(level, coinsLeft, ghostName, GhostStatus.Alive));
+                   moveClock => moveClock.ShouldGhostMove(level, coinsLeft, ghostName, GhostStatus.Alive, false));
+        }
+
+        [Theory]
+        [ClassData(typeof(GhostShouldTravelAtDifferentSpeedsWhenInTheTunnelTestData))]
+        public void GhostShouldTravelAtDifferentSpeedsWhenInTheTunnel(int level, int moveSpeedMilliseconds, GhostStatus ghostStatus)
+        {
+            var ghostName = Guid.NewGuid().ToString();
+
+            TestMoveClock(moveSpeedMilliseconds,
+                   moveClock => moveClock.ShouldGhostMove(level, coinsRemaining: int.MaxValue, ghostName, ghostStatus,inTunnel: true));
         }
 
         private void TestMoveClock(int moveSpeedMilliseconds, Func<MoveClock, bool> action)

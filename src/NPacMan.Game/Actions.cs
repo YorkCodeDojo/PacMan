@@ -226,7 +226,8 @@ namespace NPacMan.Game
         {
             var coinsRemaining = game.Coins.Count;
 
-            var ghostsToMove = game.Ghosts.Values.Where(ghost => _gameSettings.MoveClock.ShouldGhostMove(game.Level, coinsRemaining, ghost.Name, ghost.Status));
+            var ghostsToMove = game.Ghosts.Values.Where(ghost
+                     => _gameSettings.MoveClock.ShouldGhostMove(game.Level, coinsRemaining, ghost.Name, ghost.Status, inTunnel: _gameSettings.Tunnels.Contains(ghost.Location)));
                                 
             gameState.ApplyToGhosts(ghost => ghost.Move(game, gameState), ghostsToMove);
 
