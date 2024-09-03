@@ -30,7 +30,7 @@ jobs:
         ref: 'refs/heads/gh-pages'
         path: 'blazor/wwwroot'
     - name: Download blazor site
-      uses: actions/download-artifact@v1
+      uses: actions/download-artifact@v4.1.7
       with:
         name: blazor
         path: ./blazor
